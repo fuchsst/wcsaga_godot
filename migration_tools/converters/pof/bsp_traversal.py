@@ -77,12 +77,11 @@ def make_bounding_box(polygons: List[BSPPolygon]) -> Tuple[Vector3D, Vector3D]:
     if not polygons:
         return Vector3D(), Vector3D()
         
-    min_point = Vector3D(float('inf'), float('inf'), float('inf'))
-    max_point = Vector3D(float('-inf'), float('-inf'), float('-inf'))
+    min_point = polygons[0].vertices[0].position
+    max_point = polygons[0].vertices[0].position
     
     for poly in polygons:
         for vert in poly.vertices:
-            # Expand bounds
             min_point.x = min(min_point.x, vert.position.x)
             min_point.y = min(min_point.y, vert.position.y)
             min_point.z = min(min_point.z, vert.position.z)
@@ -242,10 +241,12 @@ def choose_split_plane(polygons: List[BSPPolygon], node: BSPNode) -> bool:
     # Get bounds of polygon centers
     centers = [calculate_polygon_center(p) for p in polygons]
     
-    center_min = Vector3D(float('inf'), float('inf'), float('inf'))
-    center_max = Vector3D(float('-inf'), float('-inf'), float('-inf'))
+    # Initialize bounds with first center
+    center_min = centers[0]
+    center_max = centers[0]
     
-    for center in centers:
+    # Expand bounds with remaining centers
+    for center in centers[1:]:
         center_min.x = min(center_min.x, center.x)
         center_min.y = min(center_min.y, center.y)
         center_min.z = min(center_min.z, center.z)
@@ -259,6 +260,7 @@ def choose_split_plane(polygons: List[BSPPolygon], node: BSPNode) -> bool:
     dy = abs(center_max.y - center_min.y)
     dz = abs(center_max.z - center_min.z)
     
+    # Choose split plane based on longest axis
     if dx >= dy and dx >= dz:
         node.plane_normal = Vector3D(1, 0, 0)
         node.plane_point = Vector3D((center_min.x + center_max.x) / 2, 0, 0)
@@ -271,18 +273,17 @@ def choose_split_plane(polygons: List[BSPPolygon], node: BSPNode) -> bool:
         
     return True
 
-def extract_bsp_geometry(bsp_data: bytes) -> BSPGeometry:
+def extract_bsp_geometry(reader: BinaryReader) -> BSPGeometry:
     """
     Extract geometry from BSP data.
     
     Args:
-        bsp_data: Raw BSP chunk data
+        reader: Binary reader positioned at start of BSP data
         
     Returns:
         Extracted geometry
     """
     geometry = BSPGeometry()
-    reader = BinaryReader(bsp_data)
     
     # First block should be vertex definitions
     header = BSPBlockHeader()
@@ -293,7 +294,7 @@ def extract_bsp_geometry(bsp_data: bytes) -> BSPGeometry:
         defpoints.read(reader, header)
         
         # Store vertices and normals
-        for i, vdata in enumerate(defpoints.vertex_data):
+        for vdata in defpoints.vertex_data:
             vertex = BSPVertex(
                 position=vdata.vertex,
                 normal=vdata.norms[0] if vdata.norms else Vector3D(0, 0, 1)
@@ -322,8 +323,10 @@ def extract_bsp_geometry(bsp_data: bytes) -> BSPGeometry:
             
             # Add vertices
             for vert in poly.verts:
-                vertex = geometry.vertices[vert.vertnum]
-                vertex.normal = geometry.vertices[vert.normnum].normal
+                vertex = BSPVertex(
+                    position=geometry.vertices[vert.vertnum].position,
+                    normal=geometry.vertices[vert.normnum].normal
+                )
                 bsp_poly.vertices.append(vertex)
                 
             geometry.polygons.append(bsp_poly)

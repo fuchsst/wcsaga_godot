@@ -9,7 +9,7 @@ from typing import List, Dict, Optional, Tuple, BinaryIO
 import numpy as np
 from pygltflib import (
     GLTF2, Scene, Node, Mesh, Primitive, Buffer, BufferView, 
-    Accessor, Material, Asset, TextureInfo, NormalTextureInfo,
+    Accessor, Material, Asset, TextureInfo,
     ARRAY_BUFFER, ELEMENT_ARRAY_BUFFER, SCALAR, VEC2, VEC3, VEC4,
     FLOAT, UNSIGNED_INT, UNSIGNED_SHORT
 )
@@ -17,6 +17,7 @@ from pygltflib import (
 from .pof_file import POFFile, POFObject
 from .vector3d import Vector3D
 from .matrix3d import Matrix3D
+from .binary_data import BinaryReader
 from .bsp_traversal import (
     extract_bsp_geometry, triangulate_polygon,
     convert_coordinate_system, BSPVertex, BSPPolygon, BSPGeometry
@@ -152,8 +153,23 @@ class GltfConverter:
 
     def _convert_mesh(self, obj: POFObject) -> Mesh:
         """Convert POF object geometry to GLTF mesh."""
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        # Create binary reader for BSP data
+        reader = BinaryReader(obj.bsp_data)
+        
         # Extract geometry from BSP data
-        geometry = extract_bsp_geometry(obj.bsp_data)
+        try:
+            geometry = extract_bsp_geometry(reader)
+        except Exception as e:
+            logger.error(f"Failed to extract BSP geometry for object {obj.name}: {e}")
+            return Mesh(primitives=[])
+            
+        # Skip if no vertices or polygons
+        if not geometry.vertices or not geometry.polygons:
+            logger.warning(f"No geometry found in BSP data for object {obj.name}")
+            return Mesh(primitives=[])
         
         # Convert coordinate system
         for i, vertex in enumerate(geometry.vertices):
@@ -182,10 +198,24 @@ class GltfConverter:
         # Group polygons by material
         material_groups: Dict[int, List[List[int]]] = {}
         for poly, indices in zip(geometry.polygons, polygon_indices):
+            # Skip degenerate polygons
+            if len(indices) < 3:
+                logger.warning(f"Skipping degenerate polygon in object {obj.name}")
+                continue
+                
             material_id = poly.texture_id if poly.texture_id >= 0 else len(self.gltf.materials) - 1
             if material_id not in material_groups:
                 material_groups[material_id] = []
-            material_groups[material_id].extend(triangulate_polygon(indices))
+                
+            # Add triangulated indices
+            tri_indices = triangulate_polygon(indices)
+            if tri_indices:
+                material_groups[material_id].extend(tri_indices)
+            
+        # Skip if no valid material groups
+        if not material_groups:
+            logger.warning(f"No valid material groups found for object {obj.name}")
+            return Mesh(primitives=[])
             
         # Create primitives for each material group
         primitives = []
@@ -228,48 +258,71 @@ class GltfConverter:
         uvs = np.array(self.uv_data, dtype=np.float32)
         indices = np.array(self.index_data, dtype=np.uint32)
         
-        # Create buffer views
-        vertex_view = BufferView(
-            buffer=0,
-            byteOffset=0,
-            byteLength=vertices.nbytes,
-            target=ARRAY_BUFFER
-        )
-        self.gltf.bufferViews.append(vertex_view)
-        
-        normal_view = BufferView(
-            buffer=0,
-            byteOffset=vertex_view.byteLength,
-            byteLength=normals.nbytes,
-            target=ARRAY_BUFFER
-        )
-        self.gltf.bufferViews.append(normal_view)
-        
-        uv_view = BufferView(
-            buffer=0,
-            byteOffset=vertex_view.byteLength + normal_view.byteLength,
-            byteLength=uvs.nbytes,
-            target=ARRAY_BUFFER
-        )
-        self.gltf.bufferViews.append(uv_view)
-        
-        index_view = BufferView(
-            buffer=0,
-            byteOffset=vertex_view.byteLength + normal_view.byteLength + uv_view.byteLength,
-            byteLength=indices.nbytes,
-            target=ELEMENT_ARRAY_BUFFER
-        )
-        self.gltf.bufferViews.append(index_view)
+        # Create buffer views if we have data
+        if len(vertices) > 0:
+            vertex_view = BufferView(
+                buffer=0,
+                byteOffset=0,
+                byteLength=vertices.nbytes,
+                target=ARRAY_BUFFER
+            )
+            self.gltf.bufferViews.append(vertex_view)
+            
+            normal_view = BufferView(
+                buffer=0,
+                byteOffset=vertex_view.byteLength,
+                byteLength=normals.nbytes,
+                target=ARRAY_BUFFER
+            )
+            self.gltf.bufferViews.append(normal_view)
+            
+            uv_view = BufferView(
+                buffer=0,
+                byteOffset=vertex_view.byteLength + normal_view.byteLength,
+                byteLength=uvs.nbytes,
+                target=ARRAY_BUFFER
+            )
+            self.gltf.bufferViews.append(uv_view)
+            
+            index_view = BufferView(
+                buffer=0,
+                byteOffset=vertex_view.byteLength + normal_view.byteLength + uv_view.byteLength,
+                byteLength=indices.nbytes,
+                target=ELEMENT_ARRAY_BUFFER
+            )
+            self.gltf.bufferViews.append(index_view)
+        else:
+            # Add empty buffer views for empty mesh
+            for _ in range(4):  # Vertex, normal, UV, index views
+                empty_view = BufferView(
+                    buffer=0,
+                    byteOffset=0,
+                    byteLength=0,
+                    target=ARRAY_BUFFER
+                )
+                self.gltf.bufferViews.append(empty_view)
         
         # Create accessors
-        vertex_accessor = Accessor(
-            bufferView=0,
-            componentType=FLOAT,
-            count=len(vertices) // 3,
-            type=VEC3,
-            min=[float(x) for x in vertices.reshape(-1,3).min(axis=0)],
-            max=[float(x) for x in vertices.reshape(-1,3).max(axis=0)]
-        )
+        if len(vertices) > 0:
+            vertices_3d = vertices.reshape(-1, 3)
+            vertex_accessor = Accessor(
+                bufferView=0,
+                componentType=FLOAT,
+                count=len(vertices) // 3,
+                type=VEC3,
+                min=[float(x) for x in vertices_3d.min(axis=0)],
+                max=[float(x) for x in vertices_3d.max(axis=0)]
+            )
+        else:
+            # Default bounds for empty mesh
+            vertex_accessor = Accessor(
+                bufferView=0,
+                componentType=FLOAT,
+                count=0,
+                type=VEC3,
+                min=[0.0, 0.0, 0.0],
+                max=[0.0, 0.0, 0.0]
+            )
         self.gltf.accessors.append(vertex_accessor)
         
         normal_accessor = Accessor(
@@ -297,15 +350,19 @@ class GltfConverter:
         self.gltf.accessors.append(index_accessor)
         
         # Create buffer with all data
-        buffer_data = np.concatenate([
-            vertices.tobytes(),
-            normals.tobytes(),
-            uvs.tobytes(),
-            indices.tobytes()
-        ])
-        
-        self.buffer.byteLength = len(buffer_data)
-        self.gltf.buffers.append(self.buffer)
+        if len(vertices) > 0:
+            buffer_data = np.concatenate([
+                vertices.tobytes(),
+                normals.tobytes(),
+                uvs.tobytes(),
+                indices.tobytes()
+            ])
+            self.buffer.byteLength = len(buffer_data)
+            self.gltf.buffers.append(self.buffer)
+        else:
+            # Empty buffer for empty mesh
+            self.buffer.byteLength = 0
+            self.gltf.buffers.append(self.buffer)
 
 def convert_pof_to_gltf(pof_file: POFFile, output_path: str, progress: Optional[AsyncProgress] = None) -> None:
     """
@@ -327,7 +384,22 @@ def convert_pof_to_gltf(pof_file: POFFile, output_path: str, progress: Optional[
         progress.incrementWithMessage("Saving GLTF file")
         
     # Save as GLB if output path ends with .glb
-    if output_path.lower().endswith('.glb'):
-        gltf.save_binary(output_path)
-    else:
-        gltf.save(output_path)
+    try:
+        if output_path.lower().endswith('.glb'):
+            if gltf.buffers and gltf.buffers[0].byteLength > 0:
+                gltf.save_binary(output_path)
+            else:
+                # Handle empty buffer case
+                gltf.buffers = []  # Remove empty buffer
+                gltf.save_binary(output_path)
+        else:
+            if gltf.buffers and gltf.buffers[0].byteLength > 0:
+                gltf.save(output_path)
+            else:
+                # Handle empty buffer case
+                gltf.buffers = []  # Remove empty buffer
+                gltf.save(output_path)
+    except Exception as e:
+        if progress:
+            progress.incrementWithMessage(f"Error saving GLTF: {str(e)}")
+        raise

@@ -98,18 +98,25 @@ class POFFile:
         self.glow_banks: List[POFGlowBank] = []
         self.shield_collision_tree: bytes = b''
 
-    def read(self, filename: str) -> None:
+    def read(self, file_or_name) -> None:
         """
         Read POF file.
         
         Args:
-            filename: Path to POF file
+            file_or_name: Path to POF file or file-like object
             
         Raises:
             ValueError: If file format is invalid
             IOError: If file cannot be read
         """
-        with open(filename, 'rb') as f:
+        if isinstance(file_or_name, (str, bytes, memoryview)):
+            f = open(file_or_name, 'rb')
+            should_close = True
+        else:
+            f = file_or_name
+            should_close = False
+
+        try:
             # Read header
             reader = POFReader(f)
             
@@ -127,6 +134,13 @@ class POFFile:
             while True:
                 try:
                     chunk = reader.read_chunk_header()
+                    print(f"Reading chunk: {chunk.id} (size: {chunk.size} bytes)")
+                    
+                    # Validate chunk size
+                    if chunk.size < 0 or chunk.size > 16*1024*1024:  # 16MB sanity check
+                        print(f"Warning: Invalid chunk size {chunk.size} for chunk {chunk.id}")
+                        break
+                        
                 except EOFError:
                     break
                     
@@ -167,6 +181,9 @@ class POFFile:
                 else:
                     # Skip unknown chunk
                     reader.read_bytes(chunk.size)
+        finally:
+            if should_close:
+                f.close()
 
     def write(self, filename: str) -> None:
         """

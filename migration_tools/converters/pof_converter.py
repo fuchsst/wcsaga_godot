@@ -5,7 +5,8 @@ import json
 from pathlib import Path
 from typing import Dict, Any, Optional
 
-from .base_converter import BaseConverter, AsyncProgress
+from .base_converter import BaseConverter
+from .base_converter import AsyncProgress
 from .pof.pof_file import POFFile
 from .pof.pof_to_gltf import convert_pof_to_gltf
 from .pof.vector3d import Vector3D

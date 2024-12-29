@@ -15,16 +15,14 @@ class BSPBlockHeader:
     id: int = 0  # Block identifier
     size: int = 0  # Block size in bytes
     
-    def read(self, buffer: bytes) -> int:
-        """Read from bytes buffer. Returns bytes read."""
-        reader = BinaryReader(buffer)
+    def read(self, reader: BinaryReader) -> int:
+        """Read from binary reader. Returns bytes read."""
         self.id = reader.read_int32()
         self.size = reader.read_int32()
         return 8  # Size of header
         
-    def write(self, buffer: bytearray) -> int:
-        """Write to bytes buffer. Returns bytes written."""
-        writer = BinaryWriter(buffer)
+    def write(self, writer: BinaryWriter) -> int:
+        """Write to binary writer. Returns bytes written."""
         writer.write_int32(self.id)
         writer.write_int32(self.size)
         return 8
@@ -46,9 +44,8 @@ class BSPDefPoints:
     vertex_data: List[BSPVertexData] = field(default_factory=list)
     normals: List[Vector3D] = field(default_factory=list)
 
-    def read(self, buffer: bytes, header: BSPBlockHeader) -> int:
-        """Read from bytes buffer. Returns bytes read."""
-        reader = BinaryReader(buffer)
+    def read(self, reader: BinaryReader, header: BSPBlockHeader) -> int:
+        """Read from binary reader. Returns bytes read."""
         self.head = header
         self.n_verts = reader.read_int32()
         self.n_norms = reader.read_int32()
@@ -74,13 +71,11 @@ class BSPDefPoints:
             
         return self.get_size()
 
-    def write(self, buffer: bytearray) -> int:
-        """Write to bytes buffer. Returns bytes written."""
-        writer = BinaryWriter(buffer)
-        
+    def write(self, writer: BinaryWriter) -> int:
+        """Write to binary writer. Returns bytes written."""
         # Update size
         self.head.size = self.get_size()
-        bytes_written = self.head.write(buffer)
+        bytes_written = self.head.write(writer)
         
         writer.write_int32(self.n_verts)
         writer.write_int32(self.n_norms)
@@ -118,16 +113,14 @@ class BSPFlatVertex:
     vertnum: int = 0  # Vertex number
     normnum: int = 0  # Normal number
     
-    def read(self, buffer: bytes) -> int:
-        """Read from bytes buffer. Returns bytes read."""
-        reader = BinaryReader(buffer)
+    def read(self, reader: BinaryReader) -> int:
+        """Read from binary reader. Returns bytes read."""
         self.vertnum = reader.read_uint16()
         self.normnum = reader.read_uint16() 
         return 4
         
-    def write(self, buffer: bytearray) -> int:
-        """Write to bytes buffer. Returns bytes written."""
-        writer = BinaryWriter(buffer)
+    def write(self, writer: BinaryWriter) -> int:
+        """Write to binary writer. Returns bytes written."""
         writer.write_uint16(self.vertnum)
         writer.write_uint16(self.normnum)
         return 4
@@ -146,9 +139,8 @@ class BSPFlatPoly:
     pad: int = 0
     verts: List[BSPFlatVertex] = field(default_factory=list)
 
-    def read(self, buffer: bytes, header: BSPBlockHeader) -> int:
-        """Read from bytes buffer. Returns bytes read."""
-        reader = BinaryReader(buffer)
+    def read(self, reader: BinaryReader, header: BSPBlockHeader) -> int:
+        """Read from binary reader. Returns bytes read."""
         self.head = header
         
         self.normal = reader.read_vector3d()
@@ -164,18 +156,15 @@ class BSPFlatPoly:
         self.verts = []
         for _ in range(self.nverts):
             vert = BSPFlatVertex()
-            vert.read(buffer[reader.get_position():])
-            reader.set_position(reader.get_position() + 4)
+            vert.read(reader)
             self.verts.append(vert)
             
         return self.get_size()
 
-    def write(self, buffer: bytearray) -> int:
-        """Write to bytes buffer. Returns bytes written."""
-        writer = BinaryWriter(buffer)
-        
+    def write(self, writer: BinaryWriter) -> int:
+        """Write to binary writer. Returns bytes written."""
         self.head.size = self.get_size()
-        bytes_written = self.head.write(buffer)
+        bytes_written = self.head.write(writer)
         
         writer.write_vector3d(self.normal)
         writer.write_vector3d(self.center)
@@ -188,8 +177,7 @@ class BSPFlatPoly:
         writer.write_uint8(self.pad)
         
         for vert in self.verts:
-            bytes_written += vert.write(buffer[writer.get_position():])
-            writer.set_position(writer.get_position() + 4)
+            bytes_written += vert.write(writer)
             
         return bytes_written
 
@@ -205,18 +193,16 @@ class BSPTmapVertex:
     u: float = 0.0
     v: float = 0.0
     
-    def read(self, buffer: bytes) -> int:
-        """Read from bytes buffer. Returns bytes read."""
-        reader = BinaryReader(buffer)
+    def read(self, reader: BinaryReader) -> int:
+        """Read from binary reader. Returns bytes read."""
         self.vertnum = reader.read_uint16()
         self.normnum = reader.read_uint16()
         self.u = reader.read_float32()
         self.v = reader.read_float32()
         return 12
         
-    def write(self, buffer: bytearray) -> int:
-        """Write to bytes buffer. Returns bytes written."""
-        writer = BinaryWriter(buffer)
+    def write(self, writer: BinaryWriter) -> int:
+        """Write to binary writer. Returns bytes written."""
         writer.write_uint16(self.vertnum)
         writer.write_uint16(self.normnum)
         writer.write_float32(self.u)
@@ -234,9 +220,8 @@ class BSPTmapPoly:
     tmap_num: int = 0
     verts: List[BSPTmapVertex] = field(default_factory=list)
 
-    def read(self, buffer: bytes, header: BSPBlockHeader) -> int:
-        """Read from bytes buffer. Returns bytes read."""
-        reader = BinaryReader(buffer)
+    def read(self, reader: BinaryReader, header: BSPBlockHeader) -> int:
+        """Read from binary reader. Returns bytes read."""
         self.head = header
         
         self.normal = reader.read_vector3d()
@@ -248,18 +233,15 @@ class BSPTmapPoly:
         self.verts = []
         for _ in range(self.nverts):
             vert = BSPTmapVertex()
-            vert.read(buffer[reader.get_position():])
-            reader.set_position(reader.get_position() + 12)
+            vert.read(reader)
             self.verts.append(vert)
             
         return self.get_size()
 
-    def write(self, buffer: bytearray) -> int:
-        """Write to bytes buffer. Returns bytes written."""
-        writer = BinaryWriter(buffer)
-        
+    def write(self, writer: BinaryWriter) -> int:
+        """Write to binary writer. Returns bytes written."""
         self.head.size = self.get_size()
-        bytes_written = self.head.write(buffer)
+        bytes_written = self.head.write(writer)
         
         writer.write_vector3d(self.normal)
         writer.write_vector3d(self.center)
@@ -268,8 +250,7 @@ class BSPTmapPoly:
         writer.write_int32(self.tmap_num)
         
         for vert in self.verts:
-            bytes_written += vert.write(buffer[writer.get_position():])
-            writer.set_position(writer.get_position() + 12)
+            bytes_written += vert.write(writer)
             
         return bytes_written
 
@@ -292,9 +273,8 @@ class BSPSortNorm:
     min_bounding_box_point: Vector3D = field(default_factory=Vector3D)
     max_bounding_box_point: Vector3D = field(default_factory=Vector3D)
 
-    def read(self, buffer: bytes, header: BSPBlockHeader) -> int:
-        """Read from bytes buffer. Returns bytes read."""
-        reader = BinaryReader(buffer)
+    def read(self, reader: BinaryReader, header: BSPBlockHeader) -> int:
+        """Read from binary reader. Returns bytes read."""
         self.head = header
         
         self.plane_normal = reader.read_vector3d()
@@ -310,12 +290,10 @@ class BSPSortNorm:
         
         return self.get_size()
 
-    def write(self, buffer: bytearray) -> int:
-        """Write to bytes buffer. Returns bytes written."""
-        writer = BinaryWriter(buffer)
-        
+    def write(self, writer: BinaryWriter) -> int:
+        """Write to binary writer. Returns bytes written."""
         self.head.size = self.get_size()
-        bytes_written = self.head.write(buffer)
+        bytes_written = self.head.write(writer)
         
         writer.write_vector3d(self.plane_normal)
         writer.write_vector3d(self.plane_point)
@@ -341,9 +319,8 @@ class BSPBoundBox:
     min_point: Vector3D = field(default_factory=Vector3D)
     max_point: Vector3D = field(default_factory=Vector3D)
 
-    def read(self, buffer: bytes, header: BSPBlockHeader) -> int:
-        """Read from bytes buffer. Returns bytes read."""
-        reader = BinaryReader(buffer)
+    def read(self, reader: BinaryReader, header: BSPBlockHeader) -> int:
+        """Read from binary reader. Returns bytes read."""
         self.head = header
         
         self.min_point = reader.read_vector3d()
@@ -351,12 +328,10 @@ class BSPBoundBox:
         
         return self.get_size()
 
-    def write(self, buffer: bytearray) -> int:
-        """Write to bytes buffer. Returns bytes written."""
-        writer = BinaryWriter(buffer)
-        
+    def write(self, writer: BinaryWriter) -> int:
+        """Write to binary writer. Returns bytes written."""
         self.head.size = self.get_size()
-        bytes_written = self.head.write(buffer)
+        bytes_written = self.head.write(writer)
         
         writer.write_vector3d(self.min_point)
         writer.write_vector3d(self.max_point)

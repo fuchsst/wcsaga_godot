@@ -54,16 +54,25 @@ def write_textures(writer: POFWriter, textures: List[str]) -> None:
 
 def read_model_info(reader: POFReader) -> List[str]:
     """Read model info strings."""
-    data = reader.read_bytes(reader.peek_uint32())
     model_info = []
     
-    # Split null-terminated strings
-    start = 0
-    for i, byte in enumerate(data):
+    # Read raw data
+    data = reader.read_bytes(reader.chunk_size)
+    if not data:
+        return []
+
+    # Split into null-terminated strings
+    current_str = bytearray()
+    for byte in data:
         if byte == 0:
-            if i > start:
-                model_info.append(data[start:i].decode('ascii'))
-            start = i + 1
+            if current_str:
+                try:
+                    model_info.append(current_str.decode('ascii'))
+                except UnicodeDecodeError:
+                    pass  # Skip invalid strings
+                current_str = bytearray()
+        else:
+            current_str.append(byte)
             
     return model_info
 

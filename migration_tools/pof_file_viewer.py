@@ -13,12 +13,13 @@ The viewer provides:
 
 import argparse
 import logging
+import logging.handlers
 import sys
 from pathlib import Path
 from typing import Optional
 
-from .pof.pof_file import POFFile
-from .pof.vector3d import Vector3D
+from .converters.pof.pof_file import POFFile
+from .converters.pof.vector3d import Vector3D
 
 logger = logging.getLogger(__name__)
 
@@ -224,8 +225,8 @@ class POFViewer:
         for i, thruster in enumerate(self.pof_file.thrusters):
             print(f"\nThruster {i:2d}:")
             print(f"  Properties: {thruster.properties}")
-            print(f"  Glow Points: {len(thruster.glow_points)}")
-            for j, glow in enumerate(thruster.glow_points):
+            print(f"  Glow Points: {len(thruster.points)}")
+            for j, glow in enumerate(thruster.points):
                 print(f"    Point {j:2d}:")
                 print(f"      Position: {glow.position}")
                 print(f"      Normal: {glow.normal}")

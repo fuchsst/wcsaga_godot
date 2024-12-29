@@ -13,18 +13,21 @@ from .vector3d import Vector3D
 class BinaryReader:
     """
     Binary data reader with endianness handling.
-    Provides methods to read various data types from a binary stream.
+    Provides methods to read various data types from a binary stream or bytes buffer.
     """
     
-    def __init__(self, stream: BinaryIO, endian: str = '<'):
+    def __init__(self, source: Union[BinaryIO, bytes, bytearray], endian: str = '<'):
         """
         Initialize binary reader.
         
         Args:
-            stream: Binary stream to read from
+            source: Binary stream or bytes buffer to read from
             endian: Endianness ('<' for little-endian, '>' for big-endian)
         """
-        self.stream = stream
+        if isinstance(source, (bytes, bytearray)):
+            self.stream = io.BytesIO(source)
+        else:
+            self.stream = source
         self.endian = endian
 
     def read_bytes(self, size: int) -> bytes:
@@ -123,21 +126,32 @@ class BinaryReader:
         self.stream.seek(pos)
         return value
 
+    def get_position(self) -> int:
+        """Get current stream position."""
+        return self.stream.tell()
+
+    def set_position(self, pos: int) -> None:
+        """Set stream position."""
+        self.stream.seek(pos)
+
 class BinaryWriter:
     """
     Binary data writer with endianness handling.
-    Provides methods to write various data types to a binary stream.
+    Provides methods to write various data types to a binary stream or bytes buffer.
     """
     
-    def __init__(self, stream: BinaryIO, endian: str = '<'):
+    def __init__(self, dest: Union[BinaryIO, bytearray], endian: str = '<'):
         """
         Initialize binary writer.
         
         Args:
-            stream: Binary stream to write to
+            dest: Binary stream or bytearray to write to
             endian: Endianness ('<' for little-endian, '>' for big-endian)
         """
-        self.stream = stream
+        if isinstance(dest, bytearray):
+            self.stream = io.BytesIO(dest)
+        else:
+            self.stream = dest
         self.endian = endian
 
     def write_bytes(self, data: bytes) -> None:

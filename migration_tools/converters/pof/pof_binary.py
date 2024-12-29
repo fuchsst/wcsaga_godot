@@ -25,6 +25,7 @@ class POFReader(BinaryReader):
             endian: Endianness ('<' for little-endian, '>' for big-endian)
         """
         super().__init__(stream, endian)
+        self.chunk_size: int = 0  # Current chunk size
         
     def read_pof_string(self) -> str:
         """
@@ -38,9 +39,21 @@ class POFReader(BinaryReader):
     
     def read_chunk_header(self) -> ChunkHeader:
         """Read POF chunk header."""
-        chunk_id = self.read_bytes(4).decode('ascii')
-        chunk_size = self.read_uint32()
-        return ChunkHeader(chunk_id, chunk_size)
+        chunk_id_bytes = self.read_bytes(4)
+        # Validate chunk ID contains only printable ASCII
+        if not all(32 <= b <= 126 for b in chunk_id_bytes):
+            raise EOFError("Invalid chunk ID")
+            
+        # Check against known chunk IDs
+        chunk_id = chunk_id_bytes.decode('ascii')
+        valid_chunks = {'HDR2', 'TXTR', 'OBJ2', 'PINF', 'EYE ', 'SPCL', 
+                       'GPNT', 'MPNT', 'TGUN', 'TMIS', 'DOCK', 'FUEL',
+                       'SHLD', 'INSG', 'PATH', 'GLOW', 'SLDC', 'ACEN'}
+        if chunk_id not in valid_chunks:
+            raise EOFError(f"Unknown chunk ID: {chunk_id}")
+            
+        self.chunk_size = self.read_uint32()
+        return ChunkHeader(chunk_id, self.chunk_size)
     
     def read_vector3d(self) -> Vector3D:
         """Read POF Vector3D."""
