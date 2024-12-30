@@ -1,0 +1,186 @@
+[gd_scene load_steps=2 format=3 uid="uid://qcaw5p1dy3xf"]
+
+[ext_resource type="Script" path="res://addons/gfred2/dialogs/wing_editor_dialog.gd" id="1_w3m2p"]
+
+[node name="WingEditorDialog" type="Window"]
+title = "Wing Editor"
+position = Vector2i(0, 36)
+size = Vector2i(800, 600)
+transient = true
+exclusive = true
+unresizable = true
+script = ExtResource("1_w3m2p")
+
+[node name="Content" type="TabContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = 129.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+current_tab = 0
+
+[node name="GridContainer" type="GridContainer" parent="Content"]
+layout_mode = 2
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+columns = 2
+metadata/_tab_index = 0
+
+[node name="NameLabel" type="Label" parent="Content/GridContainer"]
+layout_mode = 2
+text = "Wing Name:"
+
+[node name="NameEdit" type="LineEdit" parent="Content/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SpecialShipLabel" type="Label" parent="Content/GridContainer"]
+layout_mode = 2
+text = "Special Ship:"
+
+[node name="SpecialShipOption" type="OptionButton" parent="Content/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="WavesLabel" type="Label" parent="Content/GridContainer"]
+layout_mode = 2
+text = "Number of Waves:"
+
+[node name="WavesSpin" type="SpinBox" parent="Content/GridContainer"]
+layout_mode = 2
+min_value = 1.0
+max_value = 99.0
+value = 1.0
+
+[node name="ThresholdLabel" type="Label" parent="Content/GridContainer"]
+layout_mode = 2
+text = "Wave Threshold:"
+
+[node name="ThresholdSpin" type="SpinBox" parent="Content/GridContainer"]
+layout_mode = 2
+max_value = 98.0
+
+[node name="ArrivalLocationLabel" type="Label" parent="Content/GridContainer"]
+layout_mode = 2
+text = "Arrival Location:"
+
+[node name="ArrivalLocation" type="OptionButton" parent="Content/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DepartureLocationLabel" type="Label" parent="Content/GridContainer"]
+layout_mode = 2
+text = "Departure Location:"
+
+[node name="DepartureLocation" type="OptionButton" parent="Content/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ArrivalDelayLabel" type="Label" parent="Content/GridContainer"]
+layout_mode = 2
+text = "Arrival Delay:"
+
+[node name="ArrivalDelay" type="SpinBox" parent="Content/GridContainer"]
+layout_mode = 2
+max_value = 999.0
+
+[node name="DepartureDelayLabel" type="Label" parent="Content/GridContainer"]
+layout_mode = 2
+text = "Departure Delay:"
+
+[node name="DepartureDelay" type="SpinBox" parent="Content/GridContainer"]
+layout_mode = 2
+max_value = 999.0
+
+[node name="ArrivalTargetLabel" type="Label" parent="Content/GridContainer"]
+layout_mode = 2
+text = "Arrival Target:"
+
+[node name="ArrivalTarget" type="OptionButton" parent="Content/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DepartureTargetLabel" type="Label" parent="Content/GridContainer"]
+layout_mode = 2
+text = "Departure Target:"
+
+[node name="DepartureTarget" type="OptionButton" parent="Content/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ArrivalDistanceLabel" type="Label" parent="Content/GridContainer"]
+layout_mode = 2
+text = "Arrival Distance:"
+
+[node name="ArrivalDistance" type="SpinBox" parent="Content/GridContainer"]
+layout_mode = 2
+max_value = 99999.0
+
+[node name="FlagsContainer" type="VBoxContainer" parent="Content"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="ReinforcementCheck" type="CheckBox" parent="Content/FlagsContainer"]
+layout_mode = 2
+text = "Reinforcement"
+
+[node name="IgnoreCountCheck" type="CheckBox" parent="Content/FlagsContainer"]
+layout_mode = 2
+text = "Ignore Count"
+
+[node name="NoArrivalMusicCheck" type="CheckBox" parent="Content/FlagsContainer"]
+layout_mode = 2
+text = "No Arrival Music"
+
+[node name="NoArrivalWarpCheck" type="CheckBox" parent="Content/FlagsContainer"]
+layout_mode = 2
+text = "No Arrival Warp"
+
+[node name="NoDepartureWarpCheck" type="CheckBox" parent="Content/FlagsContainer"]
+layout_mode = 2
+text = "No Departure Warp"
+
+[node name="NoArrivalLogCheck" type="CheckBox" parent="Content/FlagsContainer"]
+layout_mode = 2
+text = "No Arrival Log"
+
+[node name="NoDepartureLogCheck" type="CheckBox" parent="Content/FlagsContainer"]
+layout_mode = 2
+text = "No Departure Log"
+
+[node name="NoDynamicCheck" type="CheckBox" parent="Content/FlagsContainer"]
+layout_mode = 2
+text = "No Dynamic"
+
+[node name="TreeContainer" type="HBoxContainer" parent="Content"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+metadata/_tab_index = 2
+
+[node name="ArrivalContainer" type="VBoxContainer" parent="Content/TreeContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ArrivalLabel" type="Label" parent="Content/TreeContainer/ArrivalContainer"]
+layout_mode = 2
+text = "Arrival Cue:"
+
+[node name="ArrivalTree" type="Tree" parent="Content/TreeContainer/ArrivalContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="DepartureContainer" type="VBoxContainer" parent="Content/TreeContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DepartureLabel" type="Label" parent="Content/TreeContainer/DepartureContainer"]
+layout_mode = 2
+text = "Departure Cue:"
+
+[node name="DepartureTree" type="Tree" parent="Content/TreeContainer/DepartureContainer"]
+layout_mode = 2
+size_flags_vertical = 3

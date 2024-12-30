@@ -1,0 +1,48 @@
+[gd_scene load_steps=2 format=3 uid="uid://f4r8q2yw3n6xj"]
+
+[ext_resource type="Script" path="res://addons/gfred2/dialogs/restrict_paths_dialog.gd" id="1_r3m2p"]
+
+[node name="RestrictPathsDialog" type="Window"]
+title = "Restrict Paths"
+position = Vector2i(0, 36)
+size = Vector2i(300, 400)
+transient = true
+exclusive = true
+unresizable = true
+script = ExtResource("1_r3m2p")
+
+[node name="Content" type="VBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="HeaderLabel" type="Label" parent="Content"]
+layout_mode = 2
+text = "Select available paths:"
+horizontal_alignment = 1
+
+[node name="PathList" type="ItemList" parent="Content"]
+layout_mode = 2
+size_flags_vertical = 3
+select_mode = 1
+
+[node name="ButtonContainer" type="HBoxContainer" parent="Content"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="SelectAllButton" type="Button" parent="Content/ButtonContainer"]
+layout_mode = 2
+text = "Select All"
+
+[node name="ClearButton" type="Button" parent="Content/ButtonContainer"]
+layout_mode = 2
+text = "Clear All"
+
+[node name="InvertButton" type="Button" parent="Content/ButtonContainer"]
+layout_mode = 2
+text = "Invert"

@@ -1,0 +1,476 @@
+[gd_scene load_steps=2 format=3 uid="uid://b4r8q2yw3n6xf"]
+
+[ext_resource type="Script" path="res://addons/gfred2/dialogs/ship_properties_editor.gd" id="1_p3m2p"]
+
+[node name="ShipPropertiesEditor" type="Window"]
+title = "Ship Properties"
+position = Vector2i(0, 36)
+size = Vector2i(600, 500)
+transient = true
+exclusive = true
+unresizable = true
+script = ExtResource("1_p3m2p")
+
+[node name="Content" type="VBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+
+[node name="TabContainer" type="TabContainer" parent="Content"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Properties" type="VBoxContainer" parent="Content/TabContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BasicGrid" type="GridContainer" parent="Content/TabContainer/Properties"]
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 5
+
+[node name="NameLabel" type="Label" parent="Content/TabContainer/Properties/BasicGrid"]
+layout_mode = 2
+text = "Name"
+
+[node name="NameEdit" type="LineEdit" parent="Content/TabContainer/Properties/BasicGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ClassLabel" type="Label" parent="Content/TabContainer/Properties/BasicGrid"]
+layout_mode = 2
+text = "Class"
+
+[node name="ClassOption" type="OptionButton" parent="Content/TabContainer/Properties/BasicGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TeamLabel" type="Label" parent="Content/TabContainer/Properties/BasicGrid"]
+layout_mode = 2
+text = "Team"
+
+[node name="TeamOption" type="OptionButton" parent="Content/TabContainer/Properties/BasicGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AltNameLabel" type="Label" parent="Content/TabContainer/Properties/BasicGrid"]
+layout_mode = 2
+text = "Alt Name"
+
+[node name="AltNameEdit" type="LineEdit" parent="Content/TabContainer/Properties/BasicGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CallsignLabel" type="Label" parent="Content/TabContainer/Properties/BasicGrid"]
+layout_mode = 2
+text = "Callsign"
+
+[node name="CallsignEdit" type="LineEdit" parent="Content/TabContainer/Properties/BasicGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CargoLabel" type="Label" parent="Content/TabContainer/Properties/BasicGrid"]
+layout_mode = 2
+text = "Cargo"
+
+[node name="CargoEdit" type="LineEdit" parent="Content/TabContainer/Properties/BasicGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FlagsNotebook" type="TabContainer" parent="Content/TabContainer/Properties"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Combat" type="VBoxContainer" parent="Content/TabContainer/Properties/FlagsNotebook"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="ProtectShipCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Combat"]
+layout_mode = 2
+text = "Protect Ship"
+
+[node name="BeamProtectShipCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Combat"]
+layout_mode = 2
+text = "Beam Protect Ship"
+
+[node name="EscortCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Combat"]
+layout_mode = 2
+text = "Escort"
+
+[node name="EscortPriorityContainer" type="HBoxContainer" parent="Content/TabContainer/Properties/FlagsNotebook/Combat"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="PriorityLabel" type="Label" parent="Content/TabContainer/Properties/FlagsNotebook/Combat/EscortPriorityContainer"]
+layout_mode = 2
+text = "Priority"
+
+[node name="EscortPrioritySpin" type="SpinBox" parent="Content/TabContainer/Properties/FlagsNotebook/Combat/EscortPriorityContainer"]
+layout_mode = 2
+max_value = 100.0
+
+[node name="InvulnerableCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Combat"]
+layout_mode = 2
+text = "Invulnerable"
+
+[node name="TargetableAsBombCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Combat"]
+layout_mode = 2
+text = "Targetable As Bomb"
+
+[node name="GuardianCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Combat"]
+layout_mode = 2
+text = "Guardian"
+
+[node name="GuardianThresholdContainer" type="HBoxContainer" parent="Content/TabContainer/Properties/FlagsNotebook/Combat"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ThresholdLabel" type="Label" parent="Content/TabContainer/Properties/FlagsNotebook/Combat/GuardianThresholdContainer"]
+layout_mode = 2
+text = "Threshold"
+
+[node name="GuardianThresholdSpin" type="SpinBox" parent="Content/TabContainer/Properties/FlagsNotebook/Combat/GuardianThresholdContainer"]
+layout_mode = 2
+max_value = 100.0
+
+[node name="VaporizeCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Combat"]
+layout_mode = 2
+text = "Vaporize"
+
+[node name="StealthCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Combat"]
+layout_mode = 2
+text = "Stealth"
+
+[node name="FriendlyStealthInvisibleCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Combat"]
+layout_mode = 2
+text = "Friendly Stealth Invisible"
+
+[node name="Sensors" type="VBoxContainer" parent="Content/TabContainer/Properties/FlagsNotebook"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="HiddenFromSensorsCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Sensors"]
+layout_mode = 2
+text = "Hidden From Sensors"
+
+[node name="PrimitiveSensorsCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Sensors"]
+layout_mode = 2
+text = "Primitive Sensors"
+
+[node name="ToggleSubsystemScanningCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Sensors"]
+layout_mode = 2
+text = "Toggle Subsystem Scanning"
+
+[node name="ScannableCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Sensors"]
+layout_mode = 2
+text = "Scannable"
+
+[node name="Drive" type="VBoxContainer" parent="Content/TabContainer/Properties/FlagsNotebook"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="NoSubspaceDriveCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Drive"]
+layout_mode = 2
+text = "No Subspace Drive"
+
+[node name="AffectedByGravityCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Drive"]
+layout_mode = 2
+text = "Affected By Gravity"
+
+[node name="NoBankCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Drive"]
+layout_mode = 2
+text = "No Bank"
+
+[node name="Mission" type="VBoxContainer" parent="Content/TabContainer/Properties/FlagsNotebook"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="DestroyBeforeMissionCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Mission"]
+layout_mode = 2
+text = "Destroy Before Mission"
+
+[node name="IgnoreCountCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Mission"]
+layout_mode = 2
+text = "Ignore Count"
+
+[node name="NoArrivalMusicCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Mission"]
+layout_mode = 2
+text = "No Arrival Music"
+
+[node name="NoArrivalWarpCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Mission"]
+layout_mode = 2
+text = "No Arrival Warp"
+
+[node name="NoDepartureWarpCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Mission"]
+layout_mode = 2
+text = "No Departure Warp"
+
+[node name="NoArrivalLogCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Mission"]
+layout_mode = 2
+text = "No Arrival Log"
+
+[node name="NoDepartureLogCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Mission"]
+layout_mode = 2
+text = "No Departure Log"
+
+[node name="RedAlertCarryCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Mission"]
+layout_mode = 2
+text = "Red Alert Carry"
+
+[node name="AI" type="VBoxContainer" parent="Content/TabContainer/Properties/FlagsNotebook"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="NoDynamicCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/AI"]
+layout_mode = 2
+text = "No Dynamic"
+
+[node name="KamikazeCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/AI"]
+layout_mode = 2
+text = "Kamikaze"
+
+[node name="KamikazeDamageContainer" type="HBoxContainer" parent="Content/TabContainer/Properties/FlagsNotebook/AI"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="DamageLabel" type="Label" parent="Content/TabContainer/Properties/FlagsNotebook/AI/KamikazeDamageContainer"]
+layout_mode = 2
+text = "Damage"
+
+[node name="KamikazeDamageSpin" type="SpinBox" parent="Content/TabContainer/Properties/FlagsNotebook/AI/KamikazeDamageContainer"]
+layout_mode = 2
+max_value = 10000.0
+
+[node name="DisableMessagesCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/AI"]
+layout_mode = 2
+text = "Disable Messages"
+
+[node name="Status" type="VBoxContainer" parent="Content/TabContainer/Properties/FlagsNotebook"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="LockedCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Status"]
+layout_mode = 2
+text = "Locked"
+
+[node name="SetClassDynamicallyCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Status"]
+layout_mode = 2
+text = "Set Class Dynamically"
+
+[node name="NoDeathScreamCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Status"]
+layout_mode = 2
+text = "No Death Scream"
+
+[node name="AlwaysDeathScreamCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Status"]
+layout_mode = 2
+text = "Always Death Scream"
+
+[node name="HideShipNameCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Status"]
+layout_mode = 2
+text = "Hide Ship Name"
+
+[node name="HideLogEntriesCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Status"]
+layout_mode = 2
+text = "Hide Log Entries"
+
+[node name="IsHarmlessCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Status"]
+layout_mode = 2
+text = "Is Harmless"
+
+[node name="ButtonBox" type="HBoxContainer" parent="Content/TabContainer/Properties"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TexturesButton" type="Button" parent="Content/TabContainer/Properties/ButtonBox"]
+layout_mode = 2
+text = "Textures..."
+
+[node name="DamageButton" type="Button" parent="Content/TabContainer/Properties/ButtonBox"]
+layout_mode = 2
+text = "Special Damage..."
+
+[node name="HitpointsButton" type="Button" parent="Content/TabContainer/Properties/ButtonBox"]
+layout_mode = 2
+text = "Special Hitpoints..."
+
+[node name="Status" type="VBoxContainer" parent="Content/TabContainer"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="StatusGrid" type="GridContainer" parent="Content/TabContainer/Status"]
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 5
+
+[node name="HullLabel" type="Label" parent="Content/TabContainer/Status/StatusGrid"]
+layout_mode = 2
+text = "Initial Hull"
+
+[node name="HullSpin" type="SpinBox" parent="Content/TabContainer/Status/StatusGrid"]
+layout_mode = 2
+max_value = 100.0
+value = 100.0
+
+[node name="ShieldsLabel" type="Label" parent="Content/TabContainer/Status/StatusGrid"]
+layout_mode = 2
+text = "Initial Shields"
+
+[node name="ShieldsSpin" type="SpinBox" parent="Content/TabContainer/Status/StatusGrid"]
+layout_mode = 2
+max_value = 100.0
+value = 100.0
+
+[node name="VelocityLabel" type="Label" parent="Content/TabContainer/Status/StatusGrid"]
+layout_mode = 2
+text = "Initial Velocity"
+
+[node name="VelocitySpin" type="SpinBox" parent="Content/TabContainer/Status/StatusGrid"]
+layout_mode = 2
+max_value = 100.0
+value = 33.0
+
+[node name="OrientationLabel" type="Label" parent="Content/TabContainer/Status/StatusGrid"]
+layout_mode = 2
+text = "Initial Orientation"
+
+[node name="OrientationContainer" type="HBoxContainer" parent="Content/TabContainer/Status/StatusGrid"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="PLabel" type="Label" parent="Content/TabContainer/Status/StatusGrid/OrientationContainer"]
+layout_mode = 2
+text = "P"
+
+[node name="PitchSpin" type="SpinBox" parent="Content/TabContainer/Status/StatusGrid/OrientationContainer"]
+layout_mode = 2
+min_value = -180.0
+max_value = 180.0
+
+[node name="BLabel" type="Label" parent="Content/TabContainer/Status/StatusGrid/OrientationContainer"]
+layout_mode = 2
+text = "B"
+
+[node name="BankSpin" type="SpinBox" parent="Content/TabContainer/Status/StatusGrid/OrientationContainer"]
+layout_mode = 2
+min_value = -180.0
+max_value = 180.0
+
+[node name="HLabel" type="Label" parent="Content/TabContainer/Status/StatusGrid/OrientationContainer"]
+layout_mode = 2
+text = "H"
+
+[node name="HeadingSpin" type="SpinBox" parent="Content/TabContainer/Status/StatusGrid/OrientationContainer"]
+layout_mode = 2
+min_value = -180.0
+max_value = 180.0
+
+[node name="Arrival" type="VBoxContainer" parent="Content/TabContainer"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="ArrivalSection" type="VBoxContainer" parent="Content/TabContainer/Arrival"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ArrivalLabel" type="Label" parent="Content/TabContainer/Arrival/ArrivalSection"]
+layout_mode = 2
+text = "Arrival"
+
+[node name="ArrivalGrid" type="GridContainer" parent="Content/TabContainer/Arrival/ArrivalSection"]
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 5
+
+[node name="LocationLabel" type="Label" parent="Content/TabContainer/Arrival/ArrivalSection/ArrivalGrid"]
+layout_mode = 2
+text = "Location"
+
+[node name="ArrivalLocationOption" type="OptionButton" parent="Content/TabContainer/Arrival/ArrivalSection/ArrivalGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TargetLabel" type="Label" parent="Content/TabContainer/Arrival/ArrivalSection/ArrivalGrid"]
+layout_mode = 2
+text = "Target"
+
+[node name="ArrivalTargetEdit" type="LineEdit" parent="Content/TabContainer/Arrival/ArrivalSection/ArrivalGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DistanceLabel" type="Label" parent="Content/TabContainer/Arrival/ArrivalSection/ArrivalGrid"]
+layout_mode = 2
+text = "Distance"
+
+[node name="ArrivalDistanceSpin" type="SpinBox" parent="Content/TabContainer/Arrival/ArrivalSection/ArrivalGrid"]
+layout_mode = 2
+max_value = 10000.0
+value = 1000.0
+
+[node name="DelayLabel" type="Label" parent="Content/TabContainer/Arrival/ArrivalSection/ArrivalGrid"]
+layout_mode = 2
+text = "Delay"
+
+[node name="ArrivalDelaySpin" type="SpinBox" parent="Content/TabContainer/Arrival/ArrivalSection/ArrivalGrid"]
+layout_mode = 2
+max_value = 999.0
+
+[node name="ArrivalRestrictButton" type="Button" parent="Content/TabContainer/Arrival/ArrivalSection"]
+visible = false
+layout_mode = 2
+text = "Restrict Paths..."
+
+[node name="DepartureSection" type="VBoxContainer" parent="Content/TabContainer/Arrival"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="DepartureLabel" type="Label" parent="Content/TabContainer/Arrival/DepartureSection"]
+layout_mode = 2
+text = "Departure"
+
+[node name="DepartureGrid" type="GridContainer" parent="Content/TabContainer/Arrival/DepartureSection"]
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 5
+
+[node name="LocationLabel" type="Label" parent="Content/TabContainer/Arrival/DepartureSection/DepartureGrid"]
+layout_mode = 2
+text = "Location"
+
+[node name="DepartureLocationOption" type="OptionButton" parent="Content/TabContainer/Arrival/DepartureSection/DepartureGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TargetLabel" type="Label" parent="Content/TabContainer/Arrival/DepartureSection/DepartureGrid"]
+layout_mode = 2
+text = "Target"
+
+[node name="DepartureTargetEdit" type="LineEdit" parent="Content/TabContainer/Arrival/DepartureSection/DepartureGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DelayLabel" type="Label" parent="Content/TabContainer/Arrival/DepartureSection/DepartureGrid"]
+layout_mode = 2
+text = "Delay"
+
+[node name="DepartureDelaySpin" type="SpinBox" parent="Content/TabContainer/Arrival/DepartureSection/DepartureGrid"]
+layout_mode = 2
+max_value = 999.0
+
+[node name="DepartureRestrictButton" type="Button" parent="Content/TabContainer/Arrival/DepartureSection"]
+visible = false
+layout_mode = 2
+text = "Restrict Paths..."

@@ -1,0 +1,91 @@
+[gd_scene load_steps=2 format=3 uid="uid://d4r8q2yw3n6xh"]
+
+[ext_resource type="Script" path="res://addons/gfred2/dialogs/ship_special_damage_editor.gd" id="1_d3m2p"]
+
+[node name="ShipSpecialDamageEditor" type="Window"]
+title = "Special Damage"
+position = Vector2i(0, 36)
+size = Vector2i(300, 200)
+transient = true
+exclusive = true
+unresizable = true
+script = ExtResource("1_d3m2p")
+
+[node name="Content" type="VBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="EnableContainer" type="VBoxContainer" parent="Content"]
+layout_mode = 2
+
+[node name="EnableSpecialExpCheck" type="CheckBox" parent="Content/EnableContainer"]
+layout_mode = 2
+text = "Enable Special Explosion"
+
+[node name="EnableShockwaveCheck" type="CheckBox" parent="Content/EnableContainer"]
+layout_mode = 2
+text = "Enable Shockwave"
+
+[node name="ExplosionContainer" type="GridContainer" parent="Content"]
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 5
+
+[node name="InnerRadLabel" type="Label" parent="Content/ExplosionContainer"]
+layout_mode = 2
+text = "Inner Radius:"
+
+[node name="InnerRadSpin" type="SpinBox" parent="Content/ExplosionContainer"]
+layout_mode = 2
+min_value = 1.0
+max_value = 10000.0
+value = 100.0
+rounded = true
+
+[node name="OuterRadLabel" type="Label" parent="Content/ExplosionContainer"]
+layout_mode = 2
+text = "Outer Radius:"
+
+[node name="OuterRadSpin" type="SpinBox" parent="Content/ExplosionContainer"]
+layout_mode = 2
+min_value = 2.0
+max_value = 10000.0
+value = 200.0
+rounded = true
+
+[node name="DamageLabel" type="Label" parent="Content/ExplosionContainer"]
+layout_mode = 2
+text = "Damage:"
+
+[node name="DamageSpin" type="SpinBox" parent="Content/ExplosionContainer"]
+layout_mode = 2
+max_value = 10000.0
+value = 100.0
+rounded = true
+
+[node name="BlastLabel" type="Label" parent="Content/ExplosionContainer"]
+layout_mode = 2
+text = "Blast Force:"
+
+[node name="BlastSpin" type="SpinBox" parent="Content/ExplosionContainer"]
+layout_mode = 2
+max_value = 10000.0
+value = 50.0
+rounded = true
+
+[node name="ShockSpeedLabel" type="Label" parent="Content/ExplosionContainer"]
+layout_mode = 2
+text = "Shockwave Speed:"
+
+[node name="ShockSpeedSpin" type="SpinBox" parent="Content/ExplosionContainer"]
+layout_mode = 2
+min_value = 1.0
+max_value = 1000.0
+value = 10.0
+rounded = true

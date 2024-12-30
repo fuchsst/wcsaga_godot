@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import logging
-from converters import DDSConverter, PCXConverter, ANIConverter, POFConverter
+from converters import DDSConverter, PCXConverter, ANIConverter, POFConverter, FS2Converter, FC2Converter
 
 def main():
     parser = argparse.ArgumentParser(description='Convert game assets to Godot-friendly formats')
@@ -11,7 +11,7 @@ def main():
                       help='Output directory for converted files')
     parser.add_argument('-v', '--verbose', action='store_true',
                       help='Enable verbose output')
-    parser.add_argument('--format', choices=['dds', 'eff', 'ani', 'pof', 'pcx', 'tbl', 'fs2', 'frc', 'vf'],
+    parser.add_argument('--format', choices=['dds', 'eff', 'ani', 'pof', 'pcx', 'tbl', 'fs2', 'fc2', 'frc', 'vf'],
                       help='Only convert files of specified format')
     parser.add_argument('-f', '--force', action='store_true',
                       help='Force conversion even if output files exist')
@@ -34,6 +34,10 @@ def main():
         converters.append(ANIConverter(args.input, args.output, args.force))
     if args.format == 'pof' or args.format is None:
         converters.append(POFConverter(args.input, args.output, args.force))
+    if args.format == 'fs2' or args.format is None:
+        converters.append(FS2Converter(args.input, args.output, args.force))
+    if args.format == 'fc2' or args.format is None:
+        converters.append(FC2Converter(args.input, args.output, args.force))
     
     # Convert files
     success = True

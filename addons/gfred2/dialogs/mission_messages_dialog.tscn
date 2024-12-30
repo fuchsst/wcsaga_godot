@@ -1,0 +1,166 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://addons/gfred2/dialogs/mission_messages_dialog.gd" id="1_m4s2d"]
+
+[node name="MissionMessagesDialog" type="Window"]
+title = "Mission Messages"
+size = Vector2i(800, 600)
+script = ExtResource("1_m4s2d")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="HSplitContainer" type="HSplitContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/VBoxContainer"]
+layout_mode = 2
+text = "Messages"
+
+[node name="MessageList" type="ItemList" parent="MarginContainer/VBoxContainer/HSplitContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="AddMessage" type="Button" parent="MarginContainer/VBoxContainer/HSplitContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Add"
+
+[node name="DeleteMessage" type="Button" parent="MarginContainer/VBoxContainer/HSplitContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Delete"
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/VBoxContainer2"]
+layout_mode = 2
+columns = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Name:"
+
+[node name="MessageName" type="LineEdit" parent="MarginContainer/VBoxContainer/HSplitContainer/VBoxContainer2/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Priority:"
+
+[node name="Priority" type="OptionButton" parent="MarginContainer/VBoxContainer/HSplitContainer/VBoxContainer2/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Team:"
+
+[node name="Team" type="OptionButton" parent="MarginContainer/VBoxContainer/HSplitContainer/VBoxContainer2/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Label4" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Persona:"
+
+[node name="Persona" type="OptionButton" parent="MarginContainer/VBoxContainer/HSplitContainer/VBoxContainer2/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Label5" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Wave File:"
+
+[node name="WaveContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+
+[node name="WaveFile" type="LineEdit" parent="MarginContainer/VBoxContainer/HSplitContainer/VBoxContainer2/GridContainer/WaveContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="BrowseWave" type="Button" parent="MarginContainer/VBoxContainer/HSplitContainer/VBoxContainer2/GridContainer/WaveContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Browse"
+
+[node name="Label6" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+text = "Ani File:"
+
+[node name="AniContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/VBoxContainer2/GridContainer"]
+layout_mode = 2
+
+[node name="AniFile" type="LineEdit" parent="MarginContainer/VBoxContainer/HSplitContainer/VBoxContainer2/GridContainer/AniContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="BrowseAni" type="Button" parent="MarginContainer/VBoxContainer/HSplitContainer/VBoxContainer2/GridContainer/AniContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Browse"
+
+[node name="Label7" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/VBoxContainer2"]
+layout_mode = 2
+text = "Message Text:"
+
+[node name="MessageText" type="TextEdit" parent="MarginContainer/VBoxContainer/HSplitContainer/VBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/VBoxContainer2"]
+layout_mode = 2
+
+[node name="TeamSpecific" type="CheckBox" parent="MarginContainer/VBoxContainer/HSplitContainer/VBoxContainer2/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Team Specific"
+
+[node name="NoMusic" type="CheckBox" parent="MarginContainer/VBoxContainer/HSplitContainer/VBoxContainer2/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "No Music"
+
+[node name="NoSpecialMusic" type="CheckBox" parent="MarginContainer/VBoxContainer/HSplitContainer/VBoxContainer2/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "No Special Music"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+alignment = 2
+
+[node name="OkButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "OK"
+
+[node name="CancelButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Cancel"

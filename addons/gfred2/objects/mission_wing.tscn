@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://addons/gfred2/objects/mission_wing.gd" id="1_1s4m2"]
+
+[node name="MissionWing" type="Node3D"]
+script = ExtResource("1_1s4m2")
