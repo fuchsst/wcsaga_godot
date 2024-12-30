@@ -3,7 +3,3 @@ package_analysis_results/
 converted/
 extracted/
 wcsaga_code/
-**/*.png
-**/*.ogg
-**/*.ogv
-**/*.wav

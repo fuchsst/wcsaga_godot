@@ -36,3 +36,9 @@ venv.bak/
 *.swp
 .DS_Store
 **/*.log
+
+# Media ignores
+**/*.png
+**/*.ogg
+**/*.ogv
+**/*.wav
