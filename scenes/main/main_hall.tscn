@@ -1,6 +1,7 @@
-[gd_scene load_steps=1013 format=3 uid="uid://b1dtn87emut4n"]
+[gd_scene load_steps=1014 format=3 uid="uid://b1dtn87emut4n"]
 
 [ext_resource type="Script" path="res://scenes/main/main_hall.gd" id="1_d4xcv"]
+[ext_resource type="Resource" uid="uid://bay2gjgvc7fk1" path="res://resources/game_sounds.tres" id="2_6psud"]
 [ext_resource type="Texture2D" uid="uid://pfuylskiqlxa" path="res://assets/hermes_interface/2_mainhall.png" id="2_bg"]
 [ext_resource type="Texture2D" uid="uid://0pi8nh84vdy4" path="res://assets/hermes_interface/2_mainhall_door_1.png" id="3_nx0ay"]
 [ext_resource type="Texture2D" uid="uid://ti4fm11g7y5f" path="res://assets/hermes_interface/2_mainhall_door_2.png" id="4_3mi57"]
@@ -7085,8 +7086,188 @@ animations = [{
 }, {
 "duration": 1.0,
 "texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
+}, {
+"duration": 1.0,
+"texture": null
 }],
-"loop": false,
+"loop": true,
 "name": &"default",
 "speed": 25.0
 }]
@@ -7100,6 +7281,7 @@ corner_radius_bottom_left = 5
 
 [node name="MainHall" type="Node2D"]
 script = ExtResource("1_d4xcv")
+sounds = ExtResource("2_6psud")
 
 [node name="Background" type="TextureRect" parent="."]
 offset_right = 1024.0
@@ -7107,14 +7289,6 @@ offset_bottom = 768.0
 texture = ExtResource("2_bg")
 
 [node name="DoorButtons" type="Node2D" parent="."]
-
-[node name="ExitButton" type="TextureButton" parent="DoorButtons"]
-offset_left = 491.0
-offset_top = 558.0
-offset_right = 616.0
-offset_bottom = 751.0
-tooltip_text = "Exit Wing Commander Saga"
-focus_mode = 0
 
 [node name="PilotRoomButton" type="TextureButton" parent="DoorButtons"]
 offset_left = 515.0
@@ -7132,12 +7306,19 @@ offset_bottom = 453.0
 tooltip_text = "Ready room - Start or continue a campaign"
 focus_mode = 0
 
-[node name="TechRoomButton" type="TextureButton" parent="DoorButtons"]
-offset_left = 796.0
-offset_top = 518.0
-offset_right = 1027.0
-offset_bottom = 683.0
-tooltip_text = "Tech room - View specifications of Wing Commander Saga ships and weaponry"
+[node name="ExitButton" type="TextureButton" parent="DoorButtons"]
+offset_left = 491.0
+offset_top = 558.0
+offset_right = 616.0
+offset_bottom = 751.0
+tooltip_text = "Exit Wing Commander Saga"
+focus_mode = 0
+
+[node name="CampaignButton" type="TextureButton" parent="DoorButtons"]
+offset_top = 449.0
+offset_right = 296.0
+offset_bottom = 570.0
+tooltip_text = "Campaign Room - View all available campaigns"
 focus_mode = 0
 
 [node name="OptionsButton" type="TextureButton" parent="DoorButtons"]
@@ -7148,11 +7329,12 @@ offset_bottom = 509.0
 tooltip_text = "Options - Change your Wing Commander Saga options"
 focus_mode = 0
 
-[node name="CampaignButton" type="TextureButton" parent="DoorButtons"]
-offset_top = 449.0
-offset_right = 296.0
-offset_bottom = 570.0
-tooltip_text = "Campaign Room - View all available campaigns"
+[node name="TechRoomButton" type="TextureButton" parent="DoorButtons"]
+offset_left = 796.0
+offset_top = 518.0
+offset_right = 1027.0
+offset_bottom = 683.0
+tooltip_text = "Tech room - View specifications of Wing Commander Saga ships and weaponry"
 focus_mode = 0
 
 [node name="DoorAnimations" type="Node2D" parent="."]
@@ -7174,23 +7356,26 @@ sprite_frames = SubResource("SpriteFrames_campaign")
 [node name="OptionsScreen" type="AnimatedSprite2D" parent="MiscAnimations"]
 position = Vector2(704, 449)
 sprite_frames = SubResource("SpriteFrames_options_screen")
-frame_progress = 0.73474
+autoplay = "default"
+frame_progress = 0.646581
 
 [node name="WireframeFighter" type="AnimatedSprite2D" parent="MiscAnimations"]
 position = Vector2(922, 589)
 sprite_frames = SubResource("SpriteFrames_wireframe")
+autoplay = "default"
 frame_progress = 0.645175
 
 [node name="CampaignScreen" type="AnimatedSprite2D" parent="MiscAnimations"]
 position = Vector2(132, 516)
 sprite_frames = SubResource("SpriteFrames_campaign_screen")
+autoplay = "default"
 frame_progress = 0.449134
 
 [node name="FlightDeck" type="AnimatedSprite2D" parent="MiscAnimations"]
 position = Vector2(137, 369)
 sprite_frames = SubResource("SpriteFrames_fighter_holo")
-frame = 39
-frame_progress = 0.0295465
+autoplay = "default"
+frame_progress = 0.862574
 
 [node name="TooltipPanel" type="Panel" parent="."]
 visible = false
@@ -7209,3 +7394,16 @@ grow_vertical = 2
 theme_override_colors/font_color = Color(0.678431, 0.847059, 0.901961, 1)
 theme_override_font_sizes/font_size = 24
 horizontal_alignment = 1
+
+[connection signal="mouse_entered" from="DoorButtons/PilotRoomButton" to="." method="_on_pilot_room_button_mouse_entered"]
+[connection signal="mouse_exited" from="DoorButtons/PilotRoomButton" to="." method="_on_pilot_room_button_mouse_exited"]
+[connection signal="mouse_entered" from="DoorButtons/BriefingRoomButton" to="." method="_on_briefing_room_button_mouse_entered"]
+[connection signal="mouse_exited" from="DoorButtons/BriefingRoomButton" to="." method="_on_briefing_room_button_mouse_exited"]
+[connection signal="mouse_entered" from="DoorButtons/ExitButton" to="." method="_on_exit_button_mouse_entered"]
+[connection signal="mouse_exited" from="DoorButtons/ExitButton" to="." method="_on_exit_button_mouse_exited"]
+[connection signal="mouse_entered" from="DoorButtons/CampaignButton" to="." method="_on_campaign_button_mouse_entered"]
+[connection signal="mouse_exited" from="DoorButtons/CampaignButton" to="." method="_on_campaign_button_mouse_exited"]
+[connection signal="mouse_entered" from="DoorButtons/OptionsButton" to="." method="_on_options_button_mouse_entered"]
+[connection signal="mouse_exited" from="DoorButtons/OptionsButton" to="." method="_on_options_button_mouse_exited"]
+[connection signal="mouse_entered" from="DoorButtons/TechRoomButton" to="." method="_on_tech_room_button_mouse_entered"]
+[connection signal="mouse_exited" from="DoorButtons/TechRoomButton" to="." method="_on_tech_room_button_mouse_exited"]

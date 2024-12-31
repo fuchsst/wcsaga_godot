@@ -35,19 +35,7 @@ func _ready() -> void:
 	for door in $DoorAnimations.get_children():
 		door_states[door.name] = DoorState.CLOSED
 		door_sound_handles[door.name] = -1
-		
-	# Set up mask texture for clickable regions
-	var mask_image = mask_texture.get_image()
-	mask_image.convert(Image.FORMAT_RGBA8)
-	
-	# Configure buttons to use mask
-	for button in $DoorButtons.get_children():
-		var rect = button.get_rect()
-		var mask_rect = Rect2i(rect.position.x, rect.position.y, rect.size.x, rect.size.y)
-		var button_mask = mask_image.get_region(mask_rect)
-		button.mouse_filter = Control.MOUSE_FILTER_PASS
-		button.gui_input.connect(_on_button_gui_input.bind(button, button_mask))
-		
+				
 	# Connect door button signals
 	var buttons = {
 		"ExitButton": ["Exit Wing Commander Saga", "_on_exit_pressed", "ExitDoor"],
@@ -60,12 +48,7 @@ func _ready() -> void:
 	
 	for button_name in buttons:
 		var button = $DoorButtons.get_node(button_name)
-		var tooltip = buttons[button_name][0]
-		var pressed_func = buttons[button_name][1]
-		var door_name = buttons[button_name][2]
-		
-		button.mouse_entered.connect(_on_button_mouse_entered.bind(tooltip, door_name))
-		button.mouse_exited.connect(_on_button_mouse_exited.bind(door_name))
+		var pressed_func = buttons[button_name][1]		
 		button.pressed.connect(Callable(self, pressed_func))
 	
 	# Start ambient sounds
@@ -94,11 +77,11 @@ func _process(_delta: float) -> void:
 					door.stop()
 
 func _play_interface_sound(index: int, looping: bool = false) -> int:
-	var entry = sounds.get_interface_sound_entry(index)
+	var entry = sounds.interface_sounds[index]
 	if not entry:
 		return -1
 		
-	var stream = sounds.get_sound_stream(entry)
+	var stream = entry.audio_file
 	if not stream:
 		return -1
 		
@@ -163,7 +146,7 @@ func _animate_door(door_name: String, open: bool) -> void:
 	var door = $DoorAnimations.get_node(door_name)
 	if not door.sprite_frames.has_animation("default") or door.sprite_frames.get_frame_count("default") == 0:
 		return
-		
+				
 	if open and door_states[door_name] != DoorState.OPEN:
 		door_states[door_name] = DoorState.OPENING
 		door.play("default")
@@ -173,37 +156,6 @@ func _animate_door(door_name: String, open: bool) -> void:
 		door.play("default", true)  # Play in reverse
 		_play_door_sound(door_name, false)
 
-func _on_button_gui_input(event: InputEvent, button: Control, mask: Image) -> void:
-	if event is InputEventMouseMotion:
-		var local_pos = event.position
-		if local_pos.x >= 0 and local_pos.y >= 0 and local_pos.x < mask.get_width() and local_pos.y < mask.get_height():
-			var color = mask.get_pixel(local_pos.x, local_pos.y)
-			if color.a > 0.5:  # Check if pixel is in clickable region
-				if not current_mouse_region:
-					_on_button_mouse_entered(button.tooltip_text, button.name.replace("Button", "Door"))
-			else:
-				if current_mouse_region:
-					_on_button_mouse_exited(current_mouse_region.replace("Door", "Button"))
-	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		var local_pos = event.position
-		if local_pos.x >= 0 and local_pos.y >= 0 and local_pos.x < mask.get_width() and local_pos.y < mask.get_height():
-			var color = mask.get_pixel(local_pos.x, local_pos.y)
-			if color.a > 0.5:  # Check if pixel is in clickable region
-				button.emit_signal("pressed")
-
-func _on_button_mouse_entered(tooltip: String, door_name: String) -> void:
-	current_mouse_region = door_name
-	_play_hotspot_sound(true)
-	$TooltipPanel.show()
-	$TooltipPanel/TooltipLabel.text = tooltip
-	_animate_door(door_name, true)
-
-func _on_button_mouse_exited(door_name: String) -> void:
-	current_mouse_region = null
-	_play_hotspot_sound(false)
-	$TooltipPanel.hide()
-	$TooltipPanel/TooltipLabel.text = ""
-	_animate_door(door_name, false)
 
 func _on_exit_pressed() -> void:
 	# Let door animation and sound finish before quitting
@@ -234,3 +186,51 @@ func _on_options_pressed() -> void:
 
 func _on_campaign_pressed() -> void:
 	_transition_to_scene("campaign")
+
+
+func _on_exit_button_mouse_entered() -> void:
+	_animate_door("ExitDoor", true)
+
+
+func _on_exit_button_mouse_exited() -> void:
+	_animate_door("ExitDoor", false)
+
+
+func _on_briefing_room_button_mouse_entered() -> void:
+	_animate_door("BriefingDoor", true)
+
+
+func _on_briefing_room_button_mouse_exited() -> void:
+	_animate_door("BriefingDoor", false)
+
+
+func _on_pilot_room_button_mouse_entered() -> void:
+	_animate_door("PilotRoomDoor", true)
+
+
+func _on_pilot_room_button_mouse_exited() -> void:
+	_animate_door("PilotRoomDoor", false)
+
+
+func _on_campaign_button_mouse_entered() -> void:
+	_play_hotspot_sound(true)
+
+
+func _on_campaign_button_mouse_exited() -> void:
+	_play_hotspot_sound(false)
+
+
+func _on_options_button_mouse_entered() -> void:
+	_play_hotspot_sound(true)
+
+
+func _on_options_button_mouse_exited() -> void:
+	_play_hotspot_sound(false)
+
+
+func _on_tech_room_button_mouse_entered() -> void:
+	_play_hotspot_sound(true)
+
+
+func _on_tech_room_button_mouse_exited() -> void:
+	_play_hotspot_sound(false)
