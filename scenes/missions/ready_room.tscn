@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://c5fp5g17olbyc"]
+
+[ext_resource type="Script" path="res://scenes/missions/ready_room.gd" id="1_3rpqw"]
+
+[node name="ReadyRoom" type="Node2D"]
+script = ExtResource("1_3rpqw")

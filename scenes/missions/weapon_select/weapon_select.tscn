@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://dtnqded8deowa"]
+
+[ext_resource type="Script" path="res://scenes/missions/weapon_select/weapon_select.gd" id="1_2hyll"]
+
+[node name="WeaponSelect" type="Node2D"]
+script = ExtResource("1_2hyll")

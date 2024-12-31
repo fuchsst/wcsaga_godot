@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://drkg8fc7wr28i"]
+
+[ext_resource type="Script" path="res://scenes/main/user_management.gd" id="1_7q0lt"]
+
+[node name="UserManagement" type="Node2D"]
+script = ExtResource("1_7q0lt")

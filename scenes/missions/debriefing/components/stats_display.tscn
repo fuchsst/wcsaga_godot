@@ -1,0 +1,3 @@
+[gd_scene format=3 uid="uid://cqhvaf06n8ora"]
+
+[node name="StatsDisplay" type="Node2D"]
