@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import logging
+import math
 import re
-import subprocess
 import tempfile
 from pathlib import Path
 from PIL import Image
@@ -77,52 +77,79 @@ class DDSConverter(BaseConverter):
             logger.error(f"Error reading .eff file {eff_path}: {e}")
             return 30
     
-    def convert_sequence_to_webm(self, sequence_files: list[Path], output_path: Path) -> bool:
-        """Convert a sequence of DDS files to WebM video using VP8 codec"""
-        # Get base path for .eff file
-        base_path = self._get_sequence_base(sequence_files[0])
-        fps = self._read_eff_fps(base_path)
+    def _calculate_grid_dimensions(self, frame_count: int) -> tuple[int, int]:
+        """Calculate optimal grid dimensions for the spritesheet"""
+        # Get the number of rows/columns that would create a roughly square grid
+        grid_size = math.ceil(math.sqrt(frame_count))
+        rows = grid_size
+        cols = grid_size
+        
+        # If the last row would be very empty, reduce the number of rows
+        if frame_count <= (grid_size * (grid_size - 1)):
+            rows = grid_size - 1
+            cols = math.ceil(frame_count / rows)
+            
+        return rows, cols
+    
+    def convert_sequence_to_spritesheet(self, sequence_files: list[Path], output_path: Path) -> bool:
+        """Convert a sequence of DDS files to a grid-based spritesheet PNG"""
         try:
             # Create temporary directory for PNG frames
             with tempfile.TemporaryDirectory() as temp_dir:
                 temp_dir_path = Path(temp_dir)
+                frames = []
                 
                 # Convert each DDS to PNG first
                 for i, dds_file in enumerate(sequence_files):
                     temp_png = temp_dir_path / f"frame_{i:04d}.png"
                     if not self.convert_to_png(dds_file, temp_png):
                         return False
-                
-                # Use ffmpeg to convert PNG sequence to WebM
-                input_pattern = str(temp_dir_path / "frame_%04d.png")
-                output_path = output_path.with_suffix('.webm')
-                
-                cmd = [
-                    'ffmpeg', '-y',
-                    '-framerate', str(fps),
-                    '-i', input_pattern,
-                    '-c:v', 'libvpx-vp9',
-                    '-pix_fmt', 'yuva420p', 
-                    '-b:v', '2M',         # Higher bitrate for quality
-                    '-minrate', '2M',     # Force constant bitrate
-                    '-maxrate', '2M',
-                    '-cpu-used', '0',     # Maximum CPU usage for best quality
-                    '-threads', '8',      # Use multiple threads for better encoding
-                    '-deadline', 'best',  # Best quality encoding
-                    '-auto-alt-ref', '0', # Disable alternate reference frames
                     
-                    str(output_path)
-                ]
+                    # Load the converted PNG
+                    with Image.open(temp_png) as img:
+                        frames.append(img.copy())
                 
-                result = subprocess.run(cmd, capture_output=True, text=True)
-                if result.returncode != 0:
-                    logger.error(f"FFmpeg conversion failed: {result.stderr}")
+                if not frames:
+                    logger.error("No frames were converted")
                     return False
-                    
+                
+                # Get dimensions for the spritesheet
+                frame_width = frames[0].width
+                frame_height = frames[0].height
+                rows, cols = self._calculate_grid_dimensions(len(frames))
+                
+                # Create the spritesheet
+                spritesheet = Image.new('RGBA', (cols * frame_width, rows * frame_height))
+                
+                # Paste each frame into the grid
+                for idx, frame in enumerate(frames):
+                    row = idx // cols
+                    col = idx % cols
+                    x = col * frame_width
+                    y = row * frame_height
+                    spritesheet.paste(frame, (x, y))
+                
+                # Save the spritesheet
+                output_path = output_path.with_suffix('.png')
+                spritesheet.save(output_path, 'PNG')
+                
+                # Write metadata file with frame info
+                meta_path = output_path.with_suffix('.meta')
+                with open(meta_path, 'w') as f:
+                    meta = {
+                        'frame_count': len(frames),
+                        'frame_width': frame_width,
+                        'frame_height': frame_height,
+                        'grid_rows': rows,
+                        'grid_cols': cols,
+                        'fps': self._read_eff_fps(self._get_sequence_base(sequence_files[0]))
+                    }
+                    f.write(str(meta))
+                
                 return True
                 
         except Exception as e:
-            logger.error(f"Failed to convert sequence to WebM: {e}")
+            logger.error(f"Failed to convert sequence to spritesheet: {e}")
             return False
             
     def convert_file(self, input_path: Path, output_path: Path) -> bool:
@@ -172,13 +199,13 @@ class DDSConverter(BaseConverter):
             output_path = self.get_output_path(base_path)
             
             # Skip if output exists and not forcing
-            if output_path.with_suffix('.webm').exists() and not self.force:
+            if output_path.exists() and not self.force:
                 logger.info(f"Skipping sequence {base_name} (output exists)")
                 continue
             
             try:
-                if self.convert_sequence_to_webm(seq_files, output_path):
-                    logger.info(f"Converted sequence {base_name} to WebM")
+                if self.convert_sequence_to_spritesheet(seq_files, output_path):
+                    logger.info(f"Converted sequence {base_name} to spritesheet")
                     processed_files.update(seq_files)
                 else:
                     logger.error(f"Failed to convert sequence {base_name}")
