@@ -1,7 +1,18 @@
-[gd_scene load_steps=3 format=3 uid="uid://b8r5u4q7kx2pn"]
+[gd_scene load_steps=12 format=3 uid="uid://b8r5u4q7kx2pn"]
 
 [ext_resource type="Script" path="res://scenes/main/user_management.gd" id="1_uxk2p"]
-[ext_resource type="Texture2D" uid="uid://b4k1bxc4kq5gx" path="res://assets/hermes_interface/2_BRB_080001.png" id="2_bg"]
+[ext_resource type="Texture2D" uid="uid://d08rjs447vawi" path="res://assets/hermes_interface/2_ChoosePilot.png" id="2_reveh"]
+[ext_resource type="Texture2D" uid="uid://ctilmd5f2hu73" path="res://assets/hermes_interface/2_CPB_060001.png" id="3_bmy6w"]
+[ext_resource type="Texture2D" uid="uid://claybg1gksujv" path="res://assets/hermes_interface/2_CPB_070001.png" id="4_p1x1p"]
+[ext_resource type="Texture2D" uid="uid://dvv0xddbhoc6c" path="res://assets/hermes_interface/2_CPB_000001.png" id="5_1m6s8"]
+[ext_resource type="Texture2D" uid="uid://bc84r0hb36xje" path="res://assets/hermes_interface/2_CPB_010001.png" id="6_k0kkl"]
+[ext_resource type="Texture2D" uid="uid://c0vthskyisv5d" path="res://assets/hermes_interface/2_CPB_020001.png" id="7_sjxm8"]
+[ext_resource type="Texture2D" uid="uid://xry2chkopbkx" path="res://assets/hermes_interface/2_CPB_030001.png" id="8_thkwy"]
+[ext_resource type="Texture2D" uid="uid://bx8y1q6i0ythu" path="res://assets/hermes_interface/2_CPB_040001.png" id="9_vtnny"]
+[ext_resource type="Texture2D" uid="uid://o52bi2fgwoi" path="res://assets/hermes_interface/2_CPB_050001.png" id="10_rgmm2"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_7q3rk"]
+font_size = 12
 
 [node name="UserManagement" type="Node2D"]
 script = ExtResource("1_uxk2p")
@@ -10,77 +21,212 @@ script = ExtResource("1_uxk2p")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_right = 1280.0
-offset_bottom = 720.0
-texture = ExtResource("2_bg")
+offset_right = 1024.0
+offset_bottom = 768.0
+texture = ExtResource("2_reveh")
 
-[node name="TopRightButtons" type="HBoxContainer" parent="."]
-offset_left = 1080.0
-offset_top = 20.0
-offset_right = 1260.0
-offset_bottom = 60.0
-theme_override_constants/separation = 20
+[node name="PilotListContainer" type="VBoxContainer" parent="."]
+offset_left = 197.0
+offset_top = 141.0
+offset_right = 676.0
+offset_bottom = 326.0
+
+[node name="PilotListLabel" type="Label" parent="PilotListContainer"]
+layout_mode = 2
+text = "Choose Pilot"
+label_settings = SubResource("LabelSettings_7q3rk")
+
+[node name="ItemList" type="ItemList" parent="PilotListContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+item_count = 2
+item_0/text = "gncvhvcnb"
+item_1/text = "gdhgh"
+
+[node name="TopRightButtons" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 681.0
+offset_top = 128.0
+offset_right = 839.0
+offset_bottom = 169.0
 
 [node name="SinglePlayer" type="TextureButton" parent="TopRightButtons"]
-custom_minimum_size = Vector2(80, 40)
 layout_mode = 2
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 75.0
+offset_bottom = 41.0
 focus_mode = 0
+texture_hover = ExtResource("3_bmy6w")
+
+[node name="SinglePlayerLabel" type="Label" parent="TopRightButtons/SinglePlayer"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -24.5
+offset_top = 37.0
+offset_right = 22.5
+offset_bottom = 54.0
+grow_horizontal = 2
+text = "Single"
+label_settings = SubResource("LabelSettings_7q3rk")
+horizontal_alignment = 1
 
 [node name="Multiplayer" type="TextureButton" parent="TopRightButtons"]
-custom_minimum_size = Vector2(80, 40)
 layout_mode = 2
+offset_left = 82.0
+offset_top = 4.0
+offset_right = 144.0
+offset_bottom = 41.0
 focus_mode = 0
+texture_hover = ExtResource("4_p1x1p")
 
-[node name="LeftButtons" type="HBoxContainer" parent="."]
-offset_left = 200.0
-offset_top = 340.0
-offset_right = 440.0
-offset_bottom = 380.0
-theme_override_constants/separation = 20
-
-[node name="Button1" type="TextureButton" parent="LeftButtons"]
-custom_minimum_size = Vector2(60, 40)
-layout_mode = 2
-focus_mode = 0
-
-[node name="Button2" type="TextureButton" parent="LeftButtons"]
-custom_minimum_size = Vector2(60, 40)
-layout_mode = 2
-focus_mode = 0
-
-[node name="Button3" type="TextureButton" parent="LeftButtons"]
-custom_minimum_size = Vector2(60, 40)
-layout_mode = 2
-focus_mode = 0
-
-[node name="RightButtons" type="VBoxContainer" parent="."]
-offset_left = 840.0
-offset_top = 320.0
-offset_right = 900.0
-offset_bottom = 460.0
-theme_override_constants/separation = 20
-
-[node name="Button1" type="TextureButton" parent="RightButtons"]
-custom_minimum_size = Vector2(60, 40)
-layout_mode = 2
-focus_mode = 0
-
-[node name="Button2" type="TextureButton" parent="RightButtons"]
-custom_minimum_size = Vector2(60, 40)
-layout_mode = 2
-focus_mode = 0
-
-[node name="Button3" type="TextureButton" parent="RightButtons"]
-custom_minimum_size = Vector2(60, 40)
-layout_mode = 2
-focus_mode = 0
-
-[node name="WelcomeLabel" type="Label" parent="."]
-offset_left = 440.0
-offset_top = 520.0
-offset_right = 840.0
-offset_bottom = 560.0
-theme_override_colors/font_color = Color(0.678431, 0.847059, 0.901961, 1)
-theme_override_font_sizes/font_size = 24
-text = "WELCOME BACK PILOT"
+[node name="MultiPlayerLabel" type="Label" parent="TopRightButtons/Multiplayer"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -21.0
+offset_top = 37.0
+offset_right = 26.0
+offset_bottom = 54.0
+grow_horizontal = 2
+text = "Multi"
+label_settings = SubResource("LabelSettings_7q3rk")
 horizontal_alignment = 1
+
+[node name="LeftButtons" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 168.0
+offset_top = 329.0
+offset_right = 453.0
+offset_bottom = 381.0
+
+[node name="CreatePilotButton" type="TextureButton" parent="LeftButtons"]
+layout_mode = 2
+offset_left = 14.0
+offset_right = 93.0
+offset_bottom = 52.0
+focus_mode = 0
+texture_hover = ExtResource("5_1m6s8")
+
+[node name="CreatePilotLabel" type="Label" parent="LeftButtons/CreatePilotButton"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -18.5
+offset_top = 54.0
+offset_right = 20.5
+offset_bottom = 71.0
+grow_horizontal = 2
+text = "Create"
+label_settings = SubResource("LabelSettings_7q3rk")
+horizontal_alignment = 1
+
+[node name="ClonePilotButton" type="TextureButton" parent="LeftButtons"]
+layout_mode = 2
+offset_left = 107.0
+offset_top = -1.0
+offset_right = 176.0
+offset_bottom = 51.0
+focus_mode = 0
+texture_hover = ExtResource("6_k0kkl")
+
+[node name="ClonePilotLabel" type="Label" parent="LeftButtons/ClonePilotButton"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -13.5
+offset_top = 54.0
+offset_right = 25.5
+offset_bottom = 71.0
+grow_horizontal = 2
+text = "Clone"
+label_settings = SubResource("LabelSettings_7q3rk")
+horizontal_alignment = 1
+
+[node name="RemovePilotButton" type="TextureButton" parent="LeftButtons"]
+layout_mode = 2
+offset_left = 193.0
+offset_top = -1.0
+offset_right = 276.0
+offset_bottom = 51.0
+focus_mode = 0
+texture_hover = ExtResource("7_sjxm8")
+
+[node name="RemovePilotLabel" type="Label" parent="LeftButtons/RemovePilotButton"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.5
+offset_top = 54.0
+offset_right = 18.5
+offset_bottom = 71.0
+grow_horizontal = 2
+text = "Remove"
+label_settings = SubResource("LabelSettings_7q3rk")
+horizontal_alignment = 1
+
+[node name="RightButtons" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 680.0
+offset_top = 331.0
+offset_right = 843.0
+offset_bottom = 391.0
+
+[node name="UpButton" type="TextureButton" parent="RightButtons"]
+layout_mode = 2
+offset_left = 6.0
+offset_top = 10.0
+offset_right = 55.0
+offset_bottom = 59.0
+focus_mode = 0
+texture_hover = ExtResource("8_thkwy")
+
+[node name="DownButton" type="TextureButton" parent="RightButtons"]
+layout_mode = 2
+offset_left = 49.0
+offset_top = 10.0
+offset_right = 97.0
+offset_bottom = 59.0
+focus_mode = 0
+texture_hover = ExtResource("9_vtnny")
+
+[node name="SelectButton" type="TextureButton" parent="RightButtons"]
+layout_mode = 2
+offset_left = 90.0
+offset_top = 1.0
+offset_right = 167.0
+offset_bottom = 59.0
+focus_mode = 0
+texture_hover = ExtResource("10_rgmm2")
+
+[node name="SelectLabel" type="Label" parent="RightButtons/SelectButton"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -22.5
+offset_top = 58.0
+offset_right = 24.5
+offset_bottom = 75.0
+grow_horizontal = 2
+text = "Select"
+label_settings = SubResource("LabelSettings_7q3rk")
+horizontal_alignment = 1
+
+[connection signal="pressed" from="TopRightButtons/SinglePlayer" to="." method="_on_single_player_pressed"]
+[connection signal="pressed" from="TopRightButtons/Multiplayer" to="." method="_on_multiplayer_pressed"]
+[connection signal="pressed" from="LeftButtons/CreatePilotButton" to="." method="_on_create_pilot_button_pressed"]
+[connection signal="pressed" from="LeftButtons/ClonePilotButton" to="." method="_on_clone_pilot_button_pressed"]
+[connection signal="pressed" from="LeftButtons/RemovePilotButton" to="." method="_on_remove_pilot_button_pressed"]
+[connection signal="pressed" from="RightButtons/UpButton" to="." method="_on_up_button_pressed"]
+[connection signal="pressed" from="RightButtons/DownButton" to="." method="_on_down_button_pressed"]
+[connection signal="pressed" from="RightButtons/SelectButton" to="." method="_on_select_button_pressed"]
