@@ -7286,6 +7286,7 @@ script = ExtResource("1_d4xcv")
 sounds = ExtResource("2_6psud")
 
 [node name="Background" type="TextureRect" parent="."]
+layout_mode = 0
 offset_right = 1024.0
 offset_bottom = 768.0
 texture = ExtResource("2_bg")
@@ -7381,6 +7382,7 @@ frame_progress = 0.862574
 
 [node name="TooltipPanel" type="Panel" parent="."]
 visible = false
+layout_mode = 0
 offset_top = 755.0
 offset_right = 2048.0
 offset_bottom = 781.0

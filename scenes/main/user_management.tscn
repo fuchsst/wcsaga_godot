@@ -26,9 +26,12 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 offset_right = 1024.0
 offset_bottom = 768.0
+grow_horizontal = 2
+grow_vertical = 2
 texture = ExtResource("2_reveh")
 
 [node name="PilotListContainer" type="VBoxContainer" parent="."]
+layout_mode = 0
 offset_left = 197.0
 offset_top = 141.0
 offset_right = 676.0
@@ -240,6 +243,7 @@ size_flags_vertical = 8
 horizontal_alignment = 1
 
 [node name="PilotInputBox" type="LineEdit" parent="."]
+layout_mode = 0
 offset_left = 364.0
 offset_top = 575.0
 offset_right = 638.0

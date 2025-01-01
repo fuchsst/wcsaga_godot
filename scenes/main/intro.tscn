@@ -9,12 +9,14 @@ anchors_preset = 0
 script = ExtResource("1_e0ba7")
 
 [node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 0
 offset_right = 1024.0
 offset_bottom = 768.0
 color = Color(0, 0, 0, 1)
 
 [node name="VideoPlayer" type="VideoStreamPlayer" parent="."]
 custom_minimum_size = Vector2(1024, 768)
+layout_mode = 0
 offset_right = 1024.0
 offset_bottom = 768.0
 stream = ExtResource("2_re8om")
