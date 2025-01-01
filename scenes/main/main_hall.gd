@@ -54,11 +54,9 @@ func _ready() -> void:
 	# Start ambient sounds
 	_start_ambient_loop()
 	_start_intercom_timer()
-	
-	# Start misc animations
-	for anim in $MiscAnimations.get_children():
-		if anim.sprite_frames.has_animation("default") and anim.sprite_frames.get_frame_count("default") > 0:
-			anim.play("default")
+		
+	# Show first-time tip if needed
+	GameState.show_pilot_tip()
 
 func _process(_delta: float) -> void:
 	# Update door animations
@@ -153,7 +151,7 @@ func _animate_door(door_name: String, open: bool) -> void:
 		_play_door_sound(door_name, true)
 	elif not open and door_states[door_name] != DoorState.CLOSED:
 		door_states[door_name] = DoorState.CLOSING
-		door.play("default", true)  # Play in reverse
+		door.play_backwards("default")  # Play in reverse
 		_play_door_sound(door_name, false)
 
 

@@ -7279,7 +7279,9 @@ corner_radius_top_right = 5
 corner_radius_bottom_right = 5
 corner_radius_bottom_left = 5
 
-[node name="MainHall" type="Node2D"]
+[node name="MainHall" type="Control"]
+layout_mode = 3
+anchors_preset = 0
 script = ExtResource("1_d4xcv")
 sounds = ExtResource("2_6psud")
 

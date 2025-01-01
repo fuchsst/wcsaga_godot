@@ -14,10 +14,13 @@
 [sub_resource type="LabelSettings" id="LabelSettings_7q3rk"]
 font_size = 12
 
-[node name="UserManagement" type="Node2D"]
+[node name="UserManagement" type="Control"]
+layout_mode = 3
+anchors_preset = 0
 script = ExtResource("1_uxk2p")
 
 [node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -39,9 +42,8 @@ label_settings = SubResource("LabelSettings_7q3rk")
 [node name="ItemList" type="ItemList" parent="PilotListContainer"]
 layout_mode = 2
 size_flags_vertical = 3
-item_count = 2
-item_0/text = "gncvhvcnb"
-item_1/text = "gdhgh"
+allow_reselect = true
+auto_height = true
 
 [node name="TopRightButtons" type="Control" parent="."]
 layout_mode = 3
@@ -81,6 +83,7 @@ offset_top = 4.0
 offset_right = 144.0
 offset_bottom = 41.0
 focus_mode = 0
+disabled = true
 texture_hover = ExtResource("4_p1x1p")
 
 [node name="MultiPlayerLabel" type="Label" parent="TopRightButtons/Multiplayer"]
@@ -222,6 +225,26 @@ text = "Select"
 label_settings = SubResource("LabelSettings_7q3rk")
 horizontal_alignment = 1
 
+[node name="BottomText" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 478.0
+offset_right = 1024.0
+offset_bottom = 508.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+horizontal_alignment = 1
+
+[node name="PilotInputBox" type="LineEdit" parent="."]
+offset_left = 364.0
+offset_top = 575.0
+offset_right = 638.0
+offset_bottom = 606.0
+
 [connection signal="pressed" from="TopRightButtons/SinglePlayer" to="." method="_on_single_player_pressed"]
 [connection signal="pressed" from="TopRightButtons/Multiplayer" to="." method="_on_multiplayer_pressed"]
 [connection signal="pressed" from="LeftButtons/CreatePilotButton" to="." method="_on_create_pilot_button_pressed"]
@@ -230,3 +253,4 @@ horizontal_alignment = 1
 [connection signal="pressed" from="RightButtons/UpButton" to="." method="_on_up_button_pressed"]
 [connection signal="pressed" from="RightButtons/DownButton" to="." method="_on_down_button_pressed"]
 [connection signal="pressed" from="RightButtons/SelectButton" to="." method="_on_select_button_pressed"]
+[connection signal="text_submitted" from="PilotInputBox" to="." method="_on_pilot_input_box_text_submitted"]

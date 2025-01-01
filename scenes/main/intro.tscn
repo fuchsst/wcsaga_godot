@@ -3,7 +3,9 @@
 [ext_resource type="Script" path="res://scenes/main/intro.gd" id="1_e0ba7"]
 [ext_resource type="VideoStream" path="res://assets/hermes_movies/intro.ogv" id="2_re8om"]
 
-[node name="Intro" type="Node2D"]
+[node name="Intro" type="Control"]
+layout_mode = 3
+anchors_preset = 0
 script = ExtResource("1_e0ba7")
 
 [node name="ColorRect" type="ColorRect" parent="."]
