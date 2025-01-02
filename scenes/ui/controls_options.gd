@@ -3,59 +3,60 @@ extends Control
 # Sound effects
 @export var sounds: GameSounds
 
-# Sound indices from tbl file
-const HOVER_SOUND = 36  # Using HOTSPOT_ON_SOUND from original code
-const CLICK_SOUND = 37  # Using HOTSPOT_OFF_SOUND from original code
-const ERROR_SOUND = 38  # Using AMBIENT_LOOP_SOUND from original code
-const ACCEPT_SOUND = 39  # Using next available index
-const CANCEL_SOUND = 40  # Using next available index
+# Sound indices from game_sounds.tres
+const HOVER_SOUND = 17  # snd_user_over
+const CLICK_SOUND = 18  # snd_user_select
+const ERROR_SOUND = 10  # snd_general_fail
+const ACCEPT_SOUND = 7  # snd_commit_pressed
+const CANCEL_SOUND = 8  # snd_prev_next_pressed
 
 # Current state
 var current_tab := "target"
 var binding_mode := false
 var binding_control: Control = null
-var binding_type := "" # "key" or "joy" or "axis"
+var binding_type := "" # "key" or "joy" or "mouse" or "axis"
 var conflicts := {}
 var current_pilot: PilotData = null
 
 # Control configuration data
-var control_config := {}
-var control_config_backup := {}
+var target_control_config := {}
+var ship_control_config := {}
+var weapon_control_config := {}
+var computer_control_config := {}
 var axis_config := {}
+
+# Backup configs for cancel operation
+var target_control_config_backup := {}
+var ship_control_config_backup := {}
+var weapon_control_config_backup := {}
+var computer_control_config_backup := {}
 var axis_config_backup := {}
 var undo_stack: Array[Dictionary] = []
 
 # UI references
 @onready var tab_panels := {
-	"target": $TabPanels/TargetControls,
-	"ship": $TabPanels/ShipControls,
-	"weapon": $TabPanels/WeaponControls,
-	"computer": $TabPanels/ComputerControls
+	"Targeting": $TabPanels/TargetControls,
+	"Ship": $TabPanels/ShipControls,
+	"Weapons": $TabPanels/WeaponControls,
+	"Misc": $TabPanels/ComputerControls
 }
 
 func _ready() -> void:
 	# Get current pilot
-	current_pilot = GameState.current_pilot
+	current_pilot = GameState.active_pilot
 	if current_pilot == null:
 		push_error("No pilot selected")
 		return
-		
-	# Load current control configuration
+
 	load_control_config()
-	
-	# Connect signals
 	connect_signals()
-	
-	# Show initial tab
-	switch_to_tab("target")
-	
-	# Populate controls
+	switch_to_tab("Targeting")
 	populate_controls()
 
 func connect_signals() -> void:
 	# Connect tab button signals
 	for tab in tab_panels:
-		var button = get_node("TabButtons/" + tab.capitalize())
+		var button = get_node("TabButtons/" + tab)
 		button.pressed.connect(func(): switch_to_tab(tab))
 		button.mouse_entered.connect(func(): play_hover_sound())
 
@@ -82,9 +83,12 @@ func connect_signals() -> void:
 	$ControlsHelp/VBoxContainer/HBoxContainer/CloseButton.mouse_entered.connect(func(): play_hover_sound())
 
 func populate_controls() -> void:
-	# Get control config from pilot or defaults
-	var config = current_pilot.control_config if !current_pilot.control_config.is_empty() else PilotData.DEFAULT_CONTROL_CONFIG
-	var axis_cfg = current_pilot.axis_config if !current_pilot.axis_config.is_empty() else PilotData.DEFAULT_AXIS_CONFIG
+	# Get control configs from pilot or defaults
+	target_control_config = current_pilot.target_control_config if !current_pilot.target_control_config.is_empty() else PilotData.DEFAULT_TARGET_CONTROLS.duplicate(true)
+	ship_control_config = current_pilot.ship_control_config if !current_pilot.ship_control_config.is_empty() else PilotData.DEFAULT_SHIP_CONTROLS.duplicate(true)
+	weapon_control_config = current_pilot.weapon_control_config if !current_pilot.weapon_control_config.is_empty() else PilotData.DEFAULT_WEAPON_CONTROLS.duplicate(true)
+	computer_control_config = current_pilot.computer_control_config if !current_pilot.computer_control_config.is_empty() else PilotData.DEFAULT_COMPUTER_CONTROLS.duplicate(true)
+	axis_config = current_pilot.axis_config if !current_pilot.axis_config.is_empty() else PilotData.DEFAULT_AXIS_CONFIG.duplicate(true)
 	
 	# Clear existing controls
 	for tab in tab_panels:
@@ -94,36 +98,27 @@ func populate_controls() -> void:
 	
 	# Target Controls
 	var target_container = tab_panels["target"].get_node("ScrollContainer/VBoxContainer")
-	for action in ["target_next", "target_prev", "target_nearest_hostile", "target_prev_hostile",
-				  "target_nearest_friendly", "target_prev_friendly", "target_in_reticle",
-				  "target_attacking_target", "target_last_sender", "clear_target",
-				  "target_subsystem", "next_subsystem", "prev_subsystem", "clear_subsystem"]:
-		add_control_line(target_container, action, config[action])
+	for action in target_control_config:
+		add_control_line(target_container, action, target_control_config[action])
 	
 	# Ship Controls
 	var ship_container = tab_panels["ship"].get_node("ScrollContainer/VBoxContainer")
-	for action in ["pitch_forward", "pitch_back", "yaw_left", "yaw_right", "roll_left", "roll_right",
-				  "throttle_up", "throttle_down", "throttle_zero", "throttle_full",
-				  "throttle_one_third", "throttle_two_thirds", "throttle_plus_5", "throttle_minus_5",
-				  "afterburner", "glide_when_pressed", "toggle_glide"]:
-		add_control_line(ship_container, action, config[action])
+	for action in ship_control_config:
+		add_control_line(ship_container, action, ship_control_config[action])
 	
 	# Add axis controls to ship tab
-	for axis in ["pitch", "yaw", "roll", "throttle_abs", "throttle_rel"]:
-		add_axis_line(ship_container, axis, axis_cfg[axis])
+	for axis in axis_config:
+		add_axis_line(ship_container, axis, axis_config[axis])
 	
 	# Weapon Controls
 	var weapon_container = tab_panels["weapon"].get_node("ScrollContainer/VBoxContainer")
-	for action in ["fire_primary", "fire_secondary", "next_primary", "prev_primary",
-				  "cycle_secondary", "cycle_secondary_bank", "launch_countermeasure"]:
-		add_control_line(weapon_container, action, config[action])
+	for action in weapon_control_config:
+		add_control_line(weapon_container, action, weapon_control_config[action])
 	
 	# Computer Controls
 	var computer_container = tab_panels["computer"].get_node("ScrollContainer/VBoxContainer")
-	for action in ["match_target_speed", "toggle_auto_match", "view_chase", "view_external",
-				  "view_target", "view_dist_in", "view_dist_out", "view_center",
-				  "comm_menu", "show_objectives", "end_mission"]:
-		add_control_line(computer_container, action, config[action])
+	for action in computer_control_config:
+		add_control_line(computer_container, action, computer_control_config[action])
 
 func add_control_line(container: Node, action: String, binding: Dictionary) -> void:
 	var line = preload("res://scenes/ui/control_line.tscn").instantiate()
@@ -142,6 +137,10 @@ func add_control_line(container: Node, action: String, binding: Dictionary) -> v
 	# Set joy binding
 	if binding.joy >= 0:
 		line.joy_button = binding.joy
+		
+	# Set mouse binding
+	if binding.mouse >= 0:
+		line.mouse_button = binding.mouse
 	
 	# Set name for identification
 	line.name = action
@@ -149,6 +148,7 @@ func add_control_line(container: Node, action: String, binding: Dictionary) -> v
 	# Connect signals
 	line.get_node("KeyButton").pressed.connect(func(): start_key_binding(line))
 	line.get_node("JoyButton").pressed.connect(func(): start_joy_binding(line))
+	line.get_node("MouseButton").pressed.connect(func(): start_mouse_binding(line))
 
 func add_axis_line(container: Node, axis: String, config: Dictionary) -> void:
 	var line = preload("res://scenes/ui/axis_line.tscn").instantiate()
@@ -172,14 +172,11 @@ func add_axis_line(container: Node, axis: String, config: Dictionary) -> void:
 	line.get_node("InvertButton").pressed.connect(func(): toggle_axis_invert(line))
 
 func load_control_config() -> void:
-	if current_pilot.control_config.is_empty():
-		current_pilot.control_config = PilotData.DEFAULT_CONTROL_CONFIG
-		current_pilot.axis_config = PilotData.DEFAULT_AXIS_CONFIG
-	
 	# Store backups for cancel operation
-	control_config = current_pilot.control_config.duplicate(true)
-	control_config_backup = control_config.duplicate(true)
-	axis_config = current_pilot.axis_config.duplicate(true)
+	target_control_config_backup = target_control_config.duplicate(true)
+	ship_control_config_backup = ship_control_config.duplicate(true)
+	weapon_control_config_backup = weapon_control_config.duplicate(true)
+	computer_control_config_backup = computer_control_config.duplicate(true)
 	axis_config_backup = axis_config.duplicate(true)
 
 func switch_to_tab(tab: String) -> void:
@@ -226,6 +223,22 @@ func get_joy_name(joy: int) -> String:
 		return "None"
 	return "Button " + str(joy)
 
+func get_mouse_name(button: int) -> String:
+	if button < 0:
+		return "None"
+		
+	match button:
+		MOUSE_BUTTON_LEFT: return "Left Click"
+		MOUSE_BUTTON_RIGHT: return "Right Click"
+		MOUSE_BUTTON_MIDDLE: return "Middle Click"
+		MOUSE_BUTTON_WHEEL_UP: return "Wheel Up"
+		MOUSE_BUTTON_WHEEL_DOWN: return "Wheel Down"
+		MOUSE_BUTTON_WHEEL_LEFT: return "Wheel Left"
+		MOUSE_BUTTON_WHEEL_RIGHT: return "Wheel Right"
+		MOUSE_BUTTON_XBUTTON1: return "X-Button 1"
+		MOUSE_BUTTON_XBUTTON2: return "X-Button 2"
+		_: return "Button " + str(button)
+
 func get_axis_name(axis: int) -> String:
 	if axis < 0:
 		return "None"
@@ -256,18 +269,23 @@ func handle_binding_input(event: InputEvent) -> void:
 				if Input.is_key_pressed(KEY_ALT):
 					mod |= KEY_ALT
 					
-				# Get action from control line
+				# Get action and config from control line
 				var action = binding_control.get_parent().name
+				var config = _get_config_for_action(action)
 				
-				# Update control config
-				control_config[action].key = event.keycode
-				control_config[action].mod = mod
+				if config:
+					config[action].key = event.keycode
+					config[action].mod = mod
+					config[action].mouse = -1 # Clear mouse binding when setting key
+					config[action].joy = -1 # Clear joy binding when setting key
 				
 				# Update control line
 				binding_control.get_parent().key = event.keycode
 				binding_control.get_parent().alt_modifier = (mod & KEY_ALT) != 0
 				binding_control.get_parent().shift_modifier = (mod & KEY_SHIFT) != 0
 				binding_control.get_parent().ctrl_modifier = (mod & KEY_CTRL) != 0
+				binding_control.get_parent().mouse_button = -1
+				binding_control.get_parent().joy_button = -1
 				
 				binding_mode = false
 				binding_control = null
@@ -278,14 +296,50 @@ func handle_binding_input(event: InputEvent) -> void:
 				# Save current state for undo
 				save_undo_state()
 				
-				# Get action from control line
+				# Get action and config from control line
 				var action = binding_control.get_parent().name
+				var config = _get_config_for_action(action)
 				
-				# Update control config
-				control_config[action].joy = event.button_index
+				if config:
+					config[action].joy = event.button_index
+					config[action].mouse = -1 # Clear mouse binding when setting joy
+					config[action].key = -1 # Clear key binding when setting joy
+					config[action].mod = 0
 				
 				# Update control line
 				binding_control.get_parent().joy_button = event.button_index
+				binding_control.get_parent().mouse_button = -1
+				binding_control.get_parent().key = -1
+				binding_control.get_parent().alt_modifier = false
+				binding_control.get_parent().shift_modifier = false
+				binding_control.get_parent().ctrl_modifier = false
+				
+				binding_mode = false
+				binding_control = null
+				check_conflicts()
+				
+		"mouse":
+			if event is InputEventMouseButton and event.pressed:
+				# Save current state for undo
+				save_undo_state()
+				
+				# Get action and config from control line
+				var action = binding_control.get_parent().name
+				var config = _get_config_for_action(action)
+				
+				if config:
+					config[action].mouse = event.button_index
+					config[action].key = -1 # Clear key binding when setting mouse
+					config[action].joy = -1 # Clear joy binding when setting mouse
+					config[action].mod = 0
+				
+				# Update control line
+				binding_control.get_parent().mouse_button = event.button_index
+				binding_control.get_parent().key = -1
+				binding_control.get_parent().joy_button = -1
+				binding_control.get_parent().alt_modifier = false
+				binding_control.get_parent().shift_modifier = false
+				binding_control.get_parent().ctrl_modifier = false
 				
 				binding_mode = false
 				binding_control = null
@@ -313,16 +367,57 @@ func start_key_binding(line: ControlLine) -> void:
 	binding_mode = true
 	binding_type = "key"
 	binding_control = line.get_node("KeyButton")
+	
+	# Add visual feedback for current edited key
+	for tab in tab_panels:
+		var container = tab_panels[tab].get_node("ScrollContainer/VBoxContainer")
+		for control_line in container.get_children():
+			if control_line == line:
+				line.modulate = Color(0.75, 0.6, 0.6, 0.8) # Highlight yellow
+			elif control_line is ControlLine:
+				control_line.modulate = Color(1, 1, 1, 1)
 
 func start_joy_binding(line: ControlLine) -> void:
 	binding_mode = true
 	binding_type = "joy"
 	binding_control = line.get_node("JoyButton")
+	
+	# Add visual feedback for current edited key
+	for tab in tab_panels:
+		var container = tab_panels[tab].get_node("ScrollContainer/VBoxContainer")
+		for control_line in container.get_children():
+			if control_line == line:
+				line.modulate = Color(0.75, 0.6, 0.6, 0.8) # Highlight yellow
+			elif control_line is ControlLine:
+				control_line.modulate = Color(1, 1, 1, 1)
+
+func start_mouse_binding(line: ControlLine) -> void:
+	binding_mode = true
+	binding_type = "mouse"
+	binding_control = line.get_node("MouseButton")
+	
+	# Add visual feedback for current edited key
+	for tab in tab_panels:
+		var container = tab_panels[tab].get_node("ScrollContainer/VBoxContainer")
+		for control_line in container.get_children():
+			if control_line == line:
+				line.modulate = Color(0.75, 0.6, 0.6, 0.8) # Highlight yellow
+			elif control_line is ControlLine:
+				control_line.modulate = Color(1, 1, 1, 1)
 
 func start_axis_binding(line: Control) -> void:
 	binding_mode = true
 	binding_type = "axis"
 	binding_control = line.get_node("AxisButton")
+	
+	# Add visual feedback for current edited key
+	for tab in tab_panels:
+		var container = tab_panels[tab].get_node("ScrollContainer/VBoxContainer")
+		for control_line in container.get_children():
+			if control_line == line:
+				line.modulate = Color(0.75, 0.6, 0.6, 0.8) # Highlight yellow
+			elif control_line is ControlLine:
+				control_line.modulate = Color(1, 1, 1, 1)
 
 func clear_selected_binding() -> void:
 	if binding_control == null:
@@ -332,31 +427,64 @@ func clear_selected_binding() -> void:
 	
 	var line = binding_control.get_parent()
 	var action = line.name
+	var config = _get_config_for_action(action)
 	
 	match binding_type:
 		"key":
-			control_config[action].key = -1
-			control_config[action].mod = 0
-			line.key = -1
-			line.alt_modifier = false
-			line.shift_modifier = false
-			line.ctrl_modifier = false
+			if config:
+				config[action].key = -1
+				config[action].mod = 0
+				line.key = -1
+				line.alt_modifier = false
+				line.shift_modifier = false
+				line.ctrl_modifier = false
 		"joy":
-			control_config[action].joy = -1
-			line.joy_button = -1
+			if config:
+				config[action].joy = -1
+				line.joy_button = -1
+		"mouse":
+			if config:
+				config[action].mouse = -1
+				line.mouse_button = -1
 		"axis":
-			axis_config[action].axis = -1
-			line.get_node("AxisButton/AxisLabel").text = "None"
+			if action in axis_config:
+				axis_config[action].axis = -1
+				line.get_node("AxisButton/AxisLabel").text = "None"
+	
+	# Reset visual feedback
+	line.modulate = Color(1, 1, 1, 1)
+	binding_mode = false
+	binding_control = null
 	
 	check_conflicts()
+	play_click_sound()
 
 func clear_all_bindings() -> void:
 	save_undo_state()
 	
-	for action in control_config:
-		control_config[action].key = -1
-		control_config[action].joy = -1
-		control_config[action].mod = 0
+	for action in target_control_config:
+		target_control_config[action].key = -1
+		target_control_config[action].joy = -1
+		target_control_config[action].mouse = -1
+		target_control_config[action].mod = 0
+		
+	for action in ship_control_config:
+		ship_control_config[action].key = -1
+		ship_control_config[action].joy = -1
+		ship_control_config[action].mouse = -1
+		ship_control_config[action].mod = 0
+		
+	for action in weapon_control_config:
+		weapon_control_config[action].key = -1
+		weapon_control_config[action].joy = -1
+		weapon_control_config[action].mouse = -1
+		weapon_control_config[action].mod = 0
+		
+	for action in computer_control_config:
+		computer_control_config[action].key = -1
+		computer_control_config[action].joy = -1
+		computer_control_config[action].mouse = -1
+		computer_control_config[action].mod = 0
 		
 	for axis in axis_config:
 		axis_config[axis].axis = -1
@@ -367,31 +495,46 @@ func clear_all_bindings() -> void:
 func check_conflicts() -> void:
 	conflicts.clear()
 	
-	# Check for duplicate key bindings
+	# Check for duplicate key bindings across all configs
 	var used_keys := {}
 	var used_joys := {}
+	var used_mice := {}
 	var used_axes := {}
 	
-	for action in control_config:
-		var binding = control_config[action]
+	var all_configs = {}
+	all_configs.merge(target_control_config)
+	all_configs.merge(ship_control_config)
+	all_configs.merge(weapon_control_config)
+	all_configs.merge(computer_control_config)
+
+	for action in all_configs:
+		var binding = all_configs[action]
 		var key = binding.key
 		var mod = binding.mod
 		var joy = binding.joy
+		var mouse = binding.mouse
 		
 		if key >= 0:
 			var key_id = str(key) + "_" + str(mod)
 			if key_id in used_keys:
-				conflicts[action] = {"key": used_keys[key_id], "joy": -1}
-				conflicts[used_keys[key_id]] = {"key": action, "joy": -1}
+				conflicts[action] = {"key": used_keys[key_id], "joy": -1, "mouse": -1}
+				conflicts[used_keys[key_id]] = {"key": action, "joy": -1, "mouse": -1}
 			else:
 				used_keys[key_id] = action
 				
 		if joy >= 0:
 			if joy in used_joys:
-				conflicts[action] = {"key": -1, "joy": used_joys[joy]}
-				conflicts[used_joys[joy]] = {"key": -1, "joy": action}
+				conflicts[action] = {"key": -1, "joy": used_joys[joy], "mouse": -1}
+				conflicts[used_joys[joy]] = {"key": -1, "joy": action, "mouse": -1}
 			else:
 				used_joys[joy] = action
+				
+		if mouse >= 0:
+			if mouse in used_mice:
+				conflicts[action] = {"key": -1, "joy": -1, "mouse": used_mice[mouse]}
+				conflicts[used_mice[mouse]] = {"key": -1, "joy": -1, "mouse": action}
+			else:
+				used_mice[mouse] = action
 				
 	# Check for duplicate axis bindings
 	for axis in axis_config:
@@ -416,26 +559,30 @@ func accept_changes() -> void:
 		push_error("No pilot selected")
 		return
 		
-	pilot_data.control_config = control_config.duplicate(true)
+	pilot_data.target_control_config = target_control_config.duplicate(true)
+	pilot_data.ship_control_config = ship_control_config.duplicate(true)
+	pilot_data.weapon_control_config = weapon_control_config.duplicate(true)
+	pilot_data.computer_control_config = computer_control_config.duplicate(true)
 	pilot_data.axis_config = axis_config.duplicate(true)
-	
-	# Also update GameSettings for defaults
-	var settings := GameSettings.load_or_create()
-	settings.control_config = control_config.duplicate(true)
-	settings.save()
 	
 	play_accept_sound()
 	get_tree().change_scene_to_file("res://scenes/ui/options.tscn")
 
 func cancel_changes() -> void:
-	control_config = control_config_backup.duplicate(true)
+	target_control_config = target_control_config_backup.duplicate(true)
+	ship_control_config = ship_control_config_backup.duplicate(true)
+	weapon_control_config = weapon_control_config_backup.duplicate(true)
+	computer_control_config = computer_control_config_backup.duplicate(true)
 	axis_config = axis_config_backup.duplicate(true)
 	play_cancel_sound()
 	get_tree().change_scene_to_file("res://scenes/ui/options.tscn")
 
 func reset_to_defaults() -> void:
 	save_undo_state()
-	control_config.clear()
+	target_control_config.clear()
+	ship_control_config.clear()
+	weapon_control_config.clear()
+	computer_control_config.clear()
 	axis_config.clear()
 	load_control_config()
 	update_control_texts()
@@ -443,7 +590,10 @@ func reset_to_defaults() -> void:
 
 func save_undo_state() -> void:
 	var state := {
-		"control_config": control_config.duplicate(true),
+		"target_control_config": target_control_config.duplicate(true),
+		"ship_control_config": ship_control_config.duplicate(true),
+		"weapon_control_config": weapon_control_config.duplicate(true),
+		"computer_control_config": computer_control_config.duplicate(true),
 		"axis_config": axis_config.duplicate(true)
 	}
 	undo_stack.push_back(state)
@@ -453,19 +603,42 @@ func undo_last_change() -> void:
 		return
 		
 	var state = undo_stack.pop_back()
-	control_config = state.control_config.duplicate(true)
+	target_control_config = state.target_control_config.duplicate(true)
+	ship_control_config = state.ship_control_config.duplicate(true)
+	weapon_control_config = state.weapon_control_config.duplicate(true)
+	computer_control_config = state.computer_control_config.duplicate(true)
 	axis_config = state.axis_config.duplicate(true)
 	update_control_texts()
 	check_conflicts()
 
+# Helper function to get the appropriate config for an action
+func _get_config_for_action(action: String) -> Dictionary:
+	if action in target_control_config:
+		return target_control_config
+	elif action in ship_control_config:
+		return ship_control_config
+	elif action in weapon_control_config:
+		return weapon_control_config
+	elif action in computer_control_config:
+		return computer_control_config
+	return {}
+
 func update_control_line(line: Control, action: String) -> void:
+	var config = _get_config_for_action(action)
+	if not config:
+		return
+		
 	# Update key binding text
 	var key_label = line.get_node("KeyButton/KeyLabel")
-	key_label.text = get_key_name(control_config[action].key, control_config[action].mod)
+	key_label.text = get_key_name(config[action].key, config[action].mod)
 	
 	# Update joy binding text
 	var joy_label = line.get_node("JoyButton/JoyLabel")
-	joy_label.text = get_joy_name(control_config[action].joy)
+	joy_label.text = get_joy_name(config[action].joy)
+	
+	# Update mouse binding text
+	var mouse_label = line.get_node("MouseButton/MouseLabel")
+	mouse_label.text = get_mouse_name(config[action].mouse)
 	
 	# Update colors based on conflicts
 	if action in conflicts:
@@ -478,9 +651,15 @@ func update_control_line(line: Control, action: String) -> void:
 			joy_label.modulate = Color.RED
 		else:
 			joy_label.modulate = Color.WHITE
+			
+		if conflicts[action].mouse >= 0:
+			mouse_label.modulate = Color.RED
+		else:
+			mouse_label.modulate = Color.WHITE
 	else:
 		key_label.modulate = Color.WHITE
 		joy_label.modulate = Color.WHITE
+		mouse_label.modulate = Color.WHITE
 
 func update_axis_line(line: Control, axis: String) -> void:
 	# Update axis binding text
@@ -514,11 +693,15 @@ func clear_conflicts() -> void:
 	
 	# Clear key conflicts
 	for action in conflicts:
-		if conflicts[action].key >= 0:
-			control_config[action].key = -1
-			control_config[action].mod = 0
-		if conflicts[action].joy >= 0:
-			control_config[action].joy = -1
+		var config = _get_config_for_action(action)
+		if config:
+			if conflicts[action].key >= 0:
+				config[action].key = -1
+				config[action].mod = 0
+			if conflicts[action].joy >= 0:
+				config[action].joy = -1
+			if conflicts[action].mouse >= 0:
+				config[action].mouse = -1
 		if "axis" in conflicts[action]:
 			axis_config[action].axis = -1
 	
@@ -561,6 +744,14 @@ func show_conflicts() -> void:
 			list.add_child(label)
 			shown_conflicts[action] = true
 			shown_conflicts[conflict.joy] = true
+			
+		if conflict.mouse >= 0:
+			var label = template.duplicate()
+			label.text = "%s conflicts with %s (Mouse binding)" % [action, conflict.mouse]
+			label.visible = true
+			list.add_child(label)
+			shown_conflicts[action] = true
+			shown_conflicts[conflict.mouse] = true
 			
 		if "axis" in conflict:
 			var label = template.duplicate()

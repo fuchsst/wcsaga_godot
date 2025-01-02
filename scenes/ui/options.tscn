@@ -1165,15 +1165,15 @@ offset_top = 708.0
 offset_right = 92.0
 offset_bottom = 767.0
 
-[node name="AcceptButton" type="TextureButton" parent="ExitGame"]
+[node name="ExitButton" type="TextureButton" parent="ExitGame"]
 layout_mode = 0
 offset_left = 16.0
-offset_top = 3.0
+offset_top = 4.0
 offset_right = 76.0
-offset_bottom = 58.0
+offset_bottom = 59.0
 texture_hover = ExtResource("3_pabcj")
 
-[node name="AcceptLabel" type="Label" parent="ExitGame"]
+[node name="ExitLabel" type="Label" parent="ExitGame"]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
@@ -1267,7 +1267,10 @@ text = "Accept"
 label_settings = SubResource("LabelSettings_dqipr")
 horizontal_alignment = 1
 
+[connection signal="pressed" from="OptionScreenMenu/OptionsMenuItemButton" to="." method="_on_options_menu_item_button_pressed"]
 [connection signal="pressed" from="OptionScreenMenu/MultiplayerMenuItemButton" to="." method="_on_multiplayer_menu_item_button_pressed"]
 [connection signal="pressed" from="OptionScreenMenu/DetailsMenuItemButton" to="." method="_on_details_menu_item_button_pressed"]
+[connection signal="pressed" from="ExitGame/ExitButton" to="." method="_on_exit_button_pressed"]
 [connection signal="pressed" from="OtherConfigs/ControlConfigButton" to="." method="_on_control_config_button_pressed"]
 [connection signal="pressed" from="OtherConfigs/HudConfigButton" to="." method="_on_hud_config_button_pressed"]
+[connection signal="pressed" from="Accept/AcceptButton" to="." method="_on_accept_button_pressed"]

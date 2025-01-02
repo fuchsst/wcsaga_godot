@@ -1,4 +1,4 @@
-extends Node2D
+extends Control
 
 # Constants
 const MAX_PILOTS = 20  # From original WC Saga
@@ -13,7 +13,7 @@ const VALID_PILOT_CHARS = " _-"  # Valid special characters for pilot names
 # Current pilot selection
 var selected_pilot_index: int = -1
 
-func _ready() -> void:	
+func _ready() -> void:
 	# Load and display pilot list
 	refresh_pilot_list()
 	

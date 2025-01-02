@@ -90,67 +90,72 @@ enum PilotFlags {
 @export var hud_rp_dist: int = 0
 
 # Control settings
-@export var control_config: Dictionary = {}
+@export var target_control_config: Dictionary = {}
+@export var ship_control_config: Dictionary = {}
+@export var weapon_control_config: Dictionary = {}
+@export var computer_control_config: Dictionary = {}
 @export var axis_config: Dictionary = {}
 
 # Default control settings
-const DEFAULT_CONTROL_CONFIG = {
-	# Target controls
-	"target_next": {"key": KEY_T, "joy": -1, "mod": 0},
-	"target_prev": {"key": KEY_T, "joy": -1, "mod": KEY_SHIFT},
-	"target_nearest_hostile": {"key": KEY_H, "joy": -1, "mod": 0},
-	"target_prev_hostile": {"key": KEY_H, "joy": -1, "mod": KEY_SHIFT},
-	"target_nearest_friendly": {"key": KEY_F, "joy": -1, "mod": 0},
-	"target_prev_friendly": {"key": KEY_F, "joy": -1, "mod": KEY_SHIFT},
-	"target_in_reticle": {"key": KEY_Y, "joy": -1, "mod": 0},
-	"target_attacking_target": {"key": KEY_G, "joy": -1, "mod": 0},
-	"target_last_sender": {"key": KEY_Y, "joy": -1, "mod": KEY_ALT},
-	"clear_target": {"key": KEY_T, "joy": -1, "mod": KEY_ALT},
-	"target_subsystem": {"key": KEY_V, "joy": -1, "mod": 0},
-	"next_subsystem": {"key": KEY_S, "joy": -1, "mod": 0},
-	"prev_subsystem": {"key": KEY_S, "joy": -1, "mod": KEY_SHIFT},
-	"clear_subsystem": {"key": KEY_S, "joy": -1, "mod": KEY_ALT},
-	
-	# Ship controls
-	"pitch_forward": {"key": KEY_KP_8, "joy": -1, "mod": 0},
-	"pitch_back": {"key": KEY_KP_2, "joy": -1, "mod": 0},
-	"yaw_left": {"key": KEY_KP_4, "joy": -1, "mod": 0},
-	"yaw_right": {"key": KEY_KP_6, "joy": -1, "mod": 0},
-	"roll_left": {"key": KEY_KP_7, "joy": -1, "mod": 0},
-	"roll_right": {"key": KEY_KP_9, "joy": -1, "mod": 0},
-	"throttle_up": {"key": KEY_A, "joy": -1, "mod": 0},
-	"throttle_down": {"key": KEY_Z, "joy": -1, "mod": 0},
-	"throttle_zero": {"key": KEY_BACKSPACE, "joy": -1, "mod": 0},
-	"throttle_full": {"key": KEY_SLASH, "joy": -1, "mod": 0},
-	"throttle_one_third": {"key": KEY_BRACKETLEFT, "joy": -1, "mod": 0},
-	"throttle_two_thirds": {"key": KEY_BRACKETRIGHT, "joy": -1, "mod": 0},
-	"throttle_plus_5": {"key": KEY_EQUAL, "joy": -1, "mod": 0},
-	"throttle_minus_5": {"key": KEY_MINUS, "joy": -1, "mod": 0},
-	"afterburner": {"key": KEY_TAB, "joy": -1, "mod": 0},
-	"glide_when_pressed": {"key": -1, "joy": -1, "mod": 0},
-	"toggle_glide": {"key": KEY_G, "joy": -1, "mod": KEY_ALT},
-	
-	# Weapon controls
-	"fire_primary": {"key": KEY_CTRL, "joy": 0, "mod": 0},
-	"fire_secondary": {"key": KEY_SPACE, "joy": 1, "mod": 0},
-	"next_primary": {"key": KEY_PERIOD, "joy": -1, "mod": 0},
-	"prev_primary": {"key": KEY_COMMA, "joy": -1, "mod": 0},
-	"cycle_secondary": {"key": KEY_SLASH, "joy": -1, "mod": 0},
-	"cycle_secondary_bank": {"key": KEY_SLASH, "joy": -1, "mod": KEY_SHIFT},
-	"launch_countermeasure": {"key": KEY_X, "joy": -1, "mod": 0},
-	
-	# Computer controls
-	"match_target_speed": {"key": KEY_M, "joy": -1, "mod": 0},
-	"toggle_auto_match": {"key": KEY_M, "joy": -1, "mod": KEY_ALT},
-	"view_chase": {"key": KEY_KP_MULTIPLY, "joy": -1, "mod": 0},
-	"view_external": {"key": KEY_KP_PERIOD, "joy": -1, "mod": 0},
-	"view_target": {"key": KEY_KP_DIVIDE, "joy": -1, "mod": 0},
-	"view_dist_in": {"key": KEY_KP_ADD, "joy": -1, "mod": 0},
-	"view_dist_out": {"key": KEY_KP_SUBTRACT, "joy": -1, "mod": 0},
-	"view_center": {"key": KEY_KP_5, "joy": -1, "mod": 0},
-	"comm_menu": {"key": KEY_C, "joy": -1, "mod": 0},
-	"show_objectives": {"key": -1, "joy": -1, "mod": 0},
-	"end_mission": {"key": KEY_J, "joy": -1, "mod": KEY_ALT}
+const DEFAULT_TARGET_CONTROLS = {
+	"target_next": {"key": KEY_T, "joy": -1, "mouse": -1, "mod": 0},
+	"target_prev": {"key": KEY_T, "joy": -1, "mouse": -1, "mod": KEY_SHIFT},
+	"target_nearest_hostile": {"key": KEY_H, "joy": -1, "mouse": -1, "mod": 0},
+	"target_prev_hostile": {"key": KEY_H, "joy": -1, "mouse": -1, "mod": KEY_SHIFT},
+	"target_nearest_friendly": {"key": KEY_F, "joy": -1, "mouse": -1, "mod": 0},
+	"target_prev_friendly": {"key": KEY_F, "joy": -1, "mouse": -1, "mod": KEY_SHIFT},
+	"target_in_reticle": {"key": KEY_Y, "joy": -1, "mouse": -1, "mod": 0},
+	"target_attacking_target": {"key": KEY_G, "joy": -1, "mouse": -1, "mod": 0},
+	"target_last_sender": {"key": KEY_Y, "joy": -1, "mouse": -1, "mod": KEY_ALT},
+	"clear_target": {"key": KEY_T, "joy": -1, "mouse": -1, "mod": KEY_ALT},
+	"target_subsystem": {"key": KEY_V, "joy": -1, "mouse": -1, "mod": 0},
+	"next_subsystem": {"key": KEY_S, "joy": -1, "mouse": -1, "mod": 0},
+	"prev_subsystem": {"key": KEY_S, "joy": -1, "mouse": -1, "mod": KEY_SHIFT},
+	"clear_subsystem": {"key": KEY_S, "joy": -1, "mouse": -1, "mod": KEY_ALT}
+}
+
+const DEFAULT_SHIP_CONTROLS = {
+	"pitch_forward": {"key": KEY_KP_8, "joy": -1, "mouse": -1, "mod": 0},
+	"pitch_back": {"key": KEY_KP_2, "joy": -1, "mouse": -1, "mod": 0},
+	"yaw_left": {"key": KEY_KP_4, "joy": -1, "mouse": -1, "mod": 0},
+	"yaw_right": {"key": KEY_KP_6, "joy": -1, "mouse": -1, "mod": 0},
+	"roll_left": {"key": KEY_KP_7, "joy": -1, "mouse": -1, "mod": 0},
+	"roll_right": {"key": KEY_KP_9, "joy": -1, "mouse": -1, "mod": 0},
+	"throttle_up": {"key": KEY_A, "joy": -1, "mouse": MOUSE_BUTTON_WHEEL_UP, "mod": 0},
+	"throttle_down": {"key": KEY_Z, "joy": -1, "mouse": MOUSE_BUTTON_WHEEL_DOWN, "mod": 0},
+	"throttle_zero": {"key": KEY_BACKSPACE, "joy": -1, "mouse": -1, "mod": 0},
+	"throttle_full": {"key": KEY_SLASH, "joy": -1, "mouse": -1, "mod": 0},
+	"throttle_one_third": {"key": KEY_BRACKETLEFT, "joy": -1, "mouse": -1, "mod": 0},
+	"throttle_two_thirds": {"key": KEY_BRACKETRIGHT, "joy": -1, "mouse": -1, "mod": 0},
+	"throttle_plus_5": {"key": KEY_EQUAL, "joy": -1, "mouse": -1, "mod": 0},
+	"throttle_minus_5": {"key": KEY_MINUS, "joy": -1, "mouse": -1, "mod": 0},
+	"afterburner": {"key": KEY_TAB, "joy": -1, "mouse": -1, "mod": 0},
+	"glide_when_pressed": {"key": -1, "joy": -1, "mouse": -1, "mod": 0},
+	"toggle_glide": {"key": KEY_G, "joy": -1, "mouse": -1, "mod": KEY_ALT}
+}
+
+const DEFAULT_WEAPON_CONTROLS = {
+	"fire_primary": {"key": KEY_CTRL, "joy": 0, "mouse": MOUSE_BUTTON_LEFT, "mod": 0},
+	"fire_secondary": {"key": KEY_SPACE, "joy": 1, "mouse": MOUSE_BUTTON_RIGHT, "mod": 0},
+	"next_primary": {"key": KEY_PERIOD, "joy": -1, "mouse": -1, "mod": 0},
+	"prev_primary": {"key": KEY_COMMA, "joy": -1, "mouse": -1, "mod": 0},
+	"cycle_secondary": {"key": KEY_SLASH, "joy": -1, "mouse": MOUSE_BUTTON_MIDDLE, "mod": 0},
+	"cycle_secondary_bank": {"key": KEY_SLASH, "joy": -1, "mouse": -1, "mod": KEY_SHIFT},
+	"launch_countermeasure": {"key": KEY_X, "joy": -1, "mouse": MOUSE_BUTTON_XBUTTON1, "mod": 0}
+}
+
+const DEFAULT_COMPUTER_CONTROLS = {
+	"match_target_speed": {"key": KEY_M, "joy": -1, "mouse": -1, "mod": 0},
+	"toggle_auto_match": {"key": KEY_M, "joy": -1, "mouse": -1, "mod": KEY_ALT},
+	"view_chase": {"key": KEY_KP_MULTIPLY, "joy": -1, "mouse": -1, "mod": 0},
+	"view_external": {"key": KEY_KP_PERIOD, "joy": -1, "mouse": -1, "mod": 0},
+	"view_target": {"key": KEY_KP_DIVIDE, "joy": -1, "mouse": -1, "mod": 0},
+	"view_dist_in": {"key": KEY_KP_ADD, "joy": -1, "mouse": -1, "mod": 0},
+	"view_dist_out": {"key": KEY_KP_SUBTRACT, "joy": -1, "mouse": -1, "mod": 0},
+	"view_center": {"key": KEY_KP_5, "joy": -1, "mouse": -1, "mod": 0},
+	"comm_menu": {"key": KEY_C, "joy": -1, "mouse": -1, "mod": 0},
+	"show_objectives": {"key": -1, "joy": -1, "mouse": -1, "mod": 0},
+	"end_mission": {"key": KEY_J, "joy": -1, "mouse": -1, "mod": KEY_ALT}
 }
 
 const DEFAULT_AXIS_CONFIG = {
@@ -181,7 +186,10 @@ static func create(p_callsign: String) -> PilotData:
 	pilot.briefing_voice_enabled = true
 	
 	# Initialize control config with defaults
-	pilot.control_config = DEFAULT_CONTROL_CONFIG.duplicate(true)
+	pilot.target_control_config = DEFAULT_TARGET_CONTROLS.duplicate(true)
+	pilot.ship_control_config = DEFAULT_SHIP_CONTROLS.duplicate(true)
+	pilot.weapon_control_config = DEFAULT_WEAPON_CONTROLS.duplicate(true)
+	pilot.computer_control_config = DEFAULT_COMPUTER_CONTROLS.duplicate(true)
 	pilot.axis_config = DEFAULT_AXIS_CONFIG.duplicate(true)
 	
 	return pilot

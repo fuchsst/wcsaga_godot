@@ -217,7 +217,7 @@ func _update_brightness_display() -> void:
 		brightness_texture.material.set_shader_parameter("brightness", settings.brightness)
 
 func _on_brightness_changed(change: float) -> void:
-	settings.brightness = clamp(settings.brightness + change, 0.1, 5.0)
+	settings.brightness = clamp(settings.brightness + change, 0.1, 2.0)
 	_update_brightness_display()
 	settings.save()
 	
@@ -276,16 +276,16 @@ func _on_joystick_deadzone_changed(level: int) -> void:
 
 func _on_control_config_button_pressed() -> void:
 	# Change to control config scene
-	SceneManager.change_scene("control_config", 
-		SceneManager.create_options(1.0, "fade"),
-		SceneManager.create_options(1.0, "fade"),
+	SceneManager.change_scene("controls_options", 
+		SceneManager.create_options(0.5, "fade"),
+		SceneManager.create_options(0.5, "fade"),
 		SceneManager.create_general_options(Color.BLACK))
 
 func _on_hud_config_button_pressed() -> void:
 	# Change to HUD config scene
-	SceneManager.change_scene("hud_config",
-		SceneManager.create_options(1.0, "fade"),
-		SceneManager.create_options(1.0, "fade"),
+	SceneManager.change_scene("hud_options",
+		SceneManager.create_options(0.5, "fade"),
+		SceneManager.create_options(0.5, "fade"),
 		SceneManager.create_general_options(Color.BLACK))
 
 func _on_multiplayer_menu_item_button_pressed() -> void:
@@ -298,6 +298,17 @@ func _on_multiplayer_menu_item_button_pressed() -> void:
 func _on_details_menu_item_button_pressed() -> void:
 	# Change to details options scene
 	SceneManager.change_scene("details_options",
-		SceneManager.create_options(1.0, "fade"),
-		SceneManager.create_options(1.0, "fade"),
+		SceneManager.create_options(0.5, "fade"),
+		SceneManager.create_options(0.5, "fade"),
 		SceneManager.create_general_options(Color.BLACK))
+
+
+func _on_exit_button_pressed() -> void:
+	# Let door animation and sound finish before quitting
+	await get_tree().create_timer(0.5).timeout
+	# _stop_ambient_loop()
+	get_tree().quit()
+
+
+func _on_options_menu_item_button_pressed() -> void:
+	pass # Replace with function body.

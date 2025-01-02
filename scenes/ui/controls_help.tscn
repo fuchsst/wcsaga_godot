@@ -1,18 +1,8 @@
-[gd_scene load_steps=9 format=3 uid="uid://bq8y2yqn6m8x"]
-
-[ext_resource type="Theme" uid="uid://default_theme" path="res://assets/hermes_ui_theme.tres" id="1_theme"]
-[ext_resource type="Texture2D" uid="uid://ccb_btn" path="res://assets/hermes_interface/2_CCB_btn.png" id="2_btn"]
-[ext_resource type="Texture2D" uid="uid://ccb_btn_h" path="res://assets/hermes_interface/2_CCB_btn_h.png" id="3_btn_h"]
-[ext_resource type="Texture2D" uid="uid://ccb_btn_p" path="res://assets/hermes_interface/2_CCB_btn_p.png" id="4_btn_p"]
-[ext_resource type="Texture2D" uid="uid://ccb_btn_d" path="res://assets/hermes_interface/2_CCB_btn_d.png" id="5_btn_d"]
-[ext_resource type="StyleBox" uid="uid://hermes_panel" path="res://assets/hermes_ui_theme/panel.tres" id="6_panel"]
-[ext_resource type="StyleBox" uid="uid://hermes_popup" path="res://assets/hermes_ui_theme/popup.tres" id="7_popup"]
-[ext_resource type="StyleBox" uid="uid://hermes_tab" path="res://assets/hermes_ui_theme/tab.tres" id="8_tab"]
+[gd_scene format=3 uid="uid://bq8y2yqn6m8x"]
 
 [node name="ControlsHelp" type="PopupPanel"]
-size = Vector2(600, 400)
-theme = ExtResource("1_theme")
-theme_override_styles/panel = ExtResource("7_popup")
+size = Vector2i(600, 400)
+visible = true
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 offset_left = 4.0
@@ -29,19 +19,21 @@ horizontal_alignment = 1
 [node name="TabContainer" type="TabContainer" parent="VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_styles/tab_selected = ExtResource("8_tab")
-theme_override_styles/tab_unselected = ExtResource("8_tab")
-theme_override_styles/panel = ExtResource("6_panel")
+current_tab = 1
 
 [node name="General" type="ScrollContainer" parent="VBoxContainer/TabContainer"]
+visible = false
 layout_mode = 2
+metadata/_tab_index = 0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/TabContainer/General"]
+custom_minimum_size = Vector2(0, 180)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
 [node name="Label" type="Label" parent="VBoxContainer/TabContainer/General/VBoxContainer"]
+custom_minimum_size = Vector2(0, 180)
 layout_mode = 2
 text = "- Click on a key/button binding to change it
 - Press any key or joystick button to assign
@@ -53,15 +45,17 @@ text = "- Click on a key/button binding to change it
 autowrap_mode = 2
 
 [node name="Keyboard" type="ScrollContainer" parent="VBoxContainer/TabContainer"]
-visible = false
 layout_mode = 2
+metadata/_tab_index = 1
 
 [node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/TabContainer/Keyboard"]
+custom_minimum_size = Vector2(0, 180)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
 [node name="Label" type="Label" parent="VBoxContainer/TabContainer/Keyboard/VBoxContainer"]
+custom_minimum_size = Vector2(0, 180)
 layout_mode = 2
 text = "- Most keyboard keys can be bound
 - System keys like Windows key cannot be bound
@@ -72,13 +66,16 @@ autowrap_mode = 2
 [node name="Joystick" type="ScrollContainer" parent="VBoxContainer/TabContainer"]
 visible = false
 layout_mode = 2
+metadata/_tab_index = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/TabContainer/Joystick"]
+custom_minimum_size = Vector2(0, 180)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
 [node name="Label" type="Label" parent="VBoxContainer/TabContainer/Joystick/VBoxContainer"]
+custom_minimum_size = Vector2(0, 180)
 layout_mode = 2
 text = "- Up to 32 joystick buttons supported
 - 6 analog axes supported
@@ -93,7 +90,6 @@ autowrap_mode = 2
 
 [node name="Panel" type="Panel" parent="VBoxContainer"]
 layout_mode = 2
-theme_override_styles/panel = ExtResource("6_panel")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
@@ -103,10 +99,6 @@ alignment = 1
 [node name="CloseButton" type="TextureButton" parent="VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(150, 30)
 layout_mode = 2
-texture_normal = ExtResource("2_btn")
-texture_pressed = ExtResource("4_btn_p")
-texture_hover = ExtResource("3_btn_h")
-texture_disabled = ExtResource("5_btn_d")
 stretch_mode = 0
 
 [node name="Panel" type="Panel" parent="VBoxContainer/HBoxContainer/CloseButton"]
@@ -116,7 +108,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = ExtResource("6_panel")
 mouse_filter = 2
 
 [node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/CloseButton"]

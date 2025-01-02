@@ -1,4 +1,4 @@
-extends Node2D
+extends Control
 
 # Sound configuration
 @export var sounds: GameSounds
@@ -166,8 +166,8 @@ func _transition_to_scene(scene_key: String) -> void:
 	await get_tree().create_timer(0.5).timeout
 	
 	SceneManager.change_scene(scene_key,
-		SceneManager.create_options(1.0, "fade"),
-		SceneManager.create_options(1.0, "fade"),
+		SceneManager.create_options(0.5, "fade"),
+		SceneManager.create_options(0.5, "fade"),
 		SceneManager.create_general_options(Color.BLACK))
 
 func _on_barracks_pressed() -> void:
