@@ -91,6 +91,75 @@ enum PilotFlags {
 
 # Control settings
 @export var control_config: Dictionary = {}
+@export var axis_config: Dictionary = {}
+
+# Default control settings
+const DEFAULT_CONTROL_CONFIG = {
+	# Target controls
+	"target_next": {"key": KEY_T, "joy": -1, "mod": 0},
+	"target_prev": {"key": KEY_T, "joy": -1, "mod": KEY_SHIFT},
+	"target_nearest_hostile": {"key": KEY_H, "joy": -1, "mod": 0},
+	"target_prev_hostile": {"key": KEY_H, "joy": -1, "mod": KEY_SHIFT},
+	"target_nearest_friendly": {"key": KEY_F, "joy": -1, "mod": 0},
+	"target_prev_friendly": {"key": KEY_F, "joy": -1, "mod": KEY_SHIFT},
+	"target_in_reticle": {"key": KEY_Y, "joy": -1, "mod": 0},
+	"target_attacking_target": {"key": KEY_G, "joy": -1, "mod": 0},
+	"target_last_sender": {"key": KEY_Y, "joy": -1, "mod": KEY_ALT},
+	"clear_target": {"key": KEY_T, "joy": -1, "mod": KEY_ALT},
+	"target_subsystem": {"key": KEY_V, "joy": -1, "mod": 0},
+	"next_subsystem": {"key": KEY_S, "joy": -1, "mod": 0},
+	"prev_subsystem": {"key": KEY_S, "joy": -1, "mod": KEY_SHIFT},
+	"clear_subsystem": {"key": KEY_S, "joy": -1, "mod": KEY_ALT},
+	
+	# Ship controls
+	"pitch_forward": {"key": KEY_KP_8, "joy": -1, "mod": 0},
+	"pitch_back": {"key": KEY_KP_2, "joy": -1, "mod": 0},
+	"yaw_left": {"key": KEY_KP_4, "joy": -1, "mod": 0},
+	"yaw_right": {"key": KEY_KP_6, "joy": -1, "mod": 0},
+	"roll_left": {"key": KEY_KP_7, "joy": -1, "mod": 0},
+	"roll_right": {"key": KEY_KP_9, "joy": -1, "mod": 0},
+	"throttle_up": {"key": KEY_A, "joy": -1, "mod": 0},
+	"throttle_down": {"key": KEY_Z, "joy": -1, "mod": 0},
+	"throttle_zero": {"key": KEY_BACKSPACE, "joy": -1, "mod": 0},
+	"throttle_full": {"key": KEY_SLASH, "joy": -1, "mod": 0},
+	"throttle_one_third": {"key": KEY_BRACKETLEFT, "joy": -1, "mod": 0},
+	"throttle_two_thirds": {"key": KEY_BRACKETRIGHT, "joy": -1, "mod": 0},
+	"throttle_plus_5": {"key": KEY_EQUAL, "joy": -1, "mod": 0},
+	"throttle_minus_5": {"key": KEY_MINUS, "joy": -1, "mod": 0},
+	"afterburner": {"key": KEY_TAB, "joy": -1, "mod": 0},
+	"glide_when_pressed": {"key": -1, "joy": -1, "mod": 0},
+	"toggle_glide": {"key": KEY_G, "joy": -1, "mod": KEY_ALT},
+	
+	# Weapon controls
+	"fire_primary": {"key": KEY_CTRL, "joy": 0, "mod": 0},
+	"fire_secondary": {"key": KEY_SPACE, "joy": 1, "mod": 0},
+	"next_primary": {"key": KEY_PERIOD, "joy": -1, "mod": 0},
+	"prev_primary": {"key": KEY_COMMA, "joy": -1, "mod": 0},
+	"cycle_secondary": {"key": KEY_SLASH, "joy": -1, "mod": 0},
+	"cycle_secondary_bank": {"key": KEY_SLASH, "joy": -1, "mod": KEY_SHIFT},
+	"launch_countermeasure": {"key": KEY_X, "joy": -1, "mod": 0},
+	
+	# Computer controls
+	"match_target_speed": {"key": KEY_M, "joy": -1, "mod": 0},
+	"toggle_auto_match": {"key": KEY_M, "joy": -1, "mod": KEY_ALT},
+	"view_chase": {"key": KEY_KP_MULTIPLY, "joy": -1, "mod": 0},
+	"view_external": {"key": KEY_KP_PERIOD, "joy": -1, "mod": 0},
+	"view_target": {"key": KEY_KP_DIVIDE, "joy": -1, "mod": 0},
+	"view_dist_in": {"key": KEY_KP_ADD, "joy": -1, "mod": 0},
+	"view_dist_out": {"key": KEY_KP_SUBTRACT, "joy": -1, "mod": 0},
+	"view_center": {"key": KEY_KP_5, "joy": -1, "mod": 0},
+	"comm_menu": {"key": KEY_C, "joy": -1, "mod": 0},
+	"show_objectives": {"key": -1, "joy": -1, "mod": 0},
+	"end_mission": {"key": KEY_J, "joy": -1, "mod": KEY_ALT}
+}
+
+const DEFAULT_AXIS_CONFIG = {
+	"pitch": {"axis": JOY_AXIS_LEFT_Y, "invert": true},
+	"yaw": {"axis": JOY_AXIS_LEFT_X, "invert": false}, 
+	"roll": {"axis": JOY_AXIS_RIGHT_X, "invert": false},
+	"throttle_abs": {"axis": -1, "invert": false},
+	"throttle_rel": {"axis": -1, "invert": false}
+}
 
 # Campaign save data
 @export var campaign_saves: Dictionary = {}
@@ -111,49 +180,9 @@ static func create(p_callsign: String) -> PilotData:
 	pilot.show_tips = true
 	pilot.briefing_voice_enabled = true
 	
-	# Initialize control config
-	pilot.control_config = {
-		# Flight controls
-		"pitch_forward": -1,
-		"pitch_back": -1,
-		"yaw_left": -1,
-		"yaw_right": -1,
-		"roll_left": -1,
-		"roll_right": -1,
-		"throttle_up": -1,
-		"throttle_down": -1,
-		"afterburner": -1,
-		"glide_when_pressed": -1,
-		"toggle_glide": -1,
-		
-		# Combat controls
-		"fire_primary": -1,
-		"fire_secondary": -1,
-		"target_next": -1,
-		"target_prev": -1,
-		"target_nearest": -1,
-		"target_hostile": -1,
-		"target_friendly": -1,
-		"launch_countermeasure": -1,
-		"target_in_view": -1,
-		"match_target_speed": -1,
-		
-		# View controls
-		"view_chase": -1,
-		"view_external": -1,
-		"padlock_up": -1,
-		"padlock_down": -1,
-		"padlock_left": -1,
-		"padlock_right": -1,
-		"view_zoom_in": -1,
-		"view_zoom_out": -1,
-		
-		# Communication
-		"comm_menu": -1,
-		"comm_attack_target": -1,
-		"comm_form_wing": -1,
-		"comm_cover_me": -1
-	}
+	# Initialize control config with defaults
+	pilot.control_config = DEFAULT_CONTROL_CONFIG.duplicate(true)
+	pilot.axis_config = DEFAULT_AXIS_CONFIG.duplicate(true)
 	
 	return pilot
 
@@ -184,7 +213,8 @@ static func clone_from(source: PilotData, new_callsign: String) -> PilotData:
 	pilot.hud_num_msg_window_lines = source.hud_num_msg_window_lines
 	pilot.hud_rp_flags = source.hud_rp_flags
 	pilot.hud_rp_dist = source.hud_rp_dist
-	pilot.control_config = source.control_config.duplicate()
+	pilot.control_config = source.control_config.duplicate(true)
+	pilot.axis_config = source.axis_config.duplicate(true)
 	
 	return pilot
 

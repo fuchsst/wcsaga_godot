@@ -1,0 +1,114 @@
+[gd_scene load_steps=8 format=3 uid="uid://d2q8y2yqn6m8x"]
+
+[ext_resource type="Theme" uid="uid://default_theme" path="res://assets/hermes_ui_theme.tres" id="1_theme"]
+[ext_resource type="Texture2D" uid="uid://ccb_btn" path="res://assets/hermes_interface/2_CCB_btn.png" id="2_btn"]
+[ext_resource type="Texture2D" uid="uid://ccb_btn_h" path="res://assets/hermes_interface/2_CCB_btn_h.png" id="3_btn_h"]
+[ext_resource type="Texture2D" uid="uid://ccb_btn_p" path="res://assets/hermes_interface/2_CCB_btn_p.png" id="4_btn_p"]
+[ext_resource type="Texture2D" uid="uid://ccb_btn_d" path="res://assets/hermes_interface/2_CCB_btn_d.png" id="5_btn_d"]
+[ext_resource type="StyleBox" uid="uid://hermes_panel" path="res://assets/hermes_ui_theme/panel.tres" id="6_panel"]
+[ext_resource type="StyleBox" uid="uid://hermes_popup" path="res://assets/hermes_ui_theme/popup.tres" id="7_popup"]
+
+[node name="ConflictWarning" type="PopupPanel"]
+size = Vector2(600, 400)
+theme = ExtResource("1_theme")
+theme_override_styles/panel = ExtResource("7_popup")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 596.0
+offset_bottom = 396.0
+theme_override_constants/separation = 20
+
+[node name="Title" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+text = "Control Conflicts Detected!"
+horizontal_alignment = 1
+
+[node name="WarningLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "The following control conflicts were detected. You must resolve these conflicts before saving your changes."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="ConflictList" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="ConflictTemplate" type="Label" parent="VBoxContainer/ConflictList"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.5, 0.5, 1)
+text = "Action1 conflicts with Action2"
+horizontal_alignment = 1
+
+[node name="Panel" type="Panel" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("6_panel")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="OkButton" type="TextureButton" parent="VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(150, 30)
+layout_mode = 2
+texture_normal = ExtResource("2_btn")
+texture_pressed = ExtResource("4_btn_p")
+texture_hover = ExtResource("3_btn_h")
+texture_disabled = ExtResource("5_btn_d")
+stretch_mode = 0
+
+[node name="Panel" type="Panel" parent="VBoxContainer/HBoxContainer/OkButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("6_panel")
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/OkButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "OK"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ClearConflictsButton" type="TextureButton" parent="VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(150, 30)
+layout_mode = 2
+texture_normal = ExtResource("2_btn")
+texture_pressed = ExtResource("4_btn_p")
+texture_hover = ExtResource("3_btn_h")
+texture_disabled = ExtResource("5_btn_d")
+stretch_mode = 0
+
+[node name="Panel" type="Panel" parent="VBoxContainer/HBoxContainer/ClearConflictsButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("6_panel")
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/ClearConflictsButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Clear Conflicts"
+horizontal_alignment = 1
+vertical_alignment = 1
