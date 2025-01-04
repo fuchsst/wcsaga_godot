@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://c7p6s3pdoxix7"]
+
+[ext_resource type="Script" path="res://scenes/in_flight/hud.gd" id="1_kun21"]
+
+[node name="Hud" type="Node2D"]
+script = ExtResource("1_kun21")
