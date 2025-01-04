@@ -1,0 +1,5 @@
+migration_tools/analysis_results/
+migration_tools/package_analysis_results/
+migration_tools/converted/
+migration_tools/extracted/
+migration_tools/wcsaga_code/

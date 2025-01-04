@@ -50,7 +50,7 @@ var _flash_state := false
 
 func _init() -> void:
 	super._init()
-	gauge_id = HUDGauge.OFFSCREEN_INDICATOR
+	gauge_id = GaugeType.OFFSCREEN_INDICATOR
 
 func _ready() -> void:
 	super._ready()

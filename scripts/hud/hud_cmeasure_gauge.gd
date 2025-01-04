@@ -40,7 +40,7 @@ var _is_recharging := false
 
 func _init() -> void:
 	super._init()
-	gauge_id = HUDGauge.CMEASURE_GAUGE
+	gauge_id = GaugeType.CMEASURE_GAUGE
 
 func _ready() -> void:
 	super._ready()

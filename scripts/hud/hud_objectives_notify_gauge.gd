@@ -62,7 +62,7 @@ var _flash_duration := 0.0
 
 func _init() -> void:
 	super._init()
-	gauge_id = HUDGauge.OBJECTIVES_NOTIFY_GAUGE
+	gauge_id = GaugeType.OBJECTIVES_NOTIFY_GAUGE
 
 func _ready() -> void:
 	super._ready()

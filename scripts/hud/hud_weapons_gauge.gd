@@ -46,7 +46,7 @@ enum WeaponType {
 
 func _init() -> void:
 	super._init()
-	gauge_id = HUDGauge.WEAPONS_GAUGE
+	gauge_id = GaugeType.WEAPONS_GAUGE
 
 func _ready() -> void:
 	super._ready()

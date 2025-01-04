@@ -67,7 +67,7 @@ var _flash_state := false
 
 func _init() -> void:
 	super._init()
-	gauge_id = HUDGauge.CENTER_RETICLE
+	gauge_id = GaugeType.CENTER_RETICLE
 
 func _ready() -> void:
 	super._ready()

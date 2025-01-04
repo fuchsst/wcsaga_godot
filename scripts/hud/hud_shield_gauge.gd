@@ -44,7 +44,7 @@ var quadrant_flash_states: Array[bool] = [false, false, false, false]
 
 func _init() -> void:
 	super._init()
-	gauge_id = HUDGauge.PLAYER_SHIELD_ICON if is_player_gauge else HUDGauge.TARGET_SHIELD_ICON
+	gauge_id = GaugeType.PLAYER_SHIELD_ICON if is_player_gauge else GaugeType.TARGET_SHIELD_ICON
 
 func _ready() -> void:
 	super._ready()
@@ -69,7 +69,32 @@ func update_shields(strengths: Array[float], max_strength: float) -> void:
 	shield_strength = strengths.duplicate()
 	queue_redraw()
 
-# Draw the gauge using Node2D drawing
+# Draw shield arc
+func draw_shield_arc(center: Vector2, inner_radius: float, outer_radius: float, 
+	start_angle: float, end_angle: float, color: Color, num_points: int = 16) -> void:
+	
+	var points = PackedVector2Array()
+	var angle_step = (end_angle - start_angle) / (num_points - 1)
+	
+	# Generate outer arc points
+	for i in range(num_points):
+		var angle = start_angle + i * angle_step
+		points.push_back(center + Vector2(
+			cos(angle) * outer_radius,
+			sin(angle) * outer_radius
+		))
+	
+	# Generate inner arc points (in reverse)
+	for i in range(num_points - 1, -1, -1):
+		var angle = start_angle + i * angle_step
+		points.push_back(center + Vector2(
+			cos(angle) * inner_radius,
+			sin(angle) * inner_radius
+		))
+	
+	# Draw filled polygon
+	draw_colored_polygon(points, color)
+
 func _draw() -> void:
 	if Engine.is_editor_hint():
 		# Draw editor preview background
@@ -111,38 +136,6 @@ func _draw() -> void:
 			draw_shield_arc(center, radius - 5, strength_radius,
 				start_angle, end_angle, quadrant_color)
 
-# Helper to draw shield arc
-func draw_shield_arc(center: Vector2, inner_radius: float, outer_radius: float, 
-	start_angle: float, end_angle: float, color: Color, num_points: int = 16) -> void:
-	
-	var points = PackedVector2Array()
-	var angle_step = (end_angle - start_angle) / (num_points - 1)
-	
-	# Generate outer arc points
-	for i in range(num_points):
-		var angle = start_angle + i * angle_step
-		points.push_back(center + Vector2(
-			cos(angle) * outer_radius,
-			sin(angle) * outer_radius
-		))
-	
-	# Generate inner arc points (in reverse)
-	for i in range(num_points - 1, -1, -1):
-		var angle = start_angle + i * angle_step
-		points.push_back(center + Vector2(
-			cos(angle) * inner_radius,
-			sin(angle) * inner_radius
-		))
-	
-	# Draw filled polygon
-	draw_colored_polygon(points, color)
-
-# Update the gauge with current ship state
-func update_from_ship(ship: ShipBase) -> void:
-	# TODO: Update once we have proper ship state
-	# This would update shield strengths from the ship object
-	pass
-
 func _process(delta: float) -> void:
 	super._process(delta)
 	
@@ -163,3 +156,15 @@ func _process(delta: float) -> void:
 	
 	if needs_redraw:
 		queue_redraw()
+
+# Update from current game state
+func update_from_game_state() -> void:
+	if is_player_gauge:
+		# Update from player ship state
+		if GameState.player_ship:
+			update_shields(GameState.player_ship.shield_strength, GameState.player_ship.max_shield_strength)
+	else:
+		# Update from targeted ship state
+		if GameState.player_ship && GameState.player_ship.target:
+			var target = GameState.player_ship.target
+			update_shields(target.shield_strength, target.max_shield_strength)

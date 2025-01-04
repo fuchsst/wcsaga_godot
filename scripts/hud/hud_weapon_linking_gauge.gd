@@ -60,7 +60,7 @@ var _secondary_groups := []
 
 func _init() -> void:
 	super._init()
-	gauge_id = HUDGauge.WEAPON_LINKING_GAUGE
+	gauge_id = GaugeType.WEAPON_LINKING_GAUGE
 
 func _ready() -> void:
 	super._ready()

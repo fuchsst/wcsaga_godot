@@ -42,7 +42,7 @@ func _init() -> void:
 	super._init()
 	if flash_duration == 0:
 		flash_duration = 0.5
-	gauge_id = HUDGauge.AUTO_TARGET
+	gauge_id = GaugeType.AUTO_TARGET
 
 # Set auto target status
 func set_auto_target(active: bool) -> void:

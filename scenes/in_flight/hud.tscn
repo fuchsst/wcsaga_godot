@@ -1,6 +1,118 @@
-[gd_scene load_steps=2 format=3 uid="uid://c7p6s3pdoxix7"]
+[gd_scene load_steps=16 format=3 uid="uid://c7p6s3pdoxix7"]
 
 [ext_resource type="Script" path="res://scenes/in_flight/hud.gd" id="1_kun21"]
+[ext_resource type="Resource" uid="uid://cwqnitecoa5po" path="res://resources/hud/default1.tres" id="2_config"]
+[ext_resource type="Script" path="res://scripts/hud/hud_throttle_gauge.gd" id="4_throttle"]
+[ext_resource type="Script" path="res://scripts/hud/hud_radar_gauge.gd" id="5_radar"]
+[ext_resource type="Script" path="res://scripts/hud/hud_ets_gauge.gd" id="6_ets"]
+[ext_resource type="Script" path="res://scripts/resources/weapon_group.gd" id="7_shfg6"]
+[ext_resource type="Script" path="res://scripts/hud/hud_weapons_gauge.gd" id="7_weapons"]
+[ext_resource type="Script" path="res://scripts/hud/hud_reticle_gauge.gd" id="8_reticle"]
+[ext_resource type="Script" path="res://scripts/hud/hud_target_monitor.gd" id="9_monitor"]
+[ext_resource type="Script" path="res://scripts/hud/hud_damage_gauge.gd" id="10_damage"]
+[ext_resource type="Script" path="res://scripts/hud/hud_directives_gauge.gd" id="11_directives"]
+
+[sub_resource type="Resource" id="Resource_p7f24"]
+script = ExtResource("7_shfg6")
+name = "Laser"
+ammo = 0
+max_ammo = 0
+energy_cost = 0.2
+is_energy = true
+is_active = true
+is_linked = false
+
+[sub_resource type="Resource" id="Resource_5t7c5"]
+script = ExtResource("7_shfg6")
+name = "Mass Driver"
+ammo = 0
+max_ammo = 100
+energy_cost = 0.0
+is_energy = false
+is_active = false
+is_linked = false
+
+[sub_resource type="Resource" id="Resource_yb42a"]
+script = ExtResource("7_shfg6")
+name = "Missile"
+ammo = 0
+max_ammo = 20
+energy_cost = 0.0
+is_energy = false
+is_active = true
+is_linked = false
+
+[sub_resource type="Resource" id="Resource_5rmpn"]
+script = ExtResource("7_shfg6")
+name = "Torpedo"
+ammo = 0
+max_ammo = 5
+energy_cost = 0.0
+is_energy = false
+is_active = false
+is_linked = false
 
 [node name="Hud" type="Node2D"]
 script = ExtResource("1_kun21")
+hud_config = ExtResource("2_config")
+
+[node name="ShieldGauge" type="Node2D" parent="."]
+process_mode = 3
+position = Vector2(661, 599)
+script = ExtResource("4_throttle")
+current_throttle = 0.5
+preview_size = Vector2(100, 100)
+gauge_id = 7
+
+[node name="RadarGauge" type="Node2D" parent="."]
+process_mode = 3
+position = Vector2(470, 607)
+script = ExtResource("5_radar")
+gauge_id = 8
+
+[node name="ETSGauge" type="Node2D" parent="."]
+position = Vector2(416, 265)
+script = ExtResource("6_ets")
+gauge_id = 14
+#ETS_GAUGEbar_height = 41
+bar_width = 15
+bar_spacing = 25
+
+[node name="WeaponsGauge" type="Node2D" parent="."]
+process_mode = 3
+position = Vector2(763, 257)
+script = ExtResource("7_weapons")
+primary_weapons = Array[ExtResource("7_shfg6")]([SubResource("Resource_p7f24"), SubResource("Resource_5t7c5")])
+secondary_weapons = Array[ExtResource("7_shfg6")]([SubResource("Resource_yb42a"), SubResource("Resource_5rmpn")])
+gauge_id = 17
+
+[node name="ReticleGauge" type="Node2D" parent="."]
+process_mode = 3
+position = Vector2(462, 268)
+script = ExtResource("8_reticle")
+preview_size = Vector2(100, 100)
+gauge_id = 10
+
+[node name="TargetMonitor" type="Node2D" parent="."]
+process_mode = 3
+position = Vector2(30, 562)
+script = ExtResource("9_monitor")
+gauge_id = 9
+
+[node name="DamageGauge" type="Node2D" parent="." node_paths=PackedStringArray("subsystems")]
+process_mode = 3
+position = Vector2(790, 525)
+script = ExtResource("10_damage")
+subsystems = [NodePath(""), NodePath(""), NodePath(""), NodePath("")]
+gauge_id = 27
+
+[node name="DirectivesGauge" type="Node2D" parent="."]
+position = Vector2(1, 215)
+script = ExtResource("11_directives")
+gauge_id = 19
+#DIRECTIVES_VIEWgauge_size = Vector2(300, 200)
+objective_spacing = 20
+notify_duration = 3.0
+notify_flash_rate = 0.5
+show_complete = true
+show_failed = true

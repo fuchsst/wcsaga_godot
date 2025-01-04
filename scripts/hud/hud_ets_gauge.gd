@@ -73,7 +73,7 @@ var energy_levels = [
 
 func _init() -> void:
 	super._init()
-	gauge_id = HUDGauge.ETS_GAUGE
+	gauge_id = GaugeType.ETS_GAUGE
 
 func _ready() -> void:
 	super._ready()

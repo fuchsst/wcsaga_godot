@@ -62,7 +62,7 @@ var _flash_state := false
 
 func _init() -> void:
 	super._init()
-	gauge_id = HUDGauge.MESSAGE_BOX
+	gauge_id = GaugeType.MESSAGE_BOX
 	if flash_duration == 0:
 		flash_duration = 1.0
 	messages = []

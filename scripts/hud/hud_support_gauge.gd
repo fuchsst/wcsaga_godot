@@ -31,7 +31,7 @@ var _flash_state := false
 
 func _init() -> void:
 	super._init()
-	gauge_id = HUDGauge.SUPPORT_GAUGE
+	gauge_id = GaugeType.SUPPORT_GAUGE
 	support_info = SupportInfo.new()
 
 func _ready() -> void:

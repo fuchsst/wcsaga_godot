@@ -36,7 +36,7 @@ var _flash_state := false
 
 func _init() -> void:
 	super._init()
-	gauge_id = HUDGauge.WINGMEN_STATUS
+	gauge_id = GaugeType.WINGMEN_STATUS
 	if flash_duration == 0:
 		flash_duration = 0.5
 

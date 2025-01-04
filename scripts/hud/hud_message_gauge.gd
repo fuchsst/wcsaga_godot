@@ -59,7 +59,7 @@ var _target_scroll := 0.0
 
 func _init() -> void:
 	super._init()
-	gauge_id = HUDGauge.MESSAGE_LINES
+	gauge_id = GaugeType.MESSAGE_LINES
 
 func _ready() -> void:
 	super._ready()

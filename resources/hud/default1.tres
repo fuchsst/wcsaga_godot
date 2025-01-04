@@ -1,16 +1,3 @@
-[gd_resource type="Resource" script_class="HUDConfig" load_steps=2 format=3 uid="uid://cwqnitecoa5po"]
-
-[ext_resource type="Script" path="res://scripts/player/hud_config.gd" id="1_wug7r"]
+[gd_resource type="Resource" format=3 uid="uid://cwqnitecoa5po"]
 
 [resource]
-script = ExtResource("1_wug7r")
-show_flags = 0
-show_flags2 = 0
-popup_flags = 0
-popup_flags2 = 0
-num_msg_window_lines = 4
-rp_flags = 0
-rp_dist = 0
-is_observer = false
-main_color = 0
-gauge_colors = Array[Color]([])

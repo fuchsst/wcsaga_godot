@@ -34,7 +34,7 @@ var _flash_state := false
 
 func _init() -> void:
 	super._init()
-	gauge_id = HUDGauge.KILLS_GAUGE
+	gauge_id = GaugeType.KILLS_GAUGE
 	if flash_duration == 0:
 		flash_duration = 1.0
 	kill_info = KillInfo.new()

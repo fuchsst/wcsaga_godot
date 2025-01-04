@@ -52,7 +52,7 @@ var _flash_state := false
 
 func _init() -> void:
 	super._init()
-	gauge_id = HUDGauge.ATTACKING_TARGET_COUNT
+	gauge_id = GaugeType.ATTACKING_TARGET_COUNT
 
 func _ready() -> void:
 	super._ready()

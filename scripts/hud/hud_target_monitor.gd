@@ -60,7 +60,7 @@ class_name HUDTargetMonitor
 
 func _init() -> void:
 	super._init()
-	gauge_id = HUDGauge.TARGET_MONITOR
+	gauge_id = GaugeType.TARGET_MONITOR
 
 func _ready() -> void:
 	super._ready()

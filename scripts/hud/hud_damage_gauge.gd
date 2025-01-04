@@ -41,7 +41,7 @@ func _init() -> void:
 	super._init()
 	if flash_duration == 0:
 		flash_duration = 0.5
-	gauge_id = HUDGauge.DAMAGE_GAUGE
+	gauge_id = GaugeType.DAMAGE_GAUGE
 
 func _ready() -> void:
 	super._ready()

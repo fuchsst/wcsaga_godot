@@ -57,7 +57,7 @@ var _flash_state := false
 
 func _init() -> void:
 	super._init()
-	gauge_id = HUDGauge.TARGET_MINI_ICON
+	gauge_id = GaugeType.TARGET_MINI_ICON
 
 func _ready() -> void:
 	super._ready()

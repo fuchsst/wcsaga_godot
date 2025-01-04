@@ -46,7 +46,7 @@ var _is_playing := false
 
 func _init() -> void:
 	super._init()
-	gauge_id = HUDGauge.TALKING_HEAD
+	gauge_id = GaugeType.TALKING_HEAD
 
 func _ready() -> void:
 	super._ready()

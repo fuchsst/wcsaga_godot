@@ -36,7 +36,7 @@ var _warning_flash_state := false
 
 func _init() -> void:
 	super._init()
-	gauge_id = HUDGauge.THREAT_GAUGE
+	gauge_id = GaugeType.THREAT_GAUGE
 
 func _ready() -> void:
 	super._ready()

@@ -60,7 +60,7 @@ var _flash_state := false
 
 func _init() -> void:
 	super._init()
-	gauge_id = HUDGauge.OFFSCREEN_RANGE
+	gauge_id = GaugeType.OFFSCREEN_RANGE
 
 func _ready() -> void:
 	super._ready()

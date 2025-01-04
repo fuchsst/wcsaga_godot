@@ -55,7 +55,7 @@ var _packet_loss := false
 
 func _init() -> void:
 	super._init()
-	gauge_id = HUDGauge.LAG_GAUGE
+	gauge_id = GaugeType.LAG_GAUGE
 
 func _ready() -> void:
 	super._ready()

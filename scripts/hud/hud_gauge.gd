@@ -2,118 +2,76 @@
 extends Node2D
 class_name HUDGauge
 
-# Gauge types/IDs matching original implementation
-enum {
-	LEAD_INDICATOR,
-	ORIENTATION_TEE, 
-	HOSTILE_TRIANGLE,
-	TARGET_TRIANGLE,
-	MISSION_TIME,
-	RETICLE_CIRCLE,
-	THROTTLE_GAUGE,
-	RADAR,
-	TARGET_MONITOR,
-	CENTER_RETICLE,
-	TARGET_MONITOR_EXTRA_DATA,
-	TARGET_SHIELD_ICON,
-	PLAYER_SHIELD_ICON,
-	ETS_GAUGE,
-	AUTO_TARGET,
-	AUTO_SPEED,
-	WEAPONS_GAUGE,
-	ESCORT_VIEW,
-	DIRECTIVES_VIEW,
-	THREAT_GAUGE,
-	AFTERBURNER_ENERGY,
-	WEAPONS_ENERGY,
-	WEAPON_LINKING_GAUGE,
-	TARGET_MINI_ICON,
-	OFFSCREEN_INDICATOR,
-	TALKING_HEAD,
-	DAMAGE_GAUGE,
-	MESSAGE_LINES,
-	MISSILE_WARNING_ARROW,
-	CMEASURE_GAUGE,
-	OBJECTIVES_NOTIFY_GAUGE,
-	WINGMEN_STATUS,
-	OFFSCREEN_RANGE,
-	KILLS_GAUGE,
-	ATTACKING_TARGET_COUNT,
-	TEXT_FLASH,
-	MESSAGE_BOX,
-	SUPPORT_GAUGE,
-	LAG_GAUGE
-}
-
-# Gauge names for display/config
-static var GAUGE_NAMES = {
-	LEAD_INDICATOR: "Lead Indicator",
-	ORIENTATION_TEE: "Target Orientation",
-	HOSTILE_TRIANGLE: "Closest Attacking Hostile",
-	TARGET_TRIANGLE: "Current Target Direction",
-	MISSION_TIME: "Mission Time",
-	RETICLE_CIRCLE: "Reticle",
-	THROTTLE_GAUGE: "Throttle",
-	RADAR: "Radar",
-	TARGET_MONITOR: "Target Monitor",
-	CENTER_RETICLE: "Center of Reticle",
-	TARGET_MONITOR_EXTRA_DATA: "Extra Target Info",
-	TARGET_SHIELD_ICON: "Target Shield",
-	PLAYER_SHIELD_ICON: "Player Shield",
-	ETS_GAUGE: "Power Management",
-	AUTO_TARGET: "Auto-target Icon",
-	AUTO_SPEED: "Auto-speed-match Icon",
-	WEAPONS_GAUGE: "Weapons Display",
-	ESCORT_VIEW: "Monitoring View",
-	DIRECTIVES_VIEW: "Directives View",
-	THREAT_GAUGE: "Threat Gauge",
-	AFTERBURNER_ENERGY: "Afterburner Energy",
-	WEAPONS_ENERGY: "Weapons Energy",
-	WEAPON_LINKING_GAUGE: "Weapon Linking",
-	TARGET_MINI_ICON: "Target Hull/Shield Icon",
-	OFFSCREEN_INDICATOR: "Offscreen Indicator",
-	TALKING_HEAD: "Comm Video",
-	DAMAGE_GAUGE: "Damage Display",
-	MESSAGE_LINES: "Message Output",
-	MISSILE_WARNING_ARROW: "Locked Missile Direction",
-	CMEASURE_GAUGE: "Countermeasures",
-	OBJECTIVES_NOTIFY_GAUGE: "Objective Notify",
-	WINGMEN_STATUS: "Wingmen Status",
-	OFFSCREEN_RANGE: "Offscreen Range",
-	KILLS_GAUGE: "Kills Gauge",
-	ATTACKING_TARGET_COUNT: "Attacking Target Count",
-	TEXT_FLASH: "Warning Flash",
-	MESSAGE_BOX: "Message Box",
-	SUPPORT_GAUGE: "Support Gauge",
-	LAG_GAUGE: "Lag Gauge"
+# Gauge types matching original implementation
+enum GaugeType {
+	EMPTY = 0,
+	LEAD_INDICATOR = 1,
+	ORIENTATION_TEE = 2,
+	HOSTILE_TRIANGLE = 3,
+	TARGET_TRIANGLE = 4,
+	MISSION_TIME = 5,
+	RETICLE_CIRCLE = 6,
+	THROTTLE_GAUGE = 7,
+	RADAR = 8,
+	TARGET_MONITOR = 9,
+	CENTER_RETICLE = 10,
+	TARGET_MONITOR_EXTRA_DATA = 11,
+	TARGET_SHIELD_ICON = 12,
+	PLAYER_SHIELD_ICON = 13,
+	ETS_GAUGE = 14,
+	AUTO_TARGET = 15,
+	AUTO_SPEED = 16,
+	WEAPONS_GAUGE = 17,
+	ESCORT_VIEW = 18,
+	DIRECTIVES_VIEW = 19,
+	THREAT_GAUGE = 20,
+	AFTERBURNER_ENERGY = 21,
+	WEAPONS_ENERGY = 22,
+	WEAPON_LINKING_GAUGE = 23,
+	TARGET_MINI_ICON = 24,
+	OFFSCREEN_INDICATOR = 25,
+	TALKING_HEAD = 26,
+	DAMAGE_GAUGE = 27,
+	MESSAGE_LINES = 28,
+	MISSILE_WARNING_ARROW = 29,
+	CMEASURE_GAUGE = 30,
+	OBJECTIVES_NOTIFY_GAUGE = 31,
+	WINGMEN_STATUS = 32,
+	OFFSCREEN_RANGE = 33,
+	KILLS_GAUGE = 34,
+	ATTACKING_TARGET_COUNT = 35,
+	TEXT_FLASH = 36,
+	MESSAGE_BOX = 37,
+	SUPPORT_GAUGE = 38,
+	LAG_GAUGE = 39
 }
 
 # Gauge state
-@export var gauge_id: int = -1
-@export var is_visible: bool = true
-@export var is_popup: bool = false
-@export var base_alpha: float = 0.8
-@export var bright_alpha: float = 1.0
-@export var dim_alpha: float = 0.5
+@export var gauge_id: GaugeType = GaugeType.EMPTY
+@export var is_visible := true
+@export var is_popup := false
+@export var base_alpha := 0.8
+@export var bright_alpha := 1.0
+@export var dim_alpha := 0.5
 
 # Internal state
-var popup_duration: float = 0.0
-var popup_start_time: float = 0.0
-var flash_duration: float = 0.0
-var flash_interval: float = 0.0
-var flash_next_time: float = 0.0
-var is_flashing: bool = false
-var is_bright: bool = false
+var popup_duration := 0.0
+var popup_start_time := 0.0
+var flash_duration := 0.0
+var flash_interval := 0.0
+var flash_next_time := 0.0
+var is_flashing := false
+var is_bright := false
 
 # Colors
-@export var base_color: Color = Color(0, 1, 0, 0.8) # Default green
-var bright_color: Color = Color(0, 1, 0, 1.0)
-var dim_color: Color = Color(0, 1, 0, 0.5)
+@export var base_color := Color(0, 1, 0, 0.8) # Default green
+var bright_color := Color(0, 1, 0, 1.0)
+var dim_color := Color(0, 1, 0, 0.5)
 
 # Constants
-const FLASH_DURATION: float = 5.0
-const FLASH_INTERVAL: float = 0.2
-const POPUP_DEFAULT_DURATION: float = 4.0
+const FLASH_DURATION := 5.0
+const FLASH_INTERVAL := 0.2
+const POPUP_DEFAULT_DURATION := 4.0
 
 func _init() -> void:
 	# Enable processing in editor for preview
@@ -215,13 +173,9 @@ func _process(delta: float) -> void:
 	if Engine.is_editor_hint():
 		queue_redraw()
 
-# Get whether this gauge type can be set to popup mode
-static func can_popup(gauge: int) -> bool:
-	match gauge:
-		WEAPONS_GAUGE, ESCORT_VIEW, DIRECTIVES_VIEW, THREAT_GAUGE, DAMAGE_GAUGE, KILLS_GAUGE, SUPPORT_GAUGE, LAG_GAUGE:
-			return true
-		_:
-			return false
+# Virtual method to be overridden by gauge implementations
+func update_from_game_state() -> void:
+	pass
 
 # Editor preview - draw gauge name and bounds
 func _draw() -> void:
@@ -231,9 +185,61 @@ func _draw() -> void:
 		draw_rect(rect, Color(1, 1, 1, 0.2), false)
 		
 		# Draw gauge name
-		if gauge_id >= 0 && GAUGE_NAMES.has(gauge_id):
+		if gauge_id != GaugeType.EMPTY:
+			var text = _get_gauge_name(gauge_id)
 			var font = ThemeDB.fallback_font
 			var font_size = ThemeDB.fallback_font_size
-			var text = GAUGE_NAMES[gauge_id]
 			var text_size = font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size)
 			draw_string(font, Vector2(5, text_size.y + 5), text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, Color.WHITE)
+
+# Get gauge name for display
+func _get_gauge_name(id: int) -> String:
+	match id:
+		GaugeType.LEAD_INDICATOR: return "Lead Indicator"
+		GaugeType.ORIENTATION_TEE: return "Target Orientation"
+		GaugeType.HOSTILE_TRIANGLE: return "Closest Attacking Hostile"
+		GaugeType.TARGET_TRIANGLE: return "Current Target Direction"
+		GaugeType.MISSION_TIME: return "Mission Time"
+		GaugeType.RETICLE_CIRCLE: return "Reticle"
+		GaugeType.THROTTLE_GAUGE: return "Throttle"
+		GaugeType.RADAR: return "Radar"
+		GaugeType.TARGET_MONITOR: return "Target Monitor"
+		GaugeType.CENTER_RETICLE: return "Center of Reticle"
+		GaugeType.TARGET_MONITOR_EXTRA_DATA: return "Extra Target Info"
+		GaugeType.TARGET_SHIELD_ICON: return "Target Shield"
+		GaugeType.PLAYER_SHIELD_ICON: return "Player Shield"
+		GaugeType.ETS_GAUGE: return "Power Management"
+		GaugeType.AUTO_TARGET: return "Auto-target Icon"
+		GaugeType.AUTO_SPEED: return "Auto-speed-match Icon"
+		GaugeType.WEAPONS_GAUGE: return "Weapons Display"
+		GaugeType.ESCORT_VIEW: return "Monitoring View"
+		GaugeType.DIRECTIVES_VIEW: return "Directives View"
+		GaugeType.THREAT_GAUGE: return "Threat Gauge"
+		GaugeType.AFTERBURNER_ENERGY: return "Afterburner Energy"
+		GaugeType.WEAPONS_ENERGY: return "Weapons Energy"
+		GaugeType.WEAPON_LINKING_GAUGE: return "Weapon Linking"
+		GaugeType.TARGET_MINI_ICON: return "Target Hull/Shield Icon"
+		GaugeType.OFFSCREEN_INDICATOR: return "Offscreen Indicator"
+		GaugeType.TALKING_HEAD: return "Comm Video"
+		GaugeType.DAMAGE_GAUGE: return "Damage Display"
+		GaugeType.MESSAGE_LINES: return "Message Output"
+		GaugeType.MISSILE_WARNING_ARROW: return "Locked Missile Direction"
+		GaugeType.CMEASURE_GAUGE: return "Countermeasures"
+		GaugeType.OBJECTIVES_NOTIFY_GAUGE: return "Objective Notify"
+		GaugeType.WINGMEN_STATUS: return "Wingmen Status"
+		GaugeType.OFFSCREEN_RANGE: return "Offscreen Range"
+		GaugeType.KILLS_GAUGE: return "Kills Gauge"
+		GaugeType.ATTACKING_TARGET_COUNT: return "Attacking Target Count"
+		GaugeType.TEXT_FLASH: return "Warning Flash"
+		GaugeType.MESSAGE_BOX: return "Message Box"
+		GaugeType.SUPPORT_GAUGE: return "Support Gauge"
+		GaugeType.LAG_GAUGE: return "Lag Gauge"
+		_: return "Unknown Gauge"
+
+# Check if this gauge type can be set to popup mode
+static func can_popup(gauge: GaugeType) -> bool:
+	match gauge:
+		GaugeType.WEAPONS_GAUGE, GaugeType.ESCORT_VIEW, GaugeType.DIRECTIVES_VIEW, GaugeType.THREAT_GAUGE, GaugeType.DAMAGE_GAUGE, GaugeType.KILLS_GAUGE, GaugeType.SUPPORT_GAUGE, GaugeType.LAG_GAUGE:
+			return true
+		_:
+			return false

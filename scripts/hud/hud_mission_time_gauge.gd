@@ -43,7 +43,7 @@ var _flash_state := false
 
 func _init() -> void:
 	super._init()
-	gauge_id = HUDGauge.MISSION_TIME
+	gauge_id = GaugeType.MISSION_TIME
 
 func _ready() -> void:
 	super._ready()

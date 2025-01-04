@@ -33,61 +33,61 @@ func _init():
 
 # Default flags for regular HUD
 const DEFAULT_FLAGS = (
-	(1 << HUDGauge.LEAD_INDICATOR) |
-	(1 << HUDGauge.ORIENTATION_TEE) |
-	(1 << HUDGauge.HOSTILE_TRIANGLE) |
-	(1 << HUDGauge.TARGET_TRIANGLE) |
-	(1 << HUDGauge.MISSION_TIME) |
-	(1 << HUDGauge.RETICLE_CIRCLE) |
-	(1 << HUDGauge.THROTTLE_GAUGE) |
-	(1 << HUDGauge.RADAR) |
-	(1 << HUDGauge.TARGET_MONITOR) |
-	(1 << HUDGauge.CENTER_RETICLE) |
-	(1 << HUDGauge.TARGET_MONITOR_EXTRA_DATA) |
-	(1 << HUDGauge.TARGET_SHIELD_ICON) |
-	(1 << HUDGauge.PLAYER_SHIELD_ICON) |
-	(1 << HUDGauge.ETS_GAUGE) |
-	(1 << HUDGauge.AUTO_TARGET) |
-	(1 << HUDGauge.AUTO_SPEED) |
-	(1 << HUDGauge.WEAPONS_GAUGE) |
-	(1 << HUDGauge.ESCORT_VIEW) |
-	(1 << HUDGauge.DIRECTIVES_VIEW) |
-	(1 << HUDGauge.THREAT_GAUGE) |
-	(1 << HUDGauge.AFTERBURNER_ENERGY) |
-	(1 << HUDGauge.WEAPONS_ENERGY) |
-	(1 << HUDGauge.WEAPON_LINKING_GAUGE) |
-	(1 << HUDGauge.TARGET_MINI_ICON) |
-	(1 << HUDGauge.OFFSCREEN_INDICATOR) |
-	(1 << HUDGauge.TALKING_HEAD) |
-	(1 << HUDGauge.DAMAGE_GAUGE) |
-	(1 << HUDGauge.MESSAGE_LINES) |
-	(1 << HUDGauge.MISSILE_WARNING_ARROW) |
-	(1 << HUDGauge.CMEASURE_GAUGE) |
-	(1 << HUDGauge.OBJECTIVES_NOTIFY_GAUGE) |
-	(1 << HUDGauge.WINGMEN_STATUS)
+	(1 << HUDGauge.GaugeType.LEAD_INDICATOR) |
+	(1 << HUDGauge.GaugeType.ORIENTATION_TEE) |
+	(1 << HUDGauge.GaugeType.HOSTILE_TRIANGLE) |
+	(1 << HUDGauge.GaugeType.TARGET_TRIANGLE) |
+	(1 << HUDGauge.GaugeType.MISSION_TIME) |
+	(1 << HUDGauge.GaugeType.RETICLE_CIRCLE) |
+	(1 << HUDGauge.GaugeType.THROTTLE_GAUGE) |
+	(1 << HUDGauge.GaugeType.RADAR) |
+	(1 << HUDGauge.GaugeType.TARGET_MONITOR) |
+	(1 << HUDGauge.GaugeType.CENTER_RETICLE) |
+	(1 << HUDGauge.GaugeType.TARGET_MONITOR_EXTRA_DATA) |
+	(1 << HUDGauge.GaugeType.TARGET_SHIELD_ICON) |
+	(1 << HUDGauge.GaugeType.PLAYER_SHIELD_ICON) |
+	(1 << HUDGauge.GaugeType.ETS_GAUGE) |
+	(1 << HUDGauge.GaugeType.AUTO_TARGET) |
+	(1 << HUDGauge.GaugeType.AUTO_SPEED) |
+	(1 << HUDGauge.GaugeType.WEAPONS_GAUGE) |
+	(1 << HUDGauge.GaugeType.ESCORT_VIEW) |
+	(1 << HUDGauge.GaugeType.DIRECTIVES_VIEW) |
+	(1 << HUDGauge.GaugeType.THREAT_GAUGE) |
+	(1 << HUDGauge.GaugeType.AFTERBURNER_ENERGY) |
+	(1 << HUDGauge.GaugeType.WEAPONS_ENERGY) |
+	(1 << HUDGauge.GaugeType.WEAPON_LINKING_GAUGE) |
+	(1 << HUDGauge.GaugeType.TARGET_MINI_ICON) |
+	(1 << HUDGauge.GaugeType.OFFSCREEN_INDICATOR) |
+	(1 << HUDGauge.GaugeType.TALKING_HEAD) |
+	(1 << HUDGauge.GaugeType.DAMAGE_GAUGE) |
+	(1 << HUDGauge.GaugeType.MESSAGE_LINES) |
+	(1 << HUDGauge.GaugeType.MISSILE_WARNING_ARROW) |
+	(1 << HUDGauge.GaugeType.CMEASURE_GAUGE) |
+	(1 << HUDGauge.GaugeType.OBJECTIVES_NOTIFY_GAUGE) |
+	(1 << HUDGauge.GaugeType.WINGMEN_STATUS)
 )
 
 const DEFAULT_FLAGS2 = (
-	(1 << (HUDGauge.OFFSCREEN_RANGE - 32)) |
-	(1 << (HUDGauge.KILLS_GAUGE - 32)) |
-	(1 << (HUDGauge.ATTACKING_TARGET_COUNT - 32)) |
-	(1 << (HUDGauge.SUPPORT_GAUGE - 32)) |
-	(1 << (HUDGauge.LAG_GAUGE - 32))
+	(1 << (HUDGauge.GaugeType.OFFSCREEN_RANGE - 32)) |
+	(1 << (HUDGauge.GaugeType.KILLS_GAUGE - 32)) |
+	(1 << (HUDGauge.GaugeType.ATTACKING_TARGET_COUNT - 32)) |
+	(1 << (HUDGauge.GaugeType.SUPPORT_GAUGE - 32)) |
+	(1 << (HUDGauge.GaugeType.LAG_GAUGE - 32))
 )
 
 # Default flags for observer HUD
 const OBSERVER_FLAGS = (
-	(1 << HUDGauge.CENTER_RETICLE) |
-	(1 << HUDGauge.OFFSCREEN_INDICATOR) |
-	(1 << HUDGauge.MESSAGE_LINES) |
-	(1 << HUDGauge.HOSTILE_TRIANGLE) |
-	(1 << HUDGauge.TARGET_TRIANGLE) |
-	(1 << HUDGauge.TARGET_MINI_ICON) |
-	(1 << HUDGauge.TARGET_MONITOR)
+	(1 << HUDGauge.GaugeType.CENTER_RETICLE) |
+	(1 << HUDGauge.GaugeType.OFFSCREEN_INDICATOR) |
+	(1 << HUDGauge.GaugeType.MESSAGE_LINES) |
+	(1 << HUDGauge.GaugeType.HOSTILE_TRIANGLE) |
+	(1 << HUDGauge.GaugeType.TARGET_TRIANGLE) |
+	(1 << HUDGauge.GaugeType.TARGET_MINI_ICON) |
+	(1 << HUDGauge.GaugeType.TARGET_MONITOR)
 )
 
 const OBSERVER_FLAGS2 = (
-	(1 << (HUDGauge.OFFSCREEN_RANGE - 32))
+	(1 << (HUDGauge.GaugeType.OFFSCREEN_RANGE - 32))
 )
 
 func reset_to_defaults():

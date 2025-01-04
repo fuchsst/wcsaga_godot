@@ -52,7 +52,7 @@ var _flash_state := false
 
 func _init() -> void:
 	super._init()
-	gauge_id = HUDGauge.MISSILE_WARNING_ARROW
+	gauge_id = GaugeType.MISSILE_WARNING_ARROW
 
 func _ready() -> void:
 	super._ready()

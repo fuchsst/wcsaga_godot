@@ -63,7 +63,7 @@ var radar_objects: Array[RadarObject] = []
 
 func _init() -> void:
 	super._init()
-	gauge_id = HUDGauge.RADAR
+	gauge_id = GaugeType.RADAR
 
 func _ready() -> void:
 	super._ready()
@@ -98,16 +98,43 @@ func clear_radar_objects() -> void:
 	queue_redraw()
 
 # Update radar from current game state
-func update_from_game_state(player_ship: PlayerShip) -> void:
-	# TODO: Get nearby objects from game state
-	# This would:
-	# 1. Clear current objects
-	# 2. Get player position/orientation
-	# 3. Find nearby ships/objects
-	# 4. Add them to radar
-	pass
+func update_from_game_state() -> void:
+	clear_radar_objects()
+	
+	if !GameState.player_ship:
+		return
+		
+	# Add nearby ships
+	for ship in get_tree().get_nodes_in_group("ships"):
+		if ship == GameState.player_ship:
+			continue
+			
+		var distance = ship.global_position.distance_to(GameState.player_ship.global_position)
+		if distance <= RADAR_RANGES[current_range]:
+			add_radar_object(
+				ship.global_position,
+				ship.type,
+				ship.team,
+				ship == GameState.player_ship.target
+			)
+	
+	# Add missiles if enabled
+	if show_friendly_missiles || show_hostile_missiles:
+		for missile in get_tree().get_nodes_in_group("missiles"):
+			var team_matches = (
+				(show_friendly_missiles && missile.team == GameState.player_ship.team) ||
+				(show_hostile_missiles && missile.team != GameState.player_ship.team)
+			)
+			if team_matches:
+				var distance = missile.global_position.distance_to(GameState.player_ship.global_position)
+				if distance <= RADAR_RANGES[current_range]:
+					add_radar_object(
+						missile.global_position,
+						missile.type,
+						missile.team,
+						false
+					)
 
-# Draw the gauge using Node2D drawing
 func _draw() -> void:
 	if Engine.is_editor_hint():
 		# Draw editor preview background
@@ -150,13 +177,22 @@ func _draw() -> void:
 
 # Draw actual radar objects
 func _draw_radar_objects(center: Vector2, color: Color) -> void:
+	if !GameState.player_ship:
+		return
+		
+	var player_pos = GameState.player_ship.global_position
+	var player_forward = GameState.player_ship.global_transform.basis.z
+	var player_up = GameState.player_ship.global_transform.basis.y
+	
 	for obj in radar_objects:
-		# TODO: Convert world position to radar position
-		# var radar_pos = world_to_radar(obj.position, player_pos, player_forward, player_up)
-		var radar_pos = Vector2.ZERO # Temporary
+		var radar_pos = world_to_radar(obj.position, player_pos, player_forward, player_up)
 		
 		# Get object color based on type/team
-		var obj_color = color # TODO: Get proper color based on type/team
+		var obj_color = color
+		if obj.team != GameState.player_ship.team:
+			obj_color = Color.RED
+		elif obj.is_targeted:
+			obj_color = Color.GREEN
 		
 		# Draw blip
 		if obj.is_targeted:
