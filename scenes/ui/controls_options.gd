@@ -97,12 +97,12 @@ func populate_controls() -> void:
 			child.queue_free()
 	
 	# Target Controls
-	var target_container = tab_panels["target"].get_node("ScrollContainer/VBoxContainer")
+	var target_container = tab_panels["Targeting"].get_node("ScrollContainer/VBoxContainer")
 	for action in target_control_config:
 		add_control_line(target_container, action, target_control_config[action])
 	
 	# Ship Controls
-	var ship_container = tab_panels["ship"].get_node("ScrollContainer/VBoxContainer")
+	var ship_container = tab_panels["Ship"].get_node("ScrollContainer/VBoxContainer")
 	for action in ship_control_config:
 		add_control_line(ship_container, action, ship_control_config[action])
 	
@@ -111,12 +111,12 @@ func populate_controls() -> void:
 		add_axis_line(ship_container, axis, axis_config[axis])
 	
 	# Weapon Controls
-	var weapon_container = tab_panels["weapon"].get_node("ScrollContainer/VBoxContainer")
+	var weapon_container = tab_panels["Weapons"].get_node("ScrollContainer/VBoxContainer")
 	for action in weapon_control_config:
 		add_control_line(weapon_container, action, weapon_control_config[action])
 	
 	# Computer Controls
-	var computer_container = tab_panels["computer"].get_node("ScrollContainer/VBoxContainer")
+	var computer_container = tab_panels["Misc"].get_node("ScrollContainer/VBoxContainer")
 	for action in computer_control_config:
 		add_control_line(computer_container, action, computer_control_config[action])
 
@@ -132,7 +132,6 @@ func add_control_line(container: Node, action: String, binding: Dictionary) -> v
 		line.key = binding.key
 		line.alt_modifier = (binding.mod & KEY_ALT) != 0
 		line.shift_modifier = (binding.mod & KEY_SHIFT) != 0
-		line.ctrl_modifier = (binding.mod & KEY_CTRL) != 0
 	
 	# Set joy binding
 	if binding.joy >= 0:
@@ -225,7 +224,7 @@ func get_joy_name(joy: int) -> String:
 
 func get_mouse_name(button: int) -> String:
 	if button < 0:
-		return "None"
+		return ""
 		
 	match button:
 		MOUSE_BUTTON_LEFT: return "Left Click"
@@ -262,13 +261,13 @@ func handle_binding_input(event: InputEvent) -> void:
 				# Save current state for undo
 				save_undo_state()
 				
-				# Get modifiers
+				# Get shift and alt modifiers
 				var mod := 0
 				if Input.is_key_pressed(KEY_SHIFT):
 					mod |= KEY_SHIFT
 				if Input.is_key_pressed(KEY_ALT):
 					mod |= KEY_ALT
-					
+				
 				# Get action and config from control line
 				var action = binding_control.get_parent().name
 				var config = _get_config_for_action(action)
@@ -276,18 +275,15 @@ func handle_binding_input(event: InputEvent) -> void:
 				if config:
 					config[action].key = event.keycode
 					config[action].mod = mod
-					config[action].mouse = -1 # Clear mouse binding when setting key
-					config[action].joy = -1 # Clear joy binding when setting key
 				
 				# Update control line
 				binding_control.get_parent().key = event.keycode
 				binding_control.get_parent().alt_modifier = (mod & KEY_ALT) != 0
 				binding_control.get_parent().shift_modifier = (mod & KEY_SHIFT) != 0
-				binding_control.get_parent().ctrl_modifier = (mod & KEY_CTRL) != 0
-				binding_control.get_parent().mouse_button = -1
-				binding_control.get_parent().joy_button = -1
 				
+				# Exit binding mode
 				binding_mode = false
+				binding_control.get_parent().modulate = Color(1, 1, 1, 1)
 				binding_control = null
 				check_conflicts()
 				
@@ -302,19 +298,13 @@ func handle_binding_input(event: InputEvent) -> void:
 				
 				if config:
 					config[action].joy = event.button_index
-					config[action].mouse = -1 # Clear mouse binding when setting joy
-					config[action].key = -1 # Clear key binding when setting joy
-					config[action].mod = 0
 				
 				# Update control line
 				binding_control.get_parent().joy_button = event.button_index
-				binding_control.get_parent().mouse_button = -1
-				binding_control.get_parent().key = -1
-				binding_control.get_parent().alt_modifier = false
-				binding_control.get_parent().shift_modifier = false
-				binding_control.get_parent().ctrl_modifier = false
 				
+				# Exit binding mode
 				binding_mode = false
+				binding_control.get_parent().modulate = Color(1, 1, 1, 1)
 				binding_control = null
 				check_conflicts()
 				
@@ -329,19 +319,13 @@ func handle_binding_input(event: InputEvent) -> void:
 				
 				if config:
 					config[action].mouse = event.button_index
-					config[action].key = -1 # Clear key binding when setting mouse
-					config[action].joy = -1 # Clear joy binding when setting mouse
-					config[action].mod = 0
 				
 				# Update control line
 				binding_control.get_parent().mouse_button = event.button_index
-				binding_control.get_parent().key = -1
-				binding_control.get_parent().joy_button = -1
-				binding_control.get_parent().alt_modifier = false
-				binding_control.get_parent().shift_modifier = false
-				binding_control.get_parent().ctrl_modifier = false
 				
+				# Exit binding mode
 				binding_mode = false
+				binding_control.get_parent().modulate = Color(1, 1, 1, 1)
 				binding_control = null
 				check_conflicts()
 				
@@ -359,7 +343,9 @@ func handle_binding_input(event: InputEvent) -> void:
 				# Update axis line
 				binding_control.get_parent().get_node("AxisButton/AxisLabel").text = "Axis " + str(event.axis)
 				
+				# Exit binding mode
 				binding_mode = false
+				binding_control.get_parent().modulate = Color(1, 1, 1, 1)
 				binding_control = null
 				check_conflicts()
 
@@ -437,7 +423,6 @@ func clear_selected_binding() -> void:
 				line.key = -1
 				line.alt_modifier = false
 				line.shift_modifier = false
-				line.ctrl_modifier = false
 		"joy":
 			if config:
 				config[action].joy = -1

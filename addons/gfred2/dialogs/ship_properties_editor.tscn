@@ -22,16 +22,18 @@ size_flags_vertical = 3
 [node name="TabContainer" type="TabContainer" parent="Content"]
 layout_mode = 2
 size_flags_vertical = 3
+current_tab = 0
 
 [node name="Properties" type="VBoxContainer" parent="Content/TabContainer"]
 layout_mode = 2
 theme_override_constants/separation = 10
+metadata/_tab_index = 0
 
 [node name="BasicGrid" type="GridContainer" parent="Content/TabContainer/Properties"]
 layout_mode = 2
-columns = 2
 theme_override_constants/h_separation = 10
 theme_override_constants/v_separation = 5
+columns = 2
 
 [node name="NameLabel" type="Label" parent="Content/TabContainer/Properties/BasicGrid"]
 layout_mode = 2
@@ -84,10 +86,12 @@ size_flags_horizontal = 3
 [node name="FlagsNotebook" type="TabContainer" parent="Content/TabContainer/Properties"]
 layout_mode = 2
 size_flags_vertical = 3
+current_tab = 0
 
 [node name="Combat" type="VBoxContainer" parent="Content/TabContainer/Properties/FlagsNotebook"]
 layout_mode = 2
 theme_override_constants/separation = 5
+metadata/_tab_index = 0
 
 [node name="ProtectShipCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Combat"]
 layout_mode = 2
@@ -111,7 +115,6 @@ text = "Priority"
 
 [node name="EscortPrioritySpin" type="SpinBox" parent="Content/TabContainer/Properties/FlagsNotebook/Combat/EscortPriorityContainer"]
 layout_mode = 2
-max_value = 100.0
 
 [node name="InvulnerableCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Combat"]
 layout_mode = 2
@@ -135,7 +138,6 @@ text = "Threshold"
 
 [node name="GuardianThresholdSpin" type="SpinBox" parent="Content/TabContainer/Properties/FlagsNotebook/Combat/GuardianThresholdContainer"]
 layout_mode = 2
-max_value = 100.0
 
 [node name="VaporizeCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Combat"]
 layout_mode = 2
@@ -153,6 +155,7 @@ text = "Friendly Stealth Invisible"
 visible = false
 layout_mode = 2
 theme_override_constants/separation = 5
+metadata/_tab_index = 1
 
 [node name="HiddenFromSensorsCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Sensors"]
 layout_mode = 2
@@ -174,6 +177,7 @@ text = "Scannable"
 visible = false
 layout_mode = 2
 theme_override_constants/separation = 5
+metadata/_tab_index = 2
 
 [node name="NoSubspaceDriveCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Drive"]
 layout_mode = 2
@@ -191,6 +195,7 @@ text = "No Bank"
 visible = false
 layout_mode = 2
 theme_override_constants/separation = 5
+metadata/_tab_index = 3
 
 [node name="DestroyBeforeMissionCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Mission"]
 layout_mode = 2
@@ -228,6 +233,7 @@ text = "Red Alert Carry"
 visible = false
 layout_mode = 2
 theme_override_constants/separation = 5
+metadata/_tab_index = 4
 
 [node name="NoDynamicCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/AI"]
 layout_mode = 2
@@ -257,6 +263,7 @@ text = "Disable Messages"
 visible = false
 layout_mode = 2
 theme_override_constants/separation = 5
+metadata/_tab_index = 5
 
 [node name="LockedCheck" type="CheckBox" parent="Content/TabContainer/Properties/FlagsNotebook/Status"]
 layout_mode = 2
@@ -306,12 +313,13 @@ text = "Special Hitpoints..."
 visible = false
 layout_mode = 2
 theme_override_constants/separation = 10
+metadata/_tab_index = 1
 
 [node name="StatusGrid" type="GridContainer" parent="Content/TabContainer/Status"]
 layout_mode = 2
-columns = 2
 theme_override_constants/h_separation = 10
 theme_override_constants/v_separation = 5
+columns = 2
 
 [node name="HullLabel" type="Label" parent="Content/TabContainer/Status/StatusGrid"]
 layout_mode = 2
@@ -319,7 +327,6 @@ text = "Initial Hull"
 
 [node name="HullSpin" type="SpinBox" parent="Content/TabContainer/Status/StatusGrid"]
 layout_mode = 2
-max_value = 100.0
 value = 100.0
 
 [node name="ShieldsLabel" type="Label" parent="Content/TabContainer/Status/StatusGrid"]
@@ -328,7 +335,6 @@ text = "Initial Shields"
 
 [node name="ShieldsSpin" type="SpinBox" parent="Content/TabContainer/Status/StatusGrid"]
 layout_mode = 2
-max_value = 100.0
 value = 100.0
 
 [node name="VelocityLabel" type="Label" parent="Content/TabContainer/Status/StatusGrid"]
@@ -337,7 +343,6 @@ text = "Initial Velocity"
 
 [node name="VelocitySpin" type="SpinBox" parent="Content/TabContainer/Status/StatusGrid"]
 layout_mode = 2
-max_value = 100.0
 value = 33.0
 
 [node name="OrientationLabel" type="Label" parent="Content/TabContainer/Status/StatusGrid"]
@@ -379,6 +384,7 @@ max_value = 180.0
 visible = false
 layout_mode = 2
 theme_override_constants/separation = 20
+metadata/_tab_index = 2
 
 [node name="ArrivalSection" type="VBoxContainer" parent="Content/TabContainer/Arrival"]
 layout_mode = 2
@@ -390,9 +396,9 @@ text = "Arrival"
 
 [node name="ArrivalGrid" type="GridContainer" parent="Content/TabContainer/Arrival/ArrivalSection"]
 layout_mode = 2
-columns = 2
 theme_override_constants/h_separation = 10
 theme_override_constants/v_separation = 5
+columns = 2
 
 [node name="LocationLabel" type="Label" parent="Content/TabContainer/Arrival/ArrivalSection/ArrivalGrid"]
 layout_mode = 2
@@ -442,9 +448,9 @@ text = "Departure"
 
 [node name="DepartureGrid" type="GridContainer" parent="Content/TabContainer/Arrival/DepartureSection"]
 layout_mode = 2
-columns = 2
 theme_override_constants/h_separation = 10
 theme_override_constants/v_separation = 5
+columns = 2
 
 [node name="LocationLabel" type="Label" parent="Content/TabContainer/Arrival/DepartureSection/DepartureGrid"]
 layout_mode = 2

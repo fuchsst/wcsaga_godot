@@ -39,12 +39,6 @@ class_name ControlLine
 		if is_inside_tree():
 			update_key_label()
 
-@export var ctrl_modifier := false:
-	set(value):
-		ctrl_modifier = value
-		if is_inside_tree():
-			update_key_label()
-
 func _ready() -> void:
 	# Set initial values
 	$Label.text = label_text
@@ -56,8 +50,6 @@ func update_key_label() -> void:
 	var text := ""
 	
 	# Add modifiers
-	if ctrl_modifier:
-		text += "Ctrl+"
 	if shift_modifier:
 		text += "Shift+"
 	if alt_modifier:
@@ -73,12 +65,12 @@ func update_key_label() -> void:
 
 func update_joy_label() -> void:
 	if joy_button != JoyButton.JOY_BUTTON_INVALID:
-		$JoyButton/JoyLabel.text = "Joystick " + str(joy_button)
+		$JoyButton/JoyLabel.text = str(joy_button)
 	else:
 		$JoyButton/JoyLabel.text = ""
 
 func update_mouse_label() -> void:
-	if joy_button != MouseButton.MOUSE_BUTTON_NONE:
-		$MouseButton/MouseLabel.text = "Mouse " + str(joy_button)
+	if mouse_button != MouseButton.MOUSE_BUTTON_NONE:
+		$MouseButton/MouseLabel.text = str(mouse_button)
 	else:
 		$MouseButton/MouseLabel.text = ""

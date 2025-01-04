@@ -15,21 +15,21 @@ var shield_system: Node
 var engine_system: Node
 
 func _ready():
-    # Initialize ship systems
-    pass
+	# Initialize ship systems
+	pass
 
 func take_damage(amount: float, damage_type: String = "default") -> void:
-    # Handle damage to shields/hull
-    pass
+	# Handle damage to shields/hull
+	pass
 
 func _physics_process(delta: float) -> void:
-    # Handle ship physics/movement
-    pass
+	# Handle ship physics/movement
+	pass
 
 func fire_weapon(weapon_index: int) -> void:
-    # Handle weapon firing
-    pass
+	# Handle weapon firing
+	pass
 
 func apply_thrust(amount: float) -> void:
-    # Handle engine thrust
-    pass
+	# Handle engine thrust
+	pass

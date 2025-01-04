@@ -1,4 +1,6 @@
-[gd_scene format=3 uid="uid://b4r8q2yqn6m8x"]
+[gd_scene load_steps=2 format=3 uid="uid://b4r8q2yqn6m8x"]
+
+[ext_resource type="Script" path="res://scenes/ui/control_line.gd" id="1_otshh"]
 
 [node name="ControlLine" type="HBoxContainer"]
 custom_minimum_size = Vector2(0, 30)
@@ -6,6 +8,7 @@ offset_right = 904.0
 offset_bottom = 30.0
 size_flags_horizontal = 3
 theme_override_constants/separation = 20
+script = ExtResource("1_otshh")
 
 [node name="Label" type="Label" parent="."]
 custom_minimum_size = Vector2(300, 0)

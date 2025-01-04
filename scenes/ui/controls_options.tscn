@@ -1,14 +1,12 @@
-[gd_scene load_steps=25 format=3 uid="uid://ceuf5oyrnd40x"]
+[gd_scene load_steps=23 format=3 uid="uid://ceuf5oyrnd40x"]
 
 [ext_resource type="Texture2D" uid="uid://cxqncspu12dop" path="res://assets/hermes_interface/2_ControlConfig.png" id="1_1kixd"]
 [ext_resource type="Script" path="res://scenes/ui/controls_options.gd" id="1_yvr4p"]
 [ext_resource type="Resource" uid="uid://bay2gjgvc7fk1" path="res://resources/game_sounds.tres" id="2_ylpkn"]
-[ext_resource type="PackedScene" uid="uid://b4r8q2yqn6m8x" path="res://scenes/ui/control_line.tscn" id="3_kl4m2"]
 [ext_resource type="PackedScene" uid="uid://d2q8y2yqn6m8x" path="res://scenes/ui/conflict_warning.tscn" id="5_warn"]
 [ext_resource type="Texture2D" uid="uid://dxsvhlifc6pm4" path="res://assets/hermes_interface/2_CCB_000001.png" id="5_ya3ru"]
 [ext_resource type="Texture2D" uid="uid://cpkcdxftiwlq" path="res://assets/hermes_interface/2_CCB_010001.png" id="6_gxtvo"]
 [ext_resource type="PackedScene" uid="uid://bq8y2yqn6m8x" path="res://scenes/ui/controls_help.tscn" id="6_help"]
-[ext_resource type="Script" path="res://scenes/ui/control_line.gd" id="7_hngpg"]
 [ext_resource type="Texture2D" uid="uid://b55p0osbq7c43" path="res://assets/hermes_interface/2_CCB_020001.png" id="7_q1wgm"]
 [ext_resource type="Texture2D" uid="uid://d0dotuobf8x0v" path="res://assets/hermes_interface/2_CCB_030001.png" id="8_7ah6j"]
 [ext_resource type="Texture2D" uid="uid://dlncp7f262eu1" path="res://assets/hermes_interface/2_CCB_180001.png" id="9_wc13r"]
@@ -195,67 +193,79 @@ layout_mode = 2
 text = "Mouse"
 horizontal_alignment = 1
 
-[node name="TargetControls" type="VBoxContainer" parent="TabPanels"]
+[node name="TargetControls" type="Control" parent="TabPanels"]
+visible = false
 layout_mode = 2
+size_flags_vertical = 3
 
 [node name="ScrollContainer" type="ScrollContainer" parent="TabPanels/TargetControls"]
-layout_mode = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="TabPanels/TargetControls/ScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 0
-
-[node name="ControlLine2" parent="TabPanels/TargetControls/ScrollContainer/VBoxContainer" instance=ExtResource("3_kl4m2")]
-layout_mode = 2
-script = ExtResource("7_hngpg")
-label_text = "Test"
-key = 4194313
-joy_button = 0
+size_flags_vertical = 2
 
 [node name="ShipControls" type="Control" parent="TabPanels"]
 visible = false
 layout_mode = 2
+size_flags_vertical = 3
 
 [node name="ScrollContainer" type="ScrollContainer" parent="TabPanels/ShipControls"]
-layout_mode = 0
-offset_left = 32.0
-offset_top = 94.0
-offset_right = 936.0
-offset_bottom = 518.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="TabPanels/ShipControls/ScrollContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_constants/separation = 10
 
 [node name="WeaponControls" type="Control" parent="TabPanels"]
 visible = false
 layout_mode = 2
+size_flags_vertical = 3
 
 [node name="ScrollContainer" type="ScrollContainer" parent="TabPanels/WeaponControls"]
-layout_mode = 0
-offset_left = 32.0
-offset_top = 94.0
-offset_right = 936.0
-offset_bottom = 518.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="TabPanels/WeaponControls/ScrollContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_constants/separation = 10
 
 [node name="ComputerControls" type="Control" parent="TabPanels"]
 visible = false
 layout_mode = 2
+size_flags_vertical = 3
 
 [node name="ScrollContainer" type="ScrollContainer" parent="TabPanels/ComputerControls"]
-layout_mode = 0
-offset_left = 32.0
-offset_top = 94.0
-offset_right = 936.0
-offset_bottom = 518.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="TabPanels/ComputerControls/ScrollContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_constants/separation = 10
 
 [node name="ActionButtons" type="Control" parent="."]
