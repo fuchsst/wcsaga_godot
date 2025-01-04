@@ -1,0 +1,82 @@
+[gd_scene load_steps=4 format=3 uid="uid://dj87bn8r53bcu"]
+
+[ext_resource type="Texture2D" uid="uid://8dj2y1mypoeo" path="res://assets/hermes_interface/2_Pop2.png" id="1_2inv1"]
+[ext_resource type="Script" path="res://scenes/ui/components/hermes_message_popup.gd" id="1_8uqwr"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_0fmc7"]
+
+[node name="PopupPanel" type="PopupPanel"]
+auto_translate_mode = 1
+transparent_bg = true
+initial_position = 1
+size = Vector2i(612, 331)
+visible = true
+transparent = true
+script = ExtResource("1_8uqwr")
+
+[node name="Background" type="TextureRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 608.0
+offset_bottom = 327.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_2inv1")
+
+[node name="MarginContainer" type="GridContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 608.0
+offset_bottom = 327.0
+grow_horizontal = 2
+grow_vertical = 2
+columns = 3
+
+[node name="Control" type="Control" parent="MarginContainer"]
+material = SubResource("CanvasItemMaterial_0fmc7")
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+
+[node name="Control2" type="Control" parent="MarginContainer"]
+custom_minimum_size = Vector2(16, 0)
+layout_mode = 2
+
+[node name="Control3" type="Control" parent="MarginContainer"]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+
+[node name="Control4" type="Control" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="Description" type="Label" parent="MarginContainer"]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+autowrap_mode = 3
+
+[node name="Control5" type="Control" parent="MarginContainer"]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+
+[node name="Control6" type="Control" parent="MarginContainer"]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+
+[node name="Control7" type="Control" parent="MarginContainer"]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+
+[node name="Button" type="TextureButton" parent="."]
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 608.0
+offset_bottom = 327.0
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

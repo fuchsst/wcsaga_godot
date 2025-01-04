@@ -551,7 +551,7 @@ func accept_changes() -> void:
 	pilot_data.axis_config = axis_config.duplicate(true)
 	
 	play_accept_sound()
-	get_tree().change_scene_to_file("res://scenes/ui/options.tscn")
+	SceneManager.change_scene_to_previous()
 
 func cancel_changes() -> void:
 	target_control_config = target_control_config_backup.duplicate(true)
@@ -560,7 +560,7 @@ func cancel_changes() -> void:
 	computer_control_config = computer_control_config_backup.duplicate(true)
 	axis_config = axis_config_backup.duplicate(true)
 	play_cancel_sound()
-	get_tree().change_scene_to_file("res://scenes/ui/options.tscn")
+	SceneManager.change_scene_to_previous()
 
 func reset_to_defaults() -> void:
 	save_undo_state()

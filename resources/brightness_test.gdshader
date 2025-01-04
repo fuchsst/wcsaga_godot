@@ -1,18 +1,11 @@
 shader_type canvas_item;
 
-uniform float brightness = 1.0;
+uniform sampler2D custom_texture;
 
 void fragment() {
-    // Create a checkerboard pattern
-    vec2 uv = UV * 5.0; // Reduced scale for larger squares
-    vec2 grid = floor(uv);
-    float checker = mod(grid.x + grid.y, 2.0);
-    
-    // Base color (alternating dark gray and white for better contrast)
-    vec3 color = mix(vec3(0.3), vec3(1.0), checker);
-    
-    // Apply brightness
-    color *= brightness;
-    
-    COLOR = vec4(color, 1.0);
+    vec4 tex_color = texture(custom_texture, UV);
+    if (tex_color.rgb == vec3(0.0)) {
+        tex_color.a = 0.0;
+    }
+    COLOR = tex_color;
 }

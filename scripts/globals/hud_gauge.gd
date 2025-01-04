@@ -1,0 +1,94 @@
+extends Node
+class_name HUDGauge
+
+enum {
+	LEAD_INDICATOR,
+	ORIENTATION_TEE,
+	HOSTILE_TRIANGLE,
+	TARGET_TRIANGLE,
+	MISSION_TIME,
+	RETICLE_CIRCLE,
+	THROTTLE_GAUGE,
+	RADAR,
+	TARGET_MONITOR,
+	CENTER_RETICLE,
+	TARGET_MONITOR_EXTRA_DATA,
+	TARGET_SHIELD_ICON,
+	PLAYER_SHIELD_ICON,
+	ETS_GAUGE,
+	AUTO_TARGET,
+	AUTO_SPEED,
+	WEAPONS_GAUGE,
+	ESCORT_VIEW,
+	DIRECTIVES_VIEW,
+	THREAT_GAUGE,
+	AFTERBURNER_ENERGY,
+	WEAPONS_ENERGY,
+	WEAPON_LINKING_GAUGE,
+	TARGET_MINI_ICON,
+	OFFSCREEN_INDICATOR,
+	TALKING_HEAD,
+	DAMAGE_GAUGE,
+	MESSAGE_LINES,
+	MISSILE_WARNING_ARROW,
+	CMEASURE_GAUGE,
+	OBJECTIVES_NOTIFY_GAUGE,
+	WINGMEN_STATUS,
+	OFFSCREEN_RANGE,
+	KILLS_GAUGE,
+	ATTACKING_TARGET_COUNT,
+	TEXT_FLASH,
+	MESSAGE_BOX,
+	SUPPORT_GAUGE,
+	LAG_GAUGE
+}
+
+static var GAUGE_NAMES = {
+	LEAD_INDICATOR: "Lead Indicator",
+	ORIENTATION_TEE: "Target Orientation", 
+	HOSTILE_TRIANGLE: "Closest Attacking Hostile",
+	TARGET_TRIANGLE: "Current Target Direction",
+	MISSION_TIME: "Mission Time",
+	RETICLE_CIRCLE: "Reticle",
+	THROTTLE_GAUGE: "Throttle",
+	RADAR: "Radar",
+	TARGET_MONITOR: "Target Monitor",
+	CENTER_RETICLE: "Center of Reticle",
+	TARGET_MONITOR_EXTRA_DATA: "Extra Target Info",
+	TARGET_SHIELD_ICON: "Target Shield",
+	PLAYER_SHIELD_ICON: "Player Shield",
+	ETS_GAUGE: "Power Management",
+	AUTO_TARGET: "Auto-target Icon",
+	AUTO_SPEED: "Auto-speed-match Icon",
+	WEAPONS_GAUGE: "Weapons Display",
+	ESCORT_VIEW: "Monitoring View",
+	DIRECTIVES_VIEW: "Directives View", 
+	THREAT_GAUGE: "Threat Gauge",
+	AFTERBURNER_ENERGY: "Afterburner Energy",
+	WEAPONS_ENERGY: "Weapons Energy",
+	WEAPON_LINKING_GAUGE: "Weapon Linking",
+	TARGET_MINI_ICON: "Target Hull/Shield Icon",
+	OFFSCREEN_INDICATOR: "Offscreen Indicator",
+	TALKING_HEAD: "Comm Video",
+	DAMAGE_GAUGE: "Damage Display",
+	MESSAGE_LINES: "Message Output",
+	MISSILE_WARNING_ARROW: "Locked Missile Direction",
+	CMEASURE_GAUGE: "Countermeasures",
+	OBJECTIVES_NOTIFY_GAUGE: "Objective Notify",
+	WINGMEN_STATUS: "Wingmen Status",
+	OFFSCREEN_RANGE: "Offscreen Range",
+	KILLS_GAUGE: "Kills Gauge",
+	ATTACKING_TARGET_COUNT: "Attacking Target Count",
+	TEXT_FLASH: "Warning Flash",
+	MESSAGE_BOX: "Message Box",
+	SUPPORT_GAUGE: "Support Gauge",
+	LAG_GAUGE: "Lag Gauge"
+}
+
+# Get whether a gauge can be set to popup mode
+static func can_popup(gauge: int) -> bool:
+	match gauge:
+		WEAPONS_GAUGE, ESCORT_VIEW, DIRECTIVES_VIEW, THREAT_GAUGE, DAMAGE_GAUGE, KILLS_GAUGE, SUPPORT_GAUGE, LAG_GAUGE:
+			return true
+		_:
+			return false
