@@ -48,11 +48,11 @@ enum GaugeType {
 
 # Gauge state
 @export var gauge_id: GaugeType = GaugeType.EMPTY
-@export var is_visible := true
 @export var is_popup := false
 @export var base_alpha := 0.8
 @export var bright_alpha := 1.0
 @export var dim_alpha := 0.5
+@export var draw_centered := false # Whether to draw gauge centered on position
 
 # Internal state
 var popup_duration := 0.0
@@ -85,7 +85,7 @@ func _ready() -> void:
 	queue_redraw()
 
 func reset() -> void:
-	is_visible = true
+	show()
 	is_popup = false
 	popup_duration = 0.0
 	popup_start_time = 0.0
@@ -125,7 +125,7 @@ func start_popup(duration: float = POPUP_DEFAULT_DURATION) -> void:
 	if is_popup:
 		popup_duration = duration
 		popup_start_time = Time.get_ticks_msec()
-		is_visible = true
+		hide()
 		queue_redraw()
 
 func is_popup_active() -> bool:
@@ -136,7 +136,7 @@ func is_popup_active() -> bool:
 		return (current_time - popup_start_time) < (popup_duration * 1000)
 	return false
 
-func update_flash(delta: float) -> void:
+func update_flash(_delta: float) -> void:
 	if !is_flashing:
 		return
 		
