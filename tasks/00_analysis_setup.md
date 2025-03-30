@@ -1,148 +1,102 @@
-# Wing Commander Saga: Godot Conversion Analysis (Rev 4\)
+# Wing Commander Saga: Godot Conversion Analysis
 
-This document outlines the approach for converting Wing Commander Saga from C++ to Godot, focusing on reusing existing assets while implementing game logic in GDScript and leveraging Godot's native features.
+This document outlines the approach and guidelines for analyzing the original Wing Commander Saga C++ codebase to facilitate its conversion to the Godot Engine (v4.x). The primary goal is to reuse existing assets while reimplementing game logic in GDScript, leveraging Godot's native features effectively.
 
 ## I. Project Overview
 
-The goal of this project is to migrate Wing Commander Saga from its original C++ codebase to the Godot Engine. This involves a combination of:
+The project aims to migrate Wing Commander Saga from its C++ origins to Godot. This involves:
 
-* Asset Extraction and Conversion: Extracting 3D models, textures, sounds, and other game data from the original files.  
-* Code Analysis and Translation: Understanding the C++ codebase and reimplementing the game logic in GDScript.  
-* Engine Utilization: Leveraging Godot's built-in features for rendering, physics, UI, and other systems.
+*   **Asset Extraction and Conversion:** Processing original models, textures, sounds, music, videos, and data tables into Godot-compatible formats. (See `03_asset_conversion_pipeline.md`)
+*   **Code Analysis and Translation:** Deeply understanding the C++ codebase for each game system and translating its core logic and functionality into GDScript.
+*   **Engine Utilization:** Maximizing the use of Godot's built-in nodes, resources, and systems (Physics, Rendering, UI, Audio, Navigation, etc.) while maintaining the original game's feel and mechanics.
 
 ## II. Conversion Workflow
 
-The conversion process can be visualized as follows:
-
-graph TD  
-A\[Wing Commander Saga C++\] \--\> B\[Asset Extraction\]  
-A \--\> C\[Code Analysis\]  
-B \--\> D\[Asset Conversion\]  
-C \--\> E\[Architecture Design\]  
-D \--\> F\[Godot Project Implementation\]  
-E \--\> F  
-F \--\> G\[Testing & Optimization\]
+```mermaid
+graph TD
+    A[Wing Commander Saga C++] --> B[Asset Extraction];
+    A --> C[Code Analysis (Per Component)];
+    B --> D[Asset Conversion Pipeline];
+    C --> E[Architecture Design (Godot)];
+    D --> F[Godot Project Implementation];
+    E --> F;
+    F --> G[Testing & Optimization];
+```
 
 ## III. Codebase Analysis
 
-The original Wing Commander Saga codebase can be grouped into the following core components:
+The original codebase is broken down into the following core components for analysis. Each component will have a dedicated analysis document (`tasks/XX_component_name.md`).
 
-1. **AI:** Ship AI, wingman logic, targeting, IFF (ai, autopilot, iff\_defs).  
-2. **Core Systems:** Game loop, object management, core data structures, game sequence/state (freespace2, object, gamesequence, globalincs, playerman).  
-3. **Ship & Weapon Systems:** Player/AI ship logic (movement, shields, subsystems, afterburners), weapon logic (lasers, missiles, beams, effects) (ship, weapon, fireball, object related parts).  
-4. **HUD System:** Heads-Up Display elements, radar (hud, radar).  
-5. **Mission System:** Mission loading, parsing, objectives, events (mission).  
-6. **Scripting:** Table parsing, Lua integration, S-Expressions, variable handling (parse, variables, localization).  
-7. **Menu & UI:** Main menus, mission UI screens, popups, low-level UI widgets (menuui, missionui, ui, popup, gamehelp).  
-8. **Physics & Space:** Flight model, collision detection, space environment elements (physics, object collision parts, asteroid).  
-9. **Model System:** 3D model loading, data structures (model).  
-10. **Controls & Camera:** Input handling (keyboard, mouse, joystick), control configuration, camera logic (io, controlconfig, camera).  
-11. **Sound & Animation:** Sound playback, music, voice, cutscenes, animation playback (sound, gamesnd, cutscene, anim).  
-12. **Graphics:** 3D rendering pipeline, lighting, starfield, nebula, particle effects, decals (graphics, render, starfield, nebula, particle, decals, lighting).
+1.  **AI:** Ship AI (fighters, capital ships, turrets), wingman logic, targeting (IFF, priorities), pathfinding, goals, profiles, countermeasures, stealth, docking/bay ops, guard behavior, repair/rearm logic. (Dirs: `ai`, `autopilot`, `iff_defs`, `cmeasure`)
+2.  **Mission Editor (FRED):** Analysis of the original editor's features, data structures, and workflow to inform the development of a compatible Godot editor plugin (GFRED). (Dirs: `fred2`, `wxfred2`)
+3.  **Asset Conversion Pipeline:** Strategy and tooling for converting models (POF), textures (DDS, PCX, etc.), animations (ANI, EFF), sounds (WAV), music, videos (MVE), mission files (FS2), and tables (TBL) to Godot formats (glTF, PNG/WebP, SpriteFrames, OGG/WAV, WebM/OGV, JSON/Resource). (Tooling effort, analyzes formats)
+4.  **Core Systems:** Game loop, time management, object management (creation, deletion, tracking, signatures), core data structures, game sequence/state management, player profiles, statistics, rank/medals, global variables/constants, error handling. (Dirs: `freespace2`, `object`, `gamesequence`, `globalincs`, `playerman`, `scoring`, `stats`, `medals`, `rank`)
+5.  **Ship & Weapon Systems:** Player/AI ship logic (physics integration, shields, subsystems, damage model, afterburners), weapon types (lasers, missiles, beams, flak, EMP, swarm), weapon firing logic, ammo/energy management, weapon effects (muzzle flash, trails, impacts). (Dirs: `ship`, `weapon`, `beam`, `corkscrew`, `emp`, `flak`, `muzzleflash`, `shockwave`, `swarm`, `trails`, `afterburner`, `awacs`, `shield`)
+6.  **HUD System:** Heads-Up Display rendering, gauge management (shields, weapons, throttle, energy, target info, wingman status, messages, objectives, etc.), radar (standard/orb), reticle, threat warnings, offscreen indicators, target brackets, HUD configuration (`hud_gauges.tbl`). (Dirs: `hud`, `radar`)
+7.  **Mission System:** Mission loading/parsing (`.fs2` format), objective tracking, event triggering (SEXP evaluation), dynamic spawning (waves, reinforcements), mission flow control, briefing/debriefing logic, campaign progression. (Dirs: `mission`, `missionui` parts like `missionbrief`, `missiondebrief`)
+8.  **Scripting:** Table parsing (`.tbl`), S-Expression (SEXP) parsing and evaluation, variable handling (mission, campaign, player persistent), Lua integration (hooks, conditions), localization (`tstrings.tbl`, XSTR). (Dirs: `parse`, `variables`, `localization`)
+9.  **Menu & UI:** Main menus, options screens, pilot management, tech room, ready room, popups, context help, low-level UI widgets (buttons, lists, sliders, etc.), "snazzy" UI system. (Dirs: `menuui`, `missionui`, `ui`, `popup`, `gamehelp`)
+10. **Physics & Space:** Flight model implementation (Newtonian adjustments, damping), collision detection/response (ship-ship, ship-weapon, ship-asteroid, ship-debris), space environment elements (asteroids, debris, jump nodes), background rendering (starfield, nebula, suns, skyboxes), lighting. (Dirs: `physics`, `asteroid`, `debris`, `jumpnode`, `lighting`, `nebula`, `starfield`, `supernova`)
+11. **Model System:** 3D model format (POF) parsing, data structures (`polymodel`, `bsp_info`, `model_subsystem`), submodel hierarchy/animation, docking points, weapon points, thruster points, shield mesh, AI paths, texture/material handling. (Dirs: `model`)
+12. **Controls & Camera:** Input handling (keyboard, mouse, joystick), control configuration/rebinding, camera management (views, transitions, cinematic autopilot camera, observer views), subtitle system. (Dirs: `io`, `controlconfig`, `camera`, `observer`, `autopilot` camera parts)
+13. **Sound & Animation:** Sound effect playback (2D/3D), event-driven music system, voice playback, cutscene playback (MVE/OGG), sprite animation playback (ANI/EFF), audio management (loading, channels, volume, 3D positioning). (Dirs: `sound`, `gamesnd`, `eventmusic`, `cutscene`, `anim`)
+14. **Graphics:** Core 3D rendering pipeline (OpenGL abstraction), 2D drawing primitives, texture management (caching, formats, filtering), lighting application, shader system (custom GLSL), post-processing effects (bloom), vertex buffer management (VBOs). (Dirs: `graphics`, `render`)
 
-*(Note: Mission Editor (fred2, wxfred2) and Asset Conversion Pipeline are separate tooling efforts, not runtime components, but crucial for the project.)*
+*(Note: Low-level file I/O (`cfile`), OS specifics (`osapi`), networking (`network`), and specific image format utilities (`bmpman`, `ddsutils`, etc.) are generally replaced by Godot's built-in functionalities or asset pipeline.)*
 
 ### A. Key Component Mapping to Godot
 
-| C++ Component Group | Godot Equivalent Areas | Conversion Approach | Relevant C++ Dirs (Examples) |
-| :---- | :---- | :---- | :---- |
-| **AI** | GDScript, State Machines, Behavior Trees (e.g., LimboAI) | Implement AI logic using scripts attached to ship nodes. | ai, autopilot, iff\_defs |
-| **Core Systems** | SceneTree, Nodes, Custom Resources, Singletons, Autoloads | Reimplement core object/state management and game loop using Godot's scene structure. | object, freespace2, gamesequence |
-| **Ship & Weapon Systems** | Node3D hierarchy, GDScript Components, Resources, Particles | Represent ships/weapons as scenes with scripts for logic and effects. | ship, weapon, fireball |
-| **HUD System** | CanvasLayer, Control Nodes, GDScript | Create HUD as a distinct scene using UI nodes, manage via script. | hud, radar |
-| **Mission System** | Custom Resources (.tres), GDScript, File Access | Define mission data in resources, parse/execute mission logic via scripts. | mission |
-| **Scripting** | ConfigFile, JSON, FileAccess, GDScript/C\#, (Lua module?) | Parse table files, handle Sexp/variables, potentially integrate Lua if essential. | parse, variables, localization |
-| **Menu & UI** | Control Nodes, Themes, Scene Management, GDScript | Build menu scenes and other UI elements using Godot's UI system. | menuui, missionui, ui, popup |
-| **Physics & Space** | RigidBody3D, CollisionShape3D, Custom Integrator | Utilize Godot's physics engine, possibly with custom integration for flight model. | physics, asteroid |
-| **Model System** | MeshInstance3D, Importers | Convert models (POF-\>glTF), load via Godot's import system. | model |
-| **Controls & Camera** | Input, InputMap, Camera3D, GDScript | Map C++ controls to Godot's Input system, manage camera via script. | io, controlconfig, camera |
-| **Sound & Animation** | AudioStreamPlayer, VideoStreamPlayer, AnimationPlayer | Use Godot's nodes for audio/video playback and model animations. | sound, gamesnd, cutscene, anim |
-| **Graphics** | WorldEnvironment, Shaders, Materials, GPUParticles3D | Leverage Godot's rendering features, shaders for effects (nebula, stars, particles etc.). | graphics, render, starfield |
+| C++ Component Group      | Godot Equivalent Areas                                                                                                | Conversion Approach                                                                                                                               | Relevant C++ Dirs (Examples)        |
+| :----------------------- | :-------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------ | :---------------------------------- |
+| **AI**                   | GDScript, State Machines, Behavior Trees (e.g., LimboAI addon), `NavigationAgent3D`, Custom Resources (`AIProfile`)     | Implement AI logic using scripts attached to ship nodes. Use Resources for profiles. Leverage BT/State Machine patterns.                            | `ai`, `autopilot`, `iff_defs`       |
+| **Mission Editor**       | `EditorPlugin`, `Control` nodes, `SubViewport`, `UndoRedo`, Custom Resources, GDScript                                  | Develop a Godot editor plugin (GFRED) mirroring FRED2 functionality for mission creation/editing.                                                 | `fred2`, `wxfred2`                  |
+| **Asset Pipeline**       | Python Scripts, Godot Importers, `Texture2D`, `AudioStream`, `VideoStream`, `SpriteFrames`, `Mesh`, `glTF`, JSON/Resource | Develop/use tools to convert assets. Define import settings in Godot.                                                                             | `bmpman`, `ddsutils`, `model`       |
+| **Core Systems**         | SceneTree, Nodes, Custom Resources (`PlayerData`, `RankInfo`, `MedalInfo`), Singletons/Autoloads, `ConfigFile`          | Reimplement core object/state management, game loop, stats/rank/medals using Godot's scene structure and custom resources/singletons.             | `object`, `freespace2`, `gamesequence`, `playerman`, `scoring`, `stats`, `medals`, `rank` |
+| **Ship & Weapon Systems**| `Node3D` hierarchy (`RigidBody3D`/`CharacterBody3D`), GDScript Components, Resources (`ShipData`, `WeaponData`), `GPUParticles3D` | Represent ships/weapons as scenes with scripts for logic, physics integration, and effects. Use Resources for stats.                            | `ship`, `weapon`, `fireball`, `beam`, `shield`, `afterburner` |
+| **HUD System**           | `CanvasLayer`, `Control` Nodes, `Theme`, `SubViewport`, GDScript, Custom Resources (`HUDConfig`)                        | Create HUD as a distinct scene using UI nodes, manage via script. Use `SubViewport` for target model display. Use Resources for configuration. | `hud`, `radar`                      |
+| **Mission System**       | Custom Resources (`MissionData`, `MissionObjective`, `WaveData`), GDScript, `ConfigFile`/JSON, Singletons (`MissionManager`) | Define mission data in resources (converted from `.fs2`). Parse/execute mission logic via scripts and the SEXP system.                           | `mission`, `missionparse`           |
+| **Scripting**            | `ConfigFile`, JSON, `FileAccess`, GDScript, `Expression`, Custom SEXP Parser/Evaluator, Godot Localization System       | Parse table files (`.tbl` -> JSON/Resource). Reimplement SEXP evaluation. Use Godot's localization (`.po`). Replace Lua with GDScript hooks. | `parse`, `variables`, `localization`|
+| **Menu & UI**            | `Control` Nodes, `Theme`, Scene Management, GDScript, Custom UI Scenes                                                | Build menu scenes and other UI elements using Godot's UI system, potentially custom controls for specific widgets.                              | `menuui`, `missionui`, `ui`, `popup`, `gamehelp` |
+| **Physics & Space**      | `RigidBody3D`, `CollisionShape3D`, Custom Integrator (`_integrate_forces`), `WorldEnvironment`, `GPUParticles3D`         | Utilize Godot's physics engine, with custom integration for flight model. Use `WorldEnvironment` for space effects.                           | `physics`, `asteroid`, `debris`, `jumpnode` |
+| **Model System**         | `MeshInstance3D`, Godot Importers (glTF), `Node3D` hierarchy, `Marker3D`, `AnimationPlayer`, Custom Resources (`ModelMetadata`) | Convert models (POF->glTF), load via Godot's import system. Store metadata (points, subsystems) in Resources. Use scene hierarchy for submodels. | `model`                             |
+| **Controls & Camera**    | `Input`, `InputMap`, `Camera3D`, GDScript, `Tween`, `AnimationPlayer`, Custom Resources (`NavPointData`)                 | Map C++ controls to Godot's Input system. Manage cameras via script, using `Tween`/`AnimationPlayer` for transitions. Use Resources for NavPoints. | `io`, `controlconfig`, `camera`, `autopilot`, `observer` |
+| **Sound & Animation**    | `AudioStreamPlayer`/`3D`, `AudioServer`, `VideoStreamPlayer`, `AnimatedSprite2D`, `SpriteFrames`, `AnimationPlayer`       | Use Godot's nodes for audio/video playback. Convert ANI to `SpriteFrames`. Use `AnimationPlayer` for model animations.                      | `sound`, `gamesnd`, `eventmusic`, `cutscene`, `anim` |
+| **Graphics**             | `WorldEnvironment`, `ShaderMaterial` (`.gdshader`), `BaseMaterial3D`, `GPUParticles3D`, `RenderingServer`, `Viewport`     | Leverage Godot's rendering features. Reimplement custom C++ shaders in Godot Shading Language. Use `WorldEnvironment` for PPFX.                | `graphics`, `render`, `starfield`, `nebula`, `particle`, `decal`, `lighting` |
 
-*(Low-level file I/O (cfile), OS specifics (osapi), networking (network), and specific image format utilities (bmpman, ddsutils, etc.) are generally replaced by Godot's built-in functionalities or asset pipeline.)*
+### B. Detailed Code Analysis Guidelines
 
-### **B. Detailed Code Analysis Guidelines**
+For each component analysis document (`tasks/XX_component_name.md`):
 
-To effectively convert the Wing Commander Saga codebase, a thorough analysis is crucial. For each component identified above, the analysis should include the following:
-
-1. **Identify Key Features:**  
-   * List the primary functions and capabilities of the component.  
-   * Example (AI): Pathfinding, enemy behavior selection, formation flying, target prioritization.  
-2. **List Potential Godot Solutions:**  
-   * For each feature, identify how it can be implemented using Godot's native features.  
-   * Consider both code and editor-based solutions.  
-   * Example (AI):  
-     * Pathfinding: NavigationAgent3D, NavigationPath  
-     * Behavior: State machines (GDScript), Behavior Trees (addons or custom implementation)  
-     * Targeting: GDScript logic for distance checks, LOS, IFF  
-   * For audio, consider AudioStreamPlayer, AudioStreamPlayer3D, and AudioServer.  
-   * For 2D/3D rendering, consider Node2D, Node3D, CanvasLayer, Camera2D, Camera3D, MeshInstance3D, Sprite2D.  
-   * For data structures and assets, consider Resource, Dictionary, Array, and custom .tres files.  
-3. **Outline Target Code Structure:**  
-   * Define the directory and file structure for the equivalent Godot implementation.  
-   * Provide a short comment explaining the purpose of each directory and script file.  
-   * Example (AI):  
-     scripts/ai/  
-     ├── ai\_controller.gd  \# Main AI logic for ships  
-     ├── behavior\_tree.gd \# (Optional) Behavior tree implementation  
-     ├── targeting.gd     \# Target selection functions  
-     └── wingman.gd       \# Wingman-specific behavior
-
-4. **Identify Important Methods, Classes, and Data Structures:**  
-   * List the most relevant C++ elements that need to be translated or replaced.  
-   * Describe their purpose and how they are used.  
-   * Example (AI):  
-     * class ShipAI: Main class for controlling AI behavior.  
-     * struct Waypoint: Data structure for storing path points.  
-     * function SelectTarget(): Method for choosing the current target.  
-5. **Identify Relations:**  
-   * Describe how different parts of the code interact with each other.  
-   * Visualize the relationships between classes, functions, and data structures. UML diagrams or simple text descriptions can be helpful.  
-   * Example (AI):  
-     * ShipAI class uses the Waypoint structure.  
-     * The SelectTarget() method is called by the ShipAI::Update() method.  
-     * The AI system interacts with the Ship and Weapon systems.
+1.  **Identify Key Features:**
+    *   List primary functions and capabilities.
+    *   Describe core algorithms and data flows.
+    *   Mention specific gameplay mechanics handled by this component.
+    *   *Guideline:* Be specific. Instead of "Handles AI", list "Fighter Attack Patterns", "Capital Ship Targeting Logic", "Wingman Formation Flying", "IFF Determination", "Pathfinding Algorithm Used", etc.
+2.  **List Potential Godot Solutions:**
+    *   Map *each key feature* to specific Godot nodes, resources, classes, or design patterns.
+    *   Specify *which* Godot nodes are most suitable (e.g., `RigidBody3D` vs. `CharacterBody3D`, `GPUParticles3D` vs. `CPUParticles3D`).
+    *   Identify where custom GDScript logic is needed versus using built-in node properties/methods.
+    *   Suggest relevant Godot addons if applicable (e.g., LimboAI).
+    *   Propose custom `Resource` types (`.tres` files with associated `.gd` scripts) for storing complex data (e.g., `ShipData`, `WeaponData`, `AIProfile`, `MissionData`).
+    *   *Guideline:* Justify choices. Explain *why* a specific Godot node or pattern is suitable.
+3.  **Outline Target Code Structure:**
+    *   Propose a specific directory structure within `scripts/`, `scenes/`, and `resources/` for this component.
+    *   List key GDScript files (`.gd`) and scene files (`.tscn`) with brief descriptions of their roles.
+    *   List key custom `Resource` files (`.tres`) and their associated scripts (`.gd`).
+    *   *Guideline:* Ensure consistency with the overall project structure (Section IV). Use clear and consistent naming conventions (e.g., `ship_data.gd` for the script defining the `ShipData` resource, `ship_data_hercules.tres` for an instance).
+4.  **Identify Important Methods, Classes, and Data Structures:**
+    *   List the most critical C++ classes, structs, functions, and global variables.
+    *   Describe their purpose in the original system.
+    *   Explicitly state how each will be mapped or replaced in the Godot implementation (e.g., "struct `ship_info` -> `ShipData` Resource (`ship_data.gd`)", "function `snd_play_3d` -> `SoundManager.play_sound_3d()` method using `AudioStreamPlayer3D`").
+    *   *Guideline:* Focus on elements crucial for understanding the logic and data flow. Include constants or enums if they define important states or types.
+5.  **Identify Relations:**
+    *   Describe dependencies: Which other C++ components does this one interact with? Which Godot systems/components will the new implementation interact with?
+    *   Use text descriptions or Mermaid diagrams (`graph TD` or `classDiagram`) to visualize interactions (e.g., function calls, data access, signals).
+    *   *Guideline:* Show how data flows between components (e.g., `MissionParser` creates `MissionData`, `MissionManager` uses `MissionData`, `HUD` reads state from `MissionManager`). Mention specific signals that might be used for communication.
 
 ## IV. Godot Project Structure
 
-The Godot project structure should reflect the organization of the game's components:
-
-wcsaga\_godot/  
-├── addons/ \# Godot addons (gfred2, limboai, etc.)  
-├── assets/ \# Converted game assets (models, textures, sounds, music)  
-│ ├── models/  
-│ ├── textures/  
-│ ├── sounds/  
-│ └── music/  
-├── migration\_tools/ \# Python scripts for asset conversion  
-├── resources/ \# Godot resource files (ship data, weapon data, mission data, etc.)  
-│ ├── ships/  
-│ ├── weapons/  
-│ ├── missions/  
-│ └── game\_data/  
-├── scenes/ \# Scene files (.tscn)  
-│ ├── core/ \# Core scenes (e.g., main game loop placeholder)  
-│ ├── gameplay/ \# Main gameplay scenes (space flight)  
-│ ├── ships\_weapons/ \# Ship and Weapon scenes  
-│ ├── effects/ \# Effect scenes (explosions, trails)  
-│ ├── missions/ \# Specific mission setup scenes  
-│ ├── ui/ \# UI scenes (menus, HUD, popups)  
-│ └── cutscenes/ \# Cutscene player scenes  
-├── scripts/ \# GDScript files, organized by component  
-│ ├── ai/  
-│ ├── core\_systems/  
-│ ├── ship\_weapon\_systems/  
-│ ├── hud/  
-│ ├── mission\_system/  
-│ ├── scripting/ \# Data loading, scripting integration  
-│ ├── menu\_ui/  
-│ ├── physics\_space/  
-│ ├── model\_systems/ \# Scripts related to model handling/data  
-│ ├── controls\_camera/  
-│ ├── sound\_animation/  
-│ ├── graphics/ \# Custom rendering scripts, shaders (code)  
-│ └── globals/ \# Autoloaded global scripts (singletons)  
-└── tasks/ \# Project documentation and tasks
+The target project structure is detailed in `tasks/project_structure.md`. Please refer to that document for the complete layout including directory purposes and component mapping.
 
 ## V. Conversion Strategy
 
@@ -182,51 +136,4 @@ The conversion strategy involves a phased approach:
 
 ## VI. Task List
 
-The task list is organized to reflect the conversion strategy and component-based approach:
-
-**I. Project Setup and Initial Analysis**
-
-1. Set up Python environment for conversion tools. *\[Dependencies: None\]*  
-2. Create initial Godot project structure based on the refined layout. *\[Dependencies: None\]*  
-3. Install necessary Godot addons. *\[Dependencies: None\]*  
-4. Configure MCP server (if used). *\[Dependencies: 1\]*  
-5. Analyze C++ codebase by component group (AI, Core Systems, Ship & Weapon Systems, etc.) using MCP/manual review. *\[Dependencies: 4\]*  
-   * Map C++ concepts to Godot nodes/resources/scripts.  
-   * Document inter-component dependencies.  
-   * Document asset formats.  
-6. Define data conversion pipelines. *\[Dependencies: 5\]*  
-7. Design Godot resource structures (ship stats, weapon stats, etc.). *\[Dependencies: 5\]*
-
-**II. Asset Conversion**
-
-8. Develop Python scripts for asset conversion. *\[Dependencies: 6\]*  
-9. Convert 3D models (POF \-\> glTF) & Animations. *\[Dependencies: 8\]*  
-10. Convert textures. *\[Dependencies: 8\]*  
-11. Convert sounds, music, voiceovers. *\[Dependencies: 8\]*  
-12. Convert mission data (requires understanding FRED structure). *\[Dependencies: 8, FRED Analysis\]*  
-13. Implement resource loading systems/scripts in Godot (**Scripting** component). *\[Dependencies: 7, 9, 10, 11, 12\]*
-
-**III. Core Systems & Foundation Implementation**
-
-14. Implement **Core Systems** (Object management, game state basics). *\[Dependencies: 5\]*  
-15. Implement **Controls & Camera** system basics. *\[Dependencies: 5\]*  
-16. Implement **Physics & Space** setup (collision layers, basic space environment). *\[Dependencies: 5\]*  
-17. Create base **Menu & UI** structure. *\[Dependencies: None\]*  
-18. Implement base **Model System** loading/handling. *\[Dependencies: 13\]*  
-19. Implement **Sound & Animation** playback basics. *\[Dependencies: 13\]*
-
-**IV. Gameplay Systems Implementation**
-
-20. Implement **Ship & Weapon Systems** (flight model, ship logic, weapon firing). *\[Dependencies: 14, 15, 16, 18\]*  
-21. Implement **AI** behaviors. *\[Dependencies: 20\]*  
-22. Implement **Mission System** logic (goal tracking, events, scripting integration). *\[Dependencies: 13, 14, 20, Scripting\]*  
-23. Detail **Graphics** (Effects, shaders, lighting). *\[Dependencies: 18\]*  
-24. Implement **HUD System**. *\[Dependencies: 17, 20, 21\]*  
-25. Flesh out **Menu & UI** elements. *\[Dependencies: 17\]*  
-26. Implement saving/loading (**Core Systems**). *\[Dependencies: 14, Player Data\]*
-
-**V. Testing and Optimization**
-
-27. Implement unit/integration tests.  
-28. Performance profiling and optimization.  
-29. Cross-platform compatibility testing.
+A detailed breakdown of the migration tasks, organized by phase and component, can be found in `tasks/todo.md`.

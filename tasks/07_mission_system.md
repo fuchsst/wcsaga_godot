@@ -1,1035 +1,455 @@
-# Mission System Conversion Plan
+# Wing Commander Saga: Godot Conversion Analysis - Component 07: Mission System
 
-This document outlines the strategy for converting Wing Commander Saga's mission system to Godot while maintaining the original game's mission structure and flow.
+This document analyzes the Mission System from the original Wing Commander Saga C++ codebase and proposes an implementation strategy for the Godot conversion project, following the guidelines in `tasks/00_analysis_setup.md`.
 
-## System Architecture
+*Source Code Folders:* `mission/` (core logic, parsing, goals, events, log), `missionui/` (briefing, debriefing, campaign UI, hotkeys), `parse/` (SEXP evaluation, table parsing utilities), `variables/` (SEXP variables)
 
-```mermaid
-classDiagram
-    class MissionManager {
-        +Mission current_mission
-        +Array mission_queue
-        +Dictionary campaign_state
-        +load_mission(mission_data)
-        +start_mission()
-        +end_mission(success)
-        +process_mission_events()
-        +save_campaign_state()
-        +load_campaign_state()
-    }
-    
-    class Mission {
-        +String mission_name
-        +String briefing_text
-        +Array~MissionObjective~ objectives
-        +Array~WaveData~ waves
-        +Dictionary variables
-        +Dictionary triggers
-        +load_from_json(path)
-        +check_objectives()
-        +process_events(delta)
-        +spawn_wave(wave_index)
-    }
-    
-    class MissionObjective {
-        +String name
-        +String description
-        +ObjectiveType type
-        +bool completed
-        +bool failed
-        +bool is_optional
-        +int points
-        +update_status(status)
-        +check_completion_condition()
-    }
-    
-    class WaveData {
-        +String wave_name
-        +Array~ShipData~ ships
-        +TriggerCondition spawn_condition
-        +Vector3 spawn_location
-        +bool has_spawned
-        +spawn_ships()
-    }
-    
-    class ShipData {
-        +String ship_class
-        +String pilot_name
-        +String team
-        +Dictionary loadout
-        +Array~WaypointData~ waypoints
-        +Dictionary ai_profile
-    }
-    
-    class TriggerCondition {
-        +String condition_type
-        +Dictionary parameters
-        +evaluate()
-    }
-    
-    class MissionEvent {
-        +String event_type
-        +Dictionary parameters
-        +float delay
-        +bool has_triggered
-        +execute()
-    }
-    
-    class BriefingSystem {
-        +Mission mission
-        +Array briefing_slides
-        +int current_slide
-        +show_briefing()
-        +next_slide()
-        +previous_slide()
-        +show_map_view()
-    }
-    
-    class DebriefingSystem {
-        +Mission completed_mission
-        +Dictionary mission_stats
-        +Array~String~ messages
-        +show_debriefing(success)
-        +calculate_score()
-        +award_medals()
-    }
-    
-    class CampaignSystem {
-        +String campaign_name
-        +Array~String~ mission_paths
-        +Dictionary branch_conditions
-        +int current_mission_index
-        +load_campaign(campaign_name)
-        +get_next_mission()
-        +check_branch_conditions()
-    }
-    
-    class SEXPSystem {
-        +Dictionary operators
-        +evaluate_expression(expression, context)
-        +register_operator(name, function)
-        +_op_and(args, context)
-        +_op_or(args, context)
-        +_op_not(args, context)
-    }
-    
-    class MessageSystem {
-        +Dictionary message_templates
-        +Array message_queue
-        +play_message(message_id, sender)
-        +queue_message(message_id, delay)
-        +process_message_queue()
-        +handle_message_tokens(text)
-    }
-    
-    class TrainingSystem {
-        +Array training_objectives
-        +Array training_messages
-        +process_training_objectives()
-        +display_training_message(message)
-        +check_training_failure()
-    }
-    
-    MissionManager "1" *-- "1" Mission
-    MissionManager "1" *-- "1" CampaignSystem
-    MissionManager "1" *-- "1" SEXPSystem
-    MissionManager "1" *-- "1" MessageSystem
-    MissionManager "1" *-- "1" TrainingSystem
-    Mission "1" *-- "*" MissionObjective
-    Mission "1" *-- "*" WaveData
-    Mission "1" *-- "*" MissionEvent
-    Mission "1" *-- "*" TriggerCondition
-    WaveData "1" *-- "*" ShipData
-    MissionManager "1" *-- "1" BriefingSystem
-    MissionManager "1" *-- "1" DebriefingSystem
-```
+## 1. Original System Overview
 
-## Mission System Flow
+The Mission System is the core component responsible for loading, parsing, executing, and managing the state of individual missions and their progression within a campaign. It orchestrates gameplay events, tracks objectives, handles dynamic ship spawning, manages communication, and interfaces with various UI screens (briefing, debriefing). Key C++ files include `missionparse.cpp`, `missiongoals.cpp`, `missioncampaign.cpp`, `missionbriefcommon.cpp`, `missionmessage.cpp`, `missionlog.cpp`, `missionhotkey.cpp`, and `missiontraining.cpp`.
 
 ```mermaid
 graph TD
-    A[Mission File] --> B[Parser]
-    B --> C[Mission Data]
-    C --> D[Mission Manager]
-    D --> E[Briefing System]
-    E --> F[Mission Execution]
-    F --> G[Debriefing System]
-    G --> H[Campaign Progression]
-    
-    F --> I[Event System]
-    I --> J[Objectives]
-    I --> K[Ship Spawning]
-    I --> L[Mission Events]
-    I --> M[Message System]
-    
-    J --> F
-    K --> F
-    L --> F
-    M --> F
+    MS[Mission System] --> MP[Mission Parsing (.fs2)];
+    MS --> BS[Briefing System];
+    MS --> MF[Mission Flow & Events];
+    MS --> CS[Campaign System];
+    MS --> DS[Debriefing System];
+    MS --> TS[Training System];
+    MS --> LS[Mission Log];
+    MS --> HS[Mission Hotkeys];
+
+    MP --> FS2[FS2 File Format];
+    MP --> OBJ[Object/Wing Placement];
+    MP --> WP[Waypoint Data];
+    MP --> GOALS[Goals/Objectives];
+    MP --> EVENTS[Events];
+    MP --> VARS[Variables];
+    MP --> REIN[Reinforcements];
+    MP --> DOCK[Initial Docking];
+    MP --> ENV[Environment Setup];
+
+    BS --> BMAP[Briefing Map Display];
+    BS --> BTEXT[Briefing Text/Voice];
+    BS --> BICONS[Briefing Icons/Lines];
+    BS --> BCAM[Briefing Camera];
+    BS --> CBRIEF[Command Briefing];
+
+    MF --> OT[Objective Tracking];
+    MF --> ET[Event Triggering (SEXP)];
+    MF --> SPAWN[Dynamic Spawning];
+    MF --> SFC[Success/Failure Conditions];
+    MF --> COMM[In-Mission Communication];
+    MF --> ARRDEP[Arrival/Departure Logic];
+    MF --> SUPP[Support Ship Logic];
+
+    CS --> CPROG[Campaign Progression];
+    CS --> CBRANCH[Branching Logic (SEXP)];
+    CS --> CPERSIST[State Persistence];
+    CS --> CPOOL[Ship/Weapon Pools];
+
+    DS --> DRESULTS[Results Display];
+    DS --> DPERF[Performance Evaluation];
+    DS --> DAWARDS[Medal/Rank Awards];
+    DS --> DSTAGES[Debriefing Stages (SEXP)];
+
+    TS --> TDIR[Directive Display];
+    TS --> TMSG[Training Messages];
+    TS --> TFAIL[Failure Detection];
+
+    LS --> LREC[Event Recording];
+    LS --> LDISP[Log Display];
+
+    HS --> HASSIGN[Hotkey Assignment];
+    HS --> HPERSIST[Hotkey Persistence];
+
+    MS --> SEXPSYSTEM[SEXP System];
+    MS --> MSG SYSTEM[Message System];
+    MS --> AI SYSTEM[AI System];
+    MS --> SHIP SYSTEM[Ship System];
+    MS --> HUD SYSTEM[HUD System];
+    MS --> CORE SYSTEM[Core Systems];
+
+    SEXPSYSTEM --> MF;
+    SEXPSYSTEM --> BS;
+    SEXPSYSTEM --> DS;
+    SEXPSYSTEM --> CS;
+    MSG SYSTEM --> MF;
+    MSG SYSTEM --> TS;
+    AI SYSTEM --> MF;
+    SHIP SYSTEM --> MF;
+    HUD SYSTEM --> MF;
+    HUD SYSTEM --> TS;
+    CORE SYSTEM --> MS;
 ```
 
-## Key Components to Convert
-
-1. **Mission Loading and Parsing**
-   - **FSM (Mission File) Parsing**: Convert binary FSM format to Godot-compatible JSON/Resource
-   - **Ship and Object Placement**: Accurate positioning of all mission entities
-   - **Waypoint System**: Navigation paths for AI ships
-   - **Initial State Setup**: Starting conditions, variables, and triggers
-   - **Mission Metadata**: Difficulty settings, time limits, and special conditions
-
-2. **Briefing System**
-   - **Briefing Text and Narration**: Mission context and objectives presentation
-   - **Map Display**: Interactive tactical map with ship positions
-   - **Ship Loadout Configuration**: Weapon and equipment selection
-   - **Wingman Assignment**: Squadron composition and wing assignments
-   - **Mission Planning**: Optional waypoint setting for player and wingmen
-
-3. **Mission Flow and Events**
-   - **Objective Tracking**: Primary, secondary, and bonus objectives
-   - **Event Triggers**: Time-based, location-based, and condition-based events
-   - **Dynamic Spawning**: Enemy wave generation based on conditions
-   - **Success/Failure Conditions**: Mission outcome determination
-   - **In-mission Communication**: Radio messages and command system
-
-4. **SEXP (Script Expression) System**
-   - **Condition Evaluation**: Boolean logic for mission events
-   - **Action Execution**: Mission state modifications
-   - **Variable Handling**: Mission-specific and campaign-wide variables
-   - **Operator Implementation**: Recreation of all SEXP operators in GDScript
-   - **Custom Script Integration**: Extension points for mission-specific logic
-
-5. **Message System**
-   - **Message Templates**: Predefined messages with variables
-   - **Message Queue**: Priority-based message scheduling
-   - **Voice Integration**: Synchronized voice playback with text
-   - **Token Replacement**: Dynamic content in messages
-   - **Sender Personas**: Different character personalities and styles
-
-6. **Training System**
-   - **Directive Display**: Visual presentation of mission objectives
-   - **Training Messages**: Context-sensitive help and instructions
-   - **Failure Detection**: Training-specific failure conditions
-   - **Progress Tracking**: Monitoring player actions against expected behavior
-   - **Interactive Guidance**: Responsive training based on player actions
-
-7. **Debriefing System**
-   - **Results Display**: Mission outcome and statistics
-   - **Performance Evaluation**: Scoring based on objectives and performance
-   - **Medal Awards**: Recognition for achievements
-   - **Campaign Progress Tracking**: State persistence between missions
-   - **Branching Path Determination**: Next mission selection based on performance
-
-## Conversion Approach
-
-### 1. Mission Data Structure
-
-```gdscript
-class_name MissionData
-extends Resource
-
-signal objective_updated(objective)
-signal wave_spawned(wave_index)
-signal mission_event_triggered(event)
-signal mission_completed(success)
-signal mission_started
-signal mission_ended
-
-@export_group("Mission Information")
-@export var mission_name: String
-@export var mission_description: String
-@export var campaign_id: String
-@export var mission_id: String
-@export var next_mission: String
-@export var alternate_next_mission: String
-@export var failure_next_mission: String
-
-@export_group("Briefing")
-@export var briefing_text: Array[String]
-@export var briefing_music: AudioStream
-@export var briefing_background: Texture2D
-@export var briefing_map_data: Resource
-
-@export_group("Mission Content")
-@export var objectives: Array[MissionObjective]
-@export var waves: Array[WaveData]
-@export var events: Array[MissionEvent]
-@export var triggers: Array[TriggerCondition]
-@export var variables: Dictionary
-@export var music_tracks: Dictionary
-@export var background_scene: PackedScene
-@export var nav_points: Array[Vector3]
-
-# Runtime properties
-var is_active: bool = false
-var mission_time: float = 0.0
-var player_ship: Node
-var active_ships: Dictionary = {}
-var mission_success: bool = false
-var mission_failed: bool = false
-
-func _init():
-    # Initialize with default values
-    pass
-
-func load_from_json(path: String) -> bool:
-    var file = FileAccess.open(path, FileAccess.READ)
-    if not file:
-        printerr("Failed to open mission file: ", path)
-        return false
-    
-    var json_text = file.get_as_text()
-    file.close()
-    
-    var json = JSON.new()
-    var error = json.parse(json_text)
-    if error != OK:
-        printerr("JSON Parse Error: ", json.get_error_message(), " at line ", json.get_error_line())
-        return false
-    
-    var data = json.get_data()
-    
-    # Load mission data from JSON
-    mission_name = data.get("name", "Unnamed Mission")
-    mission_description = data.get("description", "")
-    campaign_id = data.get("campaign_id", "")
-    mission_id = data.get("mission_id", "")
-    next_mission = data.get("next_mission", "")
-    alternate_next_mission = data.get("alternate_next_mission", "")
-    failure_next_mission = data.get("failure_next_mission", "")
-    
-    # Load briefing data
-    var briefing_data = data.get("briefing", {})
-    briefing_text = briefing_data.get("text", [])
-    
-    # Load objectives
-    var objectives_data = data.get("objectives", [])
-    objectives.clear()
-    for obj_data in objectives_data:
-        var objective = MissionObjective.new()
-        objective.name = obj_data.get("name", "Unnamed Objective")
-        objective.description = obj_data.get("description", "")
-        objective.type = obj_data.get("type", MissionObjective.OBJECTIVE_TYPE.PRIMARY)
-        objective.is_optional = obj_data.get("optional", false)
-        objective.points = obj_data.get("points", 100)
-        objective.completion_condition = obj_data.get("completion_condition", {})
-        objectives.append(objective)
-    
-    # Load waves
-    var waves_data = data.get("waves", [])
-    waves.clear()
-    for wave_data in waves_data:
-        var wave = WaveData.new()
-        wave.wave_name = wave_data.get("name", "Wave")
-        wave.spawn_condition = _parse_trigger_condition(wave_data.get("spawn_condition", {}))
-        
-        # Load ships in wave
-        var ships_data = wave_data.get("ships", [])
-        for ship_data in ships_data:
-            var ship = ShipData.new()
-            ship.ship_class = ship_data.get("class", "fighter")
-            ship.pilot_name = ship_data.get("pilot", "")
-            ship.team = ship_data.get("team", "hostile")
-            ship.loadout = ship_data.get("loadout", {})
-            ship.ai_profile = ship_data.get("ai_profile", {})
-            
-            # Load waypoints
-            var waypoints_data = ship_data.get("waypoints", [])
-            for wp_data in waypoints_data:
-                var waypoint = WaypointData.new()
-                waypoint.position = Vector3(wp_data.get("x", 0), wp_data.get("y", 0), wp_data.get("z", 0))
-                waypoint.radius = wp_data.get("radius", 100)
-                waypoint.speed = wp_data.get("speed", 100)
-                ship.waypoints.append(waypoint)
-            
-            wave.ships.append(ship)
-        
-        waves.append(wave)
-    
-    # Load events
-    var events_data = data.get("events", [])
-    events.clear()
-    for event_data in events_data:
-        var event = MissionEvent.new()
-        event.event_type = event_data.get("type", "")
-        event.parameters = event_data.get("parameters", {})
-        event.delay = event_data.get("delay", 0.0)
-        event.trigger_condition = _parse_trigger_condition(event_data.get("condition", {}))
-        events.append(event)
-    
-    # Load variables
-    variables = data.get("variables", {})
-    
-    # Load nav points
-    var nav_points_data = data.get("nav_points", [])
-    nav_points.clear()
-    for nav_data in nav_points_data:
-        nav_points.append(Vector3(nav_data.get("x", 0), nav_data.get("y", 0), nav_data.get("z", 0)))
-    
-    return true
-
-func _parse_trigger_condition(condition_data: Dictionary) -> TriggerCondition:
-    var trigger = TriggerCondition.new()
-    trigger.condition_type = condition_data.get("type", "always")
-    trigger.parameters = condition_data.get("parameters", {})
-    return trigger
-
-func start():
-    is_active = true
-    mission_time = 0.0
-    mission_success = false
-    mission_failed = false
-    
-    # Initialize objectives
-    for objective in objectives:
-        objective.reset()
-    
-    # Initialize waves
-    for wave in waves:
-        wave.has_spawned = false
-    
-    # Initialize events
-    for event in events:
-        event.has_triggered = false
-    
-    # Emit signal that mission has started
-    mission_started.emit()
-
-func process(delta: float):
-    if not is_active:
-        return
-    
-    mission_time += delta
-    
-    # Process triggers and events
-    _process_events(delta)
-    
-    # Check objectives
-    _check_objectives()
-    
-    # Check for mission completion
-    _check_mission_completion()
-
-func _process_events(delta: float):
-    # Check wave spawning
-    for i in range(waves.size()):
-        var wave = waves[i]
-        if not wave.has_spawned and wave.spawn_condition.evaluate(self):
-            _spawn_wave(i)
-            wave.has_spawned = true
-            wave_spawned.emit(i)
-    
-    # Process mission events
-    for event in events:
-        if not event.has_triggered and event.trigger_condition.evaluate(self):
-            event.execute(self)
-            event.has_triggered = true
-            mission_event_triggered.emit(event)
-
-func _spawn_wave(wave_index: int):
-    var wave = waves[wave_index]
-    
-    # Create ships from wave data
-    for ship_data in wave.ships:
-        var ship_instance = _create_ship_from_data(ship_data)
-        if ship_instance:
-            active_ships[ship_instance.get_instance_id()] = ship_instance
-
-func _create_ship_from_data(ship_data: ShipData) -> Node:
-    # This would be implemented to instantiate the appropriate ship type
-    # based on the ship_data and add it to the scene
-    var ship_scene = load("res://scenes/ships/" + ship_data.ship_class + ".tscn")
-    if not ship_scene:
-        printerr("Failed to load ship scene: ", ship_data.ship_class)
-        return null
-    
-    var ship_instance = ship_scene.instantiate()
-    
-    # Set ship properties
-    ship_instance.pilot_name = ship_data.pilot_name
-    ship_instance.team = ship_data.team
-    
-    # Apply loadout
-    if ship_instance.has_method("apply_loadout"):
-        ship_instance.apply_loadout(ship_data.loadout)
-    
-    # Set AI profile
-    if ship_instance.has_method("set_ai_profile"):
-        ship_instance.set_ai_profile(ship_data.ai_profile)
-    
-    # Set waypoints
-    if ship_instance.has_method("set_waypoints"):
-        ship_instance.set_waypoints(ship_data.waypoints)
-    
-    # Add to scene
-    get_tree().root.add_child(ship_instance)
-    
-    return ship_instance
-
-func _check_objectives():
-    var all_primary_complete = true
-    
-    for objective in objectives:
-        # Update objective status based on its completion condition
-        if not objective.is_completed and not objective.is_failed:
-            objective.check_completion_condition(self)
-        
-        # Check if all primary objectives are complete
-        if objective.type == MissionObjective.OBJECTIVE_TYPE.PRIMARY and not objective.is_completed:
-            all_primary_complete = false
-    
-    # Check for mission success
-    if all_primary_complete and not mission_success and not mission_failed:
-        mission_success = true
-        mission_completed.emit(true)
-
-func _check_mission_completion():
-    # Check for failure conditions
-    # This would be expanded based on specific failure conditions
-    
-    # Example: Player ship destroyed
-    if player_ship and not is_instance_valid(player_ship):
-        if not mission_success and not mission_failed:
-            mission_failed = true
-            mission_completed.emit(false)
-
-func end():
-    is_active = false
-    
-    # Clean up any mission-specific resources
-    # ...
-    
-    mission_ended.emit()
-```
-
-### 2. Objective System
-
-```gdscript
-class_name MissionObjective
-extends Resource
-
-signal status_changed(objective)
-
-enum OBJECTIVE_TYPE {
-    PRIMARY,
-    SECONDARY,
-    BONUS
-}
-
-@export var name: String = "Unnamed Objective"
-@export var description: String = ""
-@export var type: OBJECTIVE_TYPE = OBJECTIVE_TYPE.PRIMARY
-@export var is_completed: bool = false
-@export var is_failed: bool = false
-@export var is_optional: bool = false
-@export var points: int = 100
-@export var completion_condition: Dictionary = {}
-
-# Runtime properties
-var is_visible: bool = true
-var progress: float = 0.0  # For objectives with partial completion
-
-func _init():
-    # Initialize with default values
-    pass
-
-func reset():
-    is_completed = false
-    is_failed = false
-    progress = 0.0
-
-func update_status(completed: bool, failed: bool = false):
-    var status_changed = is_completed != completed or is_failed != failed
-    
-    is_completed = completed
-    is_failed = failed
-    
-    if status_changed:
-        status_changed.emit(self)
-
-func update_progress(new_progress: float):
-    progress = clamp(new_progress, 0.0, 1.0)
-    
-    # Auto-complete if progress reaches 100%
-    if progress >= 1.0 and not is_completed:
-        update_status(true)
-
-func check_completion_condition(mission: MissionData) -> bool:
-    # This would be expanded to evaluate different types of conditions
-    var condition_type = completion_condition.get("type", "")
-    var params = completion_condition.get("parameters", {})
-    
-    match condition_type:
-        "destroy_all":
-            # Check if all ships of a specific type/team are destroyed
-            var team = params.get("team", "")
-            var ship_class = params.get("ship_class", "")
-            
-            var all_destroyed = true
-            for ship_id in mission.active_ships:
-                var ship = mission.active_ships[ship_id]
-                if (team == "" or ship.team == team) and (ship_class == "" or ship.ship_class == ship_class):
-                    if is_instance_valid(ship) and not ship.is_destroyed:
-                        all_destroyed = false
-                        break
-            
-            if all_destroyed:
-                update_status(true)
-                return true
-        
-        "reach_nav":
-            # Check if player has reached a nav point
-            var nav_index = params.get("nav_index", 0)
-            var radius = params.get("radius", 1000.0)
-            
-            if nav_index >= 0 and nav_index < mission.nav_points.size() and is_instance_valid(mission.player_ship):
-                var distance = mission.player_ship.global_position.distance_to(mission.nav_points[nav_index])
-                if distance <= radius:
-                    update_status(true)
-                    return true
-        
-        "protect":
-            # Check if a specific ship is still alive
-            var target_name = params.get("target", "")
-            
-            var target_alive = false
-            for ship_id in mission.active_ships:
-                var ship = mission.active_ships[ship_id]
-                if is_instance_valid(ship) and ship.pilot_name == target_name and not ship.is_destroyed:
-                    target_alive = true
-                    break
-            
-            if not target_alive:
-                update_status(false, true)  # Failed
-                return false
-        
-        "time_limit":
-            # Check if mission has exceeded time limit
-            var time_limit = params.get("seconds", 0.0)
-            
-            if time_limit > 0 and mission.mission_time >= time_limit:
-                update_status(false, true)  # Failed
-                return false
-        
-        "always":
-            # Always true condition (useful for scripted objectives)
-            return true
-    
-    return false
-```
-
-### 3. Mission Manager
-
-```gdscript
-class_name MissionManager
-extends Node
-
-signal mission_loaded(mission_data)
-signal mission_started
-signal mission_completed(success)
-signal mission_ended
-signal objective_updated(objective)
-signal campaign_progressed(next_mission)
-
-@export var current_mission: MissionData
-@export var campaign_system: CampaignSystem
-
-var mission_queue: Array[String] = []
-var campaign_state: Dictionary = {}
-var mission_stats: Dictionary = {}
-var briefing_system: BriefingSystem
-var debriefing_system: DebriefingSystem
-var sexp_system: SEXPSystem
-
-func _ready():
-    briefing_system = BriefingSystem.new()
-    add_child(briefing_system)
-    
-    debriefing_system = DebriefingSystem.new()
-    add_child(debriefing_system)
-    
-    sexp_system = SEXPSystem.new()
-    add_child(sexp_system)
-    
-    # Connect signals
-    briefing_system.briefing_completed.connect(_on_briefing_completed)
-    debriefing_system.debriefing_completed.connect(_on_debriefing_completed)
-
-func load_campaign(campaign_name: String):
-    campaign_system.load_campaign(campaign_name)
-    campaign_state = {
-        "campaign_name": campaign_name,
-        "current_mission_index": 0,
-        "completed_missions": [],
-        "player_stats": {
-            "kills": 0,
-            "missions_completed": 0,
-            "score": 0
-        },
-        "variables": {}
-    }
-    
-    # Queue first mission
-    var first_mission = campaign_system.get_next_mission()
-    if first_mission:
-        mission_queue.append(first_mission)
-
-func load_mission(mission_path: String):
-    # Clear any existing mission
-    if current_mission:
-        current_mission.queue_free()
-        current_mission = null
-    
-    # Create new mission
-    current_mission = MissionData.new()
-    
-    # Load mission data
-    if current_mission.load_from_json(mission_path):
-        # Connect signals
-        current_mission.mission_started.connect(_on_mission_started)
-        current_mission.mission_completed.connect(_on_mission_completed)
-        current_mission.objective_updated.connect(_on_objective_updated)
-        
-        # Initialize briefing
-        briefing_system.setup_briefing(current_mission)
-        
-        mission_loaded.emit(current_mission)
-        return true
-    else:
-        printerr("Failed to load mission: ", mission_path)
-        current_mission = null
-        return false
-
-func start_briefing():
-    if current_mission:
-        briefing_system.show_briefing()
-
-func _on_briefing_completed():
-    # Start mission after briefing
-    start_mission()
-
-func start_mission():
-    if current_mission:
-        # Initialize mission stats
-        mission_stats = {
-            "start_time": Time.get_unix_time_from_system(),
-            "kills": 0,
-            "objectives_completed": 0,
-            "objectives_failed": 0,
-            "damage_taken": 0,
-            "shots_fired": 0,
-            "shots_hit": 0
-        }
-        
-        # Start the mission
-        current_mission.start()
-        mission_started.emit()
-
-func _process(delta):
-    if current_mission and current_mission.is_active:
-        current_mission.process(delta)
-
-func _on_mission_started():
-    # Additional setup when mission starts
-    pass
-
-func _on_mission_completed(success: bool):
-    # Update campaign state
-    if success:
-        campaign_state["completed_missions"].append(current_mission.mission_id)
-        campaign_state["player_stats"]["missions_completed"] += 1
-    
-    # Calculate final stats
-    mission_stats["end_time"] = Time.get_unix_time_from_system()
-    mission_stats["duration"] = mission_stats["end_time"] - mission_stats["start_time"]
-    
-    # Setup debriefing
-    debriefing_system.setup_debriefing(current_mission, mission_stats, success)
-    
-    # End mission
-    current_mission.end()
-    
-    # Show debriefing
-    debriefing_system.show_debriefing()
-
-func _on_debriefing_completed():
-    mission_ended.emit()
-    
-    # Determine next mission
-    var next_mission_path = ""
-    if current_mission.mission_success:
-        # Check for alternate path based on performance
-        if _should_take_alternate_path():
-            next_mission_path = current_mission.alternate_next_mission
-        else:
-            next_mission_path = current_mission.next_mission
-    else:
-        next_mission_path = current_mission.failure_next_mission
-    
-    # If no specific next mission, get from campaign
-    if next_mission_path.is_empty() and campaign_system:
-        next_mission_path = campaign_system.get_next_mission()
-    
-    if not next_mission_path.is_empty():
-        mission_queue.append(next_mission_path)
-        campaign_progressed.emit(next_mission_path)
-
-func _on_objective_updated(objective):
-    objective_updated.emit(objective)
-    
-    # Update mission stats
-    if objective.is_completed:
-        mission_stats["objectives_completed"] += 1
-    elif objective.is_failed:
-        mission_stats["objectives_failed"] += 1
-
-func _should_take_alternate_path() -> bool:
-    # Logic to determine if player performance warrants alternate path
-    # This could be based on score, time, or specific achievements
-    
-    # Example: Check if all bonus objectives were completed
-    var all_bonus_complete = true
-    for objective in current_mission.objectives:
-        if objective.type == MissionObjective.OBJECTIVE_TYPE.BONUS and not objective.is_completed:
-            all_bonus_complete = false
-            break
-    
-    return all_bonus_complete
-
-func save_campaign_state():
-    # Save campaign progress to disk
-    var save_path = "user://campaigns/" + campaign_state["campaign_name"] + ".save"
-    var dir = DirAccess.open("user://")
-    if not dir.dir_exists("campaigns"):
-        dir.make_dir("campaigns")
-    
-    var file = FileAccess.open(save_path, FileAccess.WRITE)
-    if file:
-        file.store_string(JSON.stringify(campaign_state))
-        file.close()
-        return true
-    else:
-        printerr("Failed to save campaign state")
-        return false
-
-func load_campaign_state(campaign_name: String) -> bool:
-    var save_path = "user://campaigns/" + campaign_name + ".save"
-    
-    if not FileAccess.file_exists(save_path):
-        printerr("No save file found for campaign: ", campaign_name)
-        return false
-    
-    var file = FileAccess.open(save_path, FileAccess.READ)
-    if not file:
-        printerr("Failed to open save file: ", save_path)
-        return false
-    
-    var json_text = file.get_as_text()
-    file.close()
-    
-    var json = JSON.new()
-    var error = json.parse(json_text)
-    if error != OK:
-        printerr("JSON Parse Error: ", json.get_error_message())
-        return false
-    
-    campaign_state = json.get_data()
-    
-    # Load campaign
-    campaign_system.load_campaign(campaign_name)
-    campaign_system.set_current_mission_index(campaign_state["current_mission_index"])
-    
-    return true
-```
-
-### 4. SEXP (Script Expression) System
-
-```gdscript
-class_name SEXPSystem
-extends Node
-
-# Dictionary of all available SEXP operators
-var operators: Dictionary = {}
-
-func _init():
-    # Register all operators
-    _register_operators()
-
-func _register_operators():
-    # Logical operators
-    operators["and"] = func(args, context): return _op_and(args, context)
-    operators["or"] = func(args, context): return _op_or(args, context)
-    operators["not"] = func(args, context): return _op_not(args, context)
-    
-    # Comparison operators
-    operators["equal"] = func(args, context): return _op_equal(args, context)
-    operators["greater-than"] = func(args, context): return _op_greater_than(args, context)
-    operators["less-than"] = func(args, context): return _op_less_than(args, context)
-    
-    # Mission state operators
-    operators["is-destroyed"] = func(args, context): return _op_is_destroyed(args, context)
-    operators["is-disabled"] = func(args, context): return _op_is_disabled(args, context)
-    operators["is-subsystem-destroyed"] = func(args, context): return _op_is_subsystem_destroyed(args, context)
-    
-    # Player state operators
-    operators["has-arrived-at-waypoint"] = func(args, context): return _op_has_arrived_at_waypoint(args, context)
-    operators["is-in-range"] = func(args, context): return _op_is_in_range(args, context)
-    
-    # Time operators
-    operators["has-time-elapsed"] = func(args, context): return _op_has_time_elapsed(args, context)
-    operators["has-time-passed"] = func(args, context): return _op_has_time_passed(args, context)
-    
-    # Variable operators
-    operators["get-variable"] = func(args, context): return _op_get_variable(args, context)
-    operators["set-variable"] = func(args, context): return _op_set_variable(args, context)
-    operators["modify-variable"] = func(args, context): return _op_modify_variable(args, context)
-
-func evaluate_expression(expression, context):
-    # Parse and evaluate a SEXP expression
-    if typeof(expression) == TYPE_ARRAY:
-        var operator_name = expression[0]
-        var args = expression.slice(1)
-        
-        if operators.has(operator_name):
-            return operators[operator_name].call(args, context)
-        else:
-            printerr("Unknown SEXP operator: ", operator_name)
-            return false
-    elif typeof(expression) == TYPE_STRING:
-        # Handle string literals or variable references
-        if expression.begins_with("$"):
-            # Variable reference
-            var var_name = expression.substr(1)
-            return context.get_variable(var_name)
-        else:
-            # String literal
-            return expression
-    elif typeof(expression) in [TYPE_INT, TYPE_FLOAT, TYPE_BOOL]:
-        # Numeric or boolean literal
-        return expression
-    
-    return null
-
-# Operator implementations
-func _op_and(args, context):
-    for arg in args:
-        if not evaluate_expression(arg, context):
-            return false
-    return true
-
-func _op_or(args, context):
-    for arg in args:
-        if evaluate_expression(arg, context):
-            return true
-    return false
-
-func _op_not(args, context):
-    if args.size() != 1:
-        printerr("'not' operator requires exactly one argument")
-        return false
-    
-    return not evaluate_expression(args[0], context)
-```
-
-## Implementation Structure
+## 2. Detailed Component Analysis
+
+### 2.1. Mission Loading and Parsing (`missionparse.cpp`, `missionparse.h`)
+
+1.  **Key Features:**
+    *   **File Parsing:** Reads `.fs2` mission files section by section (`#Mission Info`, `#Players`, `#Objects`, `#Wings`, `#Events`, `#Goals`, `#Waypoints`, `#Messages`, `#Reinforcements`, `#Background bitmaps`, `#Asteroid Fields`, `#Sexp_variables`, `#Briefing`, `#Debriefing_info`, `#Command Briefing`, etc.).
+    *   **Data Population:** Populates internal structures (`mission`, `p_object`, `wing`, `mission_event`, `mission_goal`, `waypoint_list`, `briefing`, `debriefing`, `cmd_brief`, `reinforcements`, `asteroid_field`) with parsed data.
+    *   **Object/Wing Data:** Parses ship/wing properties: class, name, team, position, orientation, initial velocity/hull/shields, AI behavior/goals, cargo, arrival/departure cues (SEXP), locations (Hyperspace, Near Ship, Dock Bay), anchors, delays, flags (`P_SF_*`, `P_OF_*`, `WF_*`), subsystem status, texture replacements (`$Texture Replace`), alternate types (`$Alt`), callsigns (`$Callsign`), hotkeys, score, persona index.
+    *   **Player Start:** Parses player ship choices (`$Ship Choices`), weapon pools (`+Weaponry Pool`), and starting ship (`$Starting Shipname`).
+    *   **Initial State:** Sets up initial docking (`Initially_docked`), arrival/departure state (`Ship_arrival_list`), SEXP variables, environment settings (backgrounds, nebula, storm).
+    *   **Support Ships:** Parses support ship settings (`+Disallow Support`, `+Hull Repair Ceiling`, etc.) and handles logic for bringing them in (`mission_bring_in_support_ship`).
+    *   **Multiplayer:** Handles multiplayer-specific sections (respawns, teams, network signatures).
+    *   **Post-Processing:** `post_process_mission()` finalizes setup after parsing (resolving names, setting up docks, initial arrivals). `mission_parse_set_arrival_locations()` calculates initial positions for arriving ships/wings.
+
+2.  **Potential Godot Solutions:**
+    *   **Parsing:** Implement an FSM/FS2 to JSON/`.tres` converter script (Python recommended) as part of the asset pipeline. This avoids complex runtime parsing in GDScript.
+    *   **Data Representation:** Define custom Godot `Resource` types for each major data structure:
+        *   `MissionData` (`mission_data.gd`): Top-level mission info, lists of other resources.
+        *   `PlayerStartData` (`player_start_data.gd`): Ship choices, weapon pools per team.
+        *   `ShipInstanceData` (`ship_instance_data.gd`): Parsed ship object data (class, name, team, pos, orient, initial state, goals, cues, flags, subsystems, etc.). Replaces `p_object`.
+        *   `WingInstanceData` (`wing_instance_data.gd`): Parsed wing data (name, waves, threshold, cues, goals, flags, ship references). Replaces `wing`.
+        *   `WaypointListData` (`waypoint_list_data.gd`): Array of `Vector3` points.
+        *   `MissionEventData` (`mission_event_data.gd`): Event definition (name, formula SEXP, repeat, interval, score, objective text).
+        *   `MissionObjectiveData` (`mission_objective_data.gd`): Goal definition (name, type, message, formula SEXP, flags, score, team). Replaces `mission_goal`.
+        *   `ReinforcementData` (`reinforcement_data.gd`): Reinforcement definition (name, type, uses, messages).
+        *   `BriefingData` (`briefing_data.gd`): Contains stages, icons, lines, camera info.
+        *   `DebriefingData` (`debriefing_data.gd`): Contains stages, conditions.
+        *   `SEXPVariableData` (`sexp_variable_data.gd`): Initial SEXP variable definitions.
+        *   `DockingPairData` (`docking_pair_data.gd`): Stores initial docking pairs (docker name, dockee name, points).
+    *   **Loading:** `MissionManager` loads the main `MissionData.tres` resource for the selected mission.
+    *   **Object/Wing Management:** `MissionManager` holds arrays of `ShipInstanceData` and `WingInstanceData` from the loaded `MissionData`. It manages their runtime state (arrival, departure, destruction).
+    *   **Arrival/Departure:** Logic within `MissionManager` or a dedicated `ArrivalDepartureSystem` node, triggered by SEXP evaluation results from the `SEXPSystem`. Uses timers for delays.
+    *   **Docking:** Initial docking state set based on `DockingPairData`. Runtime docking managed by `DockingManager` (see Core Systems) using `Marker3D` points and transforms.
+    *   **Subsystem Status:** Initial status stored in `ShipInstanceData`, applied to the ship scene instance by `MissionManager` or the ship's `_ready()` function.
+    *   **Texture Replacement:** Apply material overrides in the ship's `_ready()` function based on data in `ShipInstanceData`.
+    *   **Multiplayer:** Use Godot's `MultiplayerAPI` and RPCs. Network signatures managed via `MultiplayerSpawner`.
+
+3.  **Outline Target Code Structure:**
+    ```
+    scripts/mission_system/
+    ├── mission_manager.gd       # Singleton: Manages mission lifecycle, state, objects, events, goals.
+    ├── arrival_departure.gd     # Node/Helper: Handles arrival/departure logic and timing.
+    ├── spawn_manager.gd         # Node/Helper: Handles instantiating ships/wings.
+    ├── mission_loader.gd        # Helper: Loads MissionData resources.
+    ├── parsing/                 # Scripts defining custom Resource types for parsed data
+    │   ├── mission_data.gd
+    │   ├── player_start_data.gd
+    │   ├── ship_instance_data.gd
+    │   ├── wing_instance_data.gd
+    │   ├── waypoint_list_data.gd
+    │   ├── mission_event_data.gd
+    │   ├── mission_objective_data.gd
+    │   ├── reinforcement_data.gd
+    │   ├── briefing_data.gd
+    │   ├── debriefing_data.gd
+    │   ├── sexp_variable_data.gd
+    │   └── docking_pair_data.gd
+    ├── briefing/                # Briefing system scripts
+    │   ├── briefing_screen.gd
+    │   ├── briefing_map_manager.gd
+    │   └── briefing_icon.gd
+    ├── debriefing/              # Debriefing system scripts
+    │   └── debriefing_screen.gd
+    ├── log/                     # Mission Log scripts
+    │   ├── mission_log_manager.gd
+    │   └── mission_log_entry.gd
+    ├── message_system/          # Message system scripts
+    │   ├── message_manager.gd
+    │   ├── message_data.gd
+    │   └── persona_data.gd
+    ├── training_system/         # Training system scripts
+    │   └── training_manager.gd
+    └── hotkey/                  # Mission Hotkey scripts (if managed here)
+        └── mission_hotkey_manager.gd
+    resources/missions/          # Converted mission data (.tres files)
+    │   ├── mission_01.tres
+    │   └── campaign_a/
+    │       └── mission_a_01.tres
+    scenes/missions/             # Mission-specific scenes (if needed beyond resources)
+    │   ├── briefing/
+    │   │   ├── briefing_screen.tscn
+    │   │   ├── briefing_map_viewport.tscn
+    │   │   └── briefing_icon.tscn
+    │   └── debriefing/
+    │       └── debriefing_screen.tscn
+    ```
+    *(Structure refined for clarity and consistency)*
+
+4.  **Important Methods, Classes, Data Structures:**
+    *   `struct mission`: -> `MissionData` resource.
+    *   `struct p_object`: -> `ShipInstanceData` resource.
+    *   `struct wing`: -> `WingInstanceData` resource.
+    *   `struct mission_event`: -> `MissionEventData` resource.
+    *   `struct mission_goal`: -> `MissionObjectiveData` resource.
+    *   `struct waypoint_list`: -> `WaypointListData` resource.
+    *   `struct briefing`, `struct brief_stage`, `struct brief_icon`, `struct brief_line`: -> `BriefingData` resource (or part of `MissionData`).
+    *   `struct debriefing`, `struct debrief_stage`: -> `DebriefingData` resource (or part of `MissionData`).
+    *   `struct reinforcements`: -> `ReinforcementData` resource.
+    *   `struct asteroid_field`: -> `AsteroidFieldData` resource (used by Physics/Space system).
+    *   `struct sexp_variable`: -> `SEXPVariableData` resource.
+    *   `Initially_docked` array: -> `DockingPairData` resource array.
+    *   `Parse_objects` vector: -> `MissionData.ships` array (of `ShipInstanceData`).
+    *   `Wings` array: -> `MissionData.wings` array (of `WingInstanceData`).
+    *   `parse_mission()`: -> Asset conversion script + `MissionLoader.load_mission()`.
+    *   `post_process_mission()`: -> `MissionManager.finalize_load()`.
+    *   `mission_eval_arrivals()` / `mission_eval_departures()`: -> `ArrivalDepartureSystem._process()`.
+    *   `mission_set_arrival_location()`: -> Helper function in `ArrivalDepartureSystem` or `SpawnManager`.
+    *   `parse_dock_one_docked_object()`: -> Part of `MissionManager.finalize_load()` or `DockingManager` init.
+    *   `parse_create_object()`: -> `SpawnManager.spawn_ship()`.
+    *   `parse_wing_create_ships()`: -> `SpawnManager.spawn_wing_wave()`.
+
+5.  **Identify Relations:**
+    *   **Mission Parser** (offline tool) creates `MissionData` resources.
+    *   **Mission Loader** loads the appropriate `MissionData` resource.
+    *   **Mission Manager** holds the loaded `MissionData`, manages runtime state, and orchestrates other mission systems.
+    *   **Arrival/Departure System** uses `MissionData` cues and timers, interacts with `SpawnManager` and `SEXPSystem`.
+    *   **Spawn Manager** instantiates ship/wing scenes based on `ShipInstanceData`/`WingInstanceData`, interacting with the `ObjectManager` (Core Systems).
+    *   **Briefing/Debriefing Systems** read data from `MissionData` and display UI.
+    *   **SEXPSystem** evaluates formulas stored in `MissionData` (goals, events, cues).
+    *   **Campaign System** provides the next mission file path to the `Mission Loader`.
+
+### 2.2. Briefing System (`missionbriefcommon.cpp`, `missionbrief.cpp`, `missioncmdbrief.cpp`)
+
+1.  **Key Features:**
+    *   **Stages:** Presents mission info in sequential stages (`brief_stage`, `cmd_brief_stage`).
+    *   **Content:** Each stage includes text, voice narration, camera position/orientation (briefing), icons/lines (briefing), or full-screen animation (command brief).
+    *   **Tactical Map (Briefing):** Renders a 3D map with icons (`brief_icon`) representing ships/wings/waypoints, connecting lines (`brief_line`), and a grid (`The_grid`). Supports icon highlighting, fading, and movement between stages.
+    *   **Camera Control (Briefing):** Smoothly interpolates camera position/orientation between stages (`brief_camera_move`).
+    *   **Text/Voice:** Displays text with color coding and wipe effect (`brief_render_text`). Plays synchronized voice (`brief_voice_play`, `cmd_brief_voice_play`). Supports auto-advance.
+    *   **UI:** Provides buttons for stage navigation, scrolling, pause/play, help, options, commit.
+
+2.  **Potential Godot Solutions:**
+    *   **Scenes:** `BriefingScreen.tscn`, `CommandBriefScreen.tscn`. Use `Control` nodes for UI.
+    *   **Data:** `BriefingData`/`CommandBriefData` resources (part of `MissionData`) store stage info (text, voice path, camera transforms, icon data/animation path).
+    *   **Map (Briefing):** `SubViewport` with `Camera3D`. `Node3D` instances for icons (`BriefingIcon.tscn`). `ImmediateMesh` or `LineRenderer` addon for lines. `GridMap` or custom drawing for grid.
+    *   **Animation (Command Brief):** `VideoStreamPlayer` or `AnimationPlayer` controlling sprites/textures.
+    *   **Camera/Icon Animation:** `Tween` or `AnimationPlayer`.
+    *   **Text/Voice:** `RichTextLabel` (with BBCode) for text display and wipe effect. `AudioStreamPlayer` for voice. Synchronization via timers/signals.
+
+3.  **Outline Target Code Structure:** (See Section 2.1.3)
+
+4.  **Important Methods, Classes, Data Structures:**
+    *   `struct brief_stage`, `struct brief_icon`, `struct brief_line`: -> `BriefingData` resource structure.
+    *   `struct cmd_brief`, `struct cmd_brief_stage`: -> `CommandBriefData` resource structure.
+    *   `brief_init()`, `cmd_brief_init()`: -> `_ready()` in `BriefingScreen.gd`/`CommandBriefScreen.gd`.
+    *   `brief_do_frame()`, `cmd_brief_do_frame()`: -> `_process()` in respective screen scripts.
+    *   `brief_render_map()`, `brief_render_text()`, `brief_camera_move()`, `brief_voice_play()`: -> Helper methods within `BriefingScreen.gd` and `BriefingMapManager.gd`.
+    *   `cmd_brief_voice_play()`, `generic_anim_render()`: -> Helper methods within `CommandBriefScreen.gd`.
+
+5.  **Identify Relations:** Reads `BriefingData`/`CommandBriefData` from `MissionData`. Interacts with `UI System`, `SoundManager`, `Asset Pipeline` (icons, animations, voice). Controlled by `GameSequenceManager`.
+
+### 2.3. Mission Flow and Events (`missiongoals.cpp`, `missiongoals.h`)
+
+1.  **Key Features:**
+    *   **Objective Tracking:** Manages `mission_goal` array. Tracks status (`satisfied`: `GOAL_INCOMPLETE`, `GOAL_COMPLETE`, `GOAL_FAILED`). Evaluates SEXP formulas (`formula`) to update status (`mission_eval_goals`). Handles validation flags (`INVALID_GOAL`).
+    *   **Event Triggering:** Manages `mission_event` array. Evaluates SEXP formulas (`formula`). Triggers based on result and timing (interval `interval`, repeat count `repeat_count`, chaining `chain_delay`). Can update score (`score`) or display objective text (`objective_text`).
+    *   **Success/Failure:** `mission_evaluate_primary_goals()` checks status of primary goals. `mission_goal_fail_incomplete()` marks remaining goals as failed.
+    *   **Directives:** HUD display of current objectives/events (`training_obj_display` - also used here). Sound cues (`Mission_directive_sound_timestamp`).
+
+2.  **Potential Godot Solutions:**
+    *   **Management:** `MissionManager` singleton manages arrays of `MissionObjectiveData` and `MissionEventData` resources.
+    *   **Evaluation:** `MissionManager._process()` calls `SEXPSystem.evaluate_expression()` for active goals/events.
+    *   **State:** Store runtime status (`is_completed`, `is_failed`, `has_triggered`, `trigger_count`) directly within the instantiated `MissionObjectiveData`/`MissionEventData` resources or in parallel dictionaries within `MissionManager`.
+    *   **Signals:** Emit signals (`objective_updated(objective_resource)`, `event_triggered(event_resource)`) from `MissionManager`.
+    *   **Directives:** `HUDManager` listens for `objective_updated` signal to update the directives display. `SoundManager` plays cues.
+
+3.  **Outline Target Code Structure:** (See Section 2.1.3)
+    *   Add `scripts/missions/mission_objective.gd` (Resource script).
+
+4.  **Important Methods, Classes, Data Structures:**
+    *   `struct mission_goal`: -> `MissionObjectiveData` resource.
+    *   `struct mission_event`: -> `MissionEventData` resource.
+    *   `Mission_goals[]`, `Num_goals`: -> `MissionData.objectives` array.
+    *   `Mission_events[]`, `Num_mission_events`: -> `MissionData.events` array.
+    *   `mission_eval_goals()`: -> Core logic in `MissionManager._process()`.
+    *   `mission_process_event()`: -> Helper method called by `MissionManager._process()`.
+    *   `mission_goal_status_change()`: -> Method in `MissionManager`, emits signal.
+    *   `mission_evaluate_primary_goals()`: -> Method in `MissionManager`.
+
+5.  **Identify Relations:** `MissionManager` orchestrates. Calls `SEXPSystem`. Updates `MissionObjectiveData`/`MissionEventData` state. Emits signals to `HUDManager`, `SoundManager`, potentially `CampaignManager`.
+
+### 2.4. SEXP System (`sexp.cpp`, `sexp.h`, `variables.cpp`, `variables.h`)
+
+1.  **Key Features:** Lisp-like evaluation tree (`sexp_node`). Large operator library (`OP_*`). Variable system (`sexp_variable`, `@var_name`) with persistence. Recursive evaluation (`eval_sexp`). Syntax checking.
+2.  **Potential Godot Solutions:** Hybrid approach: Parse SEXP structure into Godot Arrays/Dictionaries. Implement `SEXPSystem` singleton with `evaluate_expression(data, context)` method. Implement operators as GDScript functions/lambdas within `SEXPSystem` or a helper node, accessing game state via `context` object or Singletons. Manage variables (`SexpVariableManager`) with persistence linked to `CampaignManager`/`PlayerData`.
+3.  **Outline Target Code Structure:** (See `08_scripting.md`)
+4.  **Important Methods, Classes, Data Structures:** `sexp_node`, `sexp_variable`, `Operators[]`, `eval_sexp`, `is_sexp_true`, `check_sexp_syntax`.
+5.  **Identify Relations:** Used by `MissionManager` (goals, events, cues), `CampaignManager` (branching), potentially AI. Operators interact with nearly all other game systems.
+
+### 2.5. Message System (`missionmessage.cpp`, `missionmessage.h`)
+
+1.  **Key Features:** Manages built-in and mission messages (`MMessage`, `messages.tbl`). Queues messages (`message_q`) by priority/timing. Plays voice (WAV) and head animations (ANI/MVE). Supports personas (`Persona`) linked to ships/messages. Handles token replacement (`$token$`, `#token#`). Multiplayer filtering. Distortion effects.
+2.  **Potential Godot Solutions:** `MessageManager` singleton. `MessageData` resource (text, voice path, animation path, persona ref). `PersonaData` resource. Queue using sorted `Array`. `AudioStreamPlayer` for voice. `AnimationPlayer`/`VideoStreamPlayer` in HUD `SubViewport` for heads. Token replacement via `String.format()` or custom parser. Distortion via `AudioEffectDistortion` or text manipulation.
+3.  **Outline Target Code Structure:** (See Section 2.1.3)
+4.  **Important Methods, Classes, Data Structures:** `struct MMessage` -> `MessageData`. `struct Persona` -> `PersonaData`. `struct message_q` -> Internal queue structure. `message_queue_message()` -> `MessageManager.queue_message()`. `message_queue_process()` -> `MessageManager._process()`. `message_play_wave()` -> `MessageManager` using `AudioStreamPlayer`. `message_play_anim()` -> `MessageManager` controlling HUD animation node. `message_translate_tokens()` -> Helper function. `message_send_*()` -> `MessageManager.send_*()`.
+5.  **Identify Relations:** Called by `MissionManager`, `SEXPSystem`, AI. Interacts with HUD, `SoundManager`, `Asset Pipeline`.
+
+### 2.6. Training System (`missiontraining.cpp`, `missiontraining.h`)
+
+1.  **Key Features:** Displays directives (`training_obj_display`). Queues/plays timed training messages (`Training_message_queue`, `message_training_setup/display/queue`). Handles bold formatting (`<b>`). Tracks failure state (`Training_failure`). Sorts objectives (`sort_training_objectives`). Checks key bindings (`translate_message_token`).
+2.  **Potential Godot Solutions:** `TrainingManager` singleton (or part of `MissionManager`). Reuse/adapt HUD directives gauge (`hud_directives_gauge.tscn/gd`). Queue messages in `Array`. Use `MessageManager` or dedicated UI (`RichTextLabel`) for messages. Failure state as bool flag. Sorting logic in `TrainingManager`. Key binding check via `InputMap`.
+3.  **Outline Target Code Structure:** (See Section 2.1.3)
+4.  **Important Methods, Classes, Data Structures:** `training_mission_init()` -> `_ready()`. `training_check_objectives()` -> Periodic update. `training_obj_display()` -> HUD gauge script. `message_training_queue()` -> `TrainingManager.queue_message()`. `message_training_setup/display()` -> Internal logic. `training_fail()` -> `TrainingManager.fail()`. `Training_obj_lines`, `Training_message_queue` -> Arrays in manager/HUD script.
+5.  **Identify Relations:** Interacts with `MissionManager` (objectives), `MessageManager`/HUD (messages), `InputMap`. Triggered by `SEXPSystem`.
+
+### 2.7. Debriefing System (`missionbriefcommon.cpp`, `missiondebrief.cpp`)
+
+1.  **Key Features:** Presents post-mission results in stages (`debrief_stage`). Evaluates SEXP conditions (`formula`) to determine which stages to show. Displays text, recommendations, voice. Shows statistics (`debrief_stats_render`), kill lists (`debrief_setup_ship_kill_stats`). Handles awards (medals, promotions, badges) (`debrief_award_init`). Multiplayer support.
+2.  **Potential Godot Solutions:** `DebriefingScreen.tscn` scene. `DebriefingData` resource (part of `MissionData`). `DebriefingScreen.gd` evaluates stage SEXPs via `SEXPSystem`, displays text (`RichTextLabel`), plays voice (`AudioStreamPlayer`), shows stats (`Label`, `ItemList`), medals (`TextureRect`). `ScoringSystem` helper calculates awards.
+3.  **Outline Target Code Structure:** (See Section 2.1.3)
+4.  **Important Methods, Classes, Data Structures:** `struct debriefing`, `struct debrief_stage` -> `DebriefingData`. `debrief_init()` -> `_ready()`. `debrief_do_frame()` -> `_process()`. `debrief_stats_render()`, `debrief_award_init()` -> Helper methods. `parse_debriefing_new()` -> `MissionParser`.
+5.  **Identify Relations:** Reads `DebriefingData`, mission results/stats from `MissionManager`/`MissionLogManager`. Calls `SEXPSystem`. Interacts with `UI System`, `SoundManager`, `CampaignManager`. Controlled by `GameSequenceManager`.
+
+### 2.8. Campaign System (`missioncampaign.cpp`, `missioncampaign.h`)
+
+1.  **Key Features:** Loads campaign definitions (`.fsc`). Manages mission sequence (`campaign`, `cmission`), progress (`next_mission`, `num_missions_completed`), looping (`loop_mission`). Evaluates SEXP formulas for branching (`mission_campaign_eval_next_mission`). Saves/loads progress (`.cs2` files) including completed goals/events, stats, persistent variables (`mission_campaign_savefile_save/load`). Manages ship/weapon pools (`ships_allowed`, `weapons_allowed`).
+2.  **Potential Godot Solutions:** `CampaignManager` singleton. `CampaignData` resource (from `.fsc`). `CampaignSaveData` resource/Dictionary (for `.cs2`). `CampaignParser` loads `.fsc`. `CampaignManager` handles progression, branching (via `SEXPSystem`), saving/loading (`ConfigFile` or `ResourceSaver`). Ship/weapon pools stored in `CampaignSaveData`.
+3.  **Outline Target Code Structure:** (See `scripts/campaign/` in Section 2.1.3)
+4.  **Important Methods, Classes, Data Structures:** `struct campaign` -> `CampaignData`. `struct cmission` -> Structure within `CampaignData`. `mission_campaign_load()` -> `CampaignParser.load()`. `mission_campaign_savefile_save/load()` -> `CampaignManager.save/load()`. `mission_campaign_eval_next_mission()` -> `CampaignManager.evaluate_next()`. `mission_campaign_store_goals_and_events_and_variables()` -> Part of save logic.
+5.  **Identify Relations:** Provides mission file to `MissionLoader`. Receives results from `MissionManager`. Calls `SEXPSystem`. Interacts with `PlayerData`, `LoadoutScreen`, `TechDatabaseManager`.
+
+### 2.9. Mission Hotkeys (`missionhotkey.cpp`, `missionhotkey.h`)
+
+1.  **Key Features:** Assigns ships/wings to F5-F12 (`Key_sets`). Stores assignments (`Player->keyed_targets`). Handles defaults from mission file (`p_object->hotkey`, `wing->hotkey`). Temporary save/restore (`Hotkey_saved_info`). UI screen for management (`mission_hotkey_init/do_frame`). Validation (`mission_hotkey_validate`).
+2.  **Potential Godot Solutions:** `HotkeyManager` singleton or part of `PlayerData`. Store assignments in `Dictionary` within `CampaignSaveData`. `PlayerTargeting` script handles selection on key press. `MissionManager` applies defaults. `HotkeyScreen.tscn/gd` for UI.
+3.  **Outline Target Code Structure:** (See `scripts/player/`, `scenes/ui/hotkey_screen/` in Section 2.1.3)
+4.  **Important Methods, Classes, Data Structures:** `Key_sets` -> Constants. `Player->keyed_targets` -> `Dictionary`. `hud_target_hotkey_add_remove()` -> `HotkeyManager.assign/remove()`. `mission_hotkey_set_defaults()` -> `HotkeyManager.apply_defaults()`. `mission_hotkey_init/do_frame/close()` -> `HotkeyScreen.gd`.
+5.  **Identify Relations:** Modifies `CampaignSaveData`. Read by `PlayerTargeting`. Defaults set by `MissionManager`. UI interacts with `HotkeyManager`. Save/Load handled by `CampaignManager`.
+
+### 2.10. Mission Log (`missionlog.cpp`, `missionlog.h`)
+
+1.  **Key Features:** Stores chronological event list (`log_entry`). Records type, timestamp, entity names/display names, team. Supports various event types (`LOG_*`). Multiplayer sync (`mission_log_add_entry_multi`). Culling/obsolescence (`mission_log_cull_obsolete_entries`). UI display formatting (`message_log_init_scrollback`). Hiding entries (`MLF_HIDDEN`).
+2.  **Potential Godot Solutions:** `MissionLogManager` singleton. Store entries in `Array` (of `Dictionary` or `MissionLogEntry` resource). `add_entry()` method called by other systems. RPCs for multiplayer sync. Culling logic in manager. `MissionLogScreen.tscn/gd` for UI (`RichTextLabel` or `ItemList`).
+3.  **Outline Target Code Structure:** (See Section 2.1.3)
+4.  **Important Methods, Classes, Data Structures:** `struct log_entry` -> `Dictionary` or `MissionLogEntry` resource. `log_entries` -> `Array`. `mission_log_add_entry()` -> `MissionLogManager.add_entry()`. `message_log_init_scrollback()`, `mission_log_scrollback()` -> `MissionLogScreen.gd` UI logic. `mission_log_cull_obsolete_entries()` -> `MissionLogManager.cull_log()`.
+5.  **Identify Relations:** Receives calls from `MissionManager`, `ShipManager`, etc. Read by `MissionLogScreen`, `DebriefingScreen`. Uses `MultiplayerAPI`.
+
+## 3. Godot Project Structure (Mission System)
 
 ```
-scenes/missions/
-├── briefing.tscn
-├── debriefing.tscn
-└── mission.tscn
-
-scripts/missions/
-├── mission_manager.gd
-├── mission_data.gd
-├── mission_objective.gd
-├── wave_data.gd
-├── sexp_system.gd
-└── events/
-    ├── mission_event.gd
-    ├── trigger_condition.gd
-    └── event_types/
-        ├── message_event.gd
-        ├── spawn_event.gd
-        └── objective_event.gd
-
-resources/missions/
-├── mission1.tres
-├── mission2.tres
-└── templates/
-    ├── objective_templates.tres
-    ├── wave_templates.tres
-    └── event_templates.tres
+wcsaga_godot/
+├── resources/
+│   ├── missions/           # MissionData resources (.tres) - Converted from .fs2
+│   │   ├── mission_01.tres
+│   │   └── campaign_a/
+│   │       └── mission_a_01.tres
+│   ├── objectives/         # MissionObjectiveData resources (.tres) - Part of MissionData
+│   ├── events/             # MissionEventData resources (.tres) - Part of MissionData
+│   ├── waves/              # WaveData resources (.tres) - Part of MissionData
+│   ├── reinforcements/     # ReinforcementData resources (.tres) - Part of MissionData
+│   ├── briefing_data/      # BriefingData resources (.tres) - Part of MissionData
+│   ├── debriefing_data/    # DebriefingData resources (.tres) - Part of MissionData
+│   ├── messages/           # MessageData, PersonaData resources (.tres) - Global or Mission-specific
+│   │   ├── personas/
+│   │   └── mission_messages/
+│   ├── variables/          # SEXPVariableData resources (.tres) - Part of MissionData
+│   ├── waypoints/          # WaypointListData resources (.tres) - Part of MissionData
+│   └── docking/            # DockingPairData resources (.tres) - Part of MissionData
+├── scenes/
+│   ├── missions/           # Scenes related to mission flow
+│   │   ├── briefing/
+│   │   │   ├── briefing_screen.tscn
+│   │   │   ├── briefing_map_viewport.tscn
+│   │   │   └── briefing_icon.tscn
+│   │   ├── debriefing/
+│   │   │   └── debriefing_screen.tscn
+│   │   └── command_brief/
+│   │       └── command_brief_screen.tscn
+│   ├── ui/                 # UI scenes used by mission system
+│   │   ├── hud/
+│   │   │   ├── hud_directives_gauge.tscn
+│   │   │   └── talking_head.tscn
+│   │   └── mission_log/
+│   │       └── mission_log_screen.tscn
+│   │   └── hotkey_screen/
+│   │       └── hotkey_screen.tscn
+│   └── gameplay/           # Main gameplay scene where mission runs
+│       └── space_flight.tscn
+├── scripts/
+│   ├── mission_system/     # Main component scripts
+│   │   ├── mission_manager.gd       # Singleton: Manages mission lifecycle, state, objects, events, goals.
+│   │   ├── arrival_departure.gd     # Node/Helper: Handles arrival/departure logic and timing.
+│   │   ├── spawn_manager.gd         # Node/Helper: Handles instantiating ships/wings.
+│   │   ├── mission_loader.gd        # Helper: Loads MissionData resources.
+│   │   ├── briefing/                # Briefing system scripts
+│   │   │   ├── briefing_screen.gd
+│   │   │   ├── briefing_map_manager.gd
+│   │   │   └── briefing_icon.gd
+│   │   ├── debriefing/              # Debriefing system scripts
+│   │   │   ├── debriefing_screen.gd
+│   │   │   └── scoring_system.gd    # (Optional) Handles score calculation, medal logic
+│   │   ├── log/                     # Mission Log scripts
+│   │   │   ├── mission_log_manager.gd # Singleton
+│   │   │   └── mission_log_entry.gd   # Resource script
+│   │   ├── message_system/          # Message system scripts
+│   │   │   ├── message_manager.gd     # Singleton
+│   │   │   ├── message_data.gd      # Resource script
+│   │   │   └── persona_data.gd      # Resource script
+│   │   ├── training_system/         # Training system scripts
+│   │   │   └── training_manager.gd    # Singleton or part of MissionManager
+│   │   └── hotkey/                  # Mission Hotkey scripts
+│   │       └── mission_hotkey_manager.gd # Singleton or part of PlayerData
+│   ├── resources/               # Scripts defining custom Resource types
+│   │   ├── mission_data.gd
+│   │   ├── player_start_data.gd
+│   │   ├── ship_instance_data.gd
+│   │   ├── wing_instance_data.gd
+│   │   ├── waypoint_list_data.gd
+│   │   ├── mission_event_data.gd
+│   │   ├── mission_objective_data.gd
+│   │   ├── reinforcement_data.gd
+│   │   ├── briefing_data.gd
+│   │   ├── debriefing_data.gd
+│   │   ├── sexp_variable_data.gd
+│   │   ├── docking_pair_data.gd
+│   │   ├── message_data.gd         # Moved from mission_system/message_system
+│   │   ├── persona_data.gd         # Moved from mission_system/message_system
+│   │   └── mission_log_entry.gd    # Moved from mission_system/log
+│   ├── scripting/               # SEXP system scripts (see 08_scripting.md)
+│   │   ├── sexp_system.gd
+│   │   ├── sexp_node.gd
+│   │   ├── sexp_parser.gd
+│   │   ├── sexp_evaluator.gd
+│   │   ├── sexp_operators.gd
+│   │   ├── sexp_variables.gd
+│   │   └── sexp_constants.gd
+│   ├── campaign/                # Campaign system scripts (see added section)
+│   │   ├── campaign_manager.gd
+│   │   ├── campaign_parser.gd
+│   │   ├── campaign_data.gd
+│   │   └── campaign_save_data.gd
+│   ├── ui/                      # UI scripts related to mission system
+│   │   ├── hud/
+│   │   │   └── hud_directives_gauge.gd
+│   │   ├── mission_log/
+│   │   │   └── mission_log_screen.gd
+│   │   └── hotkey_screen/
+│   │       └── hotkey_screen.gd
+│   └── ...
 ```
 
-## Conversion Challenges
+## 4. Relations Summary
 
-1. **FSM File Parsing**
-   - Original: Custom binary format
-   - Godot: Need conversion to JSON/Resource
-   - Solution: Create FSM-to-JSON converter
+*   **MissionManager:** Central orchestrator. Loads `MissionData`. Manages runtime state (time, active ships/wings, objectives, events). Calls `SEXPSystem` for evaluation. Triggers `SpawnManager`, `ArrivalDepartureSystem`, `MessageManager`, `SoundManager`, `HUDManager`. Interacts with `CampaignManager` for progression.
+*   **SEXPSystem:** Evaluates formulas from `MissionData` (goals, events, cues, branching). Called by `MissionManager`, `CampaignManager`. Operators within call methods on various managers (Ship, AI, Message, Mission, etc.) to query state or trigger actions.
+*   **Briefing/Debriefing/CommandBrief Systems:** Read data from `MissionData`. Display UI. Play voice/animations via `SoundManager`/`AnimationPlayer`. Controlled by `GameSequenceManager`. Debriefing interacts with `ScoringSystem`/`CampaignManager`.
+*   **MessageSystem:** Manages message queue, personas, voice/animation playback. Triggered by `MissionManager`, `SEXPSystem`, AI. Interacts with HUD.
+*   **TrainingSystem:** Manages training objectives/messages. Interacts with `MissionManager`, `MessageManager`, HUD, `InputMap`.
+*   **CampaignSystem:** Loads campaign definitions. Provides mission sequence to `MissionLoader`. Receives results from `MissionManager`. Evaluates branching via `SEXPSystem`. Saves/loads persistent state (`CampaignSaveData`).
+*   **MissionLogManager:** Receives events from various systems (`MissionManager`, `ShipManager`) and stores them. Read by `DebriefingScreen` and potentially a dedicated log UI.
+*   **HotkeyManager:** Manages hotkey assignments stored in `CampaignSaveData`. Read by `PlayerTargeting`. Defaults set by `MissionManager`.
 
-2. **Event System**
-   - Original: SEXP-based scripting
-   - Godot: Need equivalent system
-   - Solution: Custom event bus with GDScript
+## 5. Conversion Strategy Notes
 
-3. **Dynamic Loading**
-   - Original: Loads assets during mission
-   - Godot: Better with preloading
-   - Solution: Resource preloader system
+*   **FS2 Conversion:** Prioritize creating a robust `.fs2` to Godot Resource (`.tres` or JSON) converter. This simplifies runtime logic significantly.
+*   **SEXPs:** The SEXP system is critical and complex. A hybrid approach (parse structure, interpret with GDScript) is likely the most feasible path to maintain compatibility. Define all operators carefully.
+*   **Data-Driven:** Use `Resource` files extensively for mission definitions, objectives, events, briefings, etc.
+*   **Modularity:** Keep systems like Briefing, Debriefing, Logging, Messages, Training, Campaign, Hotkeys as separate Singletons or scenes/nodes managed by `MissionManager` or `GameSequenceManager`.
+*   **Signals:** Use signals for communication between mission events/goals and other systems (HUD updates, sound cues, AI triggers).
+*   **State Management:** Clearly define where runtime state is stored (e.g., objective status in `MissionObjectiveData` instance or `MissionManager` dictionary, campaign progress in `CampaignSaveData`).
 
-4. **Coordinate Systems**
-   - Original: Right-handed Z-up
-   - Godot: Left-handed Y-up
-   - Solution: Transform all coordinates during import
+## 6. Testing Strategy
 
-5. **Timing Systems**
-   - Original: Frame-based timing
-   - Godot: Delta-time based
-   - Solution: Convert all timing to use Godot's delta time
-
-## Testing Strategy
-
-1. **Mission Loading Tests**
-   - Verify all objects placed correctly
-   - Check waypoint connections
-   - Validate initial ship states
-
-2. **Objective Tests**
-   - Trigger completion conditions
-   - Test failure states
-   - Verify optional objectives
-
-3. **Flow Tests**
-   - Mission success/failure paths
-   - Branching mission outcomes
-   - Campaign progression
-
-## Migration Tools
-
-```python
-def convert_fsm_to_json(fsm_path, output_dir):
-    """Convert FSM mission files to Godot-compatible JSON"""
-    with open(fsm_path, 'rb') as f:
-        data = parse_fsm(f.read())
-        
-    json_data = {
-        'name': data.header.name,
-        'briefing': convert_briefing(data.briefing),
-        'objectives': convert_objectives(data.objectives),
-        'waves': convert_waves(data.waves)
-    }
-    
-    output_path = os.path.join(output_dir, f"{data.header.name}.json")
-    with open(output_path, 'w') as f:
-        json.dump(json_data, f, indent=2)
-```
-
-## Next Steps
-
-1. Create FSM parser/converter
-2. Implement mission manager
-3. Build briefing/debriefing UI
-4. Create objective tracking system
-5. Develop testing scenarios
-
+*   **Parser/Converter:** Test thoroughly with various `.fs2` files, verifying the output JSON/`.tres` structure and data integrity.
+*   **SEXPSystem:** Test individual operators and complex nested expressions against known outcomes from the original game or FRED2.
+*   **Mission Logic:** Test objective completion/failure triggers, event timing/conditions, arrival/departure cues, reinforcement spawning for multiple missions.
+*   **Briefing/Debriefing:** Verify correct stage display, text, voice playback, map icons/lines, camera movement, stats, and awards.
+*   **Campaign Flow:** Test mission progression, branching logic based on success/failure/SEXP results, and state persistence (variables, ship/weapon pools, hotkeys).
+*   **Training:** Test directive display, message timing/playback, failure conditions.
+*   **Log/Hotkeys:** Verify correct event logging and hotkey assignment/recall functionality.

@@ -1,0 +1,27 @@
+; LimboAI Behavior Tree resource file
+; Defines a basic behavior for a fighter AI.
+
+@tool
+extends BehaviorTree
+class_name FighterBaseBT
+
+; Define the structure of the behavior tree.
+; This is a very simple example: always try to chase the target.
+; A real tree would have more complex logic (e.g., selectors for different states like Evade, Attack, Idle).
+func _build() -> BTNode:
+	return Sequence.new([
+		BTCondition.new(HasTarget), # Custom condition needed: Checks if blackboard has a valid target_id
+		BTAction.new(ChaseTarget)   # Our custom action script
+		# TODO: Add more behaviors like firing weapons, evading, etc.
+	])
+
+; --- Custom Condition Placeholder (Needs implementation in scripts/ai/behaviors/) ---
+# Example: scripts/ai/behaviors/has_target.gd
+# class_name HasTarget extends BTCondition
+# func _tick() -> Status:
+#	 var target_id = blackboard.get_var("target_id", -1)
+#	 if target_id != -1 and is_instance_valid(instance_from_id(target_id)):
+#		 return SUCCESS
+#	 else:
+#		 blackboard.set_var("target_id", -1) # Clear potentially invalid ID
+#		 return FAILURE

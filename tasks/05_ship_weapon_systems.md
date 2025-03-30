@@ -1,821 +1,304 @@
-# Ship and Weapon Systems Conversion Plan
+# Wing Commander Saga: Godot Conversion Analysis - Component 05: Ship & Weapon Systems
 
-This document outlines the strategy for converting Wing Commander Saga's ship and weapon systems to Godot while maintaining the original game's flight model and combat mechanics.
+This document analyzes the ship and weapon systems from the original Wing Commander Saga C++ codebase and proposes an implementation strategy for the Godot conversion project, following the guidelines in `tasks/00_analysis_setup.md`.
 
-## System Architecture
+*Source Code Folders:* `ship/`, `weapon/`, `beam/`, `corkscrew/`, `emp/`, `flak/`, `muzzleflash/`, `shockwave/`, `swarm/`, `trails/`, `afterburner/`, `awacs/`, `shield/`
+
+## 1. Original System Overview
+
+This component group covers the core logic for player and AI ships, including their movement physics integration, shield mechanics, subsystem management, damage model, and afterburners. It also encompasses the diverse array of weapon types (lasers, missiles, beams, flak, EMP, swarm missiles), their firing logic, ammunition/energy management, and associated visual/audio effects (muzzle flashes, trails, impacts, shockwaves).
 
 ```mermaid
-classDiagram
-    class ShipBase {
-        +String ship_class
-        +float max_speed
-        +float acceleration
-        +float rotation_speed
-        +float shield_capacity
-        +float hull_strength
-        +ShipSubsystem[] subsystems
-        +update_physics(delta)
-        +fire_weapon(index)
-        +take_damage(amount, type, position)
-    }
-    
-    class ShipSubsystem {
-        +String name
-        +float integrity
-        +bool functional
-        +take_damage(amount)
-        +repair(amount)
-    }
-    
-    class WeaponSystem {
-        +Weapon[] primary_weapons
-        +Weapon[] secondary_weapons
-        +int current_primary
-        +int current_secondary
-        +bool primary_linked
-        +fire_primary()
-        +fire_secondary()
-        +cycle_weapons()
-    }
-    
-    class Weapon {
-        <<abstract>>
-        +String weapon_type
-        +float damage
-        +float fire_rate
-        +float energy_cost
-        +float range
-        +bool can_fire()
-        +fire()
-    }
-    
-    class LaserWeapon {
-        +Color beam_color
-        +float beam_width
-    }
-    
-    class MissileWeapon {
-        +float tracking_strength
-        +bool is_locked
-        +Object target
-    }
-    
-    class BeamWeapon {
-        +float duration
-        +float width
-        +bool continuous
-    }
-    
-    class ShieldSystem {
-        +float max_capacity
-        +float current_level
-        +float recharge_rate
-        +float[] quadrant_strength
-        +absorb_damage(amount, position)
-        +recharge(delta)
-    }
-    
-    class EngineSystem {
-        +float max_thrust
-        +float afterburner_multiplier
-        +float afterburner_fuel
-        +apply_thrust(amount)
-        +activate_afterburner(active)
-    }
-    
-    class DamageSystem {
-        +Dictionary damage_types
-        +apply_damage(target, amount, type, position)
-        +calculate_armor_reduction()
-        +handle_subsystem_damage()
-    }
-    
-    ShipBase "1" *-- "1" DamageSystem
-    ShipBase "1" *-- "1" WeaponSystem
-    ShipBase "1" *-- "1" ShieldSystem
-    ShipBase "1" *-- "1" EngineSystem
-    ShipBase "1" *-- "*" ShipSubsystem
-    WeaponSystem "1" *-- "*" Weapon
-    Weapon <|-- LaserWeapon
-    Weapon <|-- MissileWeapon
-    Weapon <|-- BeamWeapon
+graph TD
+    SW[Ship & Weapon Systems] --> SHIP[Ship Logic]
+    SW --> WPN[Weapon Logic]
+    SW --> DMG[Damage & Shields]
+    SW --> FX[Effects]
+
+    SHIP --> PHYS(Physics Integration);
+    SHIP --> SUBSYS(Subsystem Management);
+    SUBSYS --> TURRET(Turrets);
+    SUBSYS --> ENGINE(Engines);
+    SUBSYS --> SENSORS(Sensors/AWACS);
+    SUBSYS --> NAV(Navigation);
+    SUBSYS --> COMM(Communication);
+    SHIP --> AB(Afterburner);
+    SHIP --> CLOAK(Cloaking);
+    SHIP --> WARP(Warp Drive);
+    SHIP --> DOCK(Docking Logic);
+
+    WPN --> FIRE(Firing Logic);
+    WPN --> AMMO(Ammo/Energy Management);
+    WPN --> TYPES(Weapon Types);
+    TYPES --> LASER(Lasers);
+    TYPES --> MISSILE(Missiles);
+    MISSILE --> HOMING(Homing - Heat, Aspect, Javelin);
+    MISSILE --> SWARM(Swarm);
+    MISSILE --> CORKSCREW(Corkscrew);
+    MISSILE --> CMEASURE(Countermeasures);
+    TYPES --> BEAM(Beams);
+    TYPES --> FLAK(Flak);
+    TYPES --> EMP(EMP);
+    WPN --> TARGET(Targeting Integration);
+    TARGET --> LEAD(Lead Prediction);
+    TARGET --> LOCK(Locking);
+
+    DMG --> SHIELD(Shield System);
+    SHIELD --> QUAD(Quadrants);
+    SHIELD --> RECHARGE(Recharge);
+    DMG --> HULL(Hull Integrity);
+    DMG --> ARMOR(Armor Types/Reduction);
+    DMG --> SUBSYS_DMG(Subsystem Damage);
+    DMG --> CRITICAL(Critical Hits);
+    DMG --> REPAIR(Repair System Link);
+
+    FX --> MUZZLE(Muzzle Flashes);
+    FX --> TRAILS(Weapon Trails);
+    FX --> IMPACTS(Impact Effects - Sparks, Decals);
+    FX --> SHIELD_FX(Shield Hit Visuals);
+    FX --> EXPLODE(Explosions/Fireballs);
+    FX --> SHOCKWAVE(Shockwaves);
+    FX --> WARP_FX(Warp Visuals);
+    FX --> CLOAK_FX(Cloak Visuals);
+    FX --> ENGINE_FX(Engine Glow/Wash/Contrails);
 ```
 
-## Key Components to Convert
+## 2. Detailed Code Analysis Guidelines (Applied Here)
 
-1. **Ship Physics**
-   - Newtonian flight model with inertia
-   - Afterburner mechanics (fuel consumption, heat, thrust multiplier)
-   - Inertia dampening and flight assist systems
-   - Ship-specific handling characteristics
+This analysis follows the refined guidelines from `tasks/00_analysis_setup.md`:
 
-2. **Weapon Systems**
-   - Energy weapons (lasers, plasma, ion)
-   - Projectile weapons (mass drivers, ballistic)
-   - Missile systems (heat-seeking, aspect-seeking, image recognition)
-   - Beam weapons (continuous, pulsed)
-   - Special weapons (EMP, flak, shockwave)
-   - Weapon groups and linking
+*   **Specificity:** Features are broken down into specific mechanics (e.g., "Shield Quadrants", "Corkscrew Missiles").
+*   **Godot Mapping:** Each feature is mapped to concrete Godot nodes, resources, or techniques with justifications.
+*   **Structure:** The proposed Godot structure adheres to the project standard, including necessary folders and file types. Naming is consistent.
+*   **Critical Elements:** Key C++ structs, classes, and functions are identified and mapped to their Godot counterparts.
+*   **Relations:** Interactions with other systems (Physics, AI, Effects, Core, Model) are explicitly described.
 
-3. **Damage Model**
-   - Shield absorption with quadrant-based system
-   - Hull damage with armor reduction
-   - Subsystem targeting and progressive damage
-   - Critical hits and failure cascades
-   - Damage types (energy, kinetic, explosive, etc.)
-
-4. **Combat Systems**
-   - Target tracking and lock-on mechanics
-   - Weapon leading and prediction algorithms
-   - Countermeasures (chaff, flares, ECM)
-   - Radar and sensor systems
-   - Stealth mechanics
-
-5. **Special Effects**
-   - Weapon trails and particle effects
-   - Shield impact visualization
-   - Explosion and damage effects
-   - Afterburner visuals
-
-## III. C++ Codebase Analysis (Ship & Weapon Systems)
+## 3. C++ Codebase Analysis (Ship & Weapon Systems)
 
 Based on the provided C++ code snippets (`ship.h`, `shipcontrails.cpp`, `shipfx.cpp`, `shiphit.cpp`, `afterburner.cpp`, `awacs.cpp`, `shield.cpp`, `weapons.cpp`, `beam.cpp`, `corkscrew.cpp`, `emp.cpp`, `flak.cpp`, `muzzleflash.cpp`, `shockwave.cpp`, `swarm.cpp`, `trails.cpp`).
 
 ### A. Key Features
 
-*   **Ship Representation:** `ship` struct holds runtime state (position, velocity, energy, ammo, subsystems, damage, flags). `ship_info` struct holds static class data (model, physics properties, weapon mounts, shield/hull strength, sounds).
-*   **Weapon Management:** `ship_weapon` struct manages primary/secondary/tertiary banks, ammo, cooldowns, linking. `weapon_info` struct defines weapon properties (damage, speed, lifetime, homing, effects).
-*   **Subsystems:** `ship_subsys` struct represents individual components (turrets, engines, sensors) with health, status, targeting logic, and potential AWACS capabilities.
-*   **Damage Model:** Hull and subsystem damage tracking (`current_hits`, `max_hits`). Shield system with quadrant-based absorption. Armor types (`ArmorType` class) modify incoming damage based on type. Critical hits and subsystem destruction effects.
-*   **Physics & Movement:** Newtonian physics (`physics_info` within `object` struct), afterburner mechanics (`afterburner_fuel`, consumption/recharge rates), engine wash effects, contrails, maneuvering thrusters (`man_thruster`).
+*   **Ship Representation:** `ship` struct holds runtime state (position, velocity, energy, ammo, subsystems, damage, flags, timers, AI link, weapon state, warp/cloak state, etc.). `ship_info` struct holds static class data (model ref, physics properties, weapon mounts, shield/hull strength, sounds, subsystem definitions, species, AI class, etc.). (from `ship.h`)
+*   **Weapon Management:** `ship_weapon` struct manages primary/secondary/tertiary banks, ammo counts (`primary_bank_ammo`, `secondary_bank_ammo`), cooldowns (`next_primary_fire_stamp`, `next_secondary_fire_stamp`), linking (`SF_PRIMARY_LINKED`), and rearm times. `weapon_info` struct defines static weapon properties (damage, speed, lifetime, homing type/params, effects, flags `WIF_*`, `WIF2_*`). (from `ship.h`, `weapon.h`)
+*   **Subsystems:** `ship_subsys` struct represents runtime state of individual components (turrets, engines, sensors, comms, nav, warp) with health (`current_hits`, `max_hits`), status (disrupted, destroyed), targeting logic (for turrets), and links to static `model_subsystem` data. `model_subsystem` (part of `ship_info`) defines static properties like type, mount point, FOV, turn rates, weapon banks, AWACS properties. (from `ship.h`, `model.h`)
+*   **Damage Model:** Hull (`hull_strength`) and subsystem damage tracking (`current_hits`). Shield system (`shield_quadrant`) with quadrant-based absorption and recharge (`shield_recharge_index`). Armor types (`ArmorType` class, `armor_type_idx`, `shield_armor_type_idx`) modify incoming damage based on type (`damage_type_idx`). Critical hits and subsystem destruction effects (`do_subobj_destroyed_stuff`). Damage application logic (`ship_apply_local_damage`, `ship_apply_global_damage`). (from `shiphit.cpp`, `shield.cpp`, `ship.h`)
+*   **Physics & Movement:** Newtonian physics integration (`physics_info` within `object` struct). Afterburner mechanics (`afterburner_fuel`, consumption/recharge rates, `PF_AFTERBURNER_ON` flag). Engine wash effects (`wash_intensity`). Contrails (`trail_ptr`). Maneuvering thrusters (`man_thruster`). (from `afterburner.cpp`, `shipcontrails.cpp`, `physics.cpp`)
 *   **Weapon Types:**
-    *   Lasers: Defined by `WRT_LASER`, potentially with glow effects.
-    *   Missiles: Homing (Heat, Aspect, Javelin), Swarm, Corkscrew, Countermeasures. Defined by `WP_MISSILE`.
-    *   Beams: Various types (A-E), potentially with warmup/warmdown, particle effects, sections. Defined by `WIF_BEAM`.
-    *   Special: EMP, Flak, Shockwave generation.
-*   **Effects:** Muzzle flashes (`mflash_info`), weapon trails (`trail`), shield impacts, sparks (`ship_spark`), explosions (fireballs, debris, shockwaves), ship destruction sequences (including large ship blowups).
-*   **Targeting & AI Interaction:** Turret targeting logic (`turret_targeting_order`), AWACS detection (`awacs_get_level`), target priority (`ai_target_priority`), homing logic (`weapon_home`), countermeasures interaction.
-*   **Warp Effects:** Warp-in/out animations, sounds, speed calculations (`WarpEffect` class and derived types like `WE_Default`, `WE_BSG`, `WE_Homeworld`, `WE_Hyperspace`).
-*   **Cloaking:** Cloak stages, timing, alpha blending (`shipfx_cloak_frame`).
+    *   **Lasers:** Defined by `WRT_LASER`, potentially with glow effects (`laser_glow_bitmap`). Ballistic primaries (`SIF_BALLISTIC_PRIMARIES`). (from `weapon.h`)
+    *   **Missiles:** Homing (Heat `WIF_HOMING_HEAT`, Aspect `WIF_HOMING_ASPECT`, Javelin `WIF_HOMING_JAVELIN`), Swarm (`WIF_SWARM`, `swarm.cpp`), Corkscrew (`WIF_CORKSCREW`, `corkscrew.cpp`), Countermeasures (`WIF_CMEASURE`). Defined by `WP_MISSILE`. Arming time/distance (`arm_time`, `arm_dist`). (from `weapon.h`, `swarm.cpp`, `corkscrew.cpp`)
+    *   **Beams:** Various types (A-E), potentially with warmup/warmdown sounds/times, particle effects, sections (`beam_weapon_section_info`). Defined by `WIF_BEAM`. (from `beam.cpp`, `beam.h`, `weapon.h`)
+    *   **Special:** EMP (`WIF_EMP`, `emp.cpp`), Flak (`WIF_FLAK`, `flak.cpp`), Shockwave generation (`shockwave` struct in `weapon_info`). (from `emp.cpp`, `flak.cpp`, `weapon.h`)
+*   **Effects:** Muzzle flashes (`mflash_info`, `muzzleflash.cpp`). Weapon trails (`trail_info`, `trails.cpp`). Shield impacts (`do_shield_effect`, `shield.cpp`). Sparks (`ship_spark`, `shipfx.cpp`). Explosions (fireballs, debris, shockwaves - `fireballs.cpp`, `debris.cpp`, `shockwave.cpp`). Ship destruction sequences (`shipfx_large_blowup_init`, `shipfx.cpp`).
+*   **Targeting & AI Interaction:** Turret targeting logic (`turret_targeting_order`, `turret_enemy_objnum`). AWACS detection (`awacs_get_level`, `awacs.cpp`). Target priority (`ai_target_priority`). Homing logic (`weapon_home`). Countermeasures interaction (`cmeasure_maybe_alert_success`). (from `ship.h`, `weapon.cpp`, `awacs.cpp`)
+*   **Warp Effects:** Warp-in/out animations, sounds, speed calculations (`WarpEffect` class and derived types like `WE_Default`, `WE_BSG`, `WE_Homeworld`, `WE_Hyperspace`). Managed via `shipfx_warpin_start`, `shipfx_warpout_start`, etc. (from `shipfx.cpp`, `shipfx.h`)
+*   **Cloaking:** Cloak stages (`cloak_stage`), timing (`time_until_full_cloak`), alpha blending (`cloak_alpha`). Managed via `shipfx_cloak_frame`, `shipfx_start_cloak`, `shipfx_stop_cloak`. (from `shipfx.cpp`, `ship.h`)
 
 ### B. Potential Godot Solutions
 
 *   **Ship Representation:**
-    *   `ShipBase` (Node3D/RigidBody3D) for core ship scene.
-    *   `ShipData` (Resource) to hold static `ship_info` data.
-    *   GDScript on `ShipBase` to manage runtime `ship` struct state.
+    *   **Scene:** `ShipBase.tscn` (inheriting from `RigidBody3D` or `CharacterBody3D`) as the root node for each ship instance.
+    *   **Resource:** `ShipData.tres` (extends `Resource`, script `ship_data.gd`) to hold static `ship_info` data (model path, physics constants, weapon mounts, subsystem definitions, shield/hull values, sounds, species, AI class, flags `SIF_*`, `SIF2_*`).
+    *   **Script:** `ShipBase.gd` attached to the root node. Manages runtime state (current hull/shields, energy, ammo, subsystem status, flags `SF_*`, `SF2_*`, timers, AI link, warp/cloak state). Contains references to child nodes (WeaponSystem, ShieldSystem, DamageSystem, EngineSystem, Subsystem nodes).
 *   **Weapon Management:**
-    *   `WeaponSystem` (Node) child of `ShipBase`.
-    *   `WeaponData` (Resource) for `weapon_info`.
-    *   `WeaponHardpoint` (Node3D) scenes instantiated under `WeaponSystem`.
-    *   GDScript for weapon logic (firing, cooldown, ammo, energy).
+    *   **Node:** `WeaponSystem.gd` (extends `Node`) attached to `ShipBase`. Manages weapon banks, energy, ammo pools, firing logic, cycling, linking.
+    *   **Resource:** `WeaponData.tres` (extends `Resource`, script `weapon_data.gd`) for static `weapon_info` (damage, speed, lifetime, homing params, effects, flags `WIF_*`, `WIF2_*`, sounds, model path, beam info, trail info, etc.).
+    *   **Scene:** `WeaponHardpoint.tscn` (extends `Node3D`) representing a mount point. Instantiated under `WeaponSystem`. Contains logic for a specific weapon instance (cooldown timer).
+    *   **Script:** `Weapon.gd` (base class, attached to `WeaponHardpoint.tscn`), with derived classes (`LaserWeapon.gd`, `MissileWeapon.gd`, `BeamWeapon.gd`, `FlakWeapon.gd`, `EMPWeapon.gd`, `SwarmWeapon.gd`, `CorkscrewWeapon.gd`) implementing specific firing logic and projectile creation.
+    *   **Projectiles:** Separate scenes (`ProjectileBase.tscn`, `LaserProjectile.tscn`, `MissileProjectile.tscn`, etc.) with attached scripts (`ProjectileBase.gd`, `LaserProjectile.gd`, `MissileProjectile.gd`) handling movement, lifetime, homing, collision, and effects.
 *   **Subsystems:**
-    *   `ShipSubsystem` (Node) child of `ShipBase`, potentially with specific derived classes (TurretSubsystem, EngineSubsystem).
-    *   `SubsystemData` (Resource) for static `model_subsystem` info.
-    *   GDScript for subsystem health, status, targeting.
+    *   **Node:** `ShipSubsystem.gd` (extends `Node`) attached to specific `Node3D` locations within the `ShipBase` scene hierarchy (representing the submodel). Manages runtime health, status (disrupted, destroyed).
+    *   **Resource:** Subsystem definitions stored within `ShipData.tres` (linking to submodel names/paths, defining type, static health, turret properties, AWACS params, etc.).
+    *   **Derived Nodes/Scripts:** `TurretSubsystem.gd`, `EngineSubsystem.gd`, `SensorSubsystem.gd` for specialized logic (turret aiming, engine effects, sensor range/disruption). Turrets would contain a child `WeaponSystem` node.
 *   **Damage Model:**
-    *   `DamageSystem` (Node) child of `ShipBase`.
-    *   `ArmorData` (Resource) for `ArmorType`.
-    *   GDScript for applying damage, shield absorption, armor calculation, subsystem damage propagation.
+    *   **Node:** `DamageSystem.gd` (extends `Node`) attached to `ShipBase`. Handles receiving damage signals/calls, applying armor reduction, distributing damage to hull and subsystems.
+    *   **Resource:** `ArmorData.tres` (extends `Resource`, script `armor_data.gd`) defining damage resistances per type (maps to `ArmorType`). Referenced by `ShipData` and potentially `SubsystemData`.
+    *   **Script Logic:** Damage application (`apply_damage`), shield interaction (calling `ShieldSystem.absorb_damage`), hull reduction, subsystem damage propagation (finding nearby subsystems), critical hit checks.
 *   **Physics & Movement:**
-    *   `RigidBody3D` with custom integrator (`_integrate_forces`) for flight model.
-    *   GDScript for afterburner logic, engine wash triggers.
-    *   `GPUParticles3D` or custom trails for contrails/engine wash.
+    *   **Node:** Use `RigidBody3D` for ships.
+    *   **Script:** Implement custom integrator (`_integrate_forces` in `ShipBase.gd` or a dedicated `FlightModel.gd` script) to replicate the specific Newtonian flight model, damping, acceleration curves, and afterburner effects described in `physics.cpp`. Read physics constants from `ShipData.tres`.
+    *   **Effects:** `GPUParticles3D` for contrails/engine wash, controlled by `EngineSubsystem.gd` or `ShipBase.gd`.
 *   **Weapon Types:**
-    *   Base `Weapon` class (GDScript) on `WeaponHardpoint`.
-    *   Derived classes (`LaserWeapon`, `MissileWeapon`, `BeamWeapon`, `FlakWeapon`, `EMPWeapon`, etc.).
-    *   Separate scenes/scripts for projectiles (`ProjectileBase`, `LaserProjectile`, `MissileProjectile`).
-    *   `BeamWeapon` might use `Line3D` or custom mesh generation.
+    *   **Lasers:** `LaserProjectile.tscn` (potentially a simple `Node3D` with a `MeshInstance3D` for the beam visual and script for movement/collision). `LaserWeapon.gd` instantiates this.
+    *   **Missiles:** `MissileProjectile.tscn` (likely `RigidBody3D` or `CharacterBody3D`) with `MissileProjectile.gd` handling movement, lifetime, and homing logic (steering towards target). Homing types implemented within this script based on `WeaponData`.
+    *   **Swarm/Corkscrew:** Specific logic within `MissileProjectile.gd` or derived scripts, potentially using `Curve3D` or mathematical functions for pathing, managed by `SwarmWeapon.gd`/`CorkscrewWeapon.gd`.
+    *   **Beams:** `BeamWeapon.gd` uses `RayCast3D` for hit detection. Visuals via custom mesh generation (`ImmediateMesh`), `Line3D`, or shaders. Damage applied over time to hit objects.
+    *   **Flak:** `FlakWeapon.gd` fires a projectile (`FlakProjectile.tscn`) which detonates after a set range (`det_range` from `WeaponData`), creating an area effect (instantiating an `Area3D` or using `PhysicsServer3D.body_test_motion` for damage).
+    *   **EMP:** `EMPWeapon.gd` fires a projectile (`EMPProjectile.tscn`) that triggers an EMP effect on impact (calling `EmpManager.apply_emp`).
 *   **Effects:**
-    *   `GPUParticles3D` for sparks, explosions, muzzle flashes.
-    *   `AnimationPlayer` for animated effects (explosions).
-    *   Shaders for shield impacts, cloaking.
-    *   Custom trail rendering script or `Line3D`.
-    *   `Shockwave` scene/script using mesh deformation or shaders.
+    *   **Muzzle Flash:** Instantiate `MuzzleFlash.tscn` (using `GPUParticles3D` or `AnimatedSprite3D`) at the weapon hardpoint, configured by `WeaponData`. Managed by `MuzzleFlashManager.gd` or directly by `Weapon.gd`.
+    *   **Trails:** `RibbonTrailMesh` or `TubeTrailMesh` nodes attached to projectiles, configured by `trail_info` in `WeaponData`. Managed by `TrailManager.gd` or projectile scripts.
+    *   **Shield Impacts:** Triggered by `ShieldSystem.absorb_damage`. Visual effect using shaders on the shield mesh or instantiating a particle effect (`GPUParticles3D`) at the impact point.
+    *   **Sparks:** Instantiate `SparkEffect.tscn` (`GPUParticles3D`) at impact points, managed by `DamageSystem.gd`.
+    *   **Explosions/Fireballs:** Instantiate `Explosion.tscn` (`GPUParticles3D`, `AnimationPlayer`, `OmniLight3D`, `AudioStreamPlayer3D`) managed by `ExplosionManager.gd`. Use different scenes/configurations based on `weapon_expl_info`.
+    *   **Shockwaves:** Instantiate `Shockwave.tscn` (potentially a growing `MeshInstance3D` with a shader or `GPUParticles3D`). `Shockwave.gd` script handles expansion, lifetime, and damage application (using `Area3D` or physics queries). Managed by `ShockwaveManager.gd`.
 *   **Targeting & AI Interaction:**
-    *   GDScript within `ShipSubsystem` (for turrets) and `AIController` (for main ship).
-    *   Signals for communication between systems (e.g., target selected, weapon fired).
-    *   Area3D for AWACS detection range.
+    *   Turret aiming logic in `TurretSubsystem.gd`.
+    *   AWACS detection range implemented using `Area3D` on sensor subsystems. `awacs_get_level` logic implemented in a global utility or `SensorSubsystem.gd`.
+    *   Homing logic in `MissileProjectile.gd`.
+    *   Countermeasure interaction: Missiles check for nearby countermeasures (`Area3D` or distance checks) and potentially change target or detonate based on effectiveness values.
 *   **Warp Effects:**
-    *   `AnimationPlayer` and `ShaderMaterial` for visual warp effects.
-    *   GDScript to control timing and ship state during warp.
+    *   Instantiate `WarpEffect.tscn` managed by `WarpEffectManager.gd`. Scene uses `AnimationPlayer`, shaders (`ShaderMaterial`), and potentially `GPUParticles3D` for visuals. `WarpEffect.gd` script controls timing and ship state changes (e.g., disabling physics during warp).
 *   **Cloaking:**
-    *   `ShaderMaterial` on the ship's mesh for alpha blending/distortion.
-    *   GDScript to manage cloak state and timing.
+    *   Apply a `ShaderMaterial` with cloaking effect (alpha blend, distortion) to the ship's `MeshInstance3D`. Control shader uniforms (`alpha`, `distortion_amount`) via GDScript (`ShipBase.gd`) based on cloak stage and timing.
 
-### C. Important Methods, Classes, and Data Structures
-
-*   **Structs:**
-    *   `ship`: Central runtime data for a ship instance.
-    *   `ship_info`: Static data defining a ship class.
-    *   `ship_weapon`: Manages weapon banks, ammo, cooldowns for a ship or subsystem.
-    *   `weapon`: Runtime data for a weapon projectile/instance.
-    *   `weapon_info`: Static data defining a weapon type.
-    *   `ship_subsys`: Runtime data for a ship subsystem.
-    *   `model_subsystem`: Static data defining a subsystem type (part of `ship_info`).
-    *   `ArmorType`: Defines damage resistance properties.
-    *   `shockwave_create_info`: Parameters for creating shockwaves.
-    *   `trail_info`: Parameters for weapon trails.
-    *   `mflash_info`: Muzzle flash definition.
-    *   `beam`, `beam_info`, `beam_weapon_info`, `beam_weapon_section_info`: Beam weapon specifics.
-    *   `cscrew_info`: Corkscrew missile data.
-    *   `swarm_info`, `turret_swarm_info`: Swarm missile data.
-*   **Classes:**
-    *   `WarpEffect` (and derived): Abstract base and implementations for warp visuals/logic.
-    *   `weapon_explosions`: Manages loading and selecting explosion animations.
-*   **Key Functions:**
-    *   `weapon_create()`: Instantiates a weapon object.
-    *   `weapon_hit()`: Handles weapon impact logic (damage, effects, sound).
-    *   `weapon_process_post()`: Updates weapon state (lifetime, homing, trails).
-    *   `weapon_home()`: Implements missile homing logic.
-    *   `ship_apply_local_damage()`, `ship_apply_global_damage()`: Applies damage to ships.
-    *   `do_subobj_hit_stuff()`: Calculates and applies damage distribution to subsystems.
-    *   `do_subobj_destroyed_stuff()`: Handles subsystem destruction effects.
-    *   `apply_damage_to_shield()`: Calculates shield absorption.
-    *   `afterburners_start()`, `afterburners_stop()`, `afterburners_update()`: Manage afterburner state.
-    *   `beam_fire()`, `beam_move_all_post()`, `beam_render_all()`: Core beam weapon functions.
-    *   `shockwave_create()`, `shockwave_move_all()`: Shockwave management.
-    *   `shipfx_warpin_start()`, `shipfx_warpout_start()`, `shipfx_..._frame()`: Manage warp effects.
-    *   `shipfx_cloak_frame()`, `shipfx_start_cloak()`, `shipfx_stop_cloak()`: Manage cloaking.
-    *   `awacs_get_level()`: Calculates AWACS detection strength.
-    *   `trail_create()`, `trail_move_all()`, `trail_render_all()`: Trail management.
-    *   `mflash_create()`: Creates muzzle flash effects.
-
-### D. Relations
-
-*   `object` struct contains `physics_info`. Ship objects (`OBJ_SHIP`) link to a `ship` struct instance. Weapon objects (`OBJ_WEAPON`) link to a `weapon` struct instance.
-*   `ship` contains `ship_weapon` (for primary/secondary) and a list of `ship_subsys`.
-*   `ship_subsys` can contain its own `ship_weapon` (for turrets).
-*   `ship` and `ship_subsys` reference `ship_info` and `model_subsystem` respectively for static data.
-*   `weapon` references `weapon_info`.
-*   Damage functions (`ship_apply_local_damage`, `do_subobj_hit_stuff`) interact with `ship`, `ship_subsys`, `ArmorType`, and potentially `weapon_info` (for damage type).
-*   Physics functions (`physics_apply_whack`, `physics_apply_shock`) modify `physics_info`.
-*   Weapon creation (`weapon_create`, `beam_fire`) is called from `ship` or `ship_subsys` logic.
-*   Weapon update (`weapon_process_post`) calls homing (`weapon_home`), trail (`trail_...`), swarm (`swarm_update_direction`), corkscrew (`cscrew_process_post`), etc. based on `weapon_info` flags.
-*   Effects functions (`shipfx_...`, `mflash_create`, `shockwave_create`, `fireball_create`, `debris_create`) are called during impacts (`weapon_hit`), subsystem destruction (`do_subobj_destroyed_stuff`), or ship death.
-*   Shield logic (`apply_damage_to_shield`, `do_shield_effect`) interacts with ship state and rendering.
-*   AWACS logic (`awacs_get_level`) reads `ship_subsys` data (AWACS components) and affects targeting/visibility.
-
-## IV. Conversion Approach
-
-### 1. Ship Physics
-
-The original Wing Commander Saga uses a custom physics model that balances realism with arcade-style gameplay. We'll implement this in Godot using a combination of RigidBody3D for basic physics and custom code for the specific flight model behaviors.
-
-```gdscript
-class_name ShipBase
-extends RigidBody3D
-
-@export_group("Flight Properties")
-@export var ship_class: String
-@export var max_speed: float = 100.0
-@export var acceleration: float = 20.0
-@export var rotation_speed: Vector3 = Vector3(1.0, 1.0, 1.0)
-@export var dampening_factor: float = 0.1
-@export var flight_assist: bool = true
-
-@export_group("Afterburner")
-@export var afterburner_multiplier: float = 2.0
-@export var afterburner_capacity: float = 100.0
-@export var afterburner_recharge_rate: float = 5.0
-@export var afterburner_consumption_rate: float = 10.0
-
-var current_velocity: Vector3 = Vector3.ZERO
-var target_velocity: Vector3 = Vector3.ZERO
-var afterburner_active: bool = false
-var afterburner_fuel: float = 100.0
-
-func _physics_process(delta):
-    # Get input
-    var input_vector = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
-    
-    # Calculate thrust
-    var thrust = -transform.basis.z * input_vector.y * acceleration
-    
-    # Apply afterburner if active and has fuel
-    if Input.is_action_pressed("afterburner") and afterburner_fuel > 0:
-        thrust *= afterburner_multiplier
-        afterburner_active = true
-        afterburner_fuel -= afterburner_consumption_rate * delta
-    else:
-        afterburner_active = false
-        # Recharge afterburner when not in use
-        afterburner_fuel = min(afterburner_fuel + afterburner_recharge_rate * delta, afterburner_capacity)
-    
-    # Calculate rotation
-    var torque = Vector3(
-        input_vector.y * rotation_speed.x,  # Pitch
-        input_vector.x * rotation_speed.y,  # Yaw
-        Input.get_axis("roll_left", "roll_right") * rotation_speed.z  # Roll
-    )
-    
-    # Apply flight assist if enabled
-    if flight_assist:
-        # Gradually approach target velocity
-        target_velocity = -transform.basis.z * max_speed * input_vector.y
-        current_velocity = current_velocity.lerp(target_velocity, dampening_factor)
-        linear_velocity = current_velocity
-    else:
-        # Direct force application for more realistic physics
-        apply_central_force(thrust)
-    
-    # Apply rotation
-    apply_torque(torque)
-    
-    # Limit maximum speed
-    if linear_velocity.length() > max_speed * (afterburner_active ? afterburner_multiplier : 1.0):
-        linear_velocity = linear_velocity.normalized() * max_speed * (afterburner_active ? afterburner_multiplier : 1.0)
-```
-
-### 2. Weapon Systems
-
-Wing Commander Saga features a variety of weapon types with different behaviors. We'll implement a modular weapon system with specialized classes for each weapon type.
-
-```gdscript
-class_name WeaponSystem
-extends Node3D
-
-signal weapon_fired(weapon_index, weapon_type)
-signal weapon_cycled(new_index, weapon_type)
-signal ammo_changed(current, maximum)
-signal energy_changed(current, maximum)
-
-@export var primary_weapons: Array[Weapon] = []
-@export var secondary_weapons: Array[Weapon] = []
-@export var energy_capacity: float = 100.0
-@export var energy_recharge_rate: float = 10.0
-
-var current_primary: int = 0
-var current_secondary: int = 0
-var primary_linked: bool = false
-var secondary_linked: bool = false
-var current_energy: float = 100.0
-
-func _ready():
-    current_energy = energy_capacity
-    
-    # Initialize weapon hardpoints
-    for weapon in primary_weapons:
-        weapon.initialize(self)
-    
-    for weapon in secondary_weapons:
-        weapon.initialize(self)
-
-func _process(delta):
-    # Recharge energy
-    if current_energy < energy_capacity:
-        current_energy = min(current_energy + energy_recharge_rate * delta, energy_capacity)
-        energy_changed.emit(current_energy, energy_capacity)
-
-func fire_primary():
-    if primary_weapons.size() == 0:
-        return
-        
-    if primary_linked:
-        # Fire all weapons that can fire
-        for weapon in primary_weapons:
-            if weapon.can_fire() and current_energy >= weapon.energy_cost:
-                weapon.fire()
-                current_energy -= weapon.energy_cost
-                energy_changed.emit(current_energy, energy_capacity)
-    else:
-        # Fire only selected weapon
-        var weapon = primary_weapons[current_primary]
-        if weapon.can_fire() and current_energy >= weapon.energy_cost:
-            weapon.fire()
-            current_energy -= weapon.energy_cost
-            energy_changed.emit(current_energy, energy_capacity)
-            weapon_fired.emit(current_primary, "primary")
-
-func fire_secondary():
-    if secondary_weapons.size() == 0:
-        return
-        
-    var weapon = secondary_weapons[current_secondary]
-    if weapon.can_fire():
-        weapon.fire()
-        weapon_fired.emit(current_secondary, "secondary")
-        ammo_changed.emit(weapon.current_ammo, weapon.max_ammo)
-
-func cycle_primary():
-    if primary_weapons.size() <= 1:
-        return
-        
-    current_primary = (current_primary + 1) % primary_weapons.size()
-    weapon_cycled.emit(current_primary, "primary")
-
-func cycle_secondary():
-    if secondary_weapons.size() <= 1:
-        return
-        
-    current_secondary = (current_secondary + 1) % secondary_weapons.size()
-    weapon_cycled.emit(current_secondary, "secondary")
-```
-
-### 3. Weapon Type Implementations
-
-```gdscript
-class_name Weapon
-extends Node3D
-
-@export var weapon_name: String = "Default Weapon"
-@export var damage: float = 10.0
-@export var fire_rate: float = 0.2
-@export var energy_cost: float = 5.0
-@export var range: float = 1000.0
-@export var speed: float = 500.0
-@export var max_ammo: int = -1  # -1 for infinite
-
-var current_ammo: int = -1
-var can_fire: bool = true
-var cooldown_timer: Timer
-var weapon_system: WeaponSystem
-
-func _ready():
-    cooldown_timer = Timer.new()
-    cooldown_timer.one_shot = true
-    add_child(cooldown_timer)
-    cooldown_timer.timeout.connect(_on_cooldown_end)
-    
-    if max_ammo > 0:
-        current_ammo = max_ammo
-
-func initialize(system: WeaponSystem):
-    weapon_system = system
-
-func can_fire() -> bool:
-    return can_fire and (current_ammo > 0 or current_ammo == -1)
-
-func fire():
-    if not can_fire():
-        return
-        
-    _perform_fire()
-    
-    # Start cooldown
-    can_fire = false
-    cooldown_timer.start(fire_rate)
-    
-    # Reduce ammo if applicable
-    if current_ammo > 0:
-        current_ammo -= 1
-
-func _perform_fire():
-    # To be overridden by subclasses
-    pass
-
-func _on_cooldown_end():
-    can_fire = true
-```
-
-```gdscript
-class_name LaserWeapon
-extends Weapon
-
-@export var beam_color: Color = Color(1.0, 0.0, 0.0, 1.0)
-@export var beam_width: float = 0.2
-@export var projectile_scene: PackedScene
-
-func _perform_fire():
-    var projectile = projectile_scene.instantiate()
-    get_tree().root.add_child(projectile)
-    projectile.global_transform = global_transform
-    projectile.damage = damage
-    projectile.speed = speed
-    projectile.range = range
-    projectile.color = beam_color
-    projectile.width = beam_width
-```
-
-```gdscript
-class_name MissileWeapon
-extends Weapon
-
-@export var tracking_strength: float = 0.5
-@export var lock_time: float = 2.0
-@export var projectile_scene: PackedScene
-
-var target: Object = null
-var lock_timer: float = 0.0
-var is_locked: bool = false
-
-func _process(delta):
-    if target:
-        lock_timer += delta
-        if lock_timer >= lock_time:
-            is_locked = true
-
-func set_target(new_target):
-    if new_target != target:
-        target = new_target
-        lock_timer = 0.0
-        is_locked = false
-
-func _perform_fire():
-    var missile = projectile_scene.instantiate()
-    get_tree().root.add_child(missile)
-    missile.global_transform = global_transform
-    missile.damage = damage
-    missile.speed = speed
-    missile.tracking_strength = tracking_strength
-    
-    if is_locked and target:
-        missile.set_target(target)
-```
-
-### 4. Shield System
-
-```gdscript
-class_name ShieldSystem
-extends Node
-
-signal shield_hit(position, strength)
-signal shield_depleted()
-signal shield_recharged()
-
-@export var max_capacity: float = 100.0
-@export var recharge_rate: float = 5.0
-@export var recharge_delay: float = 3.0
-@export var quadrant_count: int = 4  # 0=front, 1=right, 2=back, 3=left
-
-var current_level: float = 100.0
-var quadrant_strength: Array[float] = []
-var last_hit_time: float = 0.0
-
-func _ready():
-    current_level = max_capacity
-    
-    # Initialize quadrants
-    quadrant_strength.resize(quadrant_count)
-    for i in range(quadrant_count):
-        quadrant_strength[i] = max_capacity / quadrant_count
-
-func _process(delta):
-    # Check if enough time has passed since last hit
-    if Time.get_ticks_msec() - last_hit_time > recharge_delay * 1000:
-        # Recharge shields
-        var was_depleted = current_level <= 0
-        
-        current_level = min(current_level + recharge_rate * delta, max_capacity)
-        
-        # Distribute to quadrants
-        for i in range(quadrant_count):
-            quadrant_strength[i] = min(quadrant_strength[i] + (recharge_rate * delta / quadrant_count), max_capacity / quadrant_count)
-        
-        if was_depleted and current_level > 0:
-            shield_recharged.emit()
-
-func absorb_damage(amount: float, position: Vector3) -> float:
-    # Calculate which quadrant was hit
-    var quadrant = get_hit_quadrant(position)
-    
-    # Update last hit time
-    last_hit_time = Time.get_ticks_msec()
-    
-    # Calculate how much damage the shield absorbs
-    var absorbed = min(quadrant_strength[quadrant], amount)
-    
-    # Update shield levels
-    quadrant_strength[quadrant] -= absorbed
-    current_level -= absorbed
-    
-    # Emit signal for visual effects
-    shield_hit.emit(position, absorbed / amount)
-    
-    # Check if shields are depleted
-    if current_level <= 0:
-        shield_depleted.emit()
-    
-    # Return remaining damage that penetrates the shield
-    return amount - absorbed
-
-func get_hit_quadrant(hit_position: Vector3) -> int:
-    # Calculate angle from ship forward to hit position
-    var local_hit = global_transform.basis.z.angle_to(hit_position - global_position)
-    
-    # Convert to quadrant index
-    return int(fmod(local_hit + PI/quadrant_count, 2*PI) / (2*PI/quadrant_count))
-```
-
-### 5. Damage System
-
-```gdscript
-class_name DamageSystem
-extends Node
-
-signal hull_damaged(amount, position)
-signal subsystem_damaged(subsystem_name, amount)
-signal ship_destroyed()
-
-@export var hull_strength: float = 200.0
-@export var armor_rating: float = 0.2  # Damage reduction percentage
-@export var critical_threshold: float = 0.25  # Hull percentage where critical hits start
-
-var current_hull: float = 200.0
-var subsystems: Dictionary = {}  # name -> integrity
-
-func _ready():
-    current_hull = hull_strength
-    
-    # Initialize subsystems
-    for child in get_children():
-        if child is ShipSubsystem:
-            subsystems[child.name] = child.integrity
-
-func take_damage(amount: float, damage_type: String, position: Vector3 = Vector3.ZERO):
-    # Apply armor reduction
-    var effective_damage = amount * (1.0 - armor_rating)
-    
-    # Apply damage to hull
-    current_hull -= effective_damage
-    hull_damaged.emit(effective_damage, position)
-    
-    # Check for critical hits
-    if current_hull / hull_strength <= critical_threshold:
-        apply_critical_hit(damage_type)
-    
-    # Check if destroyed
-    if current_hull <= 0:
-        current_hull = 0
-        ship_destroyed.emit()
-
-func apply_critical_hit(damage_type: String):
-    # Random chance to damage a subsystem
-    if randf() < 0.3:  # 30% chance
-        var subsystem_keys = subsystems.keys()
-        if subsystem_keys.size() > 0:
-            var random_subsystem = subsystem_keys[randi() % subsystem_keys.size()]
-            damage_subsystem(random_subsystem, 10.0 + randf() * 20.0)  # 10-30 damage
-
-func damage_subsystem(subsystem_name: String, amount: float):
-    if subsystems.has(subsystem_name):
-        var subsystem = get_node(subsystem_name)
-        if subsystem is ShipSubsystem:
-            subsystem.take_damage(amount)
-            subsystem_damaged.emit(subsystem_name, amount)
-```
-
-## Godot Implementation Structure
+### C. Outline Target Godot Project Structure
 
 ```
-scenes/ships/
-├── base_ship.tscn                # Base ship scene template
-├── fighter/                      # Fighter-class ships
-│   ├── arrow.tscn
-│   ├── rapier.tscn
+wcsaga_godot/
+├── resources/
+│   ├── ships/              # ShipData resources (.tres)
+│   │   ├── hercules.tres
+│   │   └── ...
+│   ├── weapons/            # WeaponData resources (.tres)
+│   │   ├── laser_light.tres
+│   │   ├── missile_heatseeker.tres
+│   │   ├── beam_cannon.tres
+│   │   └── ...
+│   ├── subsystems/         # (Optional) SubsystemData resources if needed separately
+│   ├── armor/              # ArmorData resources (.tres)
+│   └── effects/            # Resources for effects (particle materials, etc.)
+├── scenes/
+│   ├── ships_weapons/      # Ship and Weapon scenes (.tscn)
+│   │   ├── base_ship.tscn
+│   │   ├── hercules.tscn
+│   │   ├── components/
+│   │   │   ├── weapon_hardpoint.tscn
+│   │   │   ├── turret_base.tscn
+│   │   │   └── engine_nozzle.tscn
+│   │   ├── projectiles/
+│   │   │   ├── projectile_base.tscn
+│   │   │   ├── laser_projectile.tscn
+│   │   │   └── missile_projectile.tscn
+│   │   └── weapons/ # Scenes for complex weapons like beams
+│   │       └── beam_weapon_visual.tscn
+│   ├── effects/            # Effect scenes (.tscn)
+│   │   ├── explosion_medium.tscn
+│   │   ├── shield_impact.tscn
+│   │   ├── muzzle_flash.tscn
+│   │   ├── shockwave.tscn
+│   │   ├── warp_effect.tscn
+│   │   └── spark_effect.tscn
 │   └── ...
-├── bomber/                       # Bomber-class ships
-│   ├── longbow.tscn
+├── scripts/
+│   ├── ship_weapon_systems/ # Main component scripts
+│   │   ├── ship_base.gd          # Base ship logic, physics integration, state
+│   │   ├── weapon_system.gd      # Manages weapon banks, firing, energy/ammo
+│   │   ├── shield_system.gd      # Manages shield state, recharge, damage absorption
+│   │   ├── damage_system.gd      # Applies damage, handles hull/subsystem integrity
+│   │   ├── engine_system.gd      # Handles afterburner logic, potentially thrust effects
+│   │   ├── subsystems/           # Subsystem logic
+│   │   │   ├── ship_subsystem.gd   # Base subsystem state
+│   │   │   ├── turret_subsystem.gd # Turret aiming, firing control
+│   │   │   ├── engine_subsystem.gd # Engine specific logic/effects
+│   │   │   └── sensor_subsystem.gd # Sensor/AWACS logic
+│   │   ├── weapons/              # Weapon instance logic
+│   │   │   ├── weapon.gd           # Base weapon logic (cooldown)
+│   │   │   ├── laser_weapon.gd
+│   │   │   ├── missile_weapon.gd
+│   │   │   ├── beam_weapon.gd
+│   │   │   ├── flak_weapon.gd
+│   │   │   ├── emp_weapon.gd
+│   │   │   ├── swarm_weapon.gd
+│   │   │   └── corkscrew_weapon.gd
+│   │   └── projectiles/          # Projectile logic
+│   │       ├── projectile_base.gd  # Movement, lifetime, collision
+│   │       ├── laser_projectile.gd
+│   │       └── missile_projectile.gd # Homing logic
+│   ├── resources/          # Scripts defining custom Resource types
+│   │   ├── ship_data.gd
+│   │   ├── weapon_data.gd
+│   │   ├── subsystem_data.gd # (If needed)
+│   │   └── armor_data.gd
+│   ├── effects/            # Scripts for managing effects
+│   │   ├── explosion_manager.gd  # Singleton/Autoload
+│   │   ├── shockwave_manager.gd  # Singleton/Autoload
+│   │   ├── trail_manager.gd      # Singleton/Autoload
+│   │   ├── muzzle_flash_manager.gd # Singleton/Autoload
+│   │   ├── warp_effect_manager.gd # Singleton/Autoload
+│   │   └── spark_manager.gd      # Singleton/Autoload
 │   └── ...
-├── capital/                      # Capital ships
-│   ├── carrier.tscn
+├── shaders/
+│   ├── shield_impact.gdshader
+│   ├── cloak.gdshader
+│   └── engine_wash.gdshader
 │   └── ...
-└── components/                   # Reusable ship components
-    ├── weapon_hardpoint.tscn
-    ├── engine_exhaust.tscn
-    └── ...
-
-scripts/ship/
-├── ship_base.gd                  # Base ship class
-├── ship_types/                   # Ship type specializations
-│   ├── fighter_ship.gd
-│   ├── bomber_ship.gd
-│   └── capital_ship.gd
-├── systems/                      # Ship systems
-│   ├── weapon_system.gd
-│   ├── shield_system.gd
-│   ├── engine_system.gd
-│   ├── damage_system.gd
-│   └── power_system.gd
-├── subsystems/                   # Ship subsystems
-│   ├── ship_subsystem.gd
-│   ├── engine_subsystem.gd
-│   ├── weapon_subsystem.gd
-│   └── ...
-└── physics/                      # Physics implementations
-    ├── flight_model.gd
-    └── inertia_dampener.gd
-
-scripts/weapon/
-├── weapon.gd                     # Base weapon class
-├── weapon_types/                 # Weapon specializations
-│   ├── laser_weapon.gd
-│   ├── missile_weapon.gd
-│   ├── beam_weapon.gd
-│   └── special_weapons/
-│       ├── emp_weapon.gd
-│       ├── flak_weapon.gd
-│       └── ...
-├── projectiles/                  # Projectile implementations
-│   ├── projectile_base.gd
-│   ├── laser_projectile.gd
-│   ├── missile_projectile.gd
-│   └── ...
-└── effects/                      # Weapon visual effects
-    ├── muzzle_flash.gd
-    ├── impact_effect.gd
-    └── trail_effect.gd
-
-resources/ships/
-├── ship_templates/               # Ship configuration resources
-│   ├── fighter_template.tres
-│   ├── bomber_template.tres
-│   └── ...
-└── weapon_templates/             # Weapon configuration resources
-    ├── laser_template.tres
-    ├── missile_template.tres
-    └── ...
 ```
 
-## Conversion Challenges and Solutions
+### D. Identify Important Methods, Classes, and Data Structures
 
-1. **Physics Model**
-   - **Challenge**: Wing Commander Saga uses a custom physics implementation that balances realism with arcade-style gameplay.
-   - **Godot Approach**: Use RigidBody3D as a base, but implement a custom physics layer to handle the specific flight model behaviors.
-   - **Solution**: Create a hybrid system that uses Godot's physics for basic collisions but overrides velocity and rotation calculations to match the original game's feel.
+*   **C++ Structs/Classes:**
+    *   `ship`: Runtime ship state. -> `ShipBase.gd` properties.
+    *   `ship_info`: Static ship data. -> `ShipData.tres` resource.
+    *   `ship_weapon`: Runtime weapon bank state. -> `WeaponSystem.gd` properties.
+    *   `weapon`: Runtime projectile state. -> `ProjectileBase.gd` properties.
+    *   `weapon_info`: Static weapon data. -> `WeaponData.tres` resource.
+    *   `ship_subsys`: Runtime subsystem state. -> `ShipSubsystem.gd` properties.
+    *   `model_subsystem`: Static subsystem data. -> Defined within `ShipData.tres`.
+    *   `ArmorType`: Damage resistance. -> `ArmorData.tres` resource.
+    *   `shockwave_create_info`: Shockwave parameters. -> Properties within `WeaponData.tres` or passed to `ShockwaveManager`.
+    *   `trail_info`: Trail parameters. -> Properties within `WeaponData.tres` or passed to `TrailManager`.
+    *   `mflash_info`: Muzzle flash definition. -> Properties within `WeaponData.tres` or passed to `MuzzleFlashManager`.
+    *   `beam_info`, `beam_weapon_info`, `beam_weapon_section_info`: Beam specifics. -> Properties within `WeaponData.tres`.
+    *   `cscrew_info`: Corkscrew state. -> Managed within `CorkscrewWeapon.gd` or `MissileProjectile.gd`.
+    *   `swarm_info`, `turret_swarm_info`: Swarm state. -> Managed within `SwarmWeapon.gd` or `MissileProjectile.gd`.
+    *   `WarpEffect` (and derived): Warp logic/visuals. -> `WarpEffect.tscn` scene with `WarpEffect.gd` script, managed by `WarpEffectManager.gd`.
+*   **C++ Key Functions:**
+    *   `weapon_create()`: -> `WeaponSystem.gd` instantiates projectile scenes.
+    *   `weapon_hit()`: -> Collision handling logic in `ProjectileBase.gd` or `CollisionHandler.gd`, calls `DamageSystem.apply_damage`.
+    *   `weapon_process_post()`: -> `_physics_process()` in `ProjectileBase.gd` (lifetime, homing).
+    *   `weapon_home()`: -> Homing logic within `MissileProjectile.gd`.
+    *   `ship_apply_local_damage()`, `ship_apply_global_damage()`: -> `DamageSystem.apply_damage()`.
+    *   `do_subobj_hit_stuff()`: -> Damage distribution logic within `DamageSystem.gd`.
+    *   `do_subobj_destroyed_stuff()`: -> Subsystem destruction logic in `ShipSubsystem.gd` or `DamageSystem.gd`, triggers effects.
+    *   `apply_damage_to_shield()`: -> `ShieldSystem.absorb_damage()`.
+    *   `afterburners_start()`, `afterburners_stop()`, `afterburners_update()`: -> Methods in `EngineSystem.gd` or `ShipBase.gd`.
+    *   `beam_fire()`, `beam_move_all_post()`, `beam_render_all()`: -> Logic within `BeamWeapon.gd` and potentially a `BeamVisual.tscn/gd`.
+    *   `shockwave_create()`, `shockwave_move_all()`: -> `ShockwaveManager.create_shockwave()`, logic within `Shockwave.gd`.
+    *   `shipfx_warpin_start()`, `shipfx_warpout_start()`, `shipfx_..._frame()`: -> `WarpEffectManager.create_warp_in/out()`, logic within `WarpEffect.gd`.
+    *   `shipfx_cloak_frame()`, `shipfx_start_cloak()`, `shipfx_stop_cloak()`: -> Methods in `ShipBase.gd` controlling cloak shader/state.
+    *   `awacs_get_level()`: -> Method in `SensorSubsystem.gd` or global utility.
+    *   `trail_create()`, `trail_move_all()`, `trail_render_all()`: -> `TrailManager.create_trail()`, logic within trail node scripts.
+    *   `mflash_create()`: -> `MuzzleFlashManager.create_flash()`.
 
-2. **Weapon Effects**
-   - **Challenge**: The original game has complex particle systems for weapon effects, trails, and impacts.
-   - **Godot Approach**: Use Godot's GPU Particles3D system combined with Line3D for beam weapons.
-   - **Solution**: Create a library of particle effects that can be instantiated and configured for different weapon types, with parameters exposed for easy tweaking.
+### E. Identify Relations
 
-3. **Damage System**
-   - **Challenge**: Wing Commander Saga has a complex subsystem damage model with cascading failures.
-   - **Godot Approach**: Implement a hierarchical node structure with ShipSubsystem nodes as children of the main ship.
-   - **Solution**: Create a damage propagation system that can affect parent systems when subsystems fail, with event signals to trigger visual and gameplay effects.
+*   **ShipBase** integrates **Physics** (`_integrate_forces`), manages child **Systems** (Weapon, Shield, Damage, Engine), holds **Subsystems**, and references **ShipData**.
+*   **WeaponSystem** manages **Weapon** instances (hardpoints), interacts with **ShipBase** for energy/ammo, and instantiates **Projectiles**. Reads **WeaponData**.
+*   **DamageSystem** receives hit info (from **Projectiles** or **CollisionHandler**), interacts with **ShieldSystem**, applies damage to **ShipBase** (hull) and **ShipSubsystems**. Reads **ArmorData**.
+*   **ShieldSystem** absorbs damage, manages quadrants, recharges. Interacts with **ShipBase** for energy. Visuals controlled via shaders.
+*   **EngineSystem** handles afterburner state, interacts with **ShipBase** for fuel/energy and physics modifications. Triggers **Effects** (engine glow/wash).
+*   **Projectiles** handle their own movement (**Physics**), lifetime, homing (**AI**/**Targeting**), collision detection (**Physics**), and trigger **Effects** (impacts, trails) and **Damage** application. Read **WeaponData**.
+*   **Effects Managers** (Explosion, Shockwave, Trail, etc.) are called by various systems (Weapons, Projectiles, DamageSystem) to instantiate visual/audio effects scenes.
+*   **AI System** interacts with **WeaponSystem** (firing decisions), **Targeting** (selecting targets/subsystems), **ShipBase** (movement commands), and potentially **ShieldSystem** (smart shield management). Reads **AIProfile**.
+*   **Model System** provides the visual meshes and structure referenced by **ShipBase**, **Subsystems**, and **Projectiles**. `Marker3D`s define mount points. `AnimationPlayer` handles submodel movement.
+*   **Core Systems** manage object lifecycle and the main game loop driving updates.
 
-4. **Missile Guidance**
-   - **Challenge**: The original game has sophisticated missile guidance algorithms with different seeker types.
-   - **Godot Approach**: Implement custom guidance behaviors using Godot's physics system.
-   - **Solution**: Create a modular missile guidance system with different seeker components that can be mixed and matched.
+## 5. Conversion Strategy Notes
 
-5. **Shield Visualization**
-   - **Challenge**: Shield impacts need to show at the correct position on a spherical shield.
-   - **Godot Approach**: Use shader-based effects for shield visualization.
-   - **Solution**: Create a custom shader that can show impacts at specific world-space positions on a spherical shield mesh.
+*   **Data-Driven Design:** Rely heavily on Godot `Resource` files (`ShipData`, `WeaponData`, `ArmorData`, etc.) to define ship and weapon properties. This makes balancing and modification easier than hardcoding values.
+*   **Component-Based:** Use Godot nodes as components (`WeaponSystem`, `ShieldSystem`, `DamageSystem`, `EngineSystem`, `TurretSubsystem`) attached to the main `ShipBase` scene.
+*   **Physics:** Use `RigidBody3D` but implement `_integrate_forces` in `ShipBase.gd` (or a dedicated `FlightModel.gd`) to precisely replicate the FS2 flight model, reading parameters from `ShipData`.
+*   **Weapons:** Create a base `Weapon.gd` script for hardpoints and derive specific types. Projectiles should be separate scenes with their own logic.
+*   **Effects:** Use Godot's particle systems (`GPUParticles3D`), shaders (`ShaderMaterial`), and `AnimationPlayer`. Create reusable effect scenes managed by Singleton managers.
+*   **Subsystems:** Represent subsystems as nodes within the ship hierarchy. Link their state (health, disruption) to the main `ShipBase.gd` script. Turrets need specific aiming and firing logic (`TurretSubsystem.gd`).
+*   **Signals:** Use signals extensively for communication between systems (e.g., `Projectile.collided`, `DamageSystem.hull_damaged`, `ShieldSystem.shield_depleted`, `WeaponSystem.weapon_fired`).
 
-6. **Special Weapon Effects**
-   - **Challenge**: Special weapons like EMP, flak, and beam weapons have unique behaviors.
-   - **Godot Approach**: Combine Godot's particle systems with custom code for special effects.
-   - **Solution**: Create specialized weapon classes that handle their unique behaviors and visual effects.
+## 6. Testing Strategy (Refined)
 
-## Testing Strategy
+1.  **Flight Model Tests:** Verify acceleration, max speed (forward/reverse), rotation rates, damping, afterburner thrust/fuel mechanics against `ship_info` and `physics_info` data for multiple ship classes. Test glide mode (`PF_GLIDING`).
+2.  **Weapon System Tests:** Test firing rates (`fire_wait`), energy consumption (`energy_consumed`), ammo usage, weapon linking (`SF_PRIMARY_LINKED`), cycling for all weapon types defined in `WeaponData`. Verify projectile creation.
+3.  **Projectile Tests:** Test projectile speed (`max_speed`), lifetime (`lifetime`), range, collision detection, homing logic (aspect, heat, javelin - `WIF_HOMING_*`), swarm/corkscrew behavior (`WIF_SWARM`, `WIF_CORKSCREW`), arming time/distance (`arm_time`, `arm_dist`).
+4.  **Damage System Tests:** Test shield absorption (`apply_damage_to_shield`), quadrant mapping, recharge. Test hull damage application, including armor reduction (`ArmorType`, `armor_factor`). Test subsystem damage distribution (`do_subobj_hit_stuff`) and destruction effects. Verify damage types.
+5.  **Subsystem Tests:** Test turret tracking/firing (`TurretSubsystem.gd`), engine functionality/failure, sensor disruption (link to HUD/Radar), AWACS range/effect (`awacs_get_level`).
+6.  **Effects Tests:** Verify muzzle flashes (`mflash_create`), trails (`trail_create`), shield impacts (`do_shield_effect`), sparks (`shipfx_emit_spark`), explosions (`fireball_create`), shockwaves (`shockwave_create`), warp (`shipfx_warpin_start`), and cloak visuals/audio match descriptions and trigger correctly.
+7.  **Integration Tests:** Combine ships, weapons, AI, and effects in combat scenarios. Test ship-ship collisions, weapon impacts, subsystem targeting, and ship destruction sequences.
 
-1. **Flight Model Tests**
-   - **Basic Movement**: Verify acceleration, deceleration, and top speed match original game
-   - **Rotation Control**: Test pitch, yaw, and roll rates against reference values
-   - **Afterburner**: Validate thrust increase, fuel consumption, and recharge rates
-   - **Inertia**: Confirm that ships maintain momentum appropriately
-   - **Ship-Specific Handling**: Ensure each ship class has distinct handling characteristics
+## 7. Next Steps
 
-2. **Weapon System Tests**
-   - **Firing Mechanics**: Test fire rates, energy consumption, and ammo tracking
-   - **Weapon Linking**: Verify linked weapon groups fire correctly
-   - **Projectile Physics**: Test projectile speed, range, and collision detection
-   - **Damage Application**: Confirm damage values are applied correctly to targets
-   - **Special Weapons**: Test unique weapon behaviors like EMP effects
-
-3. **Damage System Tests**
-   - **Shield Mechanics**: Test shield absorption, quadrant damage, and recharge
-   - **Hull Damage**: Verify hull damage calculations and armor reduction
-   - **Subsystem Damage**: Test progressive damage to ship subsystems
-   - **Critical Hits**: Verify critical hit chances and effects
-   - **Destruction Sequence**: Test ship destruction effects and game state changes
-
-4. **Combat AI Tests**
-   - **Target Selection**: Verify AI prioritizes targets appropriately
-   - **Attack Patterns**: Test different attack behaviors for fighter vs capital ships
-   - **Evasive Maneuvers**: Confirm AI can dodge incoming fire
-   - **Formation Flying**: Test wing formations and coordinated attacks
-   - **Wingman Commands**: Test AI response to player commands
-
-5. **Performance Tests**
-   - **Frame Rate**: Measure performance with multiple ships and weapons
-   - **Memory Usage**: Monitor memory consumption during extended gameplay
-   - **Physics Load**: Test physics performance in large-scale battles
-   - **Particle Effects**: Verify particle system performance with many effects
-
-## Migration Tools
-
-```python
-def convert_ship_data(ship_table_path, output_dir):
-    """Convert ship table data to Godot resource files"""
-    ship_data = parse_ship_table(ship_table_path)
-    
-    for ship in ship_data:
-        resource = ShipResource.new()
-        resource.ship_class = ship['name']
-        resource.max_speed = ship['max_speed']
-        resource.acceleration = ship['accel']
-        
-        output_path = os.path.join(output_dir, f"{ship['name']}.tres")
-        ResourceSaver.save(resource, output_path)
-```
-
-## Next Steps
-
-1. Implement base ship physics
-2. Create weapon system framework
-3. Develop damage model
-4. Build testing scenarios
-5. Create ship data converter
+1.  Define and implement `ShipData.tres` and `WeaponData.tres` resource structures and associated `.gd` scripts.
+2.  Implement the base `ShipBase.gd` script with `_integrate_forces` for the core flight model.
+3.  Implement `WeaponSystem.gd` and base `Weapon.gd` / `ProjectileBase.gd` scripts.
+4.  Implement `ShieldSystem.gd` and `DamageSystem.gd`.
+5.  Create basic laser weapon and projectile implementation.
+6.  Develop test scenes for flight model validation and basic weapon firing/impact.
