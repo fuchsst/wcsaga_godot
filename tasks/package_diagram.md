@@ -61,10 +61,12 @@ packageDiagram
         }
 
         package "AI System" as AI {
-            component "AIController (Node)" # (01) Main AI logic per ship
-            component "BehaviorTree/StateMachine (LimboAI)" # (01) AI decision making structure
-            component "TargetingSystem (Node/Helper)" # (01) Target selection logic, aspect lock
-            component "Navigation (NavigationAgent3D)" # (01) Pathfinding, avoidance logic
+            component "AIController (Node)" # (01) Main AI logic per ship, orchestrates components
+            component "PerceptionComponent (Node)" # (01) Handles sensing, target finding, threat assessment
+            component "BehaviorTree/StateMachine (LimboAI)" # (01) AI decision making structure (reads Blackboard)
+            component "Blackboard (Resource)" # (01) Shared data between AIController and BT
+            component "TargetingSystem (Node/Helper)" # (01) Target selection logic, aspect lock (Potentially part of Perception)
+            component "Navigation (NavigationAgent3D)" # (01) Pathfinding, avoidance logic (Potentially separate component/node)
             component "GoalManager (Node/Helper)" # (01) AI objective handling (integrates with Mission goals)
             component "AIProfile (Resource)" # (01) AI behavior parameters
         }
@@ -188,10 +190,12 @@ packageDiagram
 
     AI --> Core : Accesses Game State, Objects, PlayerData
     AI --> Physics : Controls Movement (via ShipWeapon)
-    AI --> ShipWeapon : Controls Weapons, Targeting
+    AI --> ShipWeapon : Controls Weapons, Targeting, Reads Status
     AI --> Mission : Receives Goals, Sends Messages
     AI --> Scripting : Uses Variables, Evaluates Conditions
     AI --> ControlsCamera : Engages Autopilot
+    AI --> Core : Accesses ObjectManager, IFFManager
+    AI --> Physics : Reads Object Transforms, Controls Movement (indirectly)
 
     Mission --> Core : Manages Game State, Objects, Scoring
     Mission --> ShipWeapon : Spawns Ships/Weapons

@@ -10,5 +10,6 @@ func _tick() -> Status:
 	blackboard.set_var("deploy_countermeasure", true)
 
 	# This action completes immediately.
-	# Note: The ship/AIController should handle cooldowns for countermeasures.
+	# Note: The ship/AIController should handle cooldowns (CMEASURE_WAIT)
+	# and success/failure logic for countermeasures.
 	return SUCCESS

@@ -3,6 +3,9 @@
 class_name AIGoal
 extends Resource
 
+# Preload constants for easy access
+const AIConst = preload("res://scripts/globals/ai_constants.gd")
+
 # Goal Type (Source) - Mirrored from AIG_TYPE_*
 enum GoalSource {
 	EVENT_SHIP = 1,
@@ -26,35 +29,33 @@ enum GoalFlags {
 }
 
 # Goal Mode (Action) - Mirrored from AI_GOAL_*
-# Using a subset for clarity, map others as needed
-# Note: These values are bitflags in the original C++, but using an enum here
-# for clarity. Mapping might need adjustment if bitwise operations were used.
+# Using an enum for clarity. Values match the original bitflags for potential compatibility.
 enum GoalMode {
 	NONE = 0,
-	CHASE = 1, # AI_GOAL_CHASE (1 << 1)
-	DOCK = 2, # AI_GOAL_DOCK (1 << 2)
-	WAYPOINTS = 3, # AI_GOAL_WAYPOINTS (1 << 3)
-	WAYPOINTS_ONCE = 4, # AI_GOAL_WAYPOINTS_ONCE (1 << 4)
-	WARP = 5, # AI_GOAL_WARP (1 << 5)
-	DESTROY_SUBSYSTEM = 6, # AI_GOAL_DESTROY_SUBSYSTEM (1 << 6)
-	FORM_ON_WING = 7, # AI_GOAL_FORM_ON_WING (1 << 7)
-	UNDOCK = 8, # AI_GOAL_UNDOCK (1 << 8)
-	CHASE_WING = 9, # AI_GOAL_CHASE_WING (1 << 9)
-	GUARD = 10, # AI_GOAL_GUARD (1 << 10)
-	DISABLE_SHIP = 11, # AI_GOAL_DISABLE_SHIP (1 << 11)
-	DISARM_SHIP = 12, # AI_GOAL_DISARM_SHIP (1 << 12)
-	CHASE_ANY = 13, # AI_GOAL_CHASE_ANY (1 << 13)
-	IGNORE = 14, # AI_GOAL_IGNORE (1 << 14)
-	GUARD_WING = 15, # AI_GOAL_GUARD_WING (1 << 15)
-	EVADE_SHIP = 16, # AI_GOAL_EVADE_SHIP (1 << 16)
-	STAY_NEAR_SHIP = 17, # AI_GOAL_STAY_NEAR_SHIP (1 << 17)
-	KEEP_SAFE_DISTANCE = 18, # AI_GOAL_KEEP_SAFE_DISTANCE (1 << 18)
-	REARM_REPAIR = 19, # AI_GOAL_REARM_REPAIR (1 << 19)
-	STAY_STILL = 20, # AI_GOAL_STAY_STILL (1 << 20)
-	PLAY_DEAD = 21, # AI_GOAL_PLAY_DEAD (1 << 21)
-	CHASE_WEAPON = 22, # AI_GOAL_CHASE_WEAPON (1 << 22)
-	FLY_TO_SHIP = 23, # AI_GOAL_FLY_TO_SHIP (1 << 23)
-	IGNORE_NEW = 24 # AI_GOAL_IGNORE_NEW (1 << 24)
+	CHASE = 1 << 1,
+	DOCK = 1 << 2,
+	WAYPOINTS = 1 << 3,
+	WAYPOINTS_ONCE = 1 << 4,
+	WARP = 1 << 5,
+	DESTROY_SUBSYSTEM = 1 << 6,
+	FORM_ON_WING = 1 << 7,
+	UNDOCK = 1 << 8,
+	CHASE_WING = 1 << 9,
+	GUARD = 1 << 10,
+	DISABLE_SHIP = 1 << 11,
+	DISARM_SHIP = 1 << 12,
+	CHASE_ANY = 1 << 13,
+	IGNORE = 1 << 14,
+	GUARD_WING = 1 << 15,
+	EVADE_SHIP = 1 << 16,
+	STAY_NEAR_SHIP = 1 << 17,
+	KEEP_SAFE_DISTANCE = 1 << 18,
+	REARM_REPAIR = 1 << 19,
+	STAY_STILL = 1 << 20,
+	PLAY_DEAD = 1 << 21,
+	CHASE_WEAPON = 1 << 22,
+	FLY_TO_SHIP = 1 << 23,
+	IGNORE_NEW = 1 << 24 # Newer temporary ignore
 }
 
 # --- Goal Properties ---
@@ -70,9 +71,13 @@ enum GoalMode {
 # Stores the *name* of the target (ship, wing, waypoint list) as parsed from mission file.
 # Runtime systems will resolve this name to an actual object/path reference.
 @export var target_name: String = ""
+# Original C++ used ship_name_index for optimization, less critical here.
+# var ship_name_index: int = -1
 
 # Waypoint Goal Info
-# @export var waypoint_list_name: String = "" # Use if ai_mode is WAYPOINTS* - Covered by target_name
+# Covered by target_name for WAYPOINTS* modes.
+# Original C++ used wp_index for the list index, we can resolve from target_name.
+# var wp_index: int = -1
 
 # Weapon Goal Info
 @export var weapon_target_signature: int = -1 # If ai_mode is CHASE_WEAPON
@@ -92,8 +97,8 @@ var subsystem_node: Node = null # Runtime reference
 
 # Runtime state (not exported, managed by AIGoalManager/AIController)
 var is_active: bool = false
-var is_completed: bool = false
-var is_failed: bool = false
+var is_completed: bool = false # Added for potential use
+var is_failed: bool = false # Added for potential use
 
 func _init():
 	# Assign a default invalid signature. A unique one will be assigned by AIGoalManager.
@@ -116,21 +121,24 @@ func has_flag(flag_enum: GoalFlags) -> bool:
 	# Helper to check if a specific flag is set using the GoalFlags enum.
 	return (flags & flag_enum) != 0
 
+# --- Convenience Getters ---
+# These help interpret the target_name based on the goal mode.
+
 func get_target_ship_name() -> String:
-	# Convenience function, assumes target_name holds a ship name for relevant modes.
+	# Returns target_name if the mode implies a ship target.
 	match ai_mode:
 		GoalMode.CHASE, GoalMode.DOCK, GoalMode.DESTROY_SUBSYSTEM, \
 		GoalMode.FORM_ON_WING, GoalMode.UNDOCK, GoalMode.GUARD, \
 		GoalMode.DISABLE_SHIP, GoalMode.DISARM_SHIP, GoalMode.IGNORE, \
 		GoalMode.IGNORE_NEW, GoalMode.EVADE_SHIP, GoalMode.STAY_NEAR_SHIP, \
-		GoalMode.KEEP_SAFE_DISTANCE, GoalMode.REARM_REPAIR, GoalMode.STAY_STILL, \
+		GoalMode.REARM_REPAIR, GoalMode.STAY_STILL, \
 		GoalMode.FLY_TO_SHIP:
 			return target_name
 		_:
 			return ""
 
 func get_target_wing_name() -> String:
-	# Convenience function, assumes target_name holds a wing name for relevant modes.
+	# Returns target_name if the mode implies a wing target.
 	match ai_mode:
 		GoalMode.CHASE_WING, GoalMode.GUARD_WING:
 			return target_name
@@ -138,7 +146,7 @@ func get_target_wing_name() -> String:
 			return ""
 
 func get_target_waypoint_list_name() -> String:
-	# Convenience function, assumes target_name holds a waypoint list name for relevant modes.
+	# Returns target_name if the mode implies a waypoint list target.
 	match ai_mode:
 		GoalMode.WAYPOINTS, GoalMode.WAYPOINTS_ONCE:
 			return target_name

@@ -132,6 +132,7 @@ wcsaga_godot/
 ├── scripts/                # GDScript files, organized by component
 │   ├── ai/                 # AIController, AI behaviors, targeting, pathfinding, AIProfile script (See 01_ai.md)
 │   │   ├── ai_controller.gd         # Main AI logic node script attached to ships
+│   │   ├── perception_component.gd  # Handles sensing environment, targets, threats
 │   │   ├── ai_state_machine.gd    # State machine implementation (or use LimboAI BTState)
 │   │   ├── ai_behavior_tree.gd    # Base/helper for LimboAI BehaviorTree resources
 │   │   ├── ai_blackboard.gd       # LimboAI blackboard resource script
@@ -150,15 +151,98 @@ wcsaga_godot/
 │   │   ├── camera_manager.gd        # Manages camera creation, switching, lookup logic (See 12_controls_and_camera.md)
 │   │   ├── subtitle_manager.gd      # Manages subtitle queue and display logic (See 12_controls_and_camera.md)
 │   │   └── autopilot_manager.gd     # Manages autopilot state, engagement, NavPoints logic (See 12_controls_and_camera.md)
-│   ├── ship_weapon_systems/ # ShipBase, WeaponSystem, DamageSystem, ShieldSystem, Subsystem logic, Weapon types, Projectiles (See 05_ship_weapon_systems.md)
+│   ├── ship/                 # Ship logic and core components (See 05_ship_weapon_systems.md)
 │   │   ├── ship_base.gd             # Base ship logic, physics integration, state management script
+│   │   │   ├── func take_damage(hit_pos: Vector3, amount: float, killer_obj_id: int = -1, damage_type_key = -1, hit_subsystem: Node = null)
+│   │   │   ├── func fire_primary_weapons()
+│   │   │   ├── func fire_secondary_weapons()
+│   │   │   ├── func engage_afterburner()
+│   │   │   ├── func disengage_afterburner()
+│   │   │   ├── func start_destruction_sequence(killer_obj_id: int)
+│   │   │   ├── func apply_emp_effect(intensity: float, time: float)
+│   │   │   ├── func shipfx_start_cloak(warmup_ms: int = 5000, recalc_matrix: bool = true, device_cloak: bool = false)
+│   │   │   ├── func shipfx_stop_cloak(warmdown_ms: int = 5000)
+│   │   │   ├── func shipfx_cloak_frame(delta: float)
+│   │   │   ├── func shipfx_warpin_start()
+│   │   │   ├── func shipfx_warpin_frame(delta: float)
+│   │   │   ├── func shipfx_warpout_start()
+│   │   │   └── func shipfx_warpout_frame(delta: float)
+│   │   ├── player_ship.gd           # Player-specific ship logic script
 │   │   ├── weapon_system.gd         # Manages weapon banks, firing, energy/ammo logic script
+│   │   │   ├── func initialize_from_ship_data(ship_data: ShipData)
+│   │   │   ├── func can_fire_primary(bank_index: int) -> bool
+│   │   │   ├── func fire_primary(force: bool = false, bank_index_override: int = -1) -> bool
+│   │   │   ├── func can_fire_secondary(bank_index: int) -> bool
+│   │   │   ├── func fire_secondary(allow_swarm: bool = false, bank_index_override: int = -1) -> bool
+│   │   │   ├── func select_next_primary() -> int
+│   │   │   ├── func select_next_secondary() -> int
+│   │   │   ├── func get_primary_ammo_pct(bank_index: int) -> float
+│   │   │   ├── func get_secondary_ammo_pct(bank_index: int) -> float
+│   │   │   └── func get_weapon_energy_pct() -> float
 │   │   ├── shield_system.gd         # Manages shield state, recharge, damage absorption logic script
+│   │   │   ├── func initialize_from_ship_data(ship_data: ShipData)
+│   │   │   ├── func absorb_damage(quadrant: int, damage: float, damage_type_key = -1) -> float
+│   │   │   ├── func get_quadrant_strength(quadrant: int) -> float
+│   │   │   ├── func get_total_strength() -> float
+│   │   │   ├── func get_max_strength_per_quadrant() -> float
+│   │   │   ├── func is_quadrant_up(quadrant: int) -> bool
+│   │   │   └── func get_quadrant_from_local_pos(local_pos: Vector3) -> int
 │   │   ├── damage_system.gd         # Applies damage, handles hull/subsystem integrity logic script
+│   │   │   ├── func initialize_from_ship_data(ship_data: ShipData)
+│   │   │   ├── func apply_local_damage(hit_pos: Vector3, damage: float, killer_obj_id: int = -1, damage_type_key = -1, hit_subsystem: Node = null)
+│   │   │   ├── func apply_global_damage(damage: float, killer_obj_id: int = -1, damage_type_key = -1)
+│   │   │   └── func get_damage_sources() -> Dictionary
 │   │   ├── engine_system.gd         # Handles afterburner logic, potentially thrust effects script
-│   │   ├── subsystems/              # Subsystem logic scripts (ship_subsystem, turret_subsystem, engine_subsystem, sensor_subsystem)
-│   │   ├── weapons/                 # Weapon instance logic scripts (weapon, laser_weapon, missile_weapon, beam_weapon, etc.)
-│   │   └── projectiles/             # Projectile logic scripts (projectile_base, laser_projectile, missile_projectile)
+│   │   │   ├── func initialize_from_ship_data(ship_data: ShipData)
+│   │   │   ├── func start_afterburner()
+│   │   │   ├── func stop_afterburner(key_released: bool = false)
+│   │   │   └── func get_afterburner_fuel_pct() -> float
+│   │   └── subsystems/              # Subsystem logic scripts
+│   │       ├── ship_subsystem.gd    # Base subsystem state script
+│   │       │   ├── func initialize_from_definition(definition: ShipData.SubsystemDefinition)
+│   │       │   ├── func take_damage(amount: float, damage_type_key = -1) -> float
+│   │       │   ├── func disrupt(duration_ms: int)
+│   │       │   ├── func destroy_subsystem()
+│   │       │   ├── func get_health_percentage() -> float
+│   │       │   └── func is_functional() -> bool
+│   │       ├── turret_subsystem.gd  # Logic for turret subsystems (aiming, firing)
+│   │       │   ├── func initialize_from_definition(definition: ShipData.SubsystemDefinition)
+│   │       │   ├── func aim_at_target(target_global_pos: Vector3, delta: float)
+│   │       │   ├── func fire_turret()
+│   │       │   ├── func is_turret_ready_to_fire(target: Node3D) -> bool
+│   │       │   └── func get_turret_hardpoints(slot_index: int) -> Array[Marker3D]
+│   │       ├── engine_subsystem.gd  # Logic for engine subsystems (effects)
+│   │       │   ├── func initialize_from_definition(definition: ShipData.SubsystemDefinition)
+│   │       │   └── func destroy_subsystem()
+│   │       └── sensor_subsystem.gd  # Logic for sensor/AWACS subsystems
+│   │           ├── func initialize_from_definition(definition: ShipData.SubsystemDefinition)
+│   │           ├── func get_awacs_level_at_pos(target_pos: Vector3) -> float
+│   │           └── func destroy_subsystem()
+│   ├── weapon/               # Weapon instance and projectile logic (See 05_ship_weapon_systems.md)
+│   │   ├── weapon.gd                # Base weapon instance logic script (WeaponInstance)
+│   │   │   ├── func initialize(w_system: WeaponSystem, w_data: WeaponData, h_point: Node3D)
+│   │   │   └── func fire(target: Node3D = null, target_subsystem: ShipSubsystem = null) -> bool
+│   │   ├── laser_weapon.gd          # Logic for laser weapon instances
+│   │   │   └── func fire(target: Node3D = null, target_subsystem: ShipSubsystem = null) -> bool
+│   │   ├── missile_weapon.gd        # Logic for missile weapon instances
+│   │   │   └── func fire(target: Node3D = null, target_subsystem: ShipSubsystem = null) -> bool
+│   │   ├── beam_weapon.gd           # Logic for beam weapon instances
+│   │   │   ├── func fire(target: Node3D = null, target_subsystem: ShipSubsystem = null) -> bool
+│   │   │   ├── func start_beam_fire()
+│   │   │   ├── func stop_firing()
+│   │   │   └── func apply_beam_damage(collider: Node, hit_point: Vector3, hit_normal: Vector3)
+│   │   ├── flak_weapon.gd           # Logic for flak weapon instances
+│   │   │   └── func fire(target: Node3D = null, target_subsystem: ShipSubsystem = null) -> bool
+│   │   ├── emp_weapon.gd            # Logic for EMP weapon instances
+│   │   │   └── func fire(target: Node3D = null, target_subsystem: ShipSubsystem = null) -> bool
+│   │   ├── swarm_weapon.gd          # Logic for swarm missile weapon instances (placeholder)
+│   │   ├── corkscrew_weapon.gd      # Logic for corkscrew missile weapon instances
+│   │   │   └── func fire(target: Node3D = null, target_subsystem: ShipSubsystem = null) -> bool
+│   │   └── projectiles/             # Projectile logic scripts
+│   │       ├── projectile_base.gd   # Base projectile logic script (movement, lifetime, impact)
+│   │       │   └── func setup(w_data: WeaponData, owner: ShipBase, target: Node3D = null, target_sub: ShipSubsystem = null, initial_velocity: Vector3 = Vector3.ZERO)
+│   │       ├── laser_projectile.gd  # Logic for laser projectiles
+│   │       └── missile_projectile.gd # Logic for missile projectiles (homing)
 │   ├── hud/                # HUDManager, HUDGauge base, specific gauge scripts (Radar, Shields, TargetBox, etc.) (See 06_hud_system.md)
 │   │   ├── hud.gd                   # Main HUD controller script (attached to hud.tscn)
 │   │   ├── hud_manager.gd           # Singleton for config loading, applying settings logic
@@ -229,18 +313,104 @@ wcsaga_godot/
 │   │   ├── warp_effect_manager.gd   # Manages warp visual effects script
 │   │   └── spark_manager.gd         # Manages spark effects script
 │   ├── resources/          # Scripts defining custom Resource types (logic associated with .tres files)
-│   │   ├── ship_data.gd             # Defines ShipData resource structure and helper methods
-│   │   ├── weapon_data.gd           # Defines WeaponData resource structure and helper methods
+│   │   ├── ai_goal.gd               # Defines AI goal structure
+│   │   │   ├── func is_valid() -> bool
+│   │   │   ├── func set_flag(flag_enum: GoalFlags, value: bool)
+│   │   │   ├── func has_flag(flag_enum: GoalFlags) -> bool
+│   │   │   ├── func get_target_ship_name() -> String
+│   │   │   ├── func get_target_wing_name() -> String
+│   │   │   └── func get_target_waypoint_list_name() -> String
+│   │   ├── ai_profile.gd            # Defines AI behavior parameters
+│   │   │   ├── func get_accuracy(skill_level: int) -> float
+│   │   │   ├── func get_evasion(skill_level: int) -> float
+│   │   │   ├── func get_courage(skill_level: int) -> float
+│   │   │   ├── func get_patience(skill_level: int) -> float
+│   │   │   ├── func get_max_attackers(skill: int) -> int
+│   │   │   ├── func get_predict_position_delay(skill: int) -> float
+│   │   │   ├── func get_turn_time_scale(skill: int) -> float
+│   │   │   ├── func get_cmeasure_fire_chance(skill: int) -> float
+│   │   │   ├── func get_in_range_time(skill: int) -> float
+│   │   │   ├── func get_link_ammo_levels_maybe(skill: int) -> float
+│   │   │   ├── func get_link_ammo_levels_always(skill: int) -> float
+│   │   │   ├── func get_primary_ammo_burst_mult(skill: int) -> float
+│   │   │   ├── func get_link_energy_levels_maybe(skill: int) -> float
+│   │   │   ├── func get_link_energy_levels_always(skill: int) -> float
+│   │   │   ├── func get_shield_manage_delay(skill: int) -> float
+│   │   │   ├── func get_ship_fire_delay_scale_friendly(skill: int) -> float
+│   │   │   ├── func get_ship_fire_delay_scale_hostile(skill: int) -> float
+│   │   │   ├── func get_ship_fire_secondary_delay_scale_friendly(skill: int) -> float
+│   │   │   ├── func get_ship_fire_secondary_delay_scale_hostile(skill: int) -> float
+│   │   │   ├── func get_glide_attack_percent(skill: int) -> float
+│   │   │   ├── func get_circle_strafe_percent(skill: int) -> float
+│   │   │   ├── func get_glide_strafe_percent(skill: int) -> float
+│   │   │   ├── func get_stalemate_time_thresh(skill: int) -> float
+│   │   │   ├── func get_stalemate_dist_thresh(skill: int) -> float
+│   │   │   ├── func get_chance_to_use_missiles_on_plr(skill: int) -> int
+│   │   │   ├── func get_max_aim_update_delay(skill: int) -> float
+│   │   │   ├── func get_aburn_use_factor(skill: int) -> int
+│   │   │   ├── func get_shockwave_evade_chance(skill: int) -> float
+│   │   │   ├── func get_get_away_chance(skill: int) -> float
+│   │   │   ├── func get_secondary_range_mult(skill: int) -> float
+│   │   │   ├── func get_bump_range_mult(skill: int) -> float
+│   │   │   ├── func get_afterburner_recharge_scale(skill: int) -> float
+│   │   │   ├── func get_beam_friendly_damage_cap(skill: int) -> float
+│   │   │   ├── func get_cmeasure_life_scale(skill: int) -> float
+│   │   │   ├── func get_max_allowed_player_homers(skill: int) -> int
+│   │   │   ├── func get_max_incoming_asteroids(skill: int) -> int
+│   │   │   ├── func get_player_damage_scale(skill: int) -> float
+│   │   │   ├── func get_subsys_damage_scale(skill: int) -> float
+│   │   │   ├── func get_shield_energy_scale(skill: int) -> float
+│   │   │   ├── func get_weapon_energy_scale(skill: int) -> float
+│   │   │   ├── func get_max_turret_ownage_target(skill: int) -> int
+│   │   │   ├── func get_max_turret_ownage_player(skill: int) -> int
+│   │   │   ├── func get_kill_percentage_scale(skill: int) -> float
+│   │   │   ├── func get_assist_percentage_scale(skill: int) -> float
+│   │   │   ├── func get_assist_award_percentage_scale(skill: int) -> float
+│   │   │   ├── func get_repair_penalty(skill: int) -> int
+│   │   │   ├── func get_delay_bomb_arm_timer(skill: int) -> float
+│   │   │   ├── func has_flag(flag: int) -> bool
+│   │   │   └── func has_flag2(flag: int) -> bool
+│   │   ├── armor_data.gd            # Defines damage resistances
+│   │   │   ├── func get_damage_multiplier(damage_type_key) -> float
+│   │   │   ├── func get_shield_pierce_percentage(damage_type_key) -> float
+│   │   │   ├── func get_piercing_type(damage_type_key) -> int
+│   │   │   └── func get_piercing_limit(damage_type_key) -> float
+│   │   ├── game_sounds.gd           # Defines sound/music entries and manages playback
+│   │   │   ├── func play_sound(sound: SoundEntry, position: Vector3 = Vector3.ZERO) -> AudioStreamPlayer3D
+│   │   │   ├── func play_interface_sound(sound: SoundEntry) -> AudioStreamPlayer3D
+│   │   │   ├── func stop_sound(player: AudioStreamPlayer3D) -> void
+│   │   │   ├── func stop_all_sounds() -> void
+│   │   │   ├── func preload_sounds() -> void
+│   │   │   └── func unload_sounds() -> void
+│   │   ├── kill_info.gd             # Tracks kill statistics
+│   │   ├── medal_info.gd            # Defines medal/badge information
+│   │   │   └── func get_bitmap_filename(award_count: int = 1) -> String
+│   │   ├── music_entry.gd           # Defines music track properties
+│   │   │   ├── func preload_music() -> void
+│   │   │   └── func unload_music() -> void
+│   │   ├── pilot_tips.gd            # Holds pilot tips
+│   │   ├── player_data.gd           # Defines player profile data (PilotData)
+│   │   │   ├── func get_rank_name() -> String
+│   │   │   ├── func get_stat(stat_enum) -> int
+│   │   │   ├── func update_stat(stat_enum, value: int)
+│   │   │   ├── func add_kill(ship_class_index: int)
+│   │   │   └── func add_assist()
+│   │   ├── rank_info.gd             # Defines rank information
+│   │   ├── ship_data.gd             # Defines static ship properties
+│   │   ├── sound_entry.gd           # Defines sound effect properties
+│   │   │   ├── func preload_sound() -> void
+│   │   │   └── func unload_sound() -> void
+│   │   ├── species_info.gd          # Defines species-specific properties
+│   │   ├── subsystem.gd             # Base class/data for runtime subsystem state (Note: Redundant?)
+│   │   ├── subsystem_definition.gd  # Defines static subsystem properties (used within ShipData)
+│   │   ├── support_info.gd          # Tracks support ship status
+│   │   ├── threat.gd                # Defines threat information
+│   │   ├── weapon_data.gd           # Defines static weapon properties
+│   │   ├── weapon_group.gd          # Defines weapon group state (ammo, linking)
+│   │   ├── wingman.gd               # Defines wingman status and orders
 │   │   ├── model_metadata.gd        # Defines ModelMetadata resource structure and helper methods
 │   │   ├── mission_data.gd          # Defines MissionData resource structure (and related mission sub-resources) and helper methods
-│   │   ├── ai_profile.gd            # Defines AIProfile resource structure and helper methods
-│   │   ├── armor_data.gd            # Defines ArmorData resource structure and helper methods
-│   │   ├── rank_info.gd             # Defines RankInfo resource structure and helper methods
-│   │   ├── medal_info.gd            # Defines MedalInfo resource structure and helper methods
-│   │   ├── species_info.gd          # Defines SpeciesInfo resource structure and helper methods
-│   │   ├── player_data.gd           # Defines PlayerData resource structure and helper methods
 │   │   ├── hud_config_data.gd       # Defines HUDConfigData resource structure (and related HUD sub-resources) and helper methods
-│   │   ├── sound_entry.gd           # Defines SoundEntry resource structure and helper methods
 │   │   ├── music_track.gd           # Defines MusicTrack resource structure and helper methods
 │   │   ├── subtitle_data.gd         # Defines SubtitleData resource structure and helper methods
 │   │   ├── nav_point_data.gd        # Defines NavPointData resource structure and helper methods
@@ -253,6 +423,10 @@ wcsaga_godot/
 │       ├── input_manager.gd         # Optional: Central input constants or complex handling script
 │       ├── math_utils.gd            # Static helper functions for math operations script
 │       ├── global_constants.gd      # Defines global enums and constants script
+│       │   ├── static func load_resource_lists()
+│       │   ├── static func get_weapon_data(index: int) -> WeaponData
+│       │   ├── static func get_ship_data(index: int) -> ShipData
+│       │   └── static func get_armor_data(index: int) -> ArmorData
 │       ├── game_sounds.gd           # Autoload holding sound references/data script
 │       ├── music_data.gd            # Autoload holding music references/data script
 │       ├── script_system.gd         # Autoload for hook system management script

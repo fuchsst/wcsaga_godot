@@ -5,9 +5,9 @@
 class_name AIGoalManager
 extends Node
 
-# Preload constants for easy access
+# Preload constants and resources for easy access
 const AIConst = preload("res://scripts/globals/ai_constants.gd")
-const AIGoal = preload("res://scripts/resources/ai_goal.gd") # Ensure AIGoal is preloaded
+const AIGoal = preload("res://scripts/resources/ai_goal.gd")
 
 const MAX_AI_GOALS = 5 # From ai.h
 
@@ -167,8 +167,8 @@ func _is_goal_achievable(controller: AIController, goal: AIGoal) -> AIConstants.
 	# TODO: Integrate with MissionLogManager to check for departed/destroyed status.
 	# TODO: Integrate with WingManager for wing-related checks.
 	# TODO: Integrate with WaypointManager for path checks.
-	# TODO: Implement docking point validation and availability checks.
-	# TODO: Implement subsystem validation checks.
+	# TODO: Implement docking point validation and availability checks (DockingManager).
+	# TODO: Implement subsystem validation checks (target ship methods).
 
 	# Handle goals that are always achievable or don't have specific targets
 	match goal.ai_mode:
@@ -179,10 +179,10 @@ func _is_goal_achievable(controller: AIController, goal: AIGoal) -> AIConstants.
 			return AIConstants.GoalAchievableState.ACHIEVABLE
 
 		AIGoal.GoalMode.WARP:
-			# TODO: Check if ship has warp capability and isn't inhibited
-			# var ship_node = controller.get_parent()
-			# if ship_node and ship_node.has_method("can_warp") and not ship_node.can_warp():
-			#	 return AIConstants.GoalAchievableState.NOT_KNOWN # Or NOT_ACHIEVABLE if permanently disabled
+			# Check if ship has warp capability and isn't inhibited
+			var ship_node = controller.get_parent()
+			if ship_node and ship_node.has_method("can_warp") and not ship_node.can_warp():
+				return AIConstants.GoalAchievableState.NOT_KNOWN # Or NOT_ACHIEVABLE if permanently disabled
 			return AIConstants.GoalAchievableState.ACHIEVABLE # Assume possible for now
 
 		AIGoal.GoalMode.WAYPOINTS, AIGoal.GoalMode.WAYPOINTS_ONCE:
@@ -192,11 +192,11 @@ func _is_goal_achievable(controller: AIController, goal: AIGoal) -> AIConstants.
 			return AIConstants.GoalAchievableState.ACHIEVABLE # Placeholder
 
 		AIGoal.GoalMode.CHASE_WEAPON:
-			# TODO: Need reliable weapon lookup by signature/ID from ObjectManager
+			# Need reliable weapon lookup by signature/ID from ObjectManager
 			var weapon_node = instance_from_id(goal.weapon_target_signature) # Basic fallback
 			if not is_instance_valid(weapon_node):
 				return AIConstants.GoalAchievableState.NOT_ACHIEVABLE
-			# TODO: Check if weapon is destroyed or expired
+			# TODO: Check if weapon is destroyed or expired (needs lifetime property on weapon)
 			return AIConstants.GoalAchievableState.ACHIEVABLE
 
 	# --- Handle goals with ship/wing targets ---
@@ -241,12 +241,13 @@ func _is_goal_achievable(controller: AIController, goal: AIGoal) -> AIConstants.
 		AIGoal.GoalMode.DOCK:
 			# Basic checks: Target must exist and not be destroyed (handled above)
 			if not is_instance_valid(target_node): return AIConstants.GoalAchievableState.NOT_ACHIEVABLE
-			# TODO: Check if docker or dockee is disabled
+			# TODO: Check if docker or dockee is disabled (needs ship flags/methods)
 			# TODO: Check if dock points are valid and available (DockingManager?)
 			# Check if already docked with the target
 			if controller.ship.has_method("is_docked_with") and controller.ship.is_docked_with(target_node):
 				return AIConstants.GoalAchievableState.SATISFIED # Already docked
-			# if not _validate_docking_points(controller.ship, target_node, goal): # Needs implementation
+			# TODO: Implement _validate_docking_points
+			# if not _validate_docking_points(controller.ship, target_node, goal):
 			#	 return AIConstants.GoalAchievableState.NOT_ACHIEVABLE
 			pass # Placeholder for more checks
 
@@ -271,20 +272,34 @@ func _is_goal_achievable(controller: AIController, goal: AIGoal) -> AIConstants.
 		AIGoal.GoalMode.DESTROY_SUBSYSTEM:
 			# Basic checks: Target ship must exist and not be destroyed (handled above)
 			if not is_instance_valid(target_node): return AIConstants.GoalAchievableState.NOT_ACHIEVABLE
-			# TODO: Resolve subsystem name to node/index
-			# TODO: Check if subsystem exists and is not already destroyed
-			pass # Placeholder
+			# Resolve subsystem name to node/index if needed
+			if goal.subsystem_node == null or not is_instance_valid(goal.subsystem_node):
+				if target_node.has_method("find_subsystem_node"):
+					goal.subsystem_node = target_node.find_subsystem_node(goal.subsystem_name)
+				else:
+					printerr("AIGoalManager: Target ship %s missing find_subsystem_node method." % target_node.name)
+					return AIConstants.GoalAchievableState.NOT_ACHIEVABLE
+			# Check if subsystem exists and is not already destroyed
+			if not is_instance_valid(goal.subsystem_node):
+				return AIConstants.GoalAchievableState.NOT_ACHIEVABLE # Subsystem doesn't exist
+			if goal.subsystem_node.has_method("is_destroyed") and goal.subsystem_node.is_destroyed():
+				return AIConstants.GoalAchievableState.SATISFIED # Already destroyed
+			pass # Placeholder for other checks
 
 		AIGoal.GoalMode.DISABLE_SHIP:
 			# Basic checks: Target ship must exist and not be destroyed (handled above)
 			if not is_instance_valid(target_node): return AIConstants.GoalAchievableState.NOT_ACHIEVABLE
-			# TODO: Check if target ship's engines are already disabled
+			# Check if target ship's engines are already disabled
+			if target_node.has_method("are_engines_disabled") and target_node.are_engines_disabled():
+				return AIConstants.GoalAchievableState.SATISFIED
 			pass # Placeholder
 
 		AIGoal.GoalMode.DISARM_SHIP:
 			# Basic checks: Target ship must exist and not be destroyed (handled above)
 			if not is_instance_valid(target_node): return AIConstants.GoalAchievableState.NOT_ACHIEVABLE
-			# TODO: Check if target ship's turrets/weapons are already disabled/destroyed
+			# Check if target ship's turrets/weapons are already disabled/destroyed
+			if target_node.has_method("are_weapons_disabled") and target_node.are_weapons_disabled():
+				return AIConstants.GoalAchievableState.SATISFIED
 			pass # Placeholder
 
 		AIGoal.GoalMode.IGNORE, AIGoal.GoalMode.IGNORE_NEW:
@@ -296,10 +311,24 @@ func _is_goal_achievable(controller: AIController, goal: AIGoal) -> AIConstants.
 		AIGoal.GoalMode.REARM_REPAIR:
 			# Basic checks: Target support ship must exist and not be destroyed (handled above)
 			if not is_instance_valid(target_node): return AIConstants.GoalAchievableState.NOT_ACHIEVABLE
-			# TODO: Check if target is a valid support ship (ShipInfo flag?)
-			# TODO: Check if this ship actually needs repair/rearm (hull/subsys damage, ammo levels)
-			# TODO: Check if already being repaired or awaiting repair by someone else (AI flags)
-			pass # Placeholder
+			# Check if target is a valid support ship (ShipInfo flag?)
+			var support_ship_node = _find_target_node(goal.target_name)
+			if not is_instance_valid(support_ship_node) or not support_ship_node.has_method("is_support_ship") or not support_ship_node.is_support_ship():
+				return AIConstants.GoalAchievableState.NOT_ACHIEVABLE
+			# Check if this ship actually needs repair/rearm (hull/subsys damage, ammo levels)
+			if controller.ship.has_method("needs_rearm_repair") and not controller.ship.needs_rearm_repair():
+				return AIConstants.GoalAchievableState.SATISFIED # Already repaired/rearmed
+			# Check if already being repaired or awaiting repair by someone else (AI flags)
+			if controller.has_flag(AIConstants.AIF_BEING_REPAIRED) or controller.has_flag(AIConstants.AIF_AWAITING_REPAIR):
+				# If already being handled by the correct support ship, it's achievable (or satisfied if done)
+				if controller.support_ship_object_id == support_ship_node.get_instance_id():
+					# If being repaired, it's achievable. If awaiting, also achievable.
+					# If goal is REARM_REPAIR and ship no longer needs it, it becomes SATISFIED above.
+					return AIConstants.GoalAchievableState.ACHIEVABLE
+				else:
+					# Being handled by a *different* support ship, so this goal is not achievable now.
+					return AIConstants.GoalAchievableState.NOT_KNOWN # Or NOT_ACHIEVABLE? Let's use NOT_KNOWN for now.
+			pass # Placeholder for other checks
 
 	# If all checks pass for the specific goal type
 	return AIConstants.GoalAchievableState.ACHIEVABLE
@@ -353,13 +382,22 @@ func _execute_goal(controller: AIController, goal: AIGoal):
 		AIGoal.GoalMode.DOCK:
 			if is_instance_valid(target_node):
 				controller.set_target(target_node)
-				# TODO: Resolve docker/dockee point indices from names and store in goal runtime vars
-				# goal.docker_point_index = controller.ship.find_dock_point_index(goal.docker_point_name)
-				# goal.dockee_point_index = target_node.find_dock_point_index(goal.dockee_point_name)
-				# if goal.docker_point_index != -1 and goal.dockee_point_index != -1:
-				#	 goal.set_flag(AIGoal.GoalFlags.DOCKER_INDEX_VALID, true)
-				#	 goal.set_flag(AIGoal.GoalFlags.DOCKEE_INDEX_VALID, true)
-				# else: printerr("Failed to resolve dock points for goal %d" % goal.signature)
+				# Resolve docker/dockee point indices from names
+				if controller.ship.has_method("find_dock_point_index") and target_node.has_method("find_dock_point_index"):
+					goal.docker_point_index = controller.ship.find_dock_point_index(goal.docker_point_name)
+					goal.dockee_point_index = target_node.find_dock_point_index(goal.dockee_point_name)
+					if goal.docker_point_index != -1 and goal.dockee_point_index != -1:
+						goal.set_flag(AIGoal.GoalFlags.DOCKER_INDEX_VALID, true)
+						goal.set_flag(AIGoal.GoalFlags.DOCKEE_INDEX_VALID, true)
+					else:
+						printerr("Failed to resolve dock points for goal %d: Docker '%s' (%d), Dockee '%s' (%d)" % [goal.signature, goal.docker_point_name, goal.docker_point_index, goal.dockee_point_name, goal.dockee_point_index])
+						controller.set_mode(AIConstants.AIMode.NONE) # Cannot proceed without valid points
+						return # Abort goal execution
+				else:
+					printerr("Ship node missing find_dock_point_index method for goal %d" % goal.signature)
+					controller.set_mode(AIConstants.AIMode.NONE)
+					return # Abort goal execution
+
 				controller.set_mode(AIConstants.AIMode.DOCK, AIConstants.DockSubmode.DOCK_1_APPROACH_PATH)
 			else:
 				controller.set_mode(AIConstants.AIMode.NONE)
@@ -375,20 +413,30 @@ func _execute_goal(controller: AIController, goal: AIGoal):
 		AIGoal.GoalMode.DESTROY_SUBSYSTEM:
 			if is_instance_valid(target_node):
 				controller.set_target(target_node)
-				# TODO: Resolve subsystem name to node reference and set on controller
-				# var subsystem_node = target_node.find_subsystem(goal.subsystem_name) # Needs method on ship
-				# if is_instance_valid(subsystem_node):
-				#	 controller.set_targeted_subsystem(subsystem_node, target_node.get_instance_id())
-				# else: printerr("Could not find subsystem '%s' on target '%s'" % [goal.subsystem_name, target_node.name])
+				# Resolve subsystem name to node reference and set on controller
+				var subsystem_node = null
+				if target_node.has_method("find_subsystem_node"):
+					subsystem_node = target_node.find_subsystem_node(goal.subsystem_name)
+				if is_instance_valid(subsystem_node):
+					controller.set_targeted_subsystem(subsystem_node, target_node.get_instance_id())
+					goal.subsystem_node = subsystem_node # Store resolved node
+				else:
+					printerr("Could not find subsystem '%s' on target '%s'" % [goal.subsystem_name, target_node.name])
+					# Optionally, target center mass if subsystem not found?
+					controller.set_targeted_subsystem(null, -1)
+
 				controller.set_mode(AIConstants.AIMode.CHASE, AIConstants.ChaseSubmode.ATTACK) # Attack parent ship
 			else:
 				controller.set_mode(AIConstants.AIMode.NONE)
 
 		AIGoal.GoalMode.FORM_ON_WING:
 			if is_instance_valid(target_node): # Target node here is the leader
-				# TODO: Need set_guard_target method on AIController
-				# controller.set_guard_target(target_node)
-				controller.set_flag(AIConstants.AIF_FORMATION_OBJECT, true) # Use object formation flag
+				# Set guard target (needs implementation on AIController)
+				controller.guard_target_object_id = target_node.get_instance_id()
+				controller.guard_target_signature = target_node.get_meta("signature", target_node.get_instance_id())
+				controller.guard_target_wingnum = -1 # Indicate it's object formation
+				# Set formation flags
+				controller.set_flag(AIConstants.AIF_FORMATION_OBJECT, true)
 				controller.set_flag(AIConstants.AIF_FORMATION_WING, false)
 				controller.set_mode(AIConstants.AIMode.GUARD) # Use GUARD mode for formation
 			else:
@@ -396,16 +444,41 @@ func _execute_goal(controller: AIController, goal: AIGoal):
 
 		AIGoal.GoalMode.UNDOCK:
 			if is_instance_valid(target_node): # Target is the ship to undock from
-				# TODO: Resolve dock points used for current docking
-				# var docker_idx = controller.ship.get_used_dock_point(target_node)
-				# var dockee_idx = target_node.get_used_dock_point(controller.ship)
-				# if docker_idx != -1 and dockee_idx != -1:
-				#	 goal.docker_point_index = docker_idx
-				#	 goal.dockee_point_index = dockee_idx
+				# Resolve dock points used for current docking (needs methods on ship)
+				if controller.ship.has_method("get_used_dock_point") and target_node.has_method("get_used_dock_point"):
+					goal.docker_point_index = controller.ship.get_used_dock_point(target_node)
+					goal.dockee_point_index = target_node.get_used_dock_point(controller.ship)
+					if goal.docker_point_index != -1 and goal.dockee_point_index != -1:
+						goal.set_flag(AIGoal.GoalFlags.DOCKER_INDEX_VALID, true)
+						goal.set_flag(AIGoal.GoalFlags.DOCKEE_INDEX_VALID, true)
+					else:
+						printerr("Could not resolve current dock points for UNDOCK goal %d" % goal.signature)
+						# Might still be able to undock if path exists, but log warning
+				else:
+					printerr("Ship node missing get_used_dock_point method for UNDOCK goal %d" % goal.signature)
+					# Proceed cautiously, assuming path might work
+
 				controller.set_target(target_node) # Set target for context if needed
 				controller.set_mode(AIConstants.AIMode.DOCK, AIConstants.DockSubmode.UNDOCK_0_START_PATH)
 			else: # Undock from anything? Or invalid goal?
-				controller.set_mode(AIConstants.AIMode.NONE)
+				# If target_name was empty, check if currently docked at all
+				if goal.target_name.is_empty() and controller.ship.has_method("is_docked") and controller.ship.is_docked():
+					# Find what it's docked to (needs method)
+					var docked_to_node = controller.ship.get_docked_partner()
+					if is_instance_valid(docked_to_node):
+						controller.set_target(docked_to_node)
+						# Resolve dock points
+						if controller.ship.has_method("get_used_dock_point") and docked_to_node.has_method("get_used_dock_point"):
+							goal.docker_point_index = controller.ship.get_used_dock_point(docked_to_node)
+							goal.dockee_point_index = docked_to_node.get_used_dock_point(controller.ship)
+							if goal.docker_point_index != -1 and goal.dockee_point_index != -1:
+								goal.set_flag(AIGoal.GoalFlags.DOCKER_INDEX_VALID, true)
+								goal.set_flag(AIGoal.GoalFlags.DOCKEE_INDEX_VALID, true)
+						controller.set_mode(AIConstants.AIMode.DOCK, AIConstants.DockSubmode.UNDOCK_0_START_PATH)
+					else:
+						controller.set_mode(AIConstants.AIMode.NONE) # Cannot determine what to undock from
+				else:
+					controller.set_mode(AIConstants.AIMode.NONE) # Invalid target or not docked
 
 		AIGoal.GoalMode.CHASE_WING:
 			# TODO: Need WingManager integration and set_target_wing method
@@ -422,8 +495,10 @@ func _execute_goal(controller: AIController, goal: AIGoal):
 
 		AIGoal.GoalMode.GUARD:
 			if is_instance_valid(target_node):
-				# TODO: Need set_guard_target method on AIController
-				# controller.set_guard_target(target_node)
+				# Set guard target (needs implementation on AIController)
+				controller.guard_target_object_id = target_node.get_instance_id()
+				controller.guard_target_signature = target_node.get_meta("signature", target_node.get_instance_id())
+				controller.guard_target_wingnum = -1 # Indicate ship guard
 				controller.set_mode(AIConstants.AIMode.GUARD, AIConstants.GuardSubmode.STATIC)
 			else:
 				controller.set_mode(AIConstants.AIMode.NONE)
@@ -431,7 +506,7 @@ func _execute_goal(controller: AIController, goal: AIGoal):
 		AIGoal.GoalMode.DISABLE_SHIP:
 			if is_instance_valid(target_node):
 				controller.set_target(target_node)
-				# TODO: Set targeting preference to engines
+				# TODO: Set targeting preference to engines (needs method on AIController/Targeting)
 				# controller.set_subsystem_preference(AIConstants.SubsystemType.ENGINE)
 				controller.set_mode(AIConstants.AIMode.CHASE, AIConstants.ChaseSubmode.ATTACK)
 			else:
@@ -440,7 +515,7 @@ func _execute_goal(controller: AIController, goal: AIGoal):
 		AIGoal.GoalMode.DISARM_SHIP:
 			if is_instance_valid(target_node):
 				controller.set_target(target_node)
-				# TODO: Set targeting preference to turrets/weapons
+				# TODO: Set targeting preference to turrets/weapons (needs method on AIController/Targeting)
 				# controller.set_subsystem_preference(AIConstants.SubsystemType.TURRET)
 				controller.set_mode(AIConstants.AIMode.CHASE, AIConstants.ChaseSubmode.ATTACK)
 			else:
@@ -466,7 +541,10 @@ func _execute_goal(controller: AIController, goal: AIGoal):
 			# else:
 			#	 controller.set_mode(AIConstants.AIMode.NONE)
 			if is_instance_valid(target_node): # Fallback: guard leader
-				# controller.set_guard_target(target_node)
+				controller.guard_target_object_id = target_node.get_instance_id()
+				controller.guard_target_signature = target_node.get_meta("signature", target_node.get_instance_id())
+				# TODO: Get actual wing number from WingManager
+				controller.guard_target_wingnum = 0 # Placeholder wing number
 				controller.set_mode(AIConstants.AIMode.GUARD, AIConstants.GuardSubmode.STATIC)
 			else:
 				controller.set_mode(AIConstants.AIMode.NONE)
@@ -548,3 +626,11 @@ func _find_target_node(target_name: String) -> Node3D:
 
 	printerr("AIGoalManager: _find_target_node could not find '%s'" % target_name)
 	return null
+
+# Helper function to validate docking points (placeholder)
+func _validate_docking_points(docker_ship: Node, dockee_ship: Node, goal: AIGoal) -> bool:
+	# TODO: Implement checks:
+	# 1. Do both ships have the required dock point names?
+	# 2. Are the dock points compatible (e.g., fighter bay vs capital ship dock)?
+	# 3. Is the dock point currently occupied (needs DockingManager)?
+	return true # Placeholder

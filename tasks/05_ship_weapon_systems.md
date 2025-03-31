@@ -94,85 +94,82 @@ Based on the provided C++ code snippets (`ship.h`, `shipcontrails.cpp`, `shipfx.
 *   **Warp Effects:** Warp-in/out animations, sounds, speed calculations (`WarpEffect` class and derived types like `WE_Default`, `WE_BSG`, `WE_Homeworld`, `WE_Hyperspace`). Managed via `shipfx_warpin_start`, `shipfx_warpout_start`, etc. (from `shipfx.cpp`, `shipfx.h`)
 *   **Cloaking:** Cloak stages (`cloak_stage`), timing (`time_until_full_cloak`), alpha blending (`cloak_alpha`). Managed via `shipfx_cloak_frame`, `shipfx_start_cloak`, `shipfx_stop_cloak`. (from `shipfx.cpp`, `ship.h`)
 
-### B. Potential Godot Solutions
+### B. Potential Godot Solutions (Refined based on current implementation)
 
 *   **Ship Representation:**
-    *   **Scene:** `ShipBase.tscn` (inheriting from `RigidBody3D` or `CharacterBody3D`) as the root node for each ship instance.
-    *   **Resource:** `ShipData.tres` (extends `Resource`, script `ship_data.gd`) to hold static `ship_info` data (model path, physics constants, weapon mounts, subsystem definitions, shield/hull values, sounds, species, AI class, flags `SIF_*`, `SIF2_*`).
-    *   **Script:** `ShipBase.gd` attached to the root node. Manages runtime state (current hull/shields, energy, ammo, subsystem status, flags `SF_*`, `SF2_*`, timers, AI link, warp/cloak state). Contains references to child nodes (WeaponSystem, ShieldSystem, DamageSystem, EngineSystem, Subsystem nodes).
+    *   **Scene:** `ShipBase.tscn` (inheriting from `RigidBody3D`) as the root node for each ship instance. **(Implemented)**
+    *   **Resource:** `ShipData.tres` (extends `Resource`, script `scripts/resources/ship_data.gd`) holds static `ship_info` data. **(Implemented)**
+    *   **Script:** `scripts/ship/ship_base.gd` attached to the root node. Manages runtime state (hull, energy, flags, timers, AI link, warp/cloak state). Contains references to child nodes (`WeaponSystem`, `ShieldSystem`, `DamageSystem`, `EngineSystem`, Subsystem nodes). **(Implemented)**
 *   **Weapon Management:**
-    *   **Node:** `WeaponSystem.gd` (extends `Node`) attached to `ShipBase`. Manages weapon banks, energy, ammo pools, firing logic, cycling, linking.
-    *   **Resource:** `WeaponData.tres` (extends `Resource`, script `weapon_data.gd`) for static `weapon_info` (damage, speed, lifetime, homing params, effects, flags `WIF_*`, `WIF2_*`, sounds, model path, beam info, trail info, etc.).
-    *   **Scene:** `WeaponHardpoint.tscn` (extends `Node3D`) representing a mount point. Instantiated under `WeaponSystem`. Contains logic for a specific weapon instance (cooldown timer).
-    *   **Script:** `Weapon.gd` (base class, attached to `WeaponHardpoint.tscn`), with derived classes (`LaserWeapon.gd`, `MissileWeapon.gd`, `BeamWeapon.gd`, `FlakWeapon.gd`, `EMPWeapon.gd`, `SwarmWeapon.gd`, `CorkscrewWeapon.gd`) implementing specific firing logic and projectile creation.
-    *   **Projectiles:** Separate scenes (`ProjectileBase.tscn`, `LaserProjectile.tscn`, `MissileProjectile.tscn`, etc.) with attached scripts (`ProjectileBase.gd`, `LaserProjectile.gd`, `MissileProjectile.gd`) handling movement, lifetime, homing, collision, and effects.
+    *   **Node:** `scripts/ship/weapon_system.gd` (extends `Node`) attached to `ShipBase`. Manages weapon banks, energy, ammo pools, firing logic, cycling, linking. **(Implemented)**
+    *   **Resource:** `WeaponData.tres` (extends `Resource`, script `scripts/resources/weapon_data.gd`) for static `weapon_info`. **(Implemented)**
+    *   **Scene:** `WeaponHardpoint.tscn` (extends `Node3D`) representing a mount point. Instantiated under `WeaponSystem`. *(Assumption: This scene likely exists but wasn't provided)*.
+    *   **Script:** `scripts/weapon/weapon.gd` (base class `WeaponInstance`, attached to `WeaponHardpoint.tscn`). Derived classes `scripts/weapon/laser_weapon.gd`, `scripts/weapon/missile_weapon.gd` implement specific firing logic. **(Partially Implemented - Base, Laser, Missile)**.
+    *   **Projectiles:** Separate scenes (`ProjectileBase.tscn`, `LaserProjectile.tscn`, `MissileProjectile.tscn`, etc.). *(Assumption: These scenes likely exist but weren't provided)*. Attached scripts `scripts/weapon/projectiles/projectile_base.gd`, `scripts/weapon/projectiles/laser_projectile.gd`, `scripts/weapon/projectiles/missile_projectile.gd` handle movement, lifetime, homing, collision, and effects. **(Partially Implemented - Base, Laser, Missile)**.
+    *   **(Implementation Note: Specific logic for Beam (`scripts/weapon/beam_weapon.gd`), Flak (`scripts/weapon/flak_weapon.gd`), EMP (`scripts/weapon/emp_weapon.gd`), Swarm (`scripts/weapon/swarm_weapon.gd`), Corkscrew (`scripts/weapon/corkscrew_weapon.gd`) weapons from C++ needs full implementation in derived classes or base logic. Current scripts are mostly placeholders.)**
 *   **Subsystems:**
-    *   **Node:** `ShipSubsystem.gd` (extends `Node`) attached to specific `Node3D` locations within the `ShipBase` scene hierarchy (representing the submodel). Manages runtime health, status (disrupted, destroyed).
-    *   **Resource:** Subsystem definitions stored within `ShipData.tres` (linking to submodel names/paths, defining type, static health, turret properties, AWACS params, etc.).
-    *   **Derived Nodes/Scripts:** `TurretSubsystem.gd`, `EngineSubsystem.gd`, `SensorSubsystem.gd` for specialized logic (turret aiming, engine effects, sensor range/disruption). Turrets would contain a child `WeaponSystem` node.
+    *   **Node:** `scripts/ship/subsystems/ship_subsystem.gd` (extends `Node`) attached to specific `Node3D` locations within the `ShipBase` scene hierarchy. Manages runtime health, status. **(Implemented)**
+    *   **Resource:** Subsystem definitions stored within `ShipData.tres` as an array of `SubsystemDefinition` resources (`scripts/resources/subsystem_definition.gd`). **(Implemented)**
+    *   **Derived Nodes/Scripts:** `scripts/ship/subsystems/turret_subsystem.gd`, `scripts/ship/subsystems/engine_subsystem.gd`, `scripts/ship/subsystems/sensor_subsystem.gd` for specialized logic. Turrets contain a child `WeaponSystem` node. **(Implemented)**
 *   **Damage Model:**
-    *   **Node:** `DamageSystem.gd` (extends `Node`) attached to `ShipBase`. Handles receiving damage signals/calls, applying armor reduction, distributing damage to hull and subsystems.
-    *   **Resource:** `ArmorData.tres` (extends `Resource`, script `armor_data.gd`) defining damage resistances per type (maps to `ArmorType`). Referenced by `ShipData` and potentially `SubsystemData`.
-    *   **Script Logic:** Damage application (`apply_damage`), shield interaction (calling `ShieldSystem.absorb_damage`), hull reduction, subsystem damage propagation (finding nearby subsystems), critical hit checks.
+    *   **Node:** `scripts/ship/damage_system.gd` (extends `Node`) attached to `ShipBase`. Handles receiving damage, applying armor reduction, distributing damage to hull and subsystems. **(Implemented)**
+    *   **Resource:** `ArmorData.tres` (extends `Resource`, script `scripts/resources/armor_data.gd`) defining damage resistances. Referenced by `ShipData` and `SubsystemDefinition`. **(Implemented)**
+    *   **Script Logic:** Damage application (`apply_local_damage`, `apply_global_damage`), shield interaction (calling `ShieldSystem.absorb_damage`), hull reduction, subsystem damage propagation (`_apply_subsystem_damage`), critical hit checks. **(Implemented, critical hits need verification)**.
 *   **Physics & Movement:**
-    *   **Node:** Use `RigidBody3D` for ships.
-    *   **Script:** Implement custom integrator (`_integrate_forces` in `ShipBase.gd` or a dedicated `FlightModel.gd` script) to replicate the specific Newtonian flight model, damping, acceleration curves, and afterburner effects described in `physics.cpp`. Read physics constants from `ShipData.tres`.
-    *   **Effects:** `GPUParticles3D` for contrails/engine wash, controlled by `EngineSubsystem.gd` or `ShipBase.gd`.
+    *   **Node:** Uses `RigidBody3D` for ships (`scripts/ship/ship_base.gd`). **(Implemented)**
+    *   **Script:** Custom integrator `_integrate_forces` implemented in `scripts/ship/ship_base.gd`. Reads physics constants from `ShipData.tres`. **(Implemented)**
+    *   **Effects:** `GPUParticles3D` for contrails/engine wash. *(Needs Implementation/Verification in `EngineSubsystem.gd` or `ShipBase.gd`)*.
 *   **Weapon Types:**
-    *   **Lasers:** `LaserProjectile.tscn` (potentially a simple `Node3D` with a `MeshInstance3D` for the beam visual and script for movement/collision). `LaserWeapon.gd` instantiates this.
-    *   **Missiles:** `MissileProjectile.tscn` (likely `RigidBody3D` or `CharacterBody3D`) with `MissileProjectile.gd` handling movement, lifetime, and homing logic (steering towards target). Homing types implemented within this script based on `WeaponData`.
-    *   **Swarm/Corkscrew:** Specific logic within `MissileProjectile.gd` or derived scripts, potentially using `Curve3D` or mathematical functions for pathing, managed by `SwarmWeapon.gd`/`CorkscrewWeapon.gd`.
-    *   **Beams:** `BeamWeapon.gd` uses `RayCast3D` for hit detection. Visuals via custom mesh generation (`ImmediateMesh`), `Line3D`, or shaders. Damage applied over time to hit objects.
-    *   **Flak:** `FlakWeapon.gd` fires a projectile (`FlakProjectile.tscn`) which detonates after a set range (`det_range` from `WeaponData`), creating an area effect (instantiating an `Area3D` or using `PhysicsServer3D.body_test_motion` for damage).
-    *   **EMP:** `EMPWeapon.gd` fires a projectile (`EMPProjectile.tscn`) that triggers an EMP effect on impact (calling `EmpManager.apply_emp`).
+    *   **Lasers:** `LaserProjectile.tscn` with `scripts/weapon/projectiles/laser_projectile.gd`. Fired by `scripts/weapon/laser_weapon.gd`. **(Implemented)**
+    *   **Missiles:** `MissileProjectile.tscn` (likely `RigidBody3D`) with `scripts/weapon/projectiles/missile_projectile.gd` handling movement, lifetime, and homing. Fired by `scripts/weapon/missile_weapon.gd`. **(Implemented)**
+    *   **Swarm/Corkscrew:** Specific logic needs implementation within `MissileProjectile.gd` or derived scripts/scenes, managed by `scripts/weapon/swarm_weapon.gd`/`scripts/weapon/corkscrew_weapon.gd`. **(Needs Implementation)**
+    *   **Beams:** `scripts/weapon/beam_weapon.gd` uses `RayCast3D`. Visuals via custom mesh/shaders needed. Damage applied over time. **(Partially Implemented - Basic structure exists, needs visuals and damage logic)**.
+    *   **Flak:** `scripts/weapon/flak_weapon.gd` needs to fire a projectile (`FlakProjectile.tscn`) which detonates, creating an area effect. **(Needs Implementation)**
+    *   **EMP:** `scripts/weapon/emp_weapon.gd` needs to fire a projectile (`EMPProjectile.tscn`) that triggers an EMP effect on impact (calling `ShipBase.apply_emp_effect`). **(Needs Implementation)**
 *   **Effects:**
-    *   **Muzzle Flash:** Instantiate `MuzzleFlash.tscn` (using `GPUParticles3D` or `AnimatedSprite3D`) at the weapon hardpoint, configured by `WeaponData`. Managed by `MuzzleFlashManager.gd` or directly by `Weapon.gd`.
-    *   **Trails:** `RibbonTrailMesh` or `TubeTrailMesh` nodes attached to projectiles, configured by `trail_info` in `WeaponData`. Managed by `TrailManager.gd` or projectile scripts.
-    *   **Shield Impacts:** Triggered by `ShieldSystem.absorb_damage`. Visual effect using shaders on the shield mesh or instantiating a particle effect (`GPUParticles3D`) at the impact point.
-    *   **Sparks:** Instantiate `SparkEffect.tscn` (`GPUParticles3D`) at impact points, managed by `DamageSystem.gd`.
-    *   **Explosions/Fireballs:** Instantiate `Explosion.tscn` (`GPUParticles3D`, `AnimationPlayer`, `OmniLight3D`, `AudioStreamPlayer3D`) managed by `ExplosionManager.gd`. Use different scenes/configurations based on `weapon_expl_info`.
-    *   **Shockwaves:** Instantiate `Shockwave.tscn` (potentially a growing `MeshInstance3D` with a shader or `GPUParticles3D`). `Shockwave.gd` script handles expansion, lifetime, and damage application (using `Area3D` or physics queries). Managed by `ShockwaveManager.gd`.
+    *   **Muzzle Flash:** Instantiate `MuzzleFlash.tscn`. *(Needs Implementation - Likely managed by `WeaponInstance.gd` derived classes or an `EffectManager`)*.
+    *   **Trails:** `RibbonTrailMesh` or `TubeTrailMesh` nodes attached to projectiles. *(Needs Implementation - Likely managed by projectile scripts or an `EffectManager`)*.
+    *   **Shield Impacts:** Triggered by `ShieldSystem.absorb_damage`. Visual effect using shaders or particles. *(Needs Implementation in `ShieldSystem.gd` or via signals)*.
+    *   **Sparks:** Instantiate `SparkEffect.tscn`. *(Needs Implementation - Likely managed by `DamageSystem.gd`)*.
+    *   **Explosions/Fireballs:** Instantiate `Explosion.tscn`. *(Needs Implementation - Likely managed by `ExplosionManager.gd` or similar)*.
+    *   **Shockwaves:** Instantiate `Shockwave.tscn`. *(Needs Implementation - Likely managed by `ShockwaveManager.gd` or similar)*.
+    *   **(Note: Effects management structure using Singletons/Autoloads is proposed but not yet implemented).**
 *   **Targeting & AI Interaction:**
-    *   Turret aiming logic in `TurretSubsystem.gd`.
-    *   AWACS detection range implemented using `Area3D` on sensor subsystems. `awacs_get_level` logic implemented in a global utility or `SensorSubsystem.gd`.
-    *   Homing logic in `MissileProjectile.gd`.
-    *   Countermeasure interaction: Missiles check for nearby countermeasures (`Area3D` or distance checks) and potentially change target or detonate based on effectiveness values.
+    *   Turret aiming logic in `scripts/ship/subsystems/turret_subsystem.gd`. **(Implemented)**
+    *   AWACS detection range using `Area3D` on sensor subsystems. `awacs_get_level` logic needs implementation in `scripts/ship/subsystems/sensor_subsystem.gd` or global utility. **(Needs Implementation/Verification)**.
+    *   Homing logic in `scripts/weapon/projectiles/missile_projectile.gd`. **(Implemented)**
+    *   Countermeasure interaction: Missiles need logic to check for nearby countermeasures. **(Needs Implementation)**
 *   **Warp Effects:**
-    *   Instantiate `WarpEffect.tscn` managed by `WarpEffectManager.gd`. Scene uses `AnimationPlayer`, shaders (`ShaderMaterial`), and potentially `GPUParticles3D` for visuals. `WarpEffect.gd` script controls timing and ship state changes (e.g., disabling physics during warp).
+    *   Instantiate `WarpEffect.tscn`. *(Needs Implementation - Likely managed by `WarpEffectManager.gd` or similar)*.
 *   **Cloaking:**
-    *   Apply a `ShaderMaterial` with cloaking effect (alpha blend, distortion) to the ship's `MeshInstance3D`. Control shader uniforms (`alpha`, `distortion_amount`) via GDScript (`ShipBase.gd`) based on cloak stage and timing.
+    *   Apply a `ShaderMaterial` controlled via `scripts/ship/ship_base.gd`. **(Needs Implementation)**
 
-### C. Outline Target Godot Project Structure
+### C. Outline Target Godot Project Structure (Refined based on current implementation)
 
 ```
 wcsaga_godot/
 ├── resources/
-│   ├── ships/              # ShipData resources (.tres)
-│   │   ├── hercules.tres
-│   │   └── ...
-│   ├── weapons/            # WeaponData resources (.tres)
-│   │   ├── laser_light.tres
-│   │   ├── missile_heatseeker.tres
-│   │   ├── beam_cannon.tres
-│   │   └── ...
-│   ├── subsystems/         # (Optional) SubsystemData resources if needed separately
-│   ├── armor/              # ArmorData resources (.tres)
-│   └── effects/            # Resources for effects (particle materials, etc.)
+│   ├── ships/              # ShipData resources (.tres) - (Exists, content TBD)
+│   ├── weapons/            # WeaponData resources (.tres) - (Exists, content TBD)
+│   ├── armor/              # ArmorData resources (.tres) - (Exists, content TBD)
+│   └── effects/            # Resources for effects - (Exists, content TBD)
+│   └── ai/                 # AIProfile resources (.tres) - (Exists, content TBD)
+│   └── ...                 # Other resource types (GameSounds, RankInfo, etc.) - (Exists)
 ├── scenes/
-│   ├── ships_weapons/      # Ship and Weapon scenes (.tscn)
-│   │   ├── base_ship.tscn
-│   │   ├── hercules.tscn
-│   │   ├── components/
-│   │   │   ├── weapon_hardpoint.tscn
-│   │   │   ├── turret_base.tscn
-│   │   │   └── engine_nozzle.tscn
-│   │   ├── projectiles/
-│   │   │   ├── projectile_base.tscn
-│   │   │   ├── laser_projectile.tscn
-│   │   │   └── missile_projectile.tscn
-│   │   └── weapons/ # Scenes for complex weapons like beams
-│   │       └── beam_weapon_visual.tscn
-│   ├── effects/            # Effect scenes (.tscn)
+│   ├── ships_weapons/      # Ship and Weapon scenes (.tscn) - (Exists, content TBD)
+│   │   ├── base_ship.tscn  # (Likely exists)
+│   │   ├── hercules.tscn   # (Example, likely exists)
+│   │   ├── components/     # (Likely exists)
+│   │   │   ├── weapon_hardpoint.tscn # (Likely exists)
+│   │   │   ├── turret_base.tscn      # (Likely exists)
+│   │   │   └── engine_nozzle.tscn    # (Likely exists)
+│   │   ├── projectiles/    # (Likely exists)
+│   │   │   ├── projectile_base.tscn  # (Likely exists)
+│   │   │   ├── laser_projectile.tscn # (Likely exists)
+│   │   │   └── missile_projectile.tscn # (Likely exists)
+│   │   └── weapons/        # (Likely exists)
+│   │       └── beam_weapon_visual.tscn # (Needs creation)
+│   ├── effects/            # Effect scenes (.tscn) - (Needs creation)
 │   │   ├── explosion_medium.tscn
 │   │   ├── shield_impact.tscn
 │   │   ├── muzzle_flash.tscn
@@ -181,44 +178,66 @@ wcsaga_godot/
 │   │   └── spark_effect.tscn
 │   └── ...
 ├── scripts/
-│   ├── ship_weapon_systems/ # Main component scripts
-│   │   ├── ship_base.gd          # Base ship logic, physics integration, state
-│   │   ├── weapon_system.gd      # Manages weapon banks, firing, energy/ammo
-│   │   ├── shield_system.gd      # Manages shield state, recharge, damage absorption
-│   │   ├── damage_system.gd      # Applies damage, handles hull/subsystem integrity
-│   │   ├── engine_system.gd      # Handles afterburner logic, potentially thrust effects
-│   │   ├── subsystems/           # Subsystem logic
-│   │   │   ├── ship_subsystem.gd   # Base subsystem state
-│   │   │   ├── turret_subsystem.gd # Turret aiming, firing control
-│   │   │   ├── engine_subsystem.gd # Engine specific logic/effects
-│   │   │   └── sensor_subsystem.gd # Sensor/AWACS logic
-│   │   ├── weapons/              # Weapon instance logic
-│   │   │   ├── weapon.gd           # Base weapon logic (cooldown)
-│   │   │   ├── laser_weapon.gd
-│   │   │   ├── missile_weapon.gd
-│   │   │   ├── beam_weapon.gd
-│   │   │   ├── flak_weapon.gd
-│   │   │   ├── emp_weapon.gd
-│   │   │   ├── swarm_weapon.gd
-│   │   │   └── corkscrew_weapon.gd
-│   │   └── projectiles/          # Projectile logic
-│   │       ├── projectile_base.gd  # Movement, lifetime, collision
-│   │       ├── laser_projectile.gd
-│   │       └── missile_projectile.gd # Homing logic
-│   ├── resources/          # Scripts defining custom Resource types
-│   │   ├── ship_data.gd
-│   │   ├── weapon_data.gd
-│   │   ├── subsystem_data.gd # (If needed)
-│   │   └── armor_data.gd
-│   ├── effects/            # Scripts for managing effects
-│   │   ├── explosion_manager.gd  # Singleton/Autoload
-│   │   ├── shockwave_manager.gd  # Singleton/Autoload
-│   │   ├── trail_manager.gd      # Singleton/Autoload
-│   │   ├── muzzle_flash_manager.gd # Singleton/Autoload
-│   │   ├── warp_effect_manager.gd # Singleton/Autoload
-│   │   └── spark_manager.gd      # Singleton/Autoload
-│   └── ...
-├── shaders/
+│   ├── ship/                 # Ship component scripts - (Exists)
+│   │   ├── ship_base.gd          # (Exists)
+│   │   ├── weapon_system.gd      # (Exists)
+│   │   ├── shield_system.gd      # (Exists)
+│   │   ├── damage_system.gd      # (Exists)
+│   │   ├── engine_system.gd      # (Exists)
+│   │   └── subsystems/           # (Exists)
+│   │       ├── ship_subsystem.gd   # (Exists)
+│   │       ├── turret_subsystem.gd # (Exists)
+│   │       ├── engine_subsystem.gd # (Exists)
+│   │       └── sensor_subsystem.gd # (Exists)
+│   ├── weapon/               # Weapon component scripts - (Exists)
+│   │   ├── weapon_instance.gd    # (Missing/Not Provided)
+│   │   ├── laser_weapon.gd       # (Exists)
+│   │   ├── missile_weapon.gd     # (Exists)
+│   │   ├── beam_weapon.gd        # (Exists - Needs Implementation)
+│   │   ├── flak_weapon.gd        # (Exists - Needs Implementation)
+│   │   ├── emp_weapon.gd         # (Exists - Needs Implementation)
+│   │   ├── swarm_weapon.gd       # (Exists - Needs Implementation)
+│   │   └── corkscrew_weapon.gd   # (Exists - Needs Implementation)
+│   │   └── projectiles/          # (Exists)
+│   │       ├── projectile_base.gd  # (Exists)
+│   │       ├── laser_projectile.gd # (Exists)
+│   │       └── missile_projectile.gd # (Exists)
+│   ├── resources/            # Scripts defining custom Resource types - (Exists)
+│   │   ├── ai_goal.gd            # (Exists) Defines AI goal structure
+│   │   ├── ai_profile.gd         # (Exists) Defines AI behavior parameters
+│   │   ├── armor_data.gd         # (Exists) Defines damage resistances
+│   │   ├── game_sounds.gd        # (Exists) Defines sound/music entries and manages playback
+│   │   ├── kill_info.gd          # (Exists) Tracks kill statistics
+│   │   ├── medal_info.gd         # (Exists) Defines medal/badge information
+│   │   ├── music_entry.gd        # (Exists) Defines music track properties
+│   │   ├── pilot_tips.gd         # (Exists) Holds pilot tips
+│   │   ├── player_data.gd        # (Exists) Defines player profile data
+│   │   ├── rank_info.gd          # (Exists) Defines rank information
+│   │   ├── ship_data.gd          # (Exists) Defines static ship properties
+│   │   ├── sound_entry.gd        # (Exists) Defines sound effect properties
+│   │   ├── species_info.gd       # (Exists) Defines species-specific properties
+│   │   ├── subsystem.gd          # (Exists) Base class/data for runtime subsystem state (Note: Seems redundant with ship_subsystem.gd)
+│   │   ├── subsystem_definition.gd # (Exists) Defines static subsystem properties (used within ShipData)
+│   │   ├── support_info.gd       # (Exists) Tracks support ship status
+│   │   ├── threat.gd             # (Exists) Defines threat information
+│   │   ├── weapon_data.gd        # (Exists) Defines static weapon properties
+│   │   ├── weapon_group.gd       # (Exists) Defines weapon group state (ammo, linking)
+│   │   └── wingman.gd            # (Exists) Defines wingman status and orders
+│   ├── effects/              # Scripts for managing effects - (Needs creation)
+│   │   ├── explosion_manager.gd
+│   │   ├── shockwave_manager.gd
+│   │   ├── trail_manager.gd
+│   │   ├── muzzle_flash_manager.gd
+│   │   ├── warp_effect_manager.gd
+│   │   └── spark_manager.gd
+│   ├── ai/                   # AI component scripts - (Exists)
+│   ├── core_systems/         # Core system scripts - (Exists)
+│   ├── globals/              # Global constants/singletons - (Exists)
+│   │   └── global_constants.gd # (Exists) Defines global constants and enums
+│   ├── hud/                  # HUD scripts - (Exists)
+│   ├── missions/             # Mission logic scripts - (Exists)
+│   └── player/               # Player control scripts - (Exists)
+├── shaders/                  # (Exists, content TBD)
 │   ├── shield_impact.gdshader
 │   ├── cloak.gdshader
 │   └── engine_wash.gdshader
@@ -229,50 +248,50 @@ wcsaga_godot/
 
 *   **C++ Structs/Classes:**
     *   `ship`: Runtime ship state. -> `ShipBase.gd` properties.
-    *   `ship_info`: Static ship data. -> `ShipData.tres` resource.
+    *   `ship_info`: Static ship data. -> `ShipData.tres` resource (`ship_data.gd`).
     *   `ship_weapon`: Runtime weapon bank state. -> `WeaponSystem.gd` properties.
     *   `weapon`: Runtime projectile state. -> `ProjectileBase.gd` properties.
-    *   `weapon_info`: Static weapon data. -> `WeaponData.tres` resource.
+    *   `weapon_info`: Static weapon data. -> `WeaponData.tres` resource (`weapon_data.gd`).
     *   `ship_subsys`: Runtime subsystem state. -> `ShipSubsystem.gd` properties.
-    *   `model_subsystem`: Static subsystem data. -> Defined within `ShipData.tres`.
-    *   `ArmorType`: Damage resistance. -> `ArmorData.tres` resource.
-    *   `shockwave_create_info`: Shockwave parameters. -> Properties within `WeaponData.tres` or passed to `ShockwaveManager`.
-    *   `trail_info`: Trail parameters. -> Properties within `WeaponData.tres` or passed to `TrailManager`.
-    *   `mflash_info`: Muzzle flash definition. -> Properties within `WeaponData.tres` or passed to `MuzzleFlashManager`.
-    *   `beam_info`, `beam_weapon_info`, `beam_weapon_section_info`: Beam specifics. -> Properties within `WeaponData.tres`.
-    *   `cscrew_info`: Corkscrew state. -> Managed within `CorkscrewWeapon.gd` or `MissileProjectile.gd`.
-    *   `swarm_info`, `turret_swarm_info`: Swarm state. -> Managed within `SwarmWeapon.gd` or `MissileProjectile.gd`.
-    *   `WarpEffect` (and derived): Warp logic/visuals. -> `WarpEffect.tscn` scene with `WarpEffect.gd` script, managed by `WarpEffectManager.gd`.
+    *   `model_subsystem`: Static subsystem data. -> Defined within `ShipData.tres` (`ShipData.SubsystemDefinition`).
+    *   `ArmorType`: Damage resistance. -> `ArmorData.tres` resource (`armor_data.gd`).
+    *   `shockwave_create_info`: Shockwave parameters. -> Properties within `WeaponData.tres` or passed to `ShockwaveManager`. *(Note: Effects management TBD)*.
+    *   `trail_info`: Trail parameters. -> Properties within `WeaponData.tres` or passed to `TrailManager`. *(Note: Effects management TBD)*.
+    *   `mflash_info`: Muzzle flash definition. -> Properties within `WeaponData.tres` or passed to `MuzzleFlashManager`. *(Note: Effects management TBD)*.
+    *   `beam_info`, `beam_weapon_info`, `beam_weapon_section_info`: Beam specifics. -> Properties within `WeaponData.tres`. *(Note: Beam logic needs implementation)*.
+    *   `cscrew_info`: Corkscrew state. -> Managed within `CorkscrewWeapon.gd` or `MissileProjectile.gd`. *(Note: Needs implementation)*.
+    *   `swarm_info`, `turret_swarm_info`: Swarm state. -> Managed within `SwarmWeapon.gd` or `MissileProjectile.gd`. *(Note: Needs implementation)*.
+    *   `WarpEffect` (and derived): Warp logic/visuals. -> `WarpEffect.tscn` scene with `WarpEffect.gd` script, managed by `WarpEffectManager.gd`. *(Note: Needs implementation)*.
 *   **C++ Key Functions:**
-    *   `weapon_create()`: -> `WeaponSystem.gd` instantiates projectile scenes.
-    *   `weapon_hit()`: -> Collision handling logic in `ProjectileBase.gd` or `CollisionHandler.gd`, calls `DamageSystem.apply_damage`.
-    *   `weapon_process_post()`: -> `_physics_process()` in `ProjectileBase.gd` (lifetime, homing).
-    *   `weapon_home()`: -> Homing logic within `MissileProjectile.gd`.
-    *   `ship_apply_local_damage()`, `ship_apply_global_damage()`: -> `DamageSystem.apply_damage()`.
-    *   `do_subobj_hit_stuff()`: -> Damage distribution logic within `DamageSystem.gd`.
-    *   `do_subobj_destroyed_stuff()`: -> Subsystem destruction logic in `ShipSubsystem.gd` or `DamageSystem.gd`, triggers effects.
+    *   `weapon_create()`: -> `WeaponSystem._fire_weapon_bank()` instantiates projectile scenes.
+    *   `weapon_hit()`: -> Collision handling logic in `ProjectileBase._on_body_entered()` and `ProjectileBase._apply_impact()`, calls `DamageSystem.apply_local_damage`.
+    *   `weapon_process_post()`: -> `ProjectileBase._physics_process()` (lifetime), `MissileProjectile._homing_logic()` (homing).
+    *   `weapon_home()`: -> Homing logic within `MissileProjectile._homing_logic()`.
+    *   `ship_apply_local_damage()`, `ship_apply_global_damage()`: -> `DamageSystem.apply_local_damage()`, `DamageSystem.apply_global_damage()`.
+    *   `do_subobj_hit_stuff()`: -> Damage distribution logic within `DamageSystem._apply_subsystem_damage()`.
+    *   `do_subobj_destroyed_stuff()`: -> Subsystem destruction logic in `ShipSubsystem.destroy_subsystem()`, triggers effects (via signal or DamageSystem). *(Note: Visual effects part needs implementation)*.
     *   `apply_damage_to_shield()`: -> `ShieldSystem.absorb_damage()`.
-    *   `afterburners_start()`, `afterburners_stop()`, `afterburners_update()`: -> Methods in `EngineSystem.gd` or `ShipBase.gd`.
-    *   `beam_fire()`, `beam_move_all_post()`, `beam_render_all()`: -> Logic within `BeamWeapon.gd` and potentially a `BeamVisual.tscn/gd`.
-    *   `shockwave_create()`, `shockwave_move_all()`: -> `ShockwaveManager.create_shockwave()`, logic within `Shockwave.gd`.
-    *   `shipfx_warpin_start()`, `shipfx_warpout_start()`, `shipfx_..._frame()`: -> `WarpEffectManager.create_warp_in/out()`, logic within `WarpEffect.gd`.
-    *   `shipfx_cloak_frame()`, `shipfx_start_cloak()`, `shipfx_stop_cloak()`: -> Methods in `ShipBase.gd` controlling cloak shader/state.
-    *   `awacs_get_level()`: -> Method in `SensorSubsystem.gd` or global utility.
-    *   `trail_create()`, `trail_move_all()`, `trail_render_all()`: -> `TrailManager.create_trail()`, logic within trail node scripts.
-    *   `mflash_create()`: -> `MuzzleFlashManager.create_flash()`.
+    *   `afterburners_start()`, `afterburners_stop()`, `afterburners_update()`: -> Methods in `EngineSystem.gd` (`start_afterburner`, `stop_afterburner`, `_process`).
+    *   `beam_fire()`, `beam_move_all_post()`, `beam_render_all()`: -> Logic within `BeamWeapon.gd` and potentially a `BeamVisual.tscn/gd`. *(Note: Needs implementation)*.
+    *   `shockwave_create()`, `shockwave_move_all()`: -> `ShockwaveManager.create_shockwave()`, logic within `Shockwave.gd`. *(Note: Effects management TBD)*.
+    *   `shipfx_warpin_start()`, `shipfx_warpout_start()`, `shipfx_..._frame()`: -> `WarpEffectManager.create_warp_in/out()`, logic within `WarpEffect.gd`. *(Note: Effects management TBD)*.
+    *   `shipfx_cloak_frame()`, `shipfx_start_cloak()`, `shipfx_stop_cloak()`: -> Methods in `ShipBase.gd` controlling cloak shader/state. *(Note: Needs implementation)*.
+    *   `awacs_get_level()`: -> Method in `SensorSubsystem.gd` or global utility. *(Note: Needs verification)*.
+    *   `trail_create()`, `trail_move_all()`, `trail_render_all()`: -> `TrailManager.create_trail()`, logic within trail node scripts. *(Note: Effects management TBD)*.
+    *   `mflash_create()`: -> `MuzzleFlashManager.create_flash()`. *(Note: Effects management TBD)*.
 
-### E. Identify Relations
+### E. Identify Relations (Refined based on current implementation)
 
-*   **ShipBase** integrates **Physics** (`_integrate_forces`), manages child **Systems** (Weapon, Shield, Damage, Engine), holds **Subsystems**, and references **ShipData**.
-*   **WeaponSystem** manages **Weapon** instances (hardpoints), interacts with **ShipBase** for energy/ammo, and instantiates **Projectiles**. Reads **WeaponData**.
-*   **DamageSystem** receives hit info (from **Projectiles** or **CollisionHandler**), interacts with **ShieldSystem**, applies damage to **ShipBase** (hull) and **ShipSubsystems**. Reads **ArmorData**.
-*   **ShieldSystem** absorbs damage, manages quadrants, recharges. Interacts with **ShipBase** for energy. Visuals controlled via shaders.
-*   **EngineSystem** handles afterburner state, interacts with **ShipBase** for fuel/energy and physics modifications. Triggers **Effects** (engine glow/wash).
-*   **Projectiles** handle their own movement (**Physics**), lifetime, homing (**AI**/**Targeting**), collision detection (**Physics**), and trigger **Effects** (impacts, trails) and **Damage** application. Read **WeaponData**.
-*   **Effects Managers** (Explosion, Shockwave, Trail, etc.) are called by various systems (Weapons, Projectiles, DamageSystem) to instantiate visual/audio effects scenes.
-*   **AI System** interacts with **WeaponSystem** (firing decisions), **Targeting** (selecting targets/subsystems), **ShipBase** (movement commands), and potentially **ShieldSystem** (smart shield management). Reads **AIProfile**.
-*   **Model System** provides the visual meshes and structure referenced by **ShipBase**, **Subsystems**, and **Projectiles**. `Marker3D`s define mount points. `AnimationPlayer` handles submodel movement.
-*   **Core Systems** manage object lifecycle and the main game loop driving updates.
+*   **ShipBase** (`scripts/ship/ship_base.gd`) integrates **Physics** (`_integrate_forces`), manages child **Systems** (`WeaponSystem`, `ShieldSystem`, `DamageSystem`, `EngineSystem`), holds **Subsystems** (`scripts/ship/subsystems/ship_subsystem.gd` nodes), references **ShipData** (`scripts/resources/ship_data.gd`), and manages ETS. **(Implemented)**
+*   **WeaponSystem** (`scripts/ship/weapon_system.gd`) manages **Weapon** instances (`scripts/weapon/weapon.gd` and derived scripts on hardpoints), interacts with **ShipBase** for energy/ammo, and instantiates **Projectiles**. Reads **WeaponData** (`scripts/resources/weapon_data.gd`). Handles weapon sequences (Swarm/Corkscrew) via `ShipBase`. **(Implemented)**
+*   **DamageSystem** (`scripts/ship/damage_system.gd`) receives hit info (from **Projectiles** via collision or direct call), interacts with **ShieldSystem** (`absorb_damage`), applies damage to **ShipBase** (hull) and **ShipSubsystems** (`_apply_subsystem_damage`). Reads **ArmorData** (`scripts/resources/armor_data.gd`). Emits signals for damage/destruction. **(Implemented)**
+*   **ShieldSystem** (`scripts/ship/shield_system.gd`) absorbs damage, manages quadrants, recharges. Interacts with **ShipBase** for energy. Visuals controlled via shaders. **(Implemented)**
+*   **EngineSystem** (`scripts/ship/engine_system.gd`) handles afterburner state, interacts with **ShipBase** for fuel/energy and physics modifications. Triggers **Effects** (engine glow/wash - Needs Implementation). **(Implemented)**
+*   **Projectiles** (`scripts/weapon/projectiles/*.gd`) handle their own movement (**Physics**), lifetime, homing (**AI**/**Targeting** - in `MissileProjectile.gd`), collision detection (**Physics** - `_on_body_entered`), and trigger **Effects** (impacts, trails - via `_apply_impact` - Needs Implementation) and **Damage** application (calling `DamageSystem.apply_local_damage`). Read **WeaponData**. **(Partially Implemented - Base, Laser, Missile)**
+*   **Effects Managers** (Explosion, Shockwave, Trail, etc.) are needed to be called by various systems (DamageSystem, ProjectileBase, WeaponInstance) to instantiate visual/audio effects scenes. **(Needs Implementation)**.
+*   **AI System** (Likely in `scripts/ai/`) interacts with **WeaponSystem** (firing decisions), **Targeting** (selecting targets/subsystems), **ShipBase** (movement commands), and potentially **ShieldSystem**. Reads **AIProfile** (`scripts/resources/ai_profile.gd`). **(Partially Implemented - AI resources exist, controller logic TBD)**.
+*   **Model System** provides visual meshes referenced by **ShipBase**, **Subsystems**, and **Projectiles**. `Marker3D`s define mount points. `AnimationPlayer` handles submodel movement. **(Implicitly handled by Godot)**.
+*   **Core Systems** (`scripts/core_systems/`) manage object lifecycle and the main game loop. **(Exists, specific interactions TBD)**.
 
 ## 5. Conversion Strategy Notes
 

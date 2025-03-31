@@ -1,6 +1,10 @@
 # scripts/ai/behaviors/chase_target.gd
 # LimboAI BTAction: Calculates movement and rotation towards the current target.
 # Reads target information from the blackboard and sets desired movement/rotation.
+# NOTE: This is a simplified chase action. The full C++ ai_chase logic involves
+# complex submodes (attack, evade, get behind, etc.) which should be handled
+# by the overall Behavior Tree structure using conditions and other actions
+# in conjunction with this basic chase movement.
 class_name ChaseTarget
 extends BTAction
 
@@ -43,7 +47,7 @@ func _tick() -> Status:
 	var distance = direction.length()
 
 	# Check if we've reached the arrival distance (optional behavior)
-	# A separate condition node might be better for checking arrival.
+	# A separate condition node (like IsTargetInRange) might be better for checking arrival.
 	# if distance <= arrival_distance:
 	#	 blackboard.set_var("desired_movement", Vector3.ZERO)
 	#	 return SUCCESS # Or RUNNING if chase should continue even when close
@@ -62,6 +66,7 @@ func _tick() -> Status:
 
 	# Simple approach: always move at max speed towards target
 	# More complex logic could adjust speed based on distance, profile, etc.
+	# Assuming desired_movement is a world-space velocity vector
 	var desired_velocity = direction * max_speed * speed_multiplier
 	blackboard.set_var("desired_movement", desired_velocity) # AIController/Ship interprets this
 

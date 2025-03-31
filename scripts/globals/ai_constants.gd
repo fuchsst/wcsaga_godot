@@ -1,7 +1,7 @@
 # scripts/globals/ai_constants.gd
 # Defines constants and enums used by the AI system.
 class_name AIConstants
-extends RefCounted # Use RefCounted or Node depending on how it's accessed (likely RefCounted for constants)
+extends RefCounted # Use RefCounted as it primarily holds constants/enums
 
 # --- AI Modes (AIM_*) ---
 # High-level behavioral state of the AI.
@@ -84,9 +84,10 @@ enum StealthSweepSubmode {
 
 # Guard Submodes (AIS_GUARD_*)
 enum GuardSubmode {
-	STATIC = 101, # Guard static position relative to target
-	PATROL = 102, # Patrol around the guarded object
-	ATTACK = 103 # Attack threats to the guarded object
+	STATIC = 101, # Guard static position relative to target (Mapped from AIS_GUARD_STATIC)
+	PATROL = 102, # Patrol around the guarded object (Mapped from AIS_GUARD_PATROL)
+	ATTACK = 103, # Attack threats to the guarded object (Mapped from AIS_GUARD_ATTACK)
+	# AIS_GUARD_2 (103) seems redundant with ATTACK, mapping ATTACK to it.
 }
 
 # Docking Submodes (AIS_DOCK_*, AIS_UNDOCK_*)
@@ -111,6 +112,7 @@ enum SafetySubmode {
 	PICK_SPOT = 41, # AISS_1
 	GOTO_SPOT = 42, # AISS_2
 	CIRCLE_SPOT = 43 # AISS_3
+	# AISS_1a (44) seems unused or specific, omitting for now.
 }
 
 # Warp Out Submodes (AIS_WARP_*)
@@ -120,6 +122,7 @@ enum WarpOutSubmode {
 	ACCELERATE = 302, # AIS_WARP_3
 	INITIATE_EFFECT = 303, # AIS_WARP_4
 	WARPING = 304 # AIS_WARP_5
+	# AIS_DEPART_TO_BAY (305) seems related but distinct, maybe handle separately?
 }
 
 # --- AI Flags (AIF_*) ---
@@ -187,6 +190,40 @@ enum SubsystemType {
 	NAVIGATION = 4,
 	COMMUNICATION = 5,
 	WEAPONS = 6,
-	SENSORS = 7
-	# Add others as needed
+	SENSORS = 7,
+	SOLAR = 8,
+	GAS_COLLECT = 9,
+	ACTIVATION = 10,
+	UNKNOWN = 11
 }
+
+
+# --- AI Profile Flags (AIPF_*) ---
+# Controls AI capabilities/rules, often loaded from ai_profiles.tbl
+const AIPF_SMART_SHIELD_MANAGEMENT = 1 << 0
+const AIPF_BIG_SHIPS_CAN_ATTACK_BEAM_TURRETS_ON_UNTARGETED_SHIPS = 1 << 1
+const AIPF_SMART_PRIMARY_WEAPON_SELECTION = 1 << 2
+const AIPF_SMART_SECONDARY_WEAPON_SELECTION = 1 << 3
+const AIPF_ALLOW_RAPID_SECONDARY_DUMBFIRE = 1 << 4
+const AIPF_HUGE_TURRET_WEAPONS_IGNORE_BOMBS = 1 << 5
+const AIPF_DONT_INSERT_RANDOM_TURRET_FIRE_DELAY = 1 << 6
+# Flags 7-18 are mostly FS1/unused flags, omitted for brevity unless needed
+const AIPF_SMART_AFTERBURNER_MANAGEMENT = 1 << 19
+const AIPF_FIX_LINKED_PRIMARY_BUG = 1 << 20
+const AIPF_PREVENT_TARGETING_BOMBS_BEYOND_RANGE = 1 << 21
+const AIPF_SMART_SUBSYSTEM_TARGETING_FOR_TURRETS = 1 << 22
+const AIPF_FIX_HEAT_SEEKER_STEALTH_BUG = 1 << 23
+const AIPF_MULTI_ALLOW_EMPTY_PRIMARIES = 1 << 24 # Multiplayer: Allow ships with no primary weapons
+const AIPF_MULTI_ALLOW_EMPTY_SECONDARIES = 1 << 25 # Multiplayer: Allow ships with no secondary weapons
+const AIPF_ALLOW_TURRETS_TARGET_WEAPONS_FREELY = 1 << 26 # Turrets can target any weapon, not just bombs
+const AIPF_USE_ONLY_SINGLE_FOV_FOR_TURRETS = 1 << 27 # Use a simplified FOV check for turrets
+const AIPF_ALLOW_VERTICAL_DODGE = 1 << 28 # Allow AI ships to dodge vertically
+const AIPF_GLOBAL_DISARM_DISABLE_EFFECTS = 1 << 29 # Disarm/Disable goals affect all AI targeting globally
+const AIPF_FORCE_BEAM_TURRET_FOV = 1 << 30 # Force beam turrets to use standard FOV checks
+const AIPF_FIX_AI_CLASS_BUG = 1 << 31 # Fix for a potential bug related to AI class scaling
+
+# --- AI Profile Flags 2 (AIPF2_*) ---
+# Less common flags, often from ai_profiles.tbl flags2 column
+const AIPF2_TURRETS_IGNORE_TARGET_RADIUS = 1 << 0 # Turrets ignore target radius in range checks
+const AIPF2_CAP_VS_CAP_COLLISIONS = 1 << 1 # Enable collision detection between capital ships
+# TODO: Add other AIPF2 flags from analysis or tables

@@ -4,16 +4,18 @@
 # via a state machine or behavior tree (LimboAI).
 # Corresponds largely to the original ai_info struct and ai_execute_behavior logic.
 class_name AIController
+extends Node
+
 # Preload constants for easy access
 const AIConst = preload("res://scripts/globals/ai_constants.gd")
-
-extends Node
+const AIGoal = preload("res://scripts/resources/ai_goal.gd") # Ensure AIGoal is preloaded
 
 # --- Dependencies (Set externally or found in _ready) ---
 var ship: Node3D # Reference to the parent ship (needs specific type like ShipBase later)
 var behavior_tree_player: Node # LimboAI BTPlayer node (found by name)
 var blackboard: Resource # LimboAI Blackboard resource (obtained from BTPlayer)
 var goal_manager: Node # AIGoalManager node (found by name or created)
+var perception_component: PerceptionComponent # Handles sensing the environment
 
 # --- Configuration (Set externally, e.g., by ShipBase based on ShipData) ---
 @export var ai_profile: AIProfile = null # Link to AIProfile resource
@@ -211,6 +213,17 @@ func _ready() -> void:
 		# goal_manager.name = "AIGoalManager"
 		# add_child(goal_manager)
 
+	# Find or create Perception Component
+	perception_component = find_child("PerceptionComponent", false, false) # Non-recursive, owned
+	if not perception_component:
+		perception_component = PerceptionComponent.new()
+		perception_component.name = "PerceptionComponent"
+		add_child(perception_component)
+		print("AIController: Created PerceptionComponent for ", ship.name)
+	elif not perception_component is PerceptionComponent:
+		printerr("AIController: Found node named 'PerceptionComponent' but it's not the correct type!")
+		perception_component = null # Ensure it's null if wrong type
+
 	# Initialize state based on profile, class, skill level
 	_initialize_from_profile()
 
@@ -224,8 +237,12 @@ func _physics_process(delta: float) -> void:
 	# 1. Update Timers
 	_update_timers(delta)
 
-	# 2. Perception (Update internal state based on world)
-	_update_perception(delta)
+	# 2. Perception (Delegate to Perception Component)
+	if perception_component:
+		perception_component.update_perception(delta)
+	else:
+		printerr("AIController: PerceptionComponent is missing!")
+
 
 	# 3. Goal Processing (Delegate to Goal Manager)
 	if goal_manager and goal_manager.has_method("process_goals"):
@@ -331,350 +348,7 @@ func _update_timers(delta: float):
 	var current_time = Time.get_ticks_msec() / 1000.0
 	for i in range(ignore_new_list.size() - 1, -1, -1):
 		if current_time >= ignore_new_list[i].get("expire_time", 0.0):
-			ignore_new_list.remove_at(i)
-
-
-func _update_perception(delta: float):
-	# Main perception update function called each physics frame.
-	# Orchestrates the different perception sub-tasks.
-
-	# 1. Find potential targets if needed
-	_find_potential_targets()
-
-	# 2. Evaluate threats (missiles, dangerous projectiles)
-	_evaluate_threats()
-
-	# 3. Update status of the current target
-	_update_target_status(delta)
-
-	# 4. Handle stealth target visibility updates
-	_update_stealth_visibility()
-
-	# 5. Update perception-related timers
-	_update_perception_timers()
-
-
-# --- Perception Helper Functions ---
-
-func _find_potential_targets():
-	# Determines if a new target should be selected and selects the best one.
-	var should_find_new_target = false
-	if target_object_id == -1:
-		should_find_new_target = true
-	else:
-		var target_node = instance_from_id(target_object_id)
-		if not is_instance_valid(target_node):
-			should_find_new_target = true
-		elif target_node.has_method("is_destroyed") and target_node.is_destroyed(): # Check if destroyed
-			should_find_new_target = true
-		# TODO: Add checks if current target departed or is no longer valid based on goals
-
-	if choose_enemy_timer == 0.0:
-		should_find_new_target = true
-
-	if not should_find_new_target:
-		return # Keep current target
-
-	# --- Find Best Target ---
-	var best_target_id = -1
-	var nearest_dist_sq = 99999999.0 # Use squared distance for comparison
-	# TODO: Get sensor range from ship's SensorSubsystem or default
-	var sensor_range_sq = 5000.0 * 5000.0 # Placeholder sensor range
-
-	# Assume access to global managers (need proper implementation/injection)
-	if not Engine.has_singleton("ObjectManager") or not Engine.has_singleton("IFFManager"):
-		printerr("AIController requires ObjectManager and IFFManager singletons!")
-		return
-
-	var object_manager = Engine.get_singleton("ObjectManager")
-	var iff_manager = Engine.get_singleton("IFFManager")
-
-	# Get own team and attack mask
-	var my_team = -1
-	if ship.has_method("get_team"):
-		my_team = ship.get_team()
-	else:
-		printerr("AIController: Ship node missing get_team() method!")
-		return
-
-	var enemy_team_mask = iff_manager.get_attackee_mask(my_team) # Assumes IFFManager method
-
-	# Get potential targets (ships for now, expand later)
-	var potential_targets = object_manager.get_all_ships() # Assumes ObjectManager method
-
-	for target_ship in potential_targets:
-		if not is_instance_valid(target_ship): continue # Skip invalid instances
-
-		var target_id = target_ship.get_instance_id()
-
-		# --- Filter Targets ---
-		# 1. Don't target self
-		if target_id == ship.get_instance_id():
-			continue
-
-		# 2. Check IFF
-		var target_team = -1
-		if target_ship.has_method("get_team"):
-			target_team = target_ship.get_team()
-		else:
-			continue # Cannot determine team
-
-		if not iff_manager.iff_matches_mask(target_team, enemy_team_mask):
-			continue # Not an enemy
-
-		# 3. Check ignore lists
-		if is_ignore_object(target_id):
-			continue
-
-		# 4. Check targetability flags (requires methods/properties on target_ship)
-		# TODO: Check SF_DYING, SIF_NAVBUOY, OF_PROTECTED, SF_ARRIVING flags
-		# Example: if target_ship.is_dying(): continue
-		# Example: if target_ship.ship_info.has_flag(ShipInfo.SIF_NAVBUOY): continue
-		# Example: if target_ship.has_flag(BaseObject.OF_PROTECTED): continue
-		# Example: if target_ship.is_arriving(): continue
-
-		# 5. Check distance/sensor range
-		var dist_sq = ship.global_position.distance_squared_to(target_ship.global_position)
-		if dist_sq > sensor_range_sq:
-			continue
-
-		# 6. Check visibility (Placeholder - needs AWACS, stealth, LoS checks)
-		# if not is_target_visible(target_ship): continue
-
-		# 7. Check max attackers (Placeholder - needs num_enemies_attacking helper)
-		# var max_attackers = ai_profile.get_max_attackers(skill_level) # Assumes getter
-		# if num_enemies_attacking(target_id) >= max_attackers: continue
-
-		# --- Select Best Target (Nearest valid enemy for now) ---
-		if dist_sq < nearest_dist_sq:
-			nearest_dist_sq = dist_sq
-			best_target_id = target_id
-
-	# --- Update Target ---
-	if best_target_id != target_object_id:
-		var new_target_node = instance_from_id(best_target_id) if best_target_id != -1 else null
-		set_target(new_target_node) # Update internal target state
-		print("AI (%s): New target selected: %s" % [ship.name, new_target_node.name if new_target_node else "None"])
-
-	# Reset choose enemy timer
-	# TODO: Use skill-based timer value from profile/constants
-	choose_enemy_timer = randf_range(3.0, 7.0) # Placeholder timer
-
-
-func _evaluate_threats():
-	# Detects incoming homing missiles targeting this ship and potentially
-	# dangerous non-homing projectiles nearby.
-	# Updates nearest_locked_object, nearest_locked_distance, danger_weapon_objnum.
-
-	# Reset threat state from previous frame
-	nearest_locked_object = -1
-	nearest_locked_distance = 99999.0
-	danger_weapon_objnum = -1
-	danger_weapon_signature = -1
-
-	# Need access to ObjectManager to get active weapons
-	if not Engine.has_singleton("ObjectManager"):
-		printerr("AIController: _evaluate_threats requires ObjectManager singleton!")
-		return
-
-	var object_manager = Engine.get_singleton("ObjectManager")
-	# Assuming ObjectManager has a method to get all active weapon nodes
-	if not object_manager.has_method("get_all_weapons"):
-		printerr("AIController: ObjectManager missing get_all_weapons() method!")
-		return
-
-	var active_weapons = object_manager.get_all_weapons()
-	var my_ship_node = ship # Cache for clarity
-	var my_ship_id = my_ship_node.get_instance_id()
-
-	for weapon_node in active_weapons:
-		if not is_instance_valid(weapon_node):
-			continue
-
-		# --- Check for Homing Missiles Targeting Us ---
-		# Assumes weapon_node script (e.g., MissileProjectile.gd) has these methods/properties
-		if weapon_node.has_method("is_homing") and weapon_node.is_homing():
-			var homing_target_id = -1
-			if weapon_node.has_method("get_homing_target_id"):
-				homing_target_id = weapon_node.get_homing_target_id()
-			# Alternative: Check a property if methods aren't used
-			# elif "homing_target_id" in weapon_node:
-			#	 homing_target_id = weapon_node.homing_target_id
-
-			if homing_target_id == my_ship_id:
-				var dist = my_ship_node.global_position.distance_to(weapon_node.global_position)
-				if dist < nearest_locked_distance:
-					nearest_locked_distance = dist
-					nearest_locked_object = weapon_node.get_instance_id()
-
-		# --- Check for Dangerous Dumbfire Weapons (Placeholder) ---
-		# TODO: Implement logic similar to ai_update_danger_weapon
-		# - Check weapon type (e.g., ignore lasers at long range?)
-		# - Predict weapon trajectory using weapon velocity and lifetime.
-		# - Calculate closest point of approach (CPA) to this ship's predicted path.
-		# - Assess danger based on CPA distance, time-to-CPA, weapon damage/type.
-		# - Keep track of the weapon with the highest danger rating.
-		# - Update danger_weapon_objnum and danger_weapon_signature.
-		pass # Placeholder for dumbfire threat assessment
-
-	# Blackboard variables are updated in _update_blackboard()
-
-
-func _update_target_status(delta: float):
-	# Updates timers related to the current target's status (range, proximity).
-	if target_object_id == -1:
-		time_enemy_in_range = 0.0
-		time_enemy_near = 0.0
-		return
-
-	var target_node = instance_from_id(target_object_id)
-	# Basic validity check already done in _find_potential_targets, but double-check
-	if not is_instance_valid(target_node):
-		set_target(null)
-		time_enemy_in_range = 0.0
-		time_enemy_near = 0.0
-		return
-	elif target_node.has_method("is_destroyed") and target_node.is_destroyed():
-		set_target(null)
-		time_enemy_in_range = 0.0
-		time_enemy_near = 0.0
-		return
-
-	# TODO: Add more checks: sensor range, visibility (LoS, nebula)
-
-	# Update timers based on target status
-	var target_pos = get_target_position()
-	var dist_sq = ship.global_position.distance_squared_to(target_pos)
-
-	# TODO: Get actual weapon range from ship's WeaponSystem
-	var weapon_range = 1000.0 # Placeholder range
-	var weapon_range_sq = weapon_range * weapon_range
-
-	if dist_sq <= weapon_range_sq:
-		time_enemy_in_range += delta
-	else:
-		time_enemy_in_range = 0.0 # Reset if out of range
-
-	# Use the runtime stalemate distance threshold
-	var stalemate_dist_thresh_sq = stalemate_dist_thresh * stalemate_dist_thresh
-
-	if dist_sq <= stalemate_dist_thresh_sq:
-		time_enemy_near += delta
-	else:
-		time_enemy_near = 0.0 # Reset if too far
-
-
-func _update_stealth_visibility():
-	# Placeholder: Handles visibility updates for stealth targets.
-	# TODO: Implement stealth handling
-	# - If current target is stealthy (check target's flags/properties):
-	#   - Call ai_is_stealth_visible equivalent logic (needs implementation).
-	#   - Update stealth_last_visible_stamp, stealth_last_cheat_visible_stamp.
-	#   - If visible, update stealth_last_pos, stealth_velocity from target's current state.
-	#   - If not visible, potentially update predicted position based on last known velocity.
-	pass
-
-
-func _update_perception_timers():
-	# Placeholder: Resets or updates timers based on perception results.
-	# TODO: Implement timer updates
-	# - Example: Reset choose_enemy_timer if a new target was selected in _find_potential_targets.
-	# - Example: Reset scan_for_enemy_timer if applicable.
-	pass
-
-# --- End Perception Helpers ---
-
-
-# --- Helper function to check ignore lists ---
-func is_ignore_object(check_target_id: int) -> bool:
-	# Checks if the given target ID is on the permanent or temporary ignore list.
-
-	# Check permanent ignore
-	if ignore_object_id != -1:
-		var ignored_node = instance_from_id(ignore_object_id)
-		if is_instance_valid(ignored_node):
-			# Check signature match if available (using metadata as placeholder)
-			var ignored_sig = ignored_node.get_meta("signature", ignored_node.get_instance_id())
-			if ignore_object_id == check_target_id and ignore_signature == ignored_sig:
-				return true
-		else:
-			# Ignored object is gone, clear permanent ignore
-			ignore_object_id = -1
-			ignore_signature = -1
-
-	# Check temporary ignore list (ignore_new_list)
-	var current_time = Time.get_ticks_msec() / 1000.0
-	for item in ignore_new_list:
-		var ignored_id = item.get("id", -1)
-		var ignored_sig = item.get("sig", 0)
-		var expire_time = item.get("expire_time", 0.0)
-
-		if ignored_id == check_target_id:
-			# Check if expired (already handled by timer update, but good practice)
-			if current_time < expire_time:
-				# Check signature match if possible
-				var check_node = instance_from_id(check_target_id)
-				if is_instance_valid(check_node):
-					var check_sig = check_node.get_meta("signature", check_node.get_instance_id())
-					if ignored_sig == check_sig:
-						return true
-				# else: Target node is gone, ignore entry is stale but doesn't match current check_id
-			# else: Expired entry, will be removed by timer update
-	return false
-
-
-# Helper function to count how many other AI ships are currently targeting the given target_id
-# TODO: This needs access to all other AIControllers, likely via ObjectManager
-func num_enemies_attacking(target_id: int) -> int:
-	# Placeholder implementation - requires global access or manager
-	var count = 0
-	if target_id == -1:
-		return 0
-
-	# Need access to ObjectManager and IFFManager singletons
-	if not Engine.has_singleton("ObjectManager") or not Engine.has_singleton("IFFManager"):
-		printerr("num_enemies_attacking requires ObjectManager and IFFManager singletons!")
-		return 0
-
-	var object_manager = Engine.get_singleton("ObjectManager")
-	var iff_manager = Engine.get_singleton("IFFManager")
-	var all_ships = object_manager.get_all_ships() # Assumes method returns Array[Node]
-
-	var target_node = instance_from_id(target_id)
-	if not is_instance_valid(target_node) or not target_node.has_method("get_team"):
-		return 0 # Cannot determine target team
-	var target_team = target_node.get_team()
-
-	for other_ship in all_ships:
-		if not is_instance_valid(other_ship) or other_ship == ship:
-			continue # Skip self or invalid ships
-
-		# Check if the other ship has an AIController
-		var other_ai = other_ship.find_child("AIController", false, false) # Non-recursive, owned by ship
-		if not other_ai or not other_ai is AIController:
-			continue
-
-		# Check if the other AI is targeting the same object
-		if other_ai.target_object_id == target_id:
-			# Check if the other AI is hostile to the target
-			var other_team = -1
-			if other_ship.has_method("get_team"):
-				other_team = other_ship.get_team()
-			else:
-				continue # Cannot determine team
-
-			if iff_manager.iff_x_attacks_y(other_team, target_team):
-				# Check if the other AI is in an attacking mode (optional, but good)
-				if other_ai.mode == AIConst.AIMode.CHASE or \
-				   other_ai.mode == AIConst.AIMode.STRAFE or \
-				   other_ai.mode == AIConst.AIMode.BIGSHIP: # Add other relevant attack modes
-					# Multiplayer check from original code (simplified)
-					var is_multiplayer = false # TODO: Get actual multiplayer status
-					var is_player_ship = other_ship.has_meta("is_player") and other_ship.get_meta("is_player") # Example check
-					if (is_multiplayer and is_player_ship) or not is_player_ship:
-						count += 1
-	return count
-
+			ignore_new_list.remove_at(i) # Remove expired entry
 
 func _update_blackboard():
 	if not blackboard: return
@@ -801,7 +475,7 @@ func _execute_actions_from_blackboard(delta: float):
 
 
 # --- Public Methods (Called by other systems or BT tasks) ---
-func set_mode(new_mode: AIConst.AIMode, new_submode: int = 0): # Use AIMode enum
+func set_mode(new_mode: AIConstants.AIMode, new_submode: int = 0): # Use AIMode enum
 	if new_mode != mode or new_submode != submode:
 		previous_mode = mode
 		previous_submode = submode
@@ -811,8 +485,8 @@ func set_mode(new_mode: AIConst.AIMode, new_submode: int = 0): # Use AIMode enum
 		submode_start_time = mode_start_time
 		# Update blackboard immediately
 		if blackboard:
-			blackboard.set_var("current_mode", mode)
-			blackboard.set_var("current_submode", submode)
+			blackboard.set_var("mode", mode) # Use simple name
+			blackboard.set_var("submode", submode)
 		# If using a state machine, trigger transition here
 
 func set_target(target_node: Node3D):
@@ -832,6 +506,8 @@ func set_target(target_node: Node3D):
 		current_target_is_locked = false
 		time_enemy_in_range = 0.0
 		time_enemy_near = 0.0
+		# Clear targeted subsystem when target changes
+		set_targeted_subsystem(null, -1)
 		# Update blackboard
 		if blackboard:
 			blackboard.set_var("target_id", target_object_id)
@@ -843,7 +519,8 @@ func set_targeted_subsystem(subsystem: Node, parent_id: int): # Use specific sub
 	targeted_subsystem_parent_id = parent_id
 	# Update blackboard if needed
 	if blackboard:
-		blackboard.set_var("targeted_subsystem_name", subsystem.name if subsystem else "")
+		blackboard.set_var("has_subsystem_target", is_instance_valid(targeted_subsystem))
+		blackboard.set_var("targeted_subsystem_name", subsystem.name if is_instance_valid(subsystem) else "")
 
 func add_goal(goal: AIGoal):
 	if goal_manager and goal_manager.has_method("add_goal"):
@@ -854,10 +531,10 @@ func clear_goals():
 		goal_manager.clear_goals(self) # Pass self for context
 
 # --- Helper methods for state checks (Can be called by BT conditions) ---
-func has_flag(flag: int) -> bool:
+func has_flag(flag: int) -> bool: # Keep int for direct flag checks
 	return (ai_flags & flag) != 0
 
-func set_flag(flag: AIConst, value: bool): # Use AIConst for flags
+func set_flag(flag: int, value: bool): # Keep int for direct flag setting
 	if value:
 		ai_flags |= flag
 	else:
@@ -878,8 +555,27 @@ func get_target_position() -> Vector3:
 				return target_node.global_position
 	# Return self position if no valid target to avoid errors,
 	# or a far-off point depending on desired behavior.
-	return ship.global_position if ship else Vector3.ZERO
+	return ship.global_position if is_instance_valid(ship) else Vector3.ZERO
 
-# ... other methods mirroring original AI functions as needed ...
-# Example: is_ignore_object, maybe_recreate_path, etc.
-# These might become BT conditions/actions instead of direct methods here.
+# --- TODO: Implement other core AI logic functions ---
+# These might be called by the BT or moved to dedicated components later.
+
+# func check_collision_avoidance():
+#	 # Placeholder for collision avoidance logic
+#	 pass
+
+# func update_stealth_pursuit():
+#	 # Placeholder for stealth target tracking logic
+#	 pass
+
+# func manage_shields():
+#	 # Placeholder for shield management logic (e.g., balancing)
+#	 pass
+
+# func check_rearm_repair_needs():
+#	 # Placeholder for checking if rearm/repair is needed
+#	 pass
+
+# func select_weapons():
+#	 # Placeholder for weapon selection logic (might be BT actions)
+#	 pass
