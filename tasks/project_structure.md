@@ -235,7 +235,8 @@ wcsaga_godot/
 │   │   │   └── func fire(target: Node3D = null, target_subsystem: ShipSubsystem = null) -> bool
 │   │   ├── emp_weapon.gd            # Logic for EMP weapon instances
 │   │   │   └── func fire(target: Node3D = null, target_subsystem: ShipSubsystem = null) -> bool
-│   │   ├── swarm_weapon.gd          # Logic for swarm missile weapon instances (placeholder)
+│   │   ├── swarm_weapon.gd          # Logic for swarm missile weapon instances
+│   │   │   └── func fire(target: Node3D = null, target_subsystem: ShipSubsystem = null) -> bool
 │   │   ├── corkscrew_weapon.gd      # Logic for corkscrew missile weapon instances
 │   │   │   └── func fire(target: Node3D = null, target_subsystem: ShipSubsystem = null) -> bool
 │   │   └── projectiles/             # Projectile logic scripts
