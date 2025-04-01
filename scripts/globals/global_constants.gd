@@ -188,6 +188,50 @@ enum GameEvent {
 	# NUM_EVENTS = 67
 }
 
+# --- Hook Condition Types (Mirroring CHC_*) ---
+enum HookConditionType {
+	NONE = -1,
+	MISSION = 0,
+	SHIP = 1,
+	SHIPCLASS = 2,
+	SHIPTYPE = 3,
+	STATE = 4,
+	CAMPAIGN = 5,
+	WEAPONCLASS = 6,
+	OBJECTTYPE = 7,
+	KEYPRESS = 8,
+	VERSION = 9,
+	APPLICATION = 10
+	# NUM_SCRIPT_CONDITIONS = 11
+}
+
+# --- Hook Action Types (Mirroring CHA_*) ---
+enum HookActionType {
+	NONE = -1,
+	WARPOUT = 0,
+	WARPIN = 1,
+	DEATH = 2,
+	ONFRAME = 3,
+	COLLIDESHIP = 4,
+	COLLIDEWEAPON = 5,
+	COLLIDEDEBRIS = 6,
+	COLLIDEASTEROID = 7,
+	HUDDRAW = 8,
+	OBJECTRENDER = 9,
+	SPLASHSCREEN = 10,
+	GAMEINIT = 11,
+	MISSIONSTART = 12,
+	MISSIONEND = 13,
+	MOUSEMOVED = 14,
+	MOUSEPRESSED = 15,
+	MOUSERELEASED = 16,
+	KEYPRESSED = 17,
+	KEYRELEASED = 18,
+	ONSTATESTART = 19,
+	ONSTATEEND = 20
+	# NUM_SCRIPT_ACTIONS = 21
+}
+
 # --- Statistics Types (Placeholder) ---
 enum StatType {
 	SCORE,

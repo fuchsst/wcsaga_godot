@@ -11,13 +11,16 @@ The core strategy involves analyzing original formats, developing conversion too
    *   Analyze proprietary file formats (.fs2, .pof, .ani, .eff, table formats) and create format specs.
    *   Create test suite for format validation.
    *   Map asset relationships and dependencies.
+   *   **Identify Relations (Scripting - See `tasks/08_scripting.md`):**
+        *   **SEXP System (`parse/sexp.*`, `parse/parselo.*`):** Mapped to Godot's `SexpNode`, `SexpEvaluator`, `SexpOperatorHandler`, `SexpVariableManager`, `SexpConstants` (`scripts/scripting/sexp/`). Requires a parser (offline, python script in migration_tools) to convert `.fs2` SEXP text to `SexpNode` resources within `MissionData.tres`.
+        *   **Hook System (`parse/scripting.*`, `parse/lua.*`):** Mapped to Godot's `ScriptState`, `ConditionedHook`, `ScriptCondition`, `ScriptAction`, `ScriptHook` (`scripts/scripting/hook_system/`). Requires `ScriptSystem` Autoload (`scripts/core_systems/script_system.gd` - MISSING) for integration and loading definitions from converted `scripting.tbl`/`*-sct.tbm`. Requires `GlobalConstants.gd` (MISSING).
+        *   **Expression Parser (`variables/variables.*`):** Not currently implemented in Godot.
+        *   **Encryption (`parse/encrypt.*`):** Not currently implemented in Godot. Optional.
 
-   **B. Core Conversion Infrastructure**
-   *   Create base converter framework (Python recommended).
-   *   Implement file system traversal and management (handle `.vp` extraction).
-   *   Build logging and error handling system.
-   *   Create progress tracking and reporting.
-   *   Develop validation framework.
+   **B. Potential Godot Solutions & Integration**
+   *   **SEXP Evaluation:** Use the implemented `SexpEvaluator` (`scripts/scripting/sexp/sexp_evaluator.gd`) and `SexpOperatorHandler` (`scripts/scripting/sexp/sexp_operators.gd`) to execute SEXP logic stored as `SexpNode` trees within the converted `MissionData.tres` (see `scripts/resources/mission/mission_data.gd`).
+   *   **Hook System:** Use the implemented `ScriptState` (`scripts/scripting/hook_system/script_state.gd`) and related Resource classes (`ConditionedHook`, etc.) to manage conditional GDScript execution. Hook definitions need to be loaded (by `ScriptSystem` - `scripts/core_systems/script_system.gd`) from converted `scripting.tbl`/`*-sct.tbm` data (likely into `.tres` or JSON format first). Game events trigger checks via Godot signals connected to `ScriptSystem`.
+   *   **Table Data:** Load converted `.tbl` data (e.g., `ShipData.tres`, `WeaponData.tres`, `AIProfile.tres`) using Godot's `load()` function into custom Resource scripts (e.g., `scripts/resources/ship_weapon/ship_data.gd`, `scripts/resources/ship_weapon/weapon_data.gd`, `scripts/resources/ai/ai_profile.gd`). Mission data (`.fs2`) is converted to `MissionData.tres` (defined by `scripts/resources/mission/mission_data.gd`) and loaded via `MissionLoader.gd`.
 
    **C. Media Extractors & Conversion**
    *   **Audio Conversion System:**
@@ -52,22 +55,21 @@ The core strategy involves analyzing original formats, developing conversion too
         *   Extract collision meshes (potentially from shield mesh data or BSP). (`model_part1.md`)
         *   Convert to Godot collision shapes (`CollisionShape3D` with appropriate `Shape3D` resource) during import or scene setup.
 
-   **E. Mission & Game Data Conversion**
-   *   **Mission Structure (.fs2):**
-        *   Parse mission files (.fs2 format) using a custom Python script. (`mission_part1.md`, `fred2_part2_missionsave.md`)
-        *   Extract core components: Mission Info, Player Starts, Ships, Wings, Waypoints, Events, Goals, Messages, Briefings, Debriefings, Reinforcements, Variables (S-Expressions).
-        *   Convert mission structure to a custom Godot Resource format (`MissionData.tres`).
-        *   Preserve event triggers (S-Expressions) and conditions - requires careful mapping to Godot signals/scripting logic or direct Sexp evaluation if feasible. Store SEXP structure within the `MissionData.tres`.
-        *   Convert Waypoints to `Path3D` nodes or Vector3 arrays within the resource.
-        *   Convert Briefing/Debriefing data (text, voice paths, camera positions, icon data) into structured data within the resource.
-   *   **Game Logic Data (.tbl):**
-        *   Extract game rules and parameters from tables (`ships.tbl`, `weapons.tbl`, `ai_profiles.tbl`, `iff_defs.tbl`, `species_defs.tbl`, `rank.tbl`, `medals.tbl`, etc.). (`species_defs.md`, `stats.md`)
-        *   Convert ship/weapon specifications, AI profiles, IFF rules, species data, etc., into corresponding Godot Resources (`ShipData.tres`, `WeaponData.tres`, `AIProfile.tres`, etc.).
-        *   Preserve AI behavior definitions and parameters.
-   *   **Text & Localization:**
-        *   Extract string tables (`tstrings.tbl`, `*-lcl.tbm`) and text resources from other `.tbl` files.
-        *   Convert to Godot Translation (`.po` or `.csv`) format.
-        *   Preserve formatting and metadata where possible.
+   **E. Outline Target Godot Project Structure (Relevant Parts)**
+   *   `resources/missions/`: Stores `MissionData.tres` files, containing mission structure and SEXP node trees (`SexpNode` resources).
+   *   `resources/ships/`, `resources/weapons/`, `resources/ai/profiles/`, etc.: Store corresponding `.tres` files converted from `.tbl` data.
+   *   `resources/scripting/`: May hold `.tres` definitions for `ConditionedHook`s if not generated procedurally from converted table data by `ScriptSystem`.
+   *   `resources/localization/`: Stores `.po` or `.csv` files for translations.
+   *   `scripts/scripting/sexp/`: Contains the SEXP evaluation runtime (`SexpEvaluator.gd`, `SexpOperatorHandler.gd`, `SexpVariableManager.gd`, `SexpNode.gd`, `SexpConstants.gd`).
+   *   `scripts/scripting/hook_system/`: Contains the Hook system runtime (`ScriptState.gd`, `ConditionedHook.gd`, `ScriptCondition.gd`, `ScriptAction.gd`, `ScriptHook.gd`).
+   *   `scripts/resources/`: Contains the GDScript classes defining the structure of the custom Resource types, organized into subfolders:
+        *   `scripts/resources/ai/`: `AIGoal.gd`, `AIProfile.gd`
+        *   `scripts/resources/game_data/`: `GameSounds.gd`, `MusicEntry.gd`, `SoundEntry.gd`, `SpeciesInfo.gd`
+        *   `scripts/resources/mission/`: `MissionData.gd`, `ShipInstanceData.gd`, `WingInstanceData.gd`, `MissionObjectiveData.gd`, `MissionEventData.gd`, `BriefingData.gd`, `DebriefingData.gd`, `MessageData.gd`, `PersonaData.gd`, `MissionLogEntry.gd`, etc.
+        *   `scripts/resources/player/`: `PlayerData.gd`, `RankInfo.gd`, `MedalInfo.gd`, etc.
+        *   `scripts/resources/ship_weapon/`: `ShipData.gd`, `WeaponData.gd`, `ArmorData.gd`, `SubsystemDefinition.gd`, etc.
+   *   `scripts/core_systems/script_system.gd`: Autoload for managing `ScriptState` and signal connections.
+   *   `scripts/globals/global_constants.gd`: Defines global enums and constants.
 
    **F. Pipeline Integration**
    *   Create automated batch processing system (`batch_convert` script).

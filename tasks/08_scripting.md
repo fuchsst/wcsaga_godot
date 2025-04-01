@@ -105,8 +105,11 @@ graph TD
 
 ### 4.1. Variable System & Expression Parser (GDScript)
 
+*   **Status:** Not Implemented.
+*   **Original C++ Files:** `variables/variables.cpp`, `variables/variables.h`
 *   **Goal:** Replicate the simple mathematical expression parser if needed, primarily for understanding game variable access. SEXP system is more critical for mission logic.
-*   **Variable System:**
+*   **Planned Godot Files:** `scripts/scripting/variables/variable_base.gd`, `scripts/scripting/variables/variable_call_data.gd`, `scripts/scripting/variables/variable_matrix.gd`, `scripts/scripting/parser/expression_parser.gd` (and specific operation/variable classes).
+*   **Planned Variable System:**
     *   Create base `Variable` class (`scripts/scripting/variables/variable_base.gd`) extending `RefCounted`.
     *   Implement derived classes: `Constant`, `BinaryOperation`, `UnaryOperation`, `GameVariable`, `Expression`.
     *   Implement specific operation classes (`AddOperation`, `SinOperation`, etc.) using Godot math functions.
@@ -120,69 +123,97 @@ graph TD
     *   Handle operator precedence, parentheses, constants (PI, E), implied multiplication.
     *   Implement parsing for game variable syntax (`:object{...}`).
     *   Implement constant folding optimization.
-*   **Example Code:** (See previous response for GDScript examples of `Variable`, `Constant`, `BinaryOperation`, `UnaryOperation`, `GameVariable`, `Expression`, `ExpressionParser`, `VariableMatrix`, `VariableCallData`)
+*   **Notes:** This system is currently lower priority than SEXP and Hooks. Its functionality might be partially covered by other systems.
 
 ### 4.2. Encryption System (GDScript)
 
+*   **Status:** Not Implemented.
+*   **Original C++ Files:** `parse/encrypt.cpp`, `parse/encrypt.h`
 *   **Goal:** Implement if needed to decrypt original encrypted files (e.g., mission files if they were encrypted, though typically they aren't). Not needed for encrypting new Godot data unless specifically required.
-*   **Implementation:**
+*   **Planned Implementation:**
     *   Create `ScriptEncryption` Singleton/Autoload (`scripts/globals/script_encryption.gd`).
     *   Implement `encrypt` and `decrypt` static methods using `PackedByteArray`.
     *   Port algorithms for FS1 7-bit, FS1 8-bit, and FS2 "new" formats, including signature checks and checksums.
     *   Use Godot byte utilities (`encode_u32`, `decode_u16`, etc.).
     *   Manage key initialization.
-*   **Example Code:** (See previous response for GDScript example of `ScriptEncryption`)
+*   **Notes:** Only necessary if original encrypted files need to be read directly.
 
 ### 4.3. Lua Scripting & Hook System (GDScript Replacement)
 
-*   **Goal:** Replace Lua logic with GDScript, leveraging Godot's signal system for hooks. Retain the conditional hook structure if useful.
-*   **Implementation:**
+*   **Status:** Implemented (Core Logic), Integration Pending.
+*   **Original C++ Files:** `parse/scripting.cpp`, `parse/scripting.h`, `parse/lua.h`, `parse/lua.cpp` (inferred)
+*   **Goal:** Replace Lua logic with GDScript, leveraging Godot's signal system for hooks. Retain the conditional hook structure.
+*   **Implemented Files:**
+    *   `scripts/scripting/hook_system/script_state.gd`: Manages `ConditionedHook` instances.
+    *   `scripts/scripting/hook_system/conditioned_hook.gd`: Resource grouping conditions and actions.
+    *   `scripts/scripting/hook_system/script_condition.gd`: Resource defining a single condition.
+    *   `scripts/scripting/hook_system/script_action.gd`: Resource linking an action type to a `ScriptHook`.
+    *   `scripts/scripting/hook_system/script_hook.gd`: Resource holding `Callable`s for hook functions.
+*   **Planned Implementation Details:**
     *   **Hook System Core:**
-        *   Create `ScriptState` class (`scripts/scripting/hook_system/script_state.gd`) to manage hooks.
-        *   Create `ScriptHook` class (`scripts/scripting/hook_system/script_hook.gd`) to represent a target GDScript function (using `Callable`).
-        *   Create `ConditionedHook` class (`scripts/scripting/hook_system/conditioned_hook.gd`) to group conditions and actions.
-        *   Create `ScriptCondition` (`scripts/scripting/hook_system/script_condition.gd`) and `ScriptAction` (`scripts/scripting/hook_system/script_action.gd`) classes with enums mirroring `CHC_*` and `CHA_*` constants.
-    *   **Integration:**
-        *   Create `ScriptSystem` Autoload (`scripts/globals/script_system.gd`) holding a `ScriptState` instance.
-        *   Implement `parse_script_tables()` in `ScriptSystem` to load hook definitions from converted table data (e.g., JSON or `.tres`) and populate `ScriptState`.
+        *   `ScriptState` class (`scripts/scripting/hook_system/script_state.gd`) manages hooks. (Implemented)
+        *   `ScriptHook` class (`scripts/scripting/hook_system/script_hook.gd`) represents a target GDScript function (using `Callable`). (Implemented)
+        *   `ConditionedHook` class (`scripts/scripting/hook_system/conditioned_hook.gd`) groups conditions and actions. (Implemented)
+        *   `ScriptCondition` (`scripts/scripting/hook_system/script_condition.gd`) and `ScriptAction` (`scripts/scripting/hook_system/script_action.gd`) classes use enums mirroring `CHC_*` and `CHA_*`. (Implemented, requires `GlobalConstants.gd`)
+    *   **Planned Integration:**
+        *   Create `ScriptSystem` Autoload (`scripts/core_systems/script_system.gd`) holding a `ScriptState` instance. (**MISSING**)
+        *   Implement `parse_script_tables()` in `ScriptSystem` to load hook definitions from converted table data (e.g., JSON or `.tres`) into `ScriptState`.
         *   Connect Godot signals (e.g., `Ship.died`, `SceneTree.process_frame`, `InputEvent`) to handler methods in `ScriptSystem`.
         *   Handler methods in `ScriptSystem` call `ScriptState.run_condition()` with the appropriate `ActionType` and context object.
-        *   `ScriptCondition.is_valid()` methods check game state based on condition type and data, accessing Singletons or the context object.
-        *   `ScriptState.run_hook()` calls the target GDScript function via the stored `Callable`.
-    *   **Override Logic:** Implement `ScriptHook.check_override()` and `ScriptState.is_condition_override()`. Game logic checks `is_condition_override()` before executing default behavior.
-*   **Example Code:** (See previous response for GDScript examples of `ScriptState`, `ScriptHook`, `ConditionedHook`, `ScriptCondition`, `ScriptAction`, and the `ScriptSystem` Autoload integration)
+        *   `ScriptCondition.is_valid()` methods check game state. (Implemented)
+        *   `ScriptHook.execute()` calls the target GDScript function via the stored `Callable`. (Implemented)
+    *   **Override Logic:** `ScriptHook.check_override()` and `ScriptState.is_condition_override()` are implemented. Game logic needs to call `is_condition_override()` before executing default behavior.
+*   **Notes:** Requires `scripts/core_systems/script_system.gd` for integration and loading hook definitions. Requires `scripts/globals/global_constants.gd` for `HookActionType` and `HookConditionType` enums.
 
 ### 4.4. S-Expression (SEXP) System (Hybrid GDScript Approach)
 
+*   **Status:** Implemented (Core Logic), Parsing Pending.
+*   **Original C++ Files:** `parse/sexp.h`, `parse/sexp.cpp` (inferred), `parse/parselo.cpp` (for text parsing)
 *   **Goal:** Parse the SEXP structure from mission files and evaluate it using GDScript to drive mission logic. Maintain compatibility with existing mission SEXP logic.
-*   **Implementation:**
+*   **Implemented Files:**
+    *   `scripts/scripting/sexp/sexp_node.gd`: Resource representing a node (list/atom) in the SEXP tree.
+    *   `scripts/scripting/sexp/sexp_constants.gd`: Defines constants (`OP_*`, `SEXP_*`, etc.).
+    *   `scripts/scripting/sexp/sexp_evaluator.gd`: Recursively evaluates `SexpNode` trees.
+    *   `scripts/scripting/sexp/sexp_operators.gd`: Autoload Node containing handler functions (`_op_*`) for operators.
+    *   `scripts/scripting/sexp/sexp_variables.gd`: Autoload Node managing SEXP variables (`@variable_name`).
+*   **Planned Implementation Details:**
     *   **Parsing:**
-        *   Create `SexpNode` class/Resource (`scripts/scripting/sexp/sexp_node.gd`) to represent the tree structure (list/atom, subtype, text, op_code, children).
-        *   Create `SexpParser` class (`scripts/scripting/sexp/sexp_parser.gd`) to parse the Lisp-like text format from converted mission data (`MissionData.tres`) into an `SexpNode` tree.
+        *   `SexpNode` class/Resource (`scripts/scripting/sexp/sexp_node.gd`) represents the tree structure. (Implemented)
+        *   Create `SexpParser` class (`scripts/scripting/sexp/sexp_parser.gd`) to parse the Lisp-like text format from converted mission data (`MissionData.tres`) into an `SexpNode` tree. (**MISSING** - May be part of offline tools).
     *   **Evaluation:**
-        *   Create `SexpEvaluator` class (`scripts/scripting/sexp/sexp_evaluator.gd`). Its `eval_sexp(node, context)` method recursively evaluates the tree.
-        *   Create `SexpOperatorHandler` Node/Singleton (`scripts/scripting/sexp/sexp_operators.gd`). This contains GDScript functions corresponding to *each* SEXP operator (`OP_*`). The `eval_sexp` function calls the appropriate handler function based on the operator node's `op_code`. Handler functions receive evaluated arguments (or unevaluated nodes for lazy operators like `and`/`or`) and the context.
-        *   Implement `is_sexp_true(node, context)` helper in `SexpEvaluator` to interpret results according to FS2 rules (non-zero numbers are true, specific integer constants).
+        *   `SexpEvaluator` class (`scripts/scripting/sexp/sexp_evaluator.gd`) recursively evaluates the tree. (Implemented)
+        *   `SexpOperatorHandler` Node/Singleton (`scripts/scripting/sexp/sexp_operators.gd`) contains GDScript functions for operators. (Implemented, needs operator functions filled in).
+        *   `is_sexp_true(node, context)` helper in `SexpEvaluator` interprets results. (Implemented)
     *   **Variables:**
-        *   Create `SexpVariableManager` Singleton (`scripts/scripting/sexp/sexp_variables.gd`) to store mission, campaign, and player persistent variables (`@variable_name`).
-        *   `SexpEvaluator` accesses this manager when encountering variable atoms.
-    *   **Constants:** Define `SexpConstants` script (`scripts/scripting/sexp/sexp_constants.gd`) for `OP_*`, `OPF_*`, `OPR_*`, `SEXP_*` values.
-*   **Example Code:** (See previous response for GDScript examples of `SexpNode`, `SexpConstants`, `SexpVariableManager`, `SexpEvaluator`, and the structure of `SexpOperatorHandler`)
+        *   `SexpVariableManager` Singleton (`scripts/scripting/sexp/sexp_variables.gd`) stores variables. (Implemented)
+        *   `SexpEvaluator` accesses this manager. (Implemented)
+    *   **Constants:** `SexpConstants` script (`scripts/scripting/sexp/sexp_constants.gd`) defines constants. (Implemented)
+*   **Notes:** Requires `SexpParser` (runtime or offline) to create the `SexpNode` trees. `SexpOperatorHandler` needs implementations for all required operators.
 
 ### 4.5. General Parsing Utilities
 
+*   **Status:** Handled by Godot built-ins / Offline Tools.
+*   **Original C++ Files:** `parse/parselo.cpp`, `parse/parselo.h`
 *   **Goal:** Replace low-level C++ file reading and tokenizing.
-*   **Implementation:**
-    *   Use Godot's `FileAccess` for reading files.
+*   **Implementation Approach:**
+    *   Use Godot's `FileAccess` for reading files. (Built-in)
     *   Use Godot's built-in string manipulation methods (`split`, `strip_edges`, `to_int`, `to_float`, `find`, etc.) for tokenizing.
     *   For complex table formats (`.tbl`), create dedicated parser classes (e.g., `TblParser.gd`) possibly using regular expressions (`RegEx` class) or state machines. These parsers will be part of the offline conversion tools (`migration_tools/`).
 
 ## 5. Integration with Godot
 
-*   **Expression System:** If implemented, `ExpressionResource` can be exported by scripts needing dynamic calculations. Evaluate using `expression_resource.evaluate(context_data)`.
-*   **Encryption System:** Called by file loading systems (`MissionLoader`, `CampaignManager`, `PlayerData` loader) before parsing data, if the source data is encrypted.
-*   **Hook System:** Integrated via the `ScriptSystem` Autoload. Game systems emit signals connected to `ScriptSystem` handlers, which then invoke `ScriptState.run_condition`.
-*   **SEXP System:** The `MissionManager` holds the parsed SEXP trees (from `MissionData.tres`). During its `_process` loop, it calls `SexpEvaluator.is_sexp_true()` on goal/event condition trees. If true, it calls `SexpEvaluator.eval_sexp()` on the corresponding action tree. The `SexpOperatorHandler` functions then interact with various game managers (AI, Ship, Message, etc.) to execute actions.
+*   **Expression System:** (Not Implemented) If implemented, `ExpressionResource` could be used for dynamic calculations via `expression_resource.evaluate(context_data)`.
+*   **Encryption System:** (Not Implemented) If implemented, would be called by file loaders before parsing encrypted data.
+*   **Hook System:** Requires integration. A `ScriptSystem` Autoload (or similar manager) needs to:
+    1.  Load hook definitions (likely from converted `.tbl` data) into the `ScriptState` instance.
+    2.  Connect relevant game signals (e.g., `Ship.died`, `InputEvent`, `SceneTree.process_frame`) to handler functions.
+    3.  These handlers call `ScriptState.run_condition(action_type, context)`.
+    4.  Game logic checks `ScriptState.is_condition_override(action_type, context)` before executing default behaviors where needed.
+*   **SEXP System:** Requires integration. A `MissionManager` (or similar) needs to:
+    1.  Load/parse SEXP text (from `MissionData.tres`) into `SexpNode` trees (using a `SexpParser` or pre-converted resources).
+    2.  During mission updates (`_process`), call `SexpEvaluator.is_sexp_true(condition_node, context)` for events/goals.
+    3.  If true, call `SexpEvaluator.eval_sexp(action_node, context)` for the corresponding actions.
+    4.  The `SexpOperatorHandler` functions (called by the evaluator) interact with game systems (AI, Ship, Message Managers, etc.) to perform actions.
 
 ## 6. Migration Notes
 

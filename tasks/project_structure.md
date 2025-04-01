@@ -52,6 +52,9 @@ wcsaga_godot/
 │   │   ├── mission_01.tres # Example mission resource
 │   │   └── campaign_a/     # Subfolder for campaign missions
 │   │       └── mission_a_01.tres
+│   ├── messages/           # MessageData, PersonaData resources (.tres) - Global or Mission-specific (See 07_mission_system.md)
+│   │   ├── personas/
+│   │   └── mission_messages/
 │   ├── model_metadata/     # ModelMetadata resources (.tres) - Stores POF metadata (points, subsystems) per model (See 11_model.md)
 │   ├── scripting/          # Scripting system resources (See 08_scripting.md)
 │   │   ├── sexp_operators.tres # (Optional) Resource defining SEXP operator signatures/validation rules
@@ -63,12 +66,17 @@ wcsaga_godot/
 │   ├── core/               # Core scenes (e.g., main game loop, manager nodes) (See 04_core_systems.md)
 │   │   ├── game_manager.tscn        # Main game state and loop integration node
 │   │   ├── object_manager.tscn      # Object tracking node
+│   │   ├── script_system.tscn       # Node for ScriptSystem singleton logic (if needed)
 │   │   ├── game_sequence_manager.tscn # Game state machine node
 │   │   ├── scoring_manager.tscn     # Scoring/stats management node
 │   │   ├── species_manager.tscn     # Species data management node
 │   │   ├── camera_manager.tscn      # Camera switching/management node (See 12_controls_and_camera.md)
 │   │   ├── subtitle_manager.tscn    # Subtitle management node (See 12_controls_and_camera.md)
 │   │   ├── autopilot_manager.tscn   # Autopilot state management node (See 12_controls_and_camera.md)
+│   │   ├── message_manager.tscn     # Node for MessageManager singleton logic (See 07_mission_system.md)
+│   │   ├── mission_log_manager.tscn # Node for MissionLogManager singleton logic (See 07_mission_system.md)
+│   │   ├── mission_manager.tscn     # Node for MissionManager singleton logic (See 07_mission_system.md)
+│   │   ├── campaign_manager.tscn    # Node for CampaignManager singleton logic (See 07_mission_system.md)
 │   │   └── skybox.tscn         # Scene containing starfield/nebula setup (See 10_physics_and_space.md, 14_graphics.md)
 │   ├── effects/            # Reusable effect scenes (explosions, trails, beams, particles, decals, warp) (See 05_ship_weapon_systems.md, 10_physics_and_space.md)
 │   │   ├── explosion_medium.tscn # Medium explosion effect scene
@@ -121,7 +129,9 @@ wcsaga_godot/
 │   │   │   └── death_popup.tscn  # Popup shown on player death
 │   │   ├── hud/                # Reusable HUD gauge scenes
 │   │   │   ├── gauges/         # (radar, shield, target_monitor, reticle, etc.) Individual gauge scenes
-│   │   │   └── effects/        # (hud_static_overlay) HUD specific visual effects scenes
+│   │   │   │   └── hud_directives_gauge.tscn # Specific gauge for training/mission directives
+│   │   │   ├── effects/        # (hud_static_overlay) HUD specific visual effects scenes
+│   │   │   └── talking_head.tscn # Scene for displaying talking head animations (See 07_mission_system.md)
 │   │   ├── mission_log/        # Mission log UI screen scene
 │   │   │   └── mission_log_screen.tscn
 │   │   ├── hotkey_screen/      # Hotkey assignment UI screen scene
@@ -131,26 +141,88 @@ wcsaga_godot/
 │       └── observer_viewpoint.tscn # Scene for observer camera (See 12_controls_and_camera.md)
 ├── scripts/                # GDScript files, organized by component
 │   ├── ai/                 # AIController, AI behaviors, targeting, pathfinding, AIProfile script (See 01_ai.md)
-│   │   ├── ai_controller.gd         # Main AI logic node script attached to ships
-│   │   ├── perception_component.gd  # Handles sensing environment, targets, threats
-│   │   ├── ai_state_machine.gd    # State machine implementation (or use LimboAI BTState)
-│   │   ├── ai_behavior_tree.gd    # Base/helper for LimboAI BehaviorTree resources
-│   │   ├── ai_blackboard.gd       # LimboAI blackboard resource script
-│   │   ├── ai_goal_manager.gd     # Handles goal processing and prioritization within AIController
-│   │   ├── behaviors/           # Scripts defining specific AI states/behaviors (or LimboAI tasks)
-│   │   ├── navigation/          # Navigation related scripts (path_follower, collision_avoidance)
-│   │   ├── targeting/           # Targeting related scripts (targeting_system, stealth_detector)
-│   │   └── turret/              # Turret specific AI script (turret_ai)
+│   │   ├── ai_controller.gd         # Main AI logic node, manages state, orchestrates BT/components.
+│   │   │   ├── func set_mode(new_mode: AIConstants.AIMode, new_submode: int = 0)
+│   │   │   ├── func set_target(target_node: Node3D)
+│   │   │   ├── func set_targeted_subsystem(subsystem: Node, parent_id: int)
+│   │   │   ├── func add_goal(goal: AIGoal)
+│   │   │   ├── func clear_goals()
+│   │   │   ├── func has_flag(flag: int) -> bool
+│   │   │   ├── func set_flag(flag: int, value: bool)
+│   │   │   └── func get_target_position() -> Vector3
+│   │   ├── perception_component.gd  # Handles sensing environment, targets, threats.
+│   │   │   └── func update_perception(delta: float)
+│   │   ├── ai_goal_manager.gd     # Manages the AI goal queue, prioritization, and selection.
+│   │   │   ├── func add_goal(controller: AIController, new_goal: AIGoal) -> bool
+│   │   │   ├── func remove_goal(controller: AIController, goal_signature: int)
+│   │   │   ├── func clear_goals(controller: AIController)
+│   │   │   └── func process_goals(controller: AIController)
+│   │   ├── ai_state_machine.gd    # (Optional) State machine implementation (or use LimboAI BTState)
+│   │   ├── ai_behavior_tree.gd    # (Optional) Base/helper for LimboAI BehaviorTree resources
+│   │   ├── ai_blackboard.gd       # (Optional) LimboAI blackboard resource script
+│   │   ├── behaviors/           # LimboAI action/condition scripts defining specific behaviors.
+│   │   │   ├── approach_target.gd   # BTAction: Steers towards target position
+│   │   │   │   └── func _tick() -> Status
+│   │   │   ├── chase_target.gd      # BTAction: Basic chase movement towards target
+│   │   │   │   └── func _tick() -> Status
+│   │   │   ├── deploy_countermeasure.gd # BTAction: Triggers countermeasure deployment
+│   │   │   │   └── func _tick() -> Status
+│   │   │   ├── fire_primary.gd      # BTAction: Triggers primary weapon fire
+│   │   │   │   └── func _tick() -> Status
+│   │   │   ├── has_target.gd        # BTCondition: Checks if AI has a target
+│   │   │   │   └── func _tick() -> Status
+│   │   │   ├── is_missile_locked.gd # BTCondition: Checks if AI is locked by a missile
+│   │   │   │   └── func _tick() -> Status
+│   │   │   ├── is_target_in_range.gd # BTCondition: Checks if target is within weapon range
+│   │   │   │   └── func _tick() -> Status
+│   │   │   ├── select_primary_weapon.gd # BTAction: Selects primary weapon bank
+│   │   │   │   └── func _tick() -> Status
+│   │   │   └── select_secondary_weapon.gd # BTAction: Selects secondary weapon bank
+│   │   │       └── func _tick() -> Status
+│   │   ├── navigation/          # (Placeholder) Navigation related scripts (path_follower, collision_avoidance)
+│   │   ├── targeting/           # (Placeholder) Targeting related scripts (targeting_system, stealth_detector)
+│   │   └── turret/              # (Placeholder) Turret specific AI script (turret_ai)
 │   ├── core_systems/       # GameManager, ObjectManager, GameSequenceManager, PlayerData, ScoringManager, etc. (See 04_core_systems.md)
 │   │   ├── game_manager.gd          # Main game state, loop integration, time, pausing logic
+│   │   │   ├── func pause_game()
+│   │   │   ├── func unpause_game()
+│   │   │   ├── func toggle_pause()
+│   │   │   ├── func set_time_compression(factor: float)
+│   │   │   ├── func get_time_compression() -> float
+│   │   │   ├── func get_mission_time() -> float
+│   │   │   └── func reset_mission_time()
 │   │   ├── object_manager.gd        # Object tracking, lookup by signature/ID logic
+│   │   │   ├── func register_object(obj: Node, signature: int = -1)
+│   │   │   ├── func unregister_object(obj: Node)
+│   │   │   ├── func get_object_by_id(id: int) -> Node
+│   │   │   ├── func get_object_by_signature(signature: int) -> Node
+│   │   │   ├── func get_all_ships() -> Array[Node]
+│   │   │   ├── func get_all_weapons() -> Array[Node]
+│   │   │   ├── func get_next_signature() -> int
+│   │   │   └── func clear_all_objects()
 │   │   ├── base_object.gd           # Base script class for all game objects (ships, weapons, etc.)
+│   │   │   ├── func get_object_type() -> GlobalConstants.ObjectType
+│   │   │   ├── func get_signature() -> int
+│   │   │   ├── func set_flag(flag: int)
+│   │   │   ├── func clear_flag(flag: int)
+│   │   │   ├── func has_flag(flag: int) -> bool
+│   │   │   ├── func set_parent_object(parent_obj: Node)
+│   │   │   ├── func get_parent_object() -> Node
+│   │   │   ├── func apply_damage(damage: float, source_pos: Vector3, source_obj: Node = null)
+│   │   │   ├── func get_team() -> int
+│   │   │   ├── func is_destroyed() -> bool
+│   │   │   └── func is_arriving() -> bool
 │   │   ├── game_sequence_manager.gd # State machine logic for game states (menu, briefing, gameplay, etc.)
 │   │   ├── scoring_manager.gd       # Scoring, rank, medal evaluation logic
 │   │   ├── species_manager.gd       # Manages loading/accessing SpeciesInfo resources
 │   │   ├── camera_manager.gd        # Manages camera creation, switching, lookup logic (See 12_controls_and_camera.md)
 │   │   ├── subtitle_manager.gd      # Manages subtitle queue and display logic (See 12_controls_and_camera.md)
-│   │   └── autopilot_manager.gd     # Manages autopilot state, engagement, NavPoints logic (See 12_controls_and_camera.md)
+│   │   ├── autopilot_manager.gd     # Manages autopilot state, engagement, NavPoints logic (See 12_controls_and_camera.md)
+│   │   ├── script_system.gd         # Autoload for hook system management script (See 08_scripting.md)
+│   │   ├── message_manager.gd       # Singleton for message system logic (See 07_mission_system.md)
+│   │   ├── mission_log_manager.gd   # Singleton for mission log logic (See 07_mission_system.md)
+│   │   ├── mission_manager.gd       # Singleton for mission management logic (See 07_mission_system.md)
+│   │   └── campaign_manager.gd      # Singleton for campaign management logic (See 07_mission_system.md)
 │   ├── ship/                 # Ship logic and core components (See 05_ship_weapon_systems.md)
 │   │   ├── ship_base.gd             # Base ship logic, physics integration, state management script
 │   │   │   ├── func take_damage(hit_pos: Vector3, amount: float, killer_obj_id: int = -1, damage_type_key = -1, hit_subsystem: Node = null)
@@ -247,23 +319,123 @@ wcsaga_godot/
 │   ├── hud/                # HUDManager, HUDGauge base, specific gauge scripts (Radar, Shields, TargetBox, etc.) (See 06_hud_system.md)
 │   │   ├── hud.gd                   # Main HUD controller script (attached to hud.tscn)
 │   │   ├── hud_manager.gd           # Singleton for config loading, applying settings logic
-│   │   ├── gauges/                  # Scripts for individual gauges (hud_gauge_base, hud_radar_base, hud_shield_gauge, etc.)
+│   │   ├── gauges/                  # Scripts for individual gauges (hud_gauge_base, hud_radar_base, hud_shield_gauge, hud_directives_gauge, etc.)
 │   │   ├── effects/                 # Scripts for HUD visual effects (hud_shake_effect, hud_static_overlay)
 │   │   └── squad_message_manager.gd # Singleton for squad message logic
-│   ├── mission_system/     # MissionManager, Briefing/Debriefing logic, CampaignManager, LogManager (See 07_mission_system.md)
-│   │   ├── mission_manager.gd       # Singleton: Manages mission lifecycle, state, objects, events, goals logic.
+│   ├── mission_system/     # Mission logic, helpers, UI scripts (See 07_mission_system.md)
+│   │   ├── mission_manager.gd       # Singleton: Orchestrates mission lifecycle, state. Delegates evaluation.
+│   │   │   ├── func load_mission(path)
+│   │   │   ├── func start_mission()
+│   │   │   └── func end_mission()
+│   │   ├── mission_event_manager.gd # Singleton/Node: Manages evaluation and state of mission events.
+│   │   │   ├── func set_runtime_events(events_array)
+│   │   │   ├── func evaluate_events(delta)
+│   │   │   └── func clear_runtime_events()
+│   │   ├── mission_goal_manager.gd  # Singleton/Node: Manages evaluation and state of mission goals.
+│   │   │   ├── func set_runtime_goals(goals_array)
+│   │   │   ├── func evaluate_goals(delta)
+│   │   │   ├── func evaluate_primary_goals_status() -> int
+│   │   │   ├── func mission_goals_met() -> bool
+│   │   │   ├── func fail_incomplete_goals()
+│   │   │   ├── func invalidate_goal(name)
+│   │   │   ├── func validate_goal(name)
+│   │   │   └── func clear_runtime_goals()
 │   │   ├── arrival_departure.gd     # Node/Helper: Handles arrival/departure logic and timing script.
+│   │   │   ├── func set_managers(m_manager, s_manager)
+│   │   │   └── func update_arrivals_departures(delta)
 │   │   ├── spawn_manager.gd         # Node/Helper: Handles instantiating ships/wings script.
+│   │   │   ├── func spawn_ship(ship_data) -> Node3D
+│   │   │   └── func spawn_wing_wave(wing_data, wave_num, num_to_spawn) -> Array[Node3D]
 │   │   ├── mission_loader.gd        # Helper: Loads MissionData resources script.
-│   │   ├── briefing/                # Briefing system scripts (briefing_screen, briefing_map_manager, briefing_icon)
-│   │   ├── debriefing/              # Debriefing system scripts (debriefing_screen, scoring_system)
-│   │   ├── log/                     # Mission Log scripts (mission_log_manager)
-│   │   ├── message_system/          # Message system scripts (message_manager)
-│   │   ├── training_system/         # Training system scripts (training_manager)
-│   │   └── hotkey/                  # Mission Hotkey scripts (mission_hotkey_manager)
-│   ├── scripting/          # SEXPParser, SEXPNode, SEXPEvaluator, SEXPVariableManager, ScriptState (hooks), Table parsers (See 08_scripting.md)
-│   │   ├── sexp/                    # SEXP system implementation (sexp_node, sexp_parser, sexp_evaluator, sexp_operators, sexp_variables, sexp_constants)
-│   │   └── hook_system/             # Hook system implementation (script_state, script_hook, conditioned_hook, script_condition, script_action, script_parser)
+│   │   │   └── static func load_mission(path) -> MissionData
+│   │   ├── briefing/                # Briefing system scripts
+│   │   │   ├── briefing_screen.gd   # Main briefing UI logic
+│   │   │   │   └── func _load_stage(index)
+│   │   │   ├── briefing_map_manager.gd # Handles 3D map display
+│   │   │   │   └── func set_stage_data(stage_data)
+│   │   │   └── briefing_icon.gd     # Represents a single map icon
+│   │   │       ├── func setup(data)
+│   │   │       └── func update_data(data)
+│   │   ├── debriefing/              # Debriefing system scripts
+│   │   │   ├── debriefing_screen.gd # Main debriefing UI logic
+│   │   │   │   └── func _load_stage(index)
+│   │   │   └── scoring_system.gd    # (Optional) Handles score calculation, medal logic
+│   │   ├── log/                     # Mission Log scripts
+│   │   │   └── mission_log_manager.gd # Singleton for managing log entries
+│   │   │       ├── func clear_log()
+│   │   │       ├── func add_entry(...)
+│   │   │       ├── func get_all_entries() -> Array[MissionLogEntry]
+│   │   │       ├── func get_entry_time(...) -> float
+│   │   │       └── func get_entry_count(...) -> int
+│   │   ├── message_system/          # Message system scripts
+│   │   │   └── message_manager.gd     # Singleton for managing messages
+│   │   │       ├── func load_mission_messages(mission_data)
+│   │   │       ├── func queue_message(...)
+│   │   │       ├── func send_unique_to_player(...)
+│   │   │       ├── func send_builtin_to_player(...)
+│   │   │       └── func kill_all_playing_messages(...)
+│   │   ├── training_system/         # Training system scripts
+│   │   │   └── training_manager.gd    # Singleton or part of MissionManager
+│   │   │       ├── func mission_init()
+│   │   │       ├── func mission_shutdown()
+│   │   │       ├── func fail_training()
+│   │   │       └── func queue_training_message(...)
+│   │   └── hotkey/                  # Mission Hotkey scripts
+│   │       └── mission_hotkey_manager.gd # Singleton or part of PlayerData
+│   │           ├── func clear_hotkey_set(set_index)
+│   │           ├── func clear_all_hotkeys()
+│   │           ├── func assign_remove_hotkey(set_index, target_node)
+│   │           ├── func apply_mission_defaults(mission_data)
+│   │           ├── func get_targets_for_set(set_index) -> Array[int]
+│   │           ├── func get_hotkey_flags_for_target(sig) -> int
+│   │           ├── func get_save_data() -> Dictionary
+│   │           └── func load_save_data(data)
+│   ├── scripting/          # SEXP evaluation and Hook system runtime logic (See 08_scripting.md)
+│   │   ├── sexp/                    # SEXP system implementation
+│   │   │   ├── sexp_constants.gd    # Defines SEXP system constants (OP_*, SEXP_*, etc.).
+│   │   │   ├── sexp_node.gd         # Resource representing a node in the SEXP tree (list or atom).
+│   │   │   │   ├── func is_list() -> bool # Checks if the node is a list.
+│   │   │   │   ├── func is_atom() -> bool # Checks if the node is an atom.
+│   │   │   │   ├── func is_operator() -> bool # Checks if the node is an operator atom.
+│   │   │   │   ├── func is_number() -> bool # Checks if the node is a number atom.
+│   │   │   │   ├── func is_string() -> bool # Checks if the node is a string atom.
+│   │   │   │   ├── func get_operator() -> int # Returns the operator code if it's an operator atom.
+│   │   │   │   ├── func get_number_value() -> float # Returns the float value if it's a number atom.
+│   │   │   │   ├── func get_string_value() -> String # Returns the string value if it's a string atom.
+│   │   │   │   ├── func get_child_count() -> int # Returns the number of children if it's a list.
+│   │   │   │   └── func get_child(index: int) -> SexpNode # Returns the child node at the given index.
+│   │   │   ├── sexp_evaluator.gd    # Evaluates parsed SexpNode trees, calling operator handlers.
+│   │   │   │   ├── func eval_sexp(node: SexpNode, context: Dictionary) -> Variant # Evaluates a node and returns its result.
+│   │   │   │   └── func is_sexp_true(node: SexpNode, context: Dictionary) -> bool # Evaluates a node for a boolean result based on FS2 rules.
+│   │   │   ├── sexp_operators.gd    # Autoload Singleton: Handles execution of individual SEXP operators.
+│   │   │   │   └── func get_operator_handler(op_code: int) -> Callable # Returns the handler function for a given operator code.
+│   │   │   └── sexp_variables.gd    # Autoload Singleton: Manages SEXP variables (@variable_name) and persistence.
+│   │   │       ├── func clear_mission_variables() -> void # Clears mission-local variables.
+│   │   │       ├── func clear_campaign_variables() -> void # Clears campaign-persistent variables.
+│   │   │       ├── func clear_player_variables() -> void # Clears player-persistent variables.
+│   │   │       ├── func set_variable(var_name: String, value: Variant, type_flags: int) -> void # Sets a variable's value and persistence.
+│   │   │       ├── func get_variable(var_name: String) -> Variant # Gets a variable's value, checking persistence levels.
+│   │   │       ├── func get_variable_type_flags(var_name: String) -> int # Gets a variable's type and persistence flags.
+│   │   │       └── func has_variable(var_name: String) -> bool # Checks if a variable exists.
+│   │   └── hook_system/             # Hook system implementation
+│   │       ├── script_state.gd      # Manages ConditionedHooks and triggers execution based on game events.
+│   │       │   ├── func add_conditioned_hook(hook: ConditionedHook) -> void # Adds a hook resource.
+│   │       │   ├── func clear_all_hooks() -> void # Clears all loaded hooks.
+│   │       │   ├── func run_condition(action_type: GlobalConstants.HookActionType, context: Dictionary) -> void # Runs hooks matching the action type if conditions are met.
+│   │       │   ├── func is_condition_override(action_type: GlobalConstants.HookActionType, context: Dictionary) -> bool # Checks if any matching hook overrides default behavior.
+│   │       │   └── func load_hooks_from_data(hook_data) -> void # Placeholder for loading hook definitions.
+│   │       ├── conditioned_hook.gd  # Resource: Groups conditions and actions for a hook.
+│   │       │   ├── func are_conditions_valid(context: Dictionary) -> bool # Checks if all conditions are met.
+│   │       │   ├── func run_actions_for_type(action_type: GlobalConstants.HookActionType, context: Dictionary) -> void # Executes actions of a specific type if conditions are valid.
+│   │       │   └── func check_override_for_type(action_type: GlobalConstants.HookActionType, context: Dictionary) -> bool # Checks if any action of a specific type overrides behavior.
+│   │       ├── script_condition.gd  # Resource: Defines a single condition to be checked.
+│   │       │   └── func is_valid(context: Dictionary) -> bool # Checks if this specific condition is met based on context.
+│   │       ├── script_action.gd     # Resource: Links a game event type to an executable ScriptHook.
+│   │       │   └── func is_valid() -> bool # Checks if the associated ScriptHook is valid.
+│   │       └── script_hook.gd       # Resource: Represents an executable hook (GDScript function Callable).
+│   │           ├── func is_valid() -> bool # Checks if the main hook callable is valid.
+│   │           ├── func execute(context: Dictionary) -> Variant # Executes the main hook function.
+│   │           └── func check_override(context: Dictionary) -> bool # Executes the override check function.
 │   ├── menu_ui/            # Scripts for main menus, options, popups, custom UI controls (See 09_menu_ui.md)
 │   │   ├── main_menu.gd             # Main menu logic script
 │   │   ├── options_menu.gd          # Options menu logic script
@@ -276,6 +448,10 @@ wcsaga_godot/
 │   │   ├── popups/                  # Popup logic scripts (popup_base, death_popup)
 │   │   ├── help/                    # Context help logic (context_help_manager, help_overlay)
 │   │   ├── snazzy/                  # Snazzy UI logic (snazzy_ui, region)
+│   │   ├── mission_log/             # Mission log UI script
+│   │   │   └── mission_log_screen.gd
+│   │   ├── hotkey_screen/           # Hotkey assignment UI script
+│   │   │   └── hotkey_screen.gd
 │   │   └── components/              # Custom UI component scripts (wcsaga_button, wcsaga_listbox, etc.)
 │   ├── physics_space/      # Custom physics integrator (if needed), AsteroidField, DebrisManager, JumpNode logic (See 10_physics_and_space.md)
 │   │   ├── space_physics.gd         # Attached to ShipBase for custom physics integration logic
@@ -314,124 +490,158 @@ wcsaga_godot/
 │   │   ├── warp_effect_manager.gd   # Manages warp visual effects script
 │   │   └── spark_manager.gd         # Manages spark effects script
 │   ├── resources/          # Scripts defining custom Resource types (logic associated with .tres files)
-│   │   ├── ai_goal.gd               # Defines AI goal structure
-│   │   │   ├── func is_valid() -> bool
-│   │   │   ├── func set_flag(flag_enum: GoalFlags, value: bool)
-│   │   │   ├── func has_flag(flag_enum: GoalFlags) -> bool
-│   │   │   ├── func get_target_ship_name() -> String
-│   │   │   ├── func get_target_wing_name() -> String
-│   │   │   └── func get_target_waypoint_list_name() -> String
-│   │   ├── ai_profile.gd            # Defines AI behavior parameters
-│   │   │   ├── func get_accuracy(skill_level: int) -> float
-│   │   │   ├── func get_evasion(skill_level: int) -> float
-│   │   │   ├── func get_courage(skill_level: int) -> float
-│   │   │   ├── func get_patience(skill_level: int) -> float
-│   │   │   ├── func get_max_attackers(skill: int) -> int
-│   │   │   ├── func get_predict_position_delay(skill: int) -> float
-│   │   │   ├── func get_turn_time_scale(skill: int) -> float
-│   │   │   ├── func get_cmeasure_fire_chance(skill: int) -> float
-│   │   │   ├── func get_in_range_time(skill: int) -> float
-│   │   │   ├── func get_link_ammo_levels_maybe(skill: int) -> float
-│   │   │   ├── func get_link_ammo_levels_always(skill: int) -> float
-│   │   │   ├── func get_primary_ammo_burst_mult(skill: int) -> float
-│   │   │   ├── func get_link_energy_levels_maybe(skill: int) -> float
-│   │   │   ├── func get_link_energy_levels_always(skill: int) -> float
-│   │   │   ├── func get_shield_manage_delay(skill: int) -> float
-│   │   │   ├── func get_ship_fire_delay_scale_friendly(skill: int) -> float
-│   │   │   ├── func get_ship_fire_delay_scale_hostile(skill: int) -> float
-│   │   │   ├── func get_ship_fire_secondary_delay_scale_friendly(skill: int) -> float
-│   │   │   ├── func get_ship_fire_secondary_delay_scale_hostile(skill: int) -> float
-│   │   │   ├── func get_glide_attack_percent(skill: int) -> float
-│   │   │   ├── func get_circle_strafe_percent(skill: int) -> float
-│   │   │   ├── func get_glide_strafe_percent(skill: int) -> float
-│   │   │   ├── func get_stalemate_time_thresh(skill: int) -> float
-│   │   │   ├── func get_stalemate_dist_thresh(skill: int) -> float
-│   │   │   ├── func get_chance_to_use_missiles_on_plr(skill: int) -> int
-│   │   │   ├── func get_max_aim_update_delay(skill: int) -> float
-│   │   │   ├── func get_aburn_use_factor(skill: int) -> int
-│   │   │   ├── func get_shockwave_evade_chance(skill: int) -> float
-│   │   │   ├── func get_get_away_chance(skill: int) -> float
-│   │   │   ├── func get_secondary_range_mult(skill: int) -> float
-│   │   │   ├── func get_bump_range_mult(skill: int) -> float
-│   │   │   ├── func get_afterburner_recharge_scale(skill: int) -> float
-│   │   │   ├── func get_beam_friendly_damage_cap(skill: int) -> float
-│   │   │   ├── func get_cmeasure_life_scale(skill: int) -> float
-│   │   │   ├── func get_max_allowed_player_homers(skill: int) -> int
-│   │   │   ├── func get_max_incoming_asteroids(skill: int) -> int
-│   │   │   ├── func get_player_damage_scale(skill: int) -> float
-│   │   │   ├── func get_subsys_damage_scale(skill: int) -> float
-│   │   │   ├── func get_shield_energy_scale(skill: int) -> float
-│   │   │   ├── func get_weapon_energy_scale(skill: int) -> float
-│   │   │   ├── func get_max_turret_ownage_target(skill: int) -> int
-│   │   │   ├── func get_max_turret_ownage_player(skill: int) -> int
-│   │   │   ├── func get_kill_percentage_scale(skill: int) -> float
-│   │   │   ├── func get_assist_percentage_scale(skill: int) -> float
-│   │   │   ├── func get_assist_award_percentage_scale(skill: int) -> float
-│   │   │   ├── func get_repair_penalty(skill: int) -> int
-│   │   │   ├── func get_delay_bomb_arm_timer(skill: int) -> float
-│   │   │   ├── func has_flag(flag: int) -> bool
-│   │   │   └── func has_flag2(flag: int) -> bool
-│   │   ├── armor_data.gd            # Defines damage resistances
-│   │   │   ├── func get_damage_multiplier(damage_type_key) -> float
-│   │   │   ├── func get_shield_pierce_percentage(damage_type_key) -> float
-│   │   │   ├── func get_piercing_type(damage_type_key) -> int
-│   │   │   └── func get_piercing_limit(damage_type_key) -> float
-│   │   ├── game_sounds.gd           # Defines sound/music entries and manages playback
-│   │   │   ├── func play_sound(sound: SoundEntry, position: Vector3 = Vector3.ZERO) -> AudioStreamPlayer3D
-│   │   │   ├── func play_interface_sound(sound: SoundEntry) -> AudioStreamPlayer3D
-│   │   │   ├── func stop_sound(player: AudioStreamPlayer3D) -> void
-│   │   │   ├── func stop_all_sounds() -> void
-│   │   │   ├── func preload_sounds() -> void
-│   │   │   └── func unload_sounds() -> void
-│   │   ├── kill_info.gd             # Tracks kill statistics
-│   │   ├── medal_info.gd            # Defines medal/badge information
-│   │   │   └── func get_bitmap_filename(award_count: int = 1) -> String
-│   │   ├── music_entry.gd           # Defines music track properties
-│   │   │   ├── func preload_music() -> void
-│   │   │   └── func unload_music() -> void
-│   │   ├── pilot_tips.gd            # Holds pilot tips
-│   │   ├── player_data.gd           # Defines player profile data (PilotData)
-│   │   │   ├── func get_rank_name() -> String
-│   │   │   ├── func get_stat(stat_enum) -> int
-│   │   │   ├── func update_stat(stat_enum, value: int)
-│   │   │   ├── func add_kill(ship_class_index: int)
-│   │   │   └── func add_assist()
-│   │   ├── rank_info.gd             # Defines rank information
-│   │   ├── ship_data.gd             # Defines static ship properties
-│   │   ├── sound_entry.gd           # Defines sound effect properties
-│   │   │   ├── func preload_sound() -> void
-│   │   │   └── func unload_sound() -> void
-│   │   ├── species_info.gd          # Defines species-specific properties
-│   │   ├── subsystem.gd             # Base class/data for runtime subsystem state (Note: Redundant?)
-│   │   ├── subsystem_definition.gd  # Defines static subsystem properties (used within ShipData)
-│   │   ├── support_info.gd          # Tracks support ship status
-│   │   ├── threat.gd                # Defines threat information
-│   │   ├── weapon_data.gd           # Defines static weapon properties
-│   │   ├── weapon_group.gd          # Defines weapon group state (ammo, linking)
-│   │   ├── wingman.gd               # Defines wingman status and orders
+│   │   ├── ai/
+│   │   │   ├── ai_goal.gd           # Resource defining the structure for an AI goal.
+│   │   │   │   ├── func is_valid() -> bool
+│   │   │   │   ├── func set_flag(flag_enum: GoalFlags, value: bool)
+│   │   │   │   ├── func has_flag(flag_enum: GoalFlags) -> bool
+│   │   │   │   ├── func get_target_ship_name() -> String
+│   │   │   │   ├── func get_target_wing_name() -> String
+│   │   │   │   └── func get_target_waypoint_list_name() -> String
+│   │   │   └── ai_profile.gd        # Resource defining static AI behavior parameters based on skill level.
+│   │   │       ├── func get_accuracy(skill_level: int) -> float
+│   │   │       ├── func get_evasion(skill_level: int) -> float
+│   │   │       ├── func get_courage(skill_level: int) -> float
+│   │   │       ├── func get_patience(skill_level: int) -> float
+│   │   │       ├── func get_max_attackers(skill: int) -> int
+│   │   │       ├── func get_predict_position_delay(skill: int) -> float
+│   │   │       ├── func get_turn_time_scale(skill: int) -> float
+│   │   │       ├── func get_cmeasure_fire_chance(skill: int) -> float
+│   │   │       ├── func get_in_range_time(skill: int) -> float
+│   │   │       ├── func get_link_ammo_levels_maybe(skill: int) -> float
+│   │   │       ├── func get_link_ammo_levels_always(skill: int) -> float
+│   │   │       ├── func get_primary_ammo_burst_mult(skill: int) -> float
+│   │   │       ├── func get_link_energy_levels_maybe(skill: int) -> float
+│   │   │       ├── func get_link_energy_levels_always(skill: int) -> float
+│   │   │       ├── func get_shield_manage_delay(skill: int) -> float
+│   │   │       ├── func get_ship_fire_delay_scale_friendly(skill: int) -> float
+│   │   │       ├── func get_ship_fire_delay_scale_hostile(skill: int) -> float
+│   │   │       ├── func get_ship_fire_secondary_delay_scale_friendly(skill: int) -> float
+│   │   │       ├── func get_ship_fire_secondary_delay_scale_hostile(skill: int) -> float
+│   │   │       ├── func get_glide_attack_percent(skill: int) -> float
+│   │   │       ├── func get_circle_strafe_percent(skill: int) -> float
+│   │   │       ├── func get_glide_strafe_percent(skill: int) -> float
+│   │   │       ├── func get_stalemate_time_thresh(skill: int) -> float
+│   │   │       ├── func get_stalemate_dist_thresh(skill: int) -> float
+│   │   │       ├── func get_chance_to_use_missiles_on_plr(skill: int) -> int
+│   │   │       ├── func get_max_aim_update_delay(skill: int) -> float
+│   │   │       ├── func get_aburn_use_factor(skill: int) -> int
+│   │   │       ├── func get_shockwave_evade_chance(skill: int) -> float
+│   │   │       ├── func get_get_away_chance(skill: int) -> float
+│   │   │       ├── func get_secondary_range_mult(skill: int) -> float
+│   │   │       ├── func get_bump_range_mult(skill: int) -> float
+│   │   │       ├── func get_afterburner_recharge_scale(skill: int) -> float
+│   │   │       ├── func get_beam_friendly_damage_cap(skill: int) -> float
+│   │   │       ├── func get_cmeasure_life_scale(skill: int) -> float
+│   │   │       ├── func get_max_allowed_player_homers(skill: int) -> int
+│   │   │       ├── func get_max_incoming_asteroids(skill: int) -> int
+│   │   │       ├── func get_player_damage_scale(skill: int) -> float
+│   │   │       ├── func get_subsys_damage_scale(skill: int) -> float
+│   │   │       ├── func get_shield_energy_scale(skill: int) -> float
+│   │   │       ├── func get_weapon_energy_scale(skill: int) -> float
+│   │   │       ├── func get_max_turret_ownage_target(skill: int) -> int
+│   │   │       ├── func get_max_turret_ownage_player(skill: int) -> int
+│   │   │       ├── func get_kill_percentage_scale(skill: int) -> float
+│   │   │       ├── func get_assist_percentage_scale(skill: int) -> float
+│   │   │       ├── func get_assist_award_percentage_scale(skill: int) -> float
+│   │   │       ├── func get_repair_penalty(skill: int) -> int
+│   │   │       ├── func get_delay_bomb_arm_timer(skill: int) -> float
+│   │   │       ├── func has_flag(flag: int) -> bool
+│   │   │       └── func has_flag2(flag: int) -> bool
+│   │   ├── ship_weapon/
+│   │   │   ├── armor_data.gd        # Defines damage resistances
+│   │   │   │   ├── func get_damage_multiplier(damage_type_key) -> float
+│   │   │   │   ├── func get_shield_pierce_percentage(damage_type_key) -> float
+│   │   │   │   ├── func get_piercing_type(damage_type_key) -> int
+│   │   │   │   └── func get_piercing_limit(damage_type_key) -> float
+│   │   │   ├── ship_data.gd         # Defines static ship properties
+│   │   │   ├── subsystem_definition.gd # Defines static subsystem properties (used within ShipData)
+│   │   │   ├── subsystem.gd         # Base class/data for runtime subsystem state (Note: Redundant?)
+│   │   │   ├── weapon_data.gd       # Defines static weapon properties
+│   │   │   └── weapon_group.gd      # Defines weapon group state (ammo, linking)
+│   │   ├── mission/
+│   │   │   ├── alt_class_data.gd    # Defines an alternate ship class entry for dynamic assignment.
+│   │   │   ├── briefing_data.gd     # Holds data for one team's briefing, containing multiple stages.
+│   │   │   ├── briefing_icon_data.gd # Defines an icon displayed in a briefing stage.
+│   │   │   ├── briefing_line_data.gd # Defines a line connecting two icons in a briefing stage.
+│   │   │   ├── briefing_stage_data.gd # Defines a single stage within a mission briefing.
+│   │   │   ├── debriefing_data.gd   # Holds data for one team's debriefing, containing multiple stages.
+│   │   │   ├── debriefing_stage_data.gd # Defines a single stage within a mission debriefing.
+│   │   │   ├── docking_pair_data.gd # Defines a pair of docking points for initial docking setup.
+│   │   │   ├── message_data.gd      # Defines a single message entry.
+│   │   │   ├── mission_data.gd      # Defines MissionData resource structure (and related mission sub-resources) and helper methods
+│   │   │   ├── mission_event_data.gd # Defines a mission event triggered by a SEXP formula.
+│   │   │   ├── mission_log_entry.gd # Defines the structure for a mission log entry.
+│   │   │   ├── mission_objective_data.gd # Defines a mission objective (goal).
+│   │   │   ├── persona_data.gd      # Defines a character persona for messages.
+│   │   │   ├── player_start_data.gd # Defines starting ship choices and weapon pools for a specific team in a mission.
+│   │   │   ├── reinforcement_data.gd # Defines a reinforcement unit.
+│   │   │   ├── sexp_variable_data.gd # Defines an initial SEXP variable value for a mission.
+│   │   │   ├── ship_instance_data.gd # Defines ShipInstanceData resource structure (part of MissionData)
+│   │   │   ├── subsystem_status_data.gd # Defines initial status overrides for a ship subsystem in a mission.
+│   │   │   ├── texture_replacement_data.gd # Defines a texture replacement for a specific ship instance in a mission.
+│   │   │   ├── waypoint_list_data.gd # Holds a named list of waypoint positions.
+│   │   │   └── wing_instance_data.gd # Defines WingInstanceData resource structure (part of MissionData)
+│   │   ├── player/
+│   │   │   ├── kill_info.gd         # Tracks kill statistics
+│   │   │   ├── medal_info.gd        # Defines medal/badge information
+│   │   │   │   └── func get_bitmap_filename(award_count: int = 1) -> String
+│   │   │   ├── pilot_tips.gd        # Holds pilot tips
+│   │   │   ├── player_data.gd       # Defines player profile data (PilotData)
+│   │   │   │   ├── func get_rank_name() -> String
+│   │   │   │   ├── func get_stat(stat_enum) -> int
+│   │   │   │   ├── func update_stat(stat_enum, value: int)
+│   │   │   │   ├── func add_kill(ship_class_index: int)
+│   │   │   │   └── func add_assist()
+│   │   │   ├── rank_info.gd         # Defines rank information
+│   │   │   ├── support_info.gd      # Tracks support ship status
+│   │   │   ├── threat.gd            # Defines threat information
+│   │   │   └── wingman.gd           # Defines wingman status and orders
+│   │   ├── game_data/
+│   │   │   ├── game_sounds.gd       # Defines sound/music entries and manages playback
+│   │   │   │   ├── func play_sound(sound: SoundEntry, position: Vector3 = Vector3.ZERO) -> AudioStreamPlayer3D
+│   │   │   │   ├── func play_interface_sound(sound: SoundEntry) -> AudioStreamPlayer3D
+│   │   │   │   ├── func stop_sound(player: AudioStreamPlayer3D) -> void
+│   │   │   │   ├── func stop_all_sounds() -> void
+│   │   │   │   ├── func preload_sounds() -> void
+│   │   │   │   └── func unload_sounds() -> void
+│   │   │   ├── music_entry.gd       # Defines music track properties
+│   │   │   │   ├── func preload_music() -> void
+│   │   │   │   └── func unload_music() -> void
+│   │   │   ├── sound_entry.gd       # Defines sound effect properties
+│   │   │   │   ├── func preload_sound() -> void
+│   │   │   │   └── func unload_sound() -> void
+│   │   │   └── species_info.gd      # Defines species-specific properties
 │   │   ├── model_metadata.gd        # Defines ModelMetadata resource structure and helper methods
-│   │   ├── mission_data.gd          # Defines MissionData resource structure (and related mission sub-resources) and helper methods
 │   │   ├── hud_config_data.gd       # Defines HUDConfigData resource structure (and related HUD sub-resources) and helper methods
 │   │   ├── music_track.gd           # Defines MusicTrack resource structure and helper methods
 │   │   ├── subtitle_data.gd         # Defines SubtitleData resource structure and helper methods
 │   │   ├── nav_point_data.gd        # Defines NavPointData resource structure and helper methods
-│   │   ├── sexp_node.gd             # Defines SexpNode resource structure (if using Resource for SEXP) and helper methods
-│   │   ├── campaign_data.gd         # Defines CampaignData resource structure and helper methods
-│   │   ├── campaign_save_data.gd    # Defines CampaignSaveData resource structure and helper methods
-│   │   └── mission_log_entry.gd     # Defines MissionLogEntry resource structure and helper methods
+│   │   ├── scripting/ # Scripting resource definitions moved here
+│   │   │   ├── sexp_node.gd         # Defines SexpNode resource structure (if using Resource for SEXP) and helper methods
+│   │   │   ├── conditioned_hook.gd  # Defines ConditionedHook resource structure (See 08_scripting.md)
+│   │   │   ├── script_condition.gd  # Defines ScriptCondition resource structure (See 08_scripting.md)
+│   │   │   ├── script_action.gd     # Defines ScriptAction resource structure (See 08_scripting.md)
+│   │   │   └── script_hook.gd       # Defines ScriptHook resource structure (See 08_scripting.md)
+│   │   ├── campaign/ # Campaign resource definitions moved here
+│   │   │   ├── campaign_data.gd     # Defines CampaignData resource structure and helper methods
+│   │   │   └── campaign_save_data.gd # Defines CampaignSaveData resource structure and helper methods
+│   ├── campaign/             # Campaign system scripts (See 07_mission_system.md)
+│   │   ├── campaign_parser.gd       # Helper script to load CampaignData resources
+│   │   └── campaign_save_data.gd    # Script associated with CampaignSaveData resource (if needed)
 │   └── globals/            # Autoloaded global scripts (singletons like GameSettings, InputManager, MathUtils, etc.)
 │       ├── game_settings.gd         # Holds global game settings (difficulty, detail levels) script
 │       ├── input_manager.gd         # Optional: Central input constants or complex handling script
 │       ├── math_utils.gd            # Static helper functions for math operations script
-│       ├── global_constants.gd      # Defines global enums and constants script
-│       │   ├── static func load_resource_lists()
-│       │   ├── static func get_weapon_data(index: int) -> WeaponData
-│       │   ├── static func get_ship_data(index: int) -> ShipData
-│       │   └── static func get_armor_data(index: int) -> ArmorData
+│       ├── global_constants.gd      # Defines global enums (e.g., HookActionType, HookConditionType) and constants script
+│       │   ├── static func load_resource_lists() # Placeholder
+│       │   ├── static func get_weapon_data(index: int) -> WeaponData # Placeholder
+│       │   ├── static func get_ship_data(index: int) -> ShipData # Placeholder
+│       │   └── static func get_armor_data(index: int) -> ArmorData # Placeholder
+│       ├── ai_constants.gd          # Defines AI-specific constants and enums (Modes, Submodes, Flags).
 │       ├── game_sounds.gd           # Autoload holding sound references/data script
 │       ├── music_data.gd            # Autoload holding music references/data script
-│       ├── script_system.gd         # Autoload for hook system management script
-│       └── script_encryption.gd     # Autoload for encryption utilities script
+│       └── script_encryption.gd     # **PLANNED/OPTIONAL** Autoload for encryption utilities script
 ├── shaders/                # Godot Shading Language files (.gdshader) (See 14_graphics.md)
 │   ├── model_base.gdshader # Base shader for ships/objects (lighting, textures, damage?)
 │   ├── shield_impact.gdshader # Shader for shield hit effect visuals

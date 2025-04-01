@@ -245,6 +245,7 @@ wcsaga_godot/
 │   │   ├── game_sequence_manager.tscn # Node for GameSequenceManager singleton logic
 │   │   ├── scoring_manager.tscn     # Node for ScoringManager singleton logic
 │   │   └── species_manager.tscn     # Node for SpeciesManager singleton logic
+│   │   # Add entries for other core system singletons if they have associated scenes
 │   └── ...
 ├── scripts/
 │   ├── core_systems/
@@ -252,12 +253,16 @@ wcsaga_godot/
 │   │   ├── object_manager.gd        # Object tracking, lookup by signature/ID
 │   │   ├── base_object.gd           # Base script for all game objects (ships, weapons, etc.)
 │   │   ├── game_sequence_manager.gd # State machine logic
-│   │   ├── player_data.gd           # Resource script for player profile/stats
 │   │   ├── scoring_manager.gd       # Scoring, rank, medal evaluation
-│   │   ├── rank_info.gd             # Resource script for rank definitions
-│   │   ├── medal_info.gd            # Resource script for medal definitions
-│   │   ├── species_info.gd          # Resource script for species definitions
 │   │   └── species_manager.gd       # Manages loading/accessing SpeciesInfo
+│   ├── resources/ # Resource definition scripts moved here
+│   │   ├── player/
+│   │   │   ├── player_data.gd       # Resource script for player profile/stats
+│   │   │   ├── rank_info.gd         # Resource script for rank definitions
+│   │   │   └── medal_info.gd        # Resource script for medal definitions
+│   │   ├── game_data/
+│   │   │   └── species_info.gd      # Resource script for species definitions
+│   │   └── ... # Other resource subfolders
 │   ├── globals/
 │   │   ├── global_constants.gd      # MAX limits, GM_*, VM_* enums, global colors
 │   │   ├── game_settings.gd         # Detail level, difficulty, player options

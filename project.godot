@@ -22,6 +22,11 @@ SceneManager="*res://addons/scene_manager/scene_manager.tscn"
 Scenes="*res://addons/scene_manager/scenes.gd"
 Signal_Debugger="*res://addons/SignalVisualizer/Debugger/SignalDebugger.gd"
 GameState="*res://scripts/globals/game_state.gd"
+GlobalConstants="*res://scripts/globals/global_constants.gd"
+AIConstants="*res://scripts/globals/ai_constants.gd"
+ScriptSystem="*res://scripts/core_systems/script_system.gd"
+SexpOperatorHandler="*res://scripts/scripting/sexp/sexp_operators.gd"
+SexpVariableManager="*res://scripts/scripting/sexp/sexp_variables.gd"
 
 [display]
 
