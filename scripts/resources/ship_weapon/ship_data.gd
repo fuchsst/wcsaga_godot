@@ -170,6 +170,8 @@ class_name ShipData
 @export var debris_max_hitpoints: float = 0.0 # ship_info.debris_max_hitpoints
 @export var debris_damage_mult: float = 1.0 # ship_info.debris_damage_mult
 @export var debris_arc_percent: float = 0.0 # ship_info.debris_arc_percent
+@export var num_debris_objects: int = 0 # polymodel.num_debris_objects
+@export var debris_objects: Array[int] = [] # polymodel.debris_objects (Indices into ShipData)
 
 ## Flags (SIF_*, SIF2_*) - Use individual booleans or a bitmask integer
 @export var flags: int = 0 # ship_info.flags

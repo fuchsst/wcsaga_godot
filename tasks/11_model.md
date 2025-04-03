@@ -132,78 +132,67 @@ Based on the provided code snippets in `migration_tools/wcsaga_code/11_model/obj
 **2. List Potential Godot Solutions:**
 
 *   **Object Representation:**
-    *   Base `Node3D` for spatial properties (position, orientation).
-    *   Custom GDScript class (e.g., `BaseObject.gd`) attached to the root node to hold common properties (type, signature, flags, parent references, hull/shield accessors).
-    *   Specific derived classes (e.g., `ShipBase.gd`, `WeaponBase.gd`) inheriting from `BaseObject.gd` for type-specific logic and instance data.
-    *   Use Godot's built-in object lifecycle (instantiation, `queue_free()`).
-    *   Manage object tracking via Groups or custom Singleton (e.g., `ObjectManager`).
+    *   Implemented: Base `Node3D` for spatial properties.
+    *   Implemented: `scripts/core_systems/base_object.gd` attached to root node holds common properties (type, signature, flags, parent references). Uses Godot physics layers/masks.
+    *   Implemented: Derived classes `scripts/ship/ship_base.gd`, `scripts/object/weapon_base.gd`, `scripts/object/asteroid.gd`, `scripts/object/debris.gd` inherit from `BaseObject.gd`.
+    *   Implemented: Godot's built-in object lifecycle (`instantiate()`, `queue_free()`).
+    *   Implemented: `scripts/core_systems/object_manager.gd` (Autoload) manages object lookup by ID and signature (using meta), and uses Groups (`GROUP_SHIP`, etc.).
 *   **Model Data Structure (`polymodel` equivalent):**
-    *   Use Godot's scene structure (`.tscn`) as the primary container for a ship/object.
-    *   `MeshInstance3D` nodes for visual representation (potentially multiple for LODs).
-    *   Custom `Resource` (`.tres`) files (e.g., `ShipData.tres`, `ModelMetadata.tres`) to store data not easily represented in the scene tree:
-        *   Physics properties (mass, center of mass - though `RigidBody3D` handles some).
-        *   Detail level mesh paths/references.
-        *   Debris object scene paths.
-        *   Weapon mount points (`Marker3D` in scene, referenced in resource).
-        *   Docking points (`Marker3D` in scene, referenced in resource with type flags).
-        *   Thruster points (`Marker3D` in scene, linked to `GPUParticles3D` or custom effect nodes, properties in resource).
-        *   Shield mesh data (potentially a separate `Mesh` resource or generated).
-        *   AI/Scripting paths (`Path3D` nodes in scene, referenced in resource).
-        *   Cross-section data (Array in resource).
-        *   Insignia locations/UVs (`Decal` nodes or custom shader logic, data in resource).
-        *   Glow points (`Marker3D` in scene, linked to `PointLight3D` or custom shader, properties in resource).
-        *   Subsystem definitions (Array/Dictionary within the main resource, linking `Marker3D`s for position).
+    *   Implemented: Godot scene structure (`.tscn`) used as primary container.
+    *   Implemented: `MeshInstance3D` nodes for visuals.
+    *   Implemented: Custom `Resource` (`.tres`) files used for static data (`scripts/resources/ship_weapon/ship_data.gd`, `scripts/resources/ship_weapon/weapon_data.gd`). `scripts/resources/object/model_metadata.gd` is planned for POF metadata.
+    *   Implemented: `Marker3D` nodes used in scenes for weapon/dock/thruster points, referenced by scripts/resources.
+    *   Implemented: Physics properties (mass, inertia) handled by `RigidBody3D` (`ShipBase`, `AsteroidObject`, `DebrisObject`).
+    *   Implemented: Subsystem definitions stored within `ShipData.gd`.
 *   **Submodel Data Structure (`bsp_info` equivalent):**
-    *   Represent submodels as child `Node3D` nodes within the main object scene.
-    *   Attach `MeshInstance3D`, `CollisionShape3D` as needed.
-    *   Use `AnimationPlayer` to handle rotations/movements defined in the original `bsp_info` (movement type/axis).
-    *   Store state (`blown_off`, `is_damaged`) in attached scripts (e.g., `SubmodelLogic.gd`).
-    *   Parent/child relationships are handled by the scene tree.
-    *   Electrical arc effects: Custom shader or `GPUParticles3D`.
-    *   Collision flags: Set physics layers/masks on `CollisionShape3D`.
+    *   Implemented: Submodels represented as child `Node3D` nodes within the main object scene.
+    *   Implemented: `MeshInstance3D`, `CollisionShape3D` attached as needed.
+    *   Implemented: `AnimationPlayer` node exists in `ShipBase` for handling rotations/movements.
+    *   Implemented: State (`blown_off`, `is_damaged`) managed in attached scripts (`scripts/ship/subsystems/ship_subsystem.gd`).
+    *   Implemented: Parent/child relationships handled by the scene tree.
+    *   Planned: Electrical arc effects via custom shader or `GPUParticles3D`.
+    *   Implemented: Collision flags set via physics layers/masks on `CollisionShape3D`.
 *   **Subsystem Data Structure (`model_subsystem` equivalent):**
-    *   Define subsystems within the custom `ShipData.tres` resource.
-    *   Link subsystems to `Marker3D` nodes in the scene for position/orientation.
-    *   Implement subsystem logic (turret aiming, engine effects) in scripts attached to the main ship node or dedicated sub-nodes.
-    *   Turret properties: Store in the resource, use GDScript for aiming logic, potentially `AnimationPlayer` for rotation limits/sounds.
-    *   Engine wash: `GPUParticles3D` or custom shader effect.
-    *   AWACS: `Area3D` for detection radius, GDScript for logic.
-    *   Triggered animations: Use `AnimationPlayer` controlled by GDScript.
+    *   Implemented: Subsystems defined within `ShipData.gd` resource (`scripts/resources/ship_weapon/subsystem_definition.gd`).
+    *   Implemented: Subsystems linked to `Marker3D` nodes in the scene.
+    *   Implemented: Subsystem logic implemented in `scripts/ship/subsystems/ship_subsystem.gd` and derived classes like `scripts/ship/subsystems/turret_subsystem.gd`.
+    *   Implemented: Turret properties stored in resource, aiming logic in `TurretSubsystem.gd`. `AnimationPlayer` available for rotation.
+    *   Planned: Engine wash via `GPUParticles3D` or custom shader.
+    *   Planned: AWACS via `Area3D` and GDScript.
+    *   Implemented: Triggered animations handled via `AnimationPlayer` controlled by GDScript (`ShipBase.play_submodel_animation`).
 *   **Model Loading & Management:**
-    *   Godot handles scene/resource loading (`load()`, `preload()`).
-    *   Texture memory management is largely handled by Godot, but `ResourceLoader` can provide finer control if needed.
+    *   Implemented: Godot handles scene/resource loading (`load()`, `preload()`).
+    *   Implemented: Texture memory management handled by Godot.
 *   **Model Rendering:**
-    *   Godot's rendering engine handles most aspects.
-    *   LOD: Use `VisibleOnScreenNotifier3D` or distance checks in script to swap `MeshInstance3D` visibility or use `MeshLOD` resource type.
-    *   Lighting: Use Godot's `DirectionalLight3D`, `OmniLight3D`, `SpotLight3D`, `WorldEnvironment`.
-    *   Texturing: Apply materials (`StandardMaterial3D`, `ShaderMaterial`) to `MeshInstance3D`. Godot supports base, glow (emission), specular, normal maps natively. Animated textures via `AnimatedTexture` or shaders.
-    *   Rendering Flags: Map `MR_*` flags to material properties (transparency, culling, unshaded), `WorldEnvironment` settings (fog), or rendering layers. Outlines via shaders or post-processing.
-    *   Thruster Effects: `GPUParticles3D`, potentially custom shaders. `GlowPointBank` equivalent: `PointLight3D`, `GPUParticles3D`, or emissive materials controlled by script/`AnimationPlayer`.
-    *   Insignias: `Decal` nodes or custom shaders.
-    *   Shield Rendering: Dedicated `MeshInstance3D` with a shield shader, visibility/color controlled by script.
-    *   Warping/Cloaking: Full-screen shaders or `ShaderMaterial` applied to the model.
+    *   Implemented: Godot's rendering engine handles most aspects.
+    *   Planned: LOD via `VisibleOnScreenNotifier3D` or distance checks.
+    *   Implemented: Lighting via Godot's light nodes and `WorldEnvironment`.
+    *   Implemented: Texturing via `StandardMaterial3D` / `ShaderMaterial`.
+    *   Planned: Rendering Flags mapped to material properties, `WorldEnvironment`, or rendering layers.
+    *   Planned: Thruster Effects via `GPUParticles3D` / shaders. Glow points via `PointLight3D` / `GPUParticles3D` / emissive materials.
+    *   Planned: Insignias via `Decal` nodes or custom shaders.
+    *   Implemented: Shield Rendering via dedicated `MeshInstance3D` with shield shader (controlled by `ShieldSystem.gd`).
+    *   Planned: Warping/Cloaking via shaders. `ShipBase.gd` has cloak/warp state variables and function stubs.
 *   **Submodel Animation:**
-    *   Use `AnimationPlayer` to create and manage animations for submodel rotations/movements.
-    *   Trigger animations from GDScript based on game state (docking, firing weapons).
-    *   Use animation tracks for properties, method calls (for sounds), and potentially controlling shader parameters.
+    *   Implemented: `AnimationPlayer` used for animations.
+    *   Implemented: `ShipBase.play_submodel_animation` triggers animations from GDScript.
 *   **Collision Detection:**
-    *   `RigidBody3D` (for physics-simulated objects like debris) or `CharacterBody3D` (for player/AI ships) or `Area3D` (for triggers, non-physical objects).
-    *   `CollisionShape3D` using primitives or generated collision meshes (convex/concave decomposition) based on the visual `Mesh`.
-    *   Use Godot's physics layers and masks for collision group equivalents (`MC_CHECK_MODEL` vs `MC_CHECK_SHIELD` can be different layers/masks).
-    *   Implement collision handling logic in `_physics_process` or via signal callbacks (`body_entered`, `area_entered`).
-    *   Ray/Shape casts (`PhysicsDirectSpaceState3D.intersect_ray`, `intersect_shape`) for weapon hits or specific checks. Map `MC_CHECK_RAY`/`MC_CHECK_SPHERELINE` to these.
+    *   Implemented: `RigidBody3D` (`ShipBase`, `AsteroidObject`, `DebrisObject`), `Area3D` (`WeaponBase`).
+    *   Implemented: `CollisionShape3D` used with primitives or generated meshes.
+    *   Implemented: Godot physics layers/masks used for collision groups.
+    *   Implemented: Collision handling logic in `_on_body_entered` signal callbacks within object scripts (`ShipBase`, `AsteroidObject`, `DebrisObject`, `WeaponBase`).
+    *   Implemented: Ray/Shape casts available via `PhysicsDirectSpaceState3D`.
 *   **Shield Management:**
-    *   Store shield quadrant strengths in the `ShipBase.gd` script.
-    *   Implement shield logic (damage application, recharge) within `ShipBase.gd`.
-    *   Shield visuals/collision: Separate `MeshInstance3D` with shield shader and `Area3D` or `StaticBody3D` with `CollisionShape3D` on a specific shield layer.
+    *   Implemented: Shield quadrant strengths stored and managed in `scripts/ship/shield_system.gd`.
+    *   Implemented: Shield visuals/collision handled by separate `MeshInstance3D` and `CollisionShape3D` (likely on shield layer).
 *   **Docking System:**
-    *   Use `Marker3D` nodes within ship scenes to represent dock points (`dock_bay`).
-    *   Manage docking relationships in GDScript, possibly storing references in a `DockingManager` Singleton or within object scripts.
-    *   Use `Node.reparent()` or transform updates (`Node3D.global_transform`) to handle movement.
+    *   Implemented: `Marker3D` nodes used for dock points.
+    *   Implemented: `scripts/core_systems/docking_manager.gd` (Autoload) manages docking relationships using dictionaries.
+    *   Implemented: `DockingManager.move_docked_objects` handles transform updates. `BaseObject.gd` has `dock_list` placeholders.
 *   **Object Sounds:**
-    *   Use `AudioStreamPlayer3D` nodes attached to the object's scene or specific sub-nodes (turrets, engines).
-    *   Manage playback via GDScript.
-*   **Spatial Partitioning:** Godot's renderer and physics engine have built-in broadphase and spatial partitioning. Manual octants (`modeloctant.cpp`) are likely unnecessary.
+    *   Implemented: `AudioStreamPlayer3D` nodes used.
+    *   Implemented: Playback managed via GDScript (e.g., `BaseObject.gd` placeholders).
+*   **Spatial Partitioning:** Handled by Godot's engine. Manual octants unnecessary.
 
 **3. Outline Target Code Structure:**
 
@@ -281,14 +270,24 @@ Based on the provided code snippets in `migration_tools/wcsaga_code/11_model/obj
 
 **5. Identify Relations:**
 
-*   **Object Manager (Core System)** creates (`instantiate()`) and destroys (`queue_free()`) objects, potentially tracking them via Groups or lists.
-*   **Game Object Scenes** (`Ship.tscn`, etc.) contain `Node3D` hierarchy: `MeshInstance3D`, `CollisionShape3D`, `Marker3D`s, `AnimationPlayer`, `GPUParticles3D`, `AudioStreamPlayer3D`.
-*   **Game Object Scripts** (`ShipBase.gd`, etc.) attached to the root node access child nodes and associated `Resource` files (`ShipData.tres`, `ModelMetadata.tres`) for data and logic.
-*   **Physics Engine** uses `CollisionShape3D` to detect collisions between physics bodies/areas.
-*   **Collision Handling Logic** (in object scripts or `CollisionHandler.gd`) reacts to physics signals (`body_entered`) or results from ray/shape casts, applying damage, shield effects, sound effects.
-*   **Ship Scripts (`ShipBase.gd`)** manage shield strength, process damage, handle docking logic (interacting with `Marker3D`s and `DockingManager`), control `AnimationPlayer` for subsystems/doors, and manage `AudioStreamPlayer3D` nodes.
-*   **Rendering System (Graphics)** uses `MeshInstance3D` and associated `Material`/`ShaderMaterial` resources to draw objects. `WorldEnvironment` controls global effects.
-*   **AnimationPlayer** manipulates `Node3D` transforms (for submodels), material properties (glow), light energy, particle emission, and calls methods (sounds).
+*   **ObjectManager (`scripts/core_systems/object_manager.gd`)** (Autoload) registers (`register_object`) and unregisters (`unregister_object`) objects (like `ShipBase`, `WeaponBase`) when they enter/exit the tree. Tracks objects by ID and signature (meta). Provides lookup functions (`get_object_by_id`, `get_object_by_signature`) and group-based access (`get_all_ships`).
+*   **Game Object Scenes** (`scenes/ships_weapons/*.tscn`) contain the `Node3D` hierarchy: `MeshInstance3D`, `CollisionShape3D`, `Marker3D`s (for hardpoints, dock points), `AnimationPlayer`, `GPUParticles3D`, `AudioStreamPlayer3D`, and component nodes (`WeaponSystem`, `ShieldSystem`, `DamageSystem`, `EngineSystem`, `EnergyTransferSystem`, `AIController`).
+*   **BaseObject (`scripts/core_systems/base_object.gd`)** is attached to the root of object scenes. It registers/unregisters with `ObjectManager`, holds common flags, type, signature (meta), parent info, and collision layer/mask settings. Defines virtual methods like `apply_damage`, `get_team`, `is_destroyed`.
+*   **ShipBase (`scripts/ship/ship_base.gd`)** inherits `BaseObject`. It holds references to component nodes (`WeaponSystem`, `ShieldSystem`, etc.), `ShipData` resource, manages hull strength, weapon energy, ETS indices, cloak/warp state, and destruction sequence. It receives damage via `take_damage` (delegating to `DamageSystem`) and handles collisions via `_on_body_entered`. It triggers animations via `play_submodel_animation`.
+*   **WeaponBase (`scripts/object/weapon_base.gd`)** inherits `BaseObject`. It holds `WeaponData`, owner reference, lifetime, velocity. It handles collisions via `_on_body_entered` / `_on_area_entered` and applies damage to hit objects (`ShipBase.take_damage`, `AsteroidObject.hit`, `DebrisObject.hit`).
+*   **AsteroidObject/DebrisObject (`scripts/object/asteroid.gd`, `scripts/object/debris.gd`)** inherit `BaseObject` (via `RigidBody3D`). They handle their own health (`hull_strength`), destruction, and collision responses via `hit()` and `_on_body_entered`.
+*   **Physics Engine** uses `CollisionShape3D` attached to `RigidBody3D` (`ShipBase`, `AsteroidObject`, `DebrisObject`) or `Area3D` (`WeaponBase`) to detect collisions.
+*   **Collision Handling Logic** is implemented within the `_on_body_entered` methods of the respective object scripts (`ShipBase`, `AsteroidObject`, `DebrisObject`, `WeaponBase`), reacting to physics signals.
+*   **DamageSystem (`scripts/ship/damage_system.gd`)** (Node within `ShipBase`) receives damage via `apply_local_damage` or `apply_global_damage`. It interacts with `ShieldSystem` to check/apply shield absorption and distributes remaining damage to subsystems (`ShipSubsystem.take_damage`) and the ship's hull (`ShipBase.hull_strength`). Emits signals for hull/subsystem damage/destruction. Tracks damage sources.
+*   **ShieldSystem (`scripts/ship/shield_system.gd`)** (Node within `ShipBase`) manages shield quadrant strengths (`shield_quadrants`), absorbs damage (`absorb_damage`), and handles recharge (`recharge` called by `EnergyTransferSystem`). Emits signals for shield hits/changes.
+*   **EnergyTransferSystem (`scripts/ship/energy_transfer_system.gd`)** (Node within `ShipBase`) manages power distribution (`_manage_ets`) based on `ShipBase` recharge indices, calling `recharge` methods on `ShieldSystem` and `EngineSystem`, and updating `ShipBase.weapon_energy`.
+*   **EngineSystem (`scripts/ship/engine_system.gd`)** (Node within `ShipBase`) manages afterburner state (`afterburner_on`, `afterburner_fuel`), fuel consumption, and recharge (`recharge` called by `EnergyTransferSystem`).
+*   **WeaponSystem (`scripts/ship/weapon_system.gd`)** (Node within `ShipBase`) manages weapon banks, ammo (`primary_bank_ammo`, `secondary_bank_ammo`), energy (`ShipBase.weapon_energy`), cooldowns (`next_primary_fire_stamp`, etc.), linking (`primary_linked`), and firing logic (`fire_primary`, `fire_secondary`). It instantiates projectile scenes (`WeaponBase` derived) and calls their `setup` method. It interacts with `TurretSubsystem` via `turret_bank_map`.
+*   **ShipSubsystem (`scripts/ship/subsystems/ship_subsystem.gd`)** (Node within `ShipBase`) holds runtime state for a subsystem (health, disruption timer), references its static definition (`SubsystemDefinition` within `ShipData`), and handles taking damage (`take_damage`).
+*   **TurretSubsystem (`scripts/ship/subsystems/turret_subsystem.gd`)** inherits `ShipSubsystem`. It handles turret aiming (`aim_at_target`) and firing (`fire_turret`, interacting with `WeaponSystem`).
+*   **DockingManager (`scripts/core_systems/docking_manager.gd`)** (Autoload) manages docking state (`live_docks`). `dock_objects`/`undock_objects` update the state. `move_docked_objects` (called by `ShipBase._physics_process`) updates transforms based on `Marker3D` positions (`_get_dock_point_transform`).
+*   **Rendering System (Graphics)** uses `MeshInstance3D` and associated `Material`/`ShaderMaterial` resources. `WorldEnvironment` controls global effects.
+*   **AnimationPlayer** (Node within `ShipBase`) manipulates `Node3D` transforms (for submodels), material properties, particle emission, and calls methods. Triggered by `ShipBase.play_submodel_animation`.
 
 ## IV. Godot Project Structure (Relevant Parts)
 

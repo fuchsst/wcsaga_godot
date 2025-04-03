@@ -1,70 +1,53 @@
-@tool
+# scripts/resources/game_data/sound_entry.gd
 extends Resource
 class_name SoundEntry
 
-# Sound categories matching game settings
-enum Category {
-	MASTER,      # Affected by master_volume
-	MUSIC,       # Affected by music_volume
-	VOICE,       # Affected by voice_volume
-	INTERFACE,   # Affected by master_volume
-	WEAPON,      # Affected by master_volume
-	SHIP,        # Affected by master_volume
-	AMBIENT      # Affected by master_volume
-}
+## Defines properties for a single sound effect, loaded from sounds.tbl.
 
-# Sound types for 3D positioning
-enum SoundType {
-	NORMAL = 0,     # Regular non-positional sound
-	POSITIONAL = 1, # 3D positioned sound with standard attenuation
-	AMBIENT = 2,    # Background/ambient sound
-	A3D = 3        # 3D positional sound with enhanced attenuation (legacy A3D)
-}
+# The unique identifier/name for this sound (e.g., "SND_LASER_FIRE").
+@export var id_name: String = ""
 
-# Core properties
-@export var audio_stream: AudioStream  # The actual sound data
-@export var category: Category  # Sound category for organization and volume control
-@export var type: SoundType = SoundType.NORMAL  # How the sound should be played
-@export var default_volume: float = 1.0  # Base volume level
-@export var should_preload: bool = false  # Whether to preload this sound
+# Path to the AudioStream resource file (.ogg or .wav).
+@export var audio_stream_path: String = ""
+# Preloaded AudioStream resource.
+@export var audio_stream: AudioStream = null
 
-# 3D sound properties
-@export_group("3D Sound Properties")
-@export var min_distance: float = 1.0  # Distance where sound starts attenuating
-@export var max_distance: float = 20.0  # Distance where sound becomes inaudible
-@export var attenuation: float = 1.0  # How quickly sound fades with distance
+# Default volume (0.0 to 1.0). Corresponds to 'Vol' in sounds.tbl.
+@export var default_volume: float = 1.0
 
-# Unique identifier (similar to original game's sig)
-@export var id: String = ""
+# Minimum distance for 3D sound attenuation. Corresponds to 'Min' in sounds.tbl.
+@export var min_distance: float = 1.0
+# Maximum distance for 3D sound attenuation. Corresponds to 'Max' in sounds.tbl.
+@export var max_distance: float = 100.0
 
-# Runtime properties
-var loaded_audio_player: AudioStreamPlayer3D  # Cached player for preloaded sounds
+# Whether the sound should be preloaded. Corresponds to 'Preload' in sounds.tbl.
+@export var preload: bool = false
 
-func _init():
-	# Generate unique ID if not set
-	if id.is_empty():
-		id = str(hash(Time.get_unix_time_from_system()))
+# Sound priority for instance limiting (maps roughly to original logic).
+# Higher value means higher priority.
+# Corresponds to SND_PRIORITY_* constants conceptually.
+@export var priority: int = 1 # Default priority
 
-func _get_property_list() -> Array:
-	# Editor properties
-	var properties = []
-	properties.append({
-		"name": "resource_name",
-		"type": TYPE_STRING,
-		"usage": PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_EDITOR_INSTANTIATE_OBJECT
-	})
-	return properties
+# Internal signature/handle from original game (optional, for reference).
+@export var original_sig: int = -1
 
-# Runtime methods
-func preload_sound() -> void:
-	if should_preload and audio_stream and not loaded_audio_player:
-		loaded_audio_player = AudioStreamPlayer3D.new()
-		loaded_audio_player.stream = audio_stream
-		loaded_audio_player.max_distance = max_distance
-		loaded_audio_player.unit_size = min_distance
-		loaded_audio_player.attenuation = attenuation
+func _init(p_id_name := "", p_path := "", p_volume := 1.0, p_min := 1.0, p_max := 100.0, p_preload := false, p_priority := 1, p_orig_sig := -1):
+	id_name = p_id_name
+	audio_stream_path = p_path
+	default_volume = p_volume
+	min_distance = p_min
+	max_distance = p_max
+	preload = p_preload
+	priority = p_priority
+	original_sig = p_orig_sig
+	if audio_stream_path != "":
+		# Attempt to preload if specified, handle potential errors gracefully.
+		# Actual preloading might be better handled by the SoundManager during init.
+		# audio_stream = load(audio_stream_path) if preload else null
+		pass
 
-func unload_sound() -> void:
-	if loaded_audio_player:
-		loaded_audio_player.queue_free()
-		loaded_audio_player = null
+func get_stream() -> AudioStream:
+	"""Lazily loads the AudioStream if not already loaded."""
+	if audio_stream == null and audio_stream_path != "":
+		audio_stream = load(audio_stream_path)
+	return audio_stream

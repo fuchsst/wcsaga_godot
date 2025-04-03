@@ -29,45 +29,43 @@ Godot offers native solutions for most of these features:
 *   **2D Drawing:** `CanvasLayer` for UI/HUD, `Control` nodes (`TextureRect`, `Label`, `Panel`), `_draw()` with `draw_*` methods, `Sprite2D`.
 *   **3D Drawing:** `MeshInstance3D` with various `Mesh` types (`PlaneMesh`, `SphereMesh`, `BoxMesh`, `ArrayMesh`, `ImmediateMesh`), `GPUParticles3D`, `Sprite3D`. Lasers/beams might use `ImmediateMesh`, custom `ArrayMesh`, or potentially `RibbonTrailMesh`/`TubeTrailMesh`.
 *   **Texture Management:** Godot's resource system handles loading, caching, and format conversion (via import settings). `Texture2D`, `Texture3D`, `CompressedTexture2D`, `ImageTexture`, `ViewportTexture`. Mipmaps and anisotropic filtering are import settings. Render-to-texture uses `SubViewport`. Addressing modes are material properties (`BaseMaterial3D.texture_filter`, `ShaderMaterial` uniforms).
-*   **Lighting:** `DirectionalLight3D`, `OmniLight3D`, `SpotLight3D`. Ambient/environment lighting via `WorldEnvironment`. Specular highlights controlled by `Material` properties (metallic, roughness, specular). Emissive materials via `BaseMaterial3D.emission_enabled`.
-*   **Shaders:** `ShaderMaterial` using Godot Shading Language (`.gdshader`). Replaces the custom C++ shader system entirely. Material properties (albedo, glow, metallic, roughness, normal, height, AO, emission) are handled via shader uniforms and textures. Fog is typically a shader effect or `WorldEnvironment` setting.
-*   **Post-Processing:** `WorldEnvironment` node (Glow/Bloom, SSAO, SSR, SDFGI, Tonemapping). Custom effects via screen-space shaders on `Camera3D` or `Viewport`.
-*   **Vertex Buffers (VBOs/TNL):** Handled internally by Godot. Geometry defined via `Mesh` resources (`ArrayMesh`, `SurfaceTool`). Instancing via `MultiMeshInstance3D`.
+*   **Lighting:** `DirectionalLight3D` (added to `scenes/core/skybox.tscn`), `OmniLight3D`, `SpotLight3D`. Ambient/environment lighting via `WorldEnvironment` (`resources/graphics/environment/space_default.tres`). Specular highlights controlled by `Material` properties (metallic, roughness, specular). Emissive materials via `BaseMaterial3D.emission_enabled` or shader uniforms (`model_base.gdshader`).
+*   **Shaders:** `ShaderMaterial` (`resources/graphics/materials/model_base_material.tres`) using Godot Shading Language (`.gdshader`). Replaces the custom C++ shader system entirely. Implemented base shader (`scripts/graphics/shaders/model_base.gdshader`) with uniforms mirroring C++ flags (`use_light`, `use_diffuse_map`, etc.). Material properties (albedo, glow, metallic, roughness, normal, height, AO, emission) are handled via shader uniforms and textures. Fog is typically a shader effect or `WorldEnvironment` setting. Implemented effect shaders: `starfield.gdshader`, `nebula.gdshader`, `laser_beam.gdshader`.
+*   **Post-Processing:** `WorldEnvironment` node (`resources/graphics/environment/space_default.tres`) provides default Glow/Bloom. Custom effects can be managed via `scripts/graphics/post_processing.gd` attached to `Camera3D` or `Viewport`.
+*   **Vertex Buffers (VBOs/TNL):** Handled internally by Godot. Geometry defined via `Mesh` resources (`ArrayMesh`, `SurfaceTool`, `QuadMesh` used in `scenes/effects/beam_effect.tscn`). Instancing via `MultiMeshInstance3D`.
 *   **Clipping:** Frustum culling is automatic via `Camera3D`. User clip planes can be implemented via custom shaders if needed.
 *   **Coordinate Systems:** Managed by Godot's `Node3D` transforms and `Camera3D` projection. Methods like `project_position`, `unproject_position` are available.
 *   **Font Rendering:** `FontFile`, `DynamicFont`, `Label` node, `RichTextLabel`, `Theme`. Import `.ttf`/`.otf` directly. Custom `.fnt` likely needs a converter or custom loader.
 *   **Color & Palette:** `Color` struct. Alpha blending via `Material.transparency` or shader logic. Clear color via `Camera3D` or `WorldEnvironment`. Gamma via `ProjectSettings` or `WorldEnvironment`. Palettes are obsolete.
 *   **Screen Management:** Handled by Godot's main loop and `DisplayServer`. Buffer flipping is automatic. Clearing via `Camera3D` background or `WorldEnvironment`. Saving screen via `Viewport.get_texture().get_image()`. Resolution/aspect via `ProjectSettings` and `Viewport`.
-*   **Special Effects:** Nebula/Starfield via shaders (`Sky`, `PanoramaSkyMaterial`, custom shaders). Particles via `GPUParticles3D`.
+*   **Special Effects:** Nebula/Starfield implemented via custom shaders (`nebula.gdshader`, `starfield.gdshader`) applied to `MeshInstance3D` in `scenes/core/skybox.tscn`. Lasers/beams via `laser_beam.gdshader` in `scenes/effects/beam_effect.tscn`. Particles via `GPUParticles3D`.
 
 ## 3. Outline Target Code Structure
 
 ```
 scripts/graphics/
-├── graphics_utilities.gd   # Helper functions for graphics tasks (if needed).
-├── post_processing.gd      # Script attached to Camera3D/Viewport for custom PP effects.
-└── shaders/                # Directory for .gdshader files
-    ├── model_base.gdshader     # Base shader for ships/objects, handling lighting, textures.
-    ├── nebula.gdshader         # Shader for rendering nebula effects.
-    ├── starfield.gdshader      # Shader for rendering the starfield background.
-    ├── bloom_pp.gdshader       # Custom bloom/glow post-processing shader (if needed beyond WorldEnvironment).
-    ├── laser_beam.gdshader     # Shader for laser/beam effects.
-    └── particle.gdshader       # Custom particle shaders (if needed).
-scenes/effects/             # Scenes for particle effects, explosions, etc.
-├── explosion.tscn
-├── laser_hit.tscn
-└── beam_effect.tscn        # Scene for beam weapon visuals.
-resources/graphics/         # Graphics-related resources
-├── materials/              # Pre-configured materials (.material files).
-│   ├── ship_hull.material
-│   └── cockpit_glass.material
-├── themes/                 # UI themes (.theme files).
-│   └── hud_theme.tres
-└── environment/            # WorldEnvironment resources (.tres).
-    ├── space_default.tres
-    └── nebula_env.tres
-scenes/core/
-└── skybox.tscn             # Scene containing the starfield/nebula setup (using Sky).
+├── graphics_utilities.gd   # Helper functions for graphics tasks (Created - Placeholder).
+├── post_processing.gd      # Script attached to Camera3D/Viewport for custom PP effects (Created - Placeholder).
+└── shaders/                # Directory for .gdshader files (Created)
+    ├── model_base.gdshader     # Base shader for ships/objects, handling lighting, textures (Created).
+    ├── nebula.gdshader         # Shader for rendering nebula effects (Created).
+    ├── starfield.gdshader      # Shader for rendering the starfield background (Created).
+    ├── laser_beam.gdshader     # Shader for laser/beam effects (Created).
+    └── particle.gdshader       # Custom particle shaders (if needed) (Placeholder).
+scenes/effects/             # Scenes for particle effects, explosions, etc. (Created directory)
+├── explosion.tscn          # (Placeholder)
+├── laser_hit.tscn          # (Placeholder)
+└── beam_effect.tscn        # Scene for beam weapon visuals (Created).
+resources/graphics/         # Graphics-related resources (Created directory)
+├── materials/              # Pre-configured materials (.tres using ShaderMaterial) (Created directory).
+│   └── model_base_material.tres # Default material using model_base shader (Created).
+├── themes/                 # UI themes (.theme files) (Placeholder).
+│   └── hud_theme.tres      # (Placeholder)
+└── environment/            # WorldEnvironment resources (.tres) (Created directory).
+    ├── space_default.tres  # Default environment for space scenes (Created).
+    └── nebula_env.tres     # (Placeholder for nebula-specific environment)
+scenes/core/                # Core scenes (Created directory)
+└── skybox.tscn             # Scene containing the starfield/nebula setup (Created/Updated).
 ```
 
 ## 4. Identify Important Methods, Classes, and Data Structures
@@ -145,7 +143,7 @@ scenes/core/
 *   **Mission System:** May trigger specific graphical effects, set up environments (nebula, lighting).
 *   **Core Systems:** Manages the main loop which calls rendering functions, handles camera setup.
 *   **Lighting System:** Provides light data used by the 3D rendering pipeline and shaders.
-*   **Effects (Particles, Nebula, Starfield):** These are specialized rendering tasks often integrated within the main graphics pipeline or using dedicated subsystems/shaders.
+*   **Effects (Particles, Nebula, Starfield):** These are specialized rendering tasks. Nebula/Starfield implemented via shaders (`nebula.gdshader`, `starfield.gdshader`) in `skybox.tscn`. Lasers/Beams via `laser_beam.gdshader` in `beam_effect.tscn`. Particles will use `GPUParticles3D`.
 
 **Conversion Notes:**
 

@@ -29,8 +29,8 @@ wcsaga_godot/
 │   │   └── behavior_trees/ # LimboAI BehaviorTree resources (.tres) - Defines specific AI logic flows
 │   ├── armor/              # ArmorData resources (.tres) - Defines damage resistances (See 05_ship_weapon_systems.md)
 │   ├── autopilot/          # Autopilot system resources (See 12_controls_and_camera.md)
-│   │   ├── autopilot_config.tres # Global autopilot settings (link distance, messages)
-│   │   └── nav_points/     # NavPointData resources (.tres) per mission - Defines navigation targets
+│   │   ├── autopilot_config.tres # Global autopilot settings (link distance, messages) (Defined by scripts/resources/autopilot/autopilot_config.gd)
+│   │   └── nav_points/     # NavPointData resources (.tres) per mission - Defines navigation targets (Defined by scripts/resources/autopilot/nav_point_data.gd)
 │   ├── campaigns/          # CampaignData resources (.tres) - Defines campaign structure and progression (See 07_mission_system.md)
 │   ├── game_data/          # Global game data resources (See 04_core_systems.md)
 │   │   ├── game_sounds.tres # Mapping sound IDs/names to AudioStream paths (from sounds.tbl) (See 13_sound_and_animation.md)
@@ -61,6 +61,8 @@ wcsaga_godot/
 │   │   └── script_hooks.tres # (Optional) Resource defining GDScript hooks (if not hardcoded)
 │   ├── ships/              # ShipData resources (.tres) - Defines static ship properties (from ships.tbl) (See 05_ship_weapon_systems.md)
 │   ├── sounds/             # (Potentially merged into game_data/game_sounds.tres) SoundEntry resources (See 13_sound_and_animation.md)
+│   ├── subtitles/          # Subtitle resources (See 12_controls_and_camera.md)
+│   │   └── mission_x_sub_1.tres # Example SubtitleData resource instance (Defined by scripts/resources/subtitles/subtitle_data.gd)
 │   └── weapons/            # WeaponData resources (.tres) - Defines static weapon properties (from weapons.tbl) (See 05_ship_weapon_systems.md)
 ├── scenes/                 # Scene files (.tscn) - Instantiable game elements and UI screens
 │   ├── core/               # Core scenes (e.g., main game loop, manager nodes) (See 04_core_systems.md)
@@ -70,27 +72,25 @@ wcsaga_godot/
 │   │   ├── game_sequence_manager.tscn # Game state machine node
 │   │   ├── scoring_manager.tscn     # Scoring/stats management node
 │   │   ├── species_manager.tscn     # Species data management node
-│   │   ├── camera_manager.tscn      # Camera switching/management node (See 12_controls_and_camera.md)
-│   │   ├── subtitle_manager.tscn    # Subtitle management node (See 12_controls_and_camera.md)
-│   │   ├── autopilot_manager.tscn   # Autopilot state management node (See 12_controls_and_camera.md)
+│   │   # camera_manager, subtitle_manager, autopilot_manager are Autoloads, no scenes needed
 │   │   ├── message_manager.tscn     # Node for MessageManager singleton logic (See 07_mission_system.md)
 │   │   ├── mission_log_manager.tscn # Node for MissionLogManager singleton logic (See 07_mission_system.md)
 │   │   ├── mission_manager.tscn     # Node for MissionManager singleton logic (See 07_mission_system.md)
 │   │   ├── campaign_manager.tscn    # Node for CampaignManager singleton logic (See 07_mission_system.md)
-│   │   └── skybox.tscn         # Scene containing starfield/nebula setup (See 10_physics_and_space.md, 14_graphics.md)
-│   ├── effects/            # Reusable effect scenes (explosions, trails, beams, particles, decals, warp) (See 05_ship_weapon_systems.md, 10_physics_and_space.md)
-│   │   ├── explosion_medium.tscn # Medium explosion effect scene
-│   │   ├── shield_impact.tscn    # Shield hit visual effect scene
-│   │   ├── muzzle_flash.tscn     # Weapon muzzle flash effect scene
-│   │   ├── shockwave.tscn        # Shockwave visual effect scene
-│   │   ├── warp_effect.tscn      # Warp in/out visual effect scene
-│   │   ├── spark_effect.tscn     # Damage spark effect scene
-│   │   ├── debris_hull.tscn      # Large ship debris piece scene
-│   │   ├── debris_small.tscn     # Small debris piece scene
-│   │   ├── laser_hit.tscn        # Laser impact effect scene
-│   │   └── beam_effect.tscn      # Beam weapon visual effect scene
+│   │   └── skybox.tscn         # Scene containing starfield/nebula setup (Created/Updated) (See 10_physics_and_space.md, 14_graphics.md)
+│   ├── effects/            # Reusable effect scenes (explosions, trails, beams, particles, decals, warp) (Created directory) (See 05_ship_weapon_systems.md, 10_physics_and_space.md)
+│   │   ├── explosion_medium.tscn # (Placeholder) Medium explosion effect scene
+│   │   ├── shield_impact.tscn    # (Placeholder) Shield hit visual effect scene
+│   │   ├── muzzle_flash.tscn     # (Placeholder) Weapon muzzle flash effect scene
+│   │   ├── shockwave.tscn        # (Placeholder) Shockwave visual effect scene
+│   │   ├── warp_effect.tscn      # (Placeholder) Warp in/out visual effect scene
+│   │   ├── spark_effect.tscn     # (Placeholder) Damage spark effect scene
+│   │   ├── debris_hull.tscn      # (Placeholder) Large ship debris piece scene
+│   │   ├── debris_small.tscn     # (Placeholder) Small debris piece scene
+│   │   ├── laser_hit.tscn        # (Placeholder) Laser impact effect scene
+│   │   └── beam_effect.tscn      # Beam weapon visual effect scene (Created)
 │   ├── gameplay/           # Main gameplay scenes (space flight environment)
-│   │   └── space_flight.tscn   # The primary scene for in-flight gameplay, containing player, environment, managers
+│   │   └── space_flight.tscn   # (Placeholder) The primary scene for in-flight gameplay, containing player, environment, managers
 │   ├── missions/           # Mission-specific scenes (briefing, debriefing, command brief) (See 07_mission_system.md)
 │   │   ├── briefing/           # Briefing screen elements
 │   │   │   ├── briefing_screen.tscn     # Main briefing UI scene
@@ -136,9 +136,10 @@ wcsaga_godot/
 │   │   │   └── mission_log_screen.tscn
 │   │   ├── hotkey_screen/      # Hotkey assignment UI screen scene
 │   │   │   └── hotkey_screen.tscn
-│   │   └── autopilot_message.tscn # UI for displaying autopilot messages
+│   │   ├── autopilot_message.tscn # UI for displaying autopilot messages (TODO)
+│   │   └── subtitle_display.tscn  # UI Scene (CanvasLayer > MarginContainer > VBox > TextureRect + Label) for rendering a single subtitle. (See 12_controls_and_camera.md)
 │   └── utility/            # Helper scenes (e.g., observer viewpoint, debug tools)
-│       └── observer_viewpoint.tscn # Scene for observer camera (See 12_controls_and_camera.md)
+│       └── observer_viewpoint.tscn # Node3D scene, potentially with Camera3D child. (See 12_controls_and_camera.md)
 ├── scripts/                # GDScript files, organized by component
 │   ├── ai/                 # AIController, AI behaviors, targeting, pathfinding, AIProfile script (See 01_ai.md)
 │   │   ├── ai_controller.gd         # Main AI logic node, manages state, orchestrates BT/components.
@@ -200,7 +201,7 @@ wcsaga_godot/
 │   │   │   ├── func get_all_weapons() -> Array[Node]
 │   │   │   ├── func get_next_signature() -> int
 │   │   │   └── func clear_all_objects()
-│   │   ├── base_object.gd           # Base script class for all game objects (ships, weapons, etc.)
+│   │   ├── base_object.gd           # Base script class for all game objects (ships, weapons, etc.), incorporating logic from C++ object.cpp
 │   │   │   ├── func get_object_type() -> GlobalConstants.ObjectType
 │   │   │   ├── func get_signature() -> int
 │   │   │   ├── func set_flag(flag: int)
@@ -215,16 +216,48 @@ wcsaga_godot/
 │   │   ├── game_sequence_manager.gd # State machine logic for game states (menu, briefing, gameplay, etc.)
 │   │   ├── scoring_manager.gd       # Scoring, rank, medal evaluation logic
 │   │   ├── species_manager.gd       # Manages loading/accessing SpeciesInfo resources
-│   │   ├── camera_manager.gd        # Manages camera creation, switching, lookup logic (See 12_controls_and_camera.md)
-│   │   ├── subtitle_manager.gd      # Manages subtitle queue and display logic (See 12_controls_and_camera.md)
-│   │   ├── autopilot_manager.gd     # Manages autopilot state, engagement, NavPoints logic (See 12_controls_and_camera.md)
+│   │   ├── camera_manager.gd        # Autoload: Manages camera registration, switching, lookup logic (See 12_controls_and_camera.md)
+│   │   │   # - func register_camera(...)
+│   │   │   # - func set_active_camera(...)
+│   │   │   # - func reset_to_default_camera()
+│   │   │   # - func get_camera_by_name(...)
+│   │   │   # - func set_camera_zoom(...) # Helper calling BaseCameraController
+│   │   │   # - func set_camera_position(...) # Helper
+│   │   │   # - func set_camera_rotation(...) # Helper
+│   │   │   # - func set_camera_look_at(...) # Helper
+│   │   │   # - func set_camera_host(...) # Helper
+│   │   │   # - func set_camera_target(...) # Helper
+│   │   ├── subtitle_manager.gd      # Autoload: Manages subtitle queue and display logic (See 12_controls_and_camera.md)
+│   │   │   # - func queue_subtitle(subtitle_res: SubtitleData)
+│   │   │   # - func queue_subtitle_params(...)
+│   │   │   # - func clear_all()
+│   │   │   # - func _process(delta) # Updates current subtitle display/timing
+│   │   │   # - func _show_next_subtitle()
+│   │   │   # - func _clear_current_subtitle()
+│   │   ├── autopilot_manager.gd     # Autoload: Manages autopilot state, engagement, NavPoints, cinematics, linking, time compression. (See 12_controls_and_camera.md)
+│   │   │   # - func start_autopilot()
+│   │   │   # - func end_autopilot()
+│   │   │   # - func can_autopilot(send_msg: bool = false) -> bool
+│   │   │   # - func select_next_nav() -> bool
+│   │   │   # - func toggle_autopilot()
+│   │   │   # - func load_mission_nav_points(...)
+│   │   │   # - func _process(delta) # Handles checks, updates
+│   │   │   # - func _send_message(...)
+│   │   │   # - func _check_autopilot_conditions()
+│   │   │   # - func _update_standard_autopilot(delta)
+│   │   │   # - func _update_cinematic_autopilot(delta)
+│   │   │   # - func _setup_cinematic_autopilot()
+│   │   │   # - func _warp_ships(prewarp: bool = false)
+│   │   │   # - func _check_for_linking_ships()
+│   │   │   # - func _check_nearby_objects(...)
+│   │   │   # - func _set_autopilot_ai_goals(engage: bool)
 │   │   ├── script_system.gd         # Autoload for hook system management script (See 08_scripting.md)
 │   │   ├── message_manager.gd       # Singleton for message system logic (See 07_mission_system.md)
 │   │   ├── mission_log_manager.gd   # Singleton for mission log logic (See 07_mission_system.md)
 │   │   ├── mission_manager.gd       # Singleton for mission management logic (See 07_mission_system.md)
 │   │   └── campaign_manager.gd      # Singleton for campaign management logic (See 07_mission_system.md)
 │   ├── ship/                 # Ship logic and core components (See 05_ship_weapon_systems.md)
-│   │   ├── ship_base.gd             # Base ship logic, physics integration, state management script
+│   │   ├── ship_base.gd             # Base ship logic, physics integration, state management script, incorporating logic from C++ ship.cpp and model*.cpp
 │   │   │   ├── func take_damage(hit_pos: Vector3, amount: float, killer_obj_id: int = -1, damage_type_key = -1, hit_subsystem: Node = null)
 │   │   │   ├── func fire_primary_weapons()
 │   │   │   ├── func fire_secondary_weapons()
@@ -239,8 +272,58 @@ wcsaga_godot/
 │   │   │   ├── func shipfx_warpin_frame(delta: float)
 │   │   │   ├── func shipfx_warpout_start()
 │   │   │   └── func shipfx_warpout_frame(delta: float)
-│   │   ├── player_ship.gd           # Player-specific ship logic script
-│   │   ├── weapon_system.gd         # Manages weapon banks, firing, energy/ammo logic script
+│   ├── player/               # Player specific scripts (See 04_core_systems.md, 12_controls_and_camera.md)
+│   │   ├── player_ship_controller.gd # Handles player input mapping to ship actions script (Attached to player ship scene)
+│   │   │   # - func _physics_process(delta) # Reads axes
+│   │   │   # - func _unhandled_input(event) # Reads actions
+│   │   │   # - func set_active(active: bool)
+│   │   └── player_autopilot_controller.gd # AI controller used during autopilot (Attached to player ship scene)
+│   │       # - func set_active(active: bool)
+│   │       # - func set_target_nav_point(nav_point: NavPointData)
+│   │       # - func set_speed_cap(cap: float)
+│   │       # - func _physics_process(delta) # Uses NavigationAgent3D
+│   ├── controls_camera/    # PlayerController, CameraController, Autopilot logic, Observer logic (See 12_controls_and_camera.md)
+│   │   ├── base_camera_controller.gd # Attached to Camera3D: Base script for following, targeting, transitions.
+│   │   │   # - func set_active(active: bool)
+│   │   │   # - func set_object_host(...)
+│   │   │   # - func set_object_target(...)
+│   │   │   # - func set_zoom(...)
+│   │   │   # - func set_position(...)
+│   │   │   # - func set_rotation(...)
+│   │   │   # - func set_rotation_facing(...)
+│   │   │   # - func _physics_process(delta) # Handles following/targeting
+│   │   │   # - func _interpolate_rotation(quat: Quaternion) # Tween callback
+│   │   ├── cinematic_camera_controller.gd # Attached to Camera3D: Specific logic for cutscenes, AnimationPlayer interaction.
+│   │   │   # - func play_animation(animation_name: String)
+│   │   │   # - func stop_animation()
+│   │   ├── autopilot_camera_controller.gd # Attached to Autopilot Camera: Logic for cinematic camera movement.
+│   │   │   # - func set_instant_pose(pos: Vector3, look_at_target: Vector3)
+│   │   │   # - func move_to_pose(target_pos: Vector3, target_look_at: Vector3, duration: float)
+│   │   │   # - func look_at_target(target_pos: Vector3)
+│   │   ├── warp_camera_controller.gd  # Attached to Camera3D: Logic for warp effect camera.
+│   │   │   # - func start_warp_effect(player_obj: Node3D)
+│   │   │   # - func stop_warp_effect()
+│   │   │   # - func _physics_process(delta) # Custom physics movement
+│   │   └── observer_viewpoint.gd    # Attached to observer_viewpoint.tscn: Script for observer viewpoint nodes.
+│   │       # - func get_eye_transform() -> Transform3D
+│   ├── ship/                 # Ship logic and core components (See 05_ship_weapon_systems.md) # Moved player scripts out
+│   │   ├── ship_base.gd             # Base ship logic, physics integration, state management script, incorporating logic from C++ ship.cpp and model*.cpp
+│   │   │   ├── func take_damage(hit_pos: Vector3, amount: float, killer_obj_id: int = -1, damage_type_key = -1, hit_subsystem: Node = null)
+│   │   │   ├── func fire_primary_weapons()
+│   │   │   ├── func fire_secondary_weapons()
+│   │   │   ├── func engage_afterburner()
+│   │   │   ├── func disengage_afterburner()
+│   │   │   ├── func start_destruction_sequence(killer_obj_id: int)
+│   │   │   ├── func apply_emp_effect(intensity: float, time: float)
+│   │   │   ├── func shipfx_start_cloak(warmup_ms: int = 5000, recalc_matrix: bool = true, device_cloak: bool = false)
+│   │   │   ├── func shipfx_stop_cloak(warmdown_ms: int = 5000)
+│   │   │   ├── func shipfx_cloak_frame(delta: float)
+│   │   │   ├── func shipfx_warpin_start()
+│   │   │   ├── func shipfx_warpin_frame(delta: float)
+│   │   │   ├── func shipfx_warpout_start()
+│   │   │   └── func shipfx_warpout_frame(delta: float)
+│   │   # Removed player_ship.gd from here
+│   │   ├── weapon_system.gd         # Manages weapon banks, firing, energy/ammo logic script (Node within ShipBase scene)
 │   │   │   ├── func initialize_from_ship_data(ship_data: ShipData)
 │   │   │   ├── func can_fire_primary(bank_index: int) -> bool
 │   │   │   ├── func fire_primary(force: bool = false, bank_index_override: int = -1) -> bool
@@ -269,7 +352,7 @@ wcsaga_godot/
 │   │   │   ├── func start_afterburner()
 │   │   │   ├── func stop_afterburner(key_released: bool = false)
 │   │   │   └── func get_afterburner_fuel_pct() -> float
-│   │   └── subsystems/              # Subsystem logic scripts
+│   │   └── subsystems/              # Subsystem logic scripts (Attached to subsystem nodes within ship scene)
 │   │       ├── ship_subsystem.gd    # Base subsystem state script
 │   │       │   ├── func initialize_from_definition(definition: ShipData.SubsystemDefinition)
 │   │       │   ├── func take_damage(amount: float, damage_type_key = -1) -> float
@@ -452,7 +535,12 @@ wcsaga_godot/
 │   │   │   └── mission_log_screen.gd
 │   │   ├── hotkey_screen/           # Hotkey assignment UI script
 │   │   │   └── hotkey_screen.gd
-│   │   └── components/              # Custom UI component scripts (wcsaga_button, wcsaga_listbox, etc.)
+│   │   ├── components/              # Custom UI component scripts (wcsaga_button, wcsaga_listbox, etc.)
+│   │   └── subtitle_display.gd      # Attached to subtitle_display.tscn: Script for the subtitle UI scene. (See 12_controls_and_camera.md)
+│   │       # - func set_subtitle_data(subtitle: SubtitleData)
+│   │       # - func update_display(subtitle: SubtitleData, alpha: float)
+│   │       # - func clear_display()
+│   │       # - func _apply_positioning()
 │   ├── physics_space/      # Custom physics integrator (if needed), AsteroidField, DebrisManager, JumpNode logic (See 10_physics_and_space.md)
 │   │   ├── space_physics.gd         # Attached to ShipBase for custom physics integration logic
 │   │   ├── asteroid_field.gd        # Manages asteroid fields script
@@ -463,32 +551,55 @@ wcsaga_godot/
 │   │   ├── debris_small.gd          # Logic for small debris script
 │   │   ├── jump_node.gd             # Logic for jump nodes script
 │   │   └── jump_node_manager.gd     # Singleton for managing jump nodes script
-│   ├── model_systems/      # Scripts related to model instance handling (e.g., submodel state, metadata loading) (See 11_model.md)
-│   │   └── model_metadata_loader.gd # Optional helper script for loading/applying metadata
 │   ├── controls_camera/    # PlayerController, CameraController, Autopilot logic, Observer logic (See 12_controls_and_camera.md)
-│   │   ├── player_ship_controller.gd # Handles player input mapping to ship actions script
-│   │   ├── base_camera_controller.gd # Base script for Camera3D nodes
-│   │   ├── cinematic_camera_controller.gd # Specific logic for cutscene/cinematic cameras script
-│   │   ├── autopilot_camera_controller.gd # Logic for cinematic autopilot camera movement script
-│   │   ├── warp_camera_controller.gd  # Logic for warp effect camera script
-│   │   └── observer_viewpoint.gd    # Script for observer viewpoint nodes
+│   │   ├── base_camera_controller.gd # Attached to Camera3D: Base script for following, targeting, transitions.
+│   │   │   # - func set_active(active: bool)
+│   │   │   # - func set_object_host(...)
+│   │   │   # - func set_object_target(...)
+│   │   │   # - func set_zoom(...)
+│   │   │   # - func set_position(...)
+│   │   │   # - func set_rotation(...)
+│   │   │   # - func set_rotation_facing(...)
+│   │   │   # - func _physics_process(delta) # Handles following/targeting
+│   │   │   # - func _interpolate_rotation(quat: Quaternion) # Tween callback
+│   │   ├── cinematic_camera_controller.gd # Attached to Camera3D: Specific logic for cutscenes, AnimationPlayer interaction.
+│   │   │   # - func play_animation(animation_name: String)
+│   │   │   # - func stop_animation()
+│   │   ├── autopilot_camera_controller.gd # Attached to Autopilot Camera: Logic for cinematic camera movement.
+│   │   │   # - func set_instant_pose(pos: Vector3, look_at_target: Vector3)
+│   │   │   # - func move_to_pose(target_pos: Vector3, target_look_at: Vector3, duration: float)
+│   │   │   # - func look_at_target(target_pos: Vector3)
+│   │   ├── warp_camera_controller.gd  # Attached to Camera3D: Logic for warp effect camera.
+│   │   │   # - func start_warp_effect(player_obj: Node3D)
+│   │   │   # - func stop_warp_effect()
+│   │   │   # - func _physics_process(delta) # Custom physics movement
+│   │   └── observer_viewpoint.gd    # Attached to observer_viewpoint.tscn: Script for observer viewpoint nodes.
+│   │       # - func get_eye_transform() -> Transform3D
 │   ├── sound_animation/    # SoundManager, MusicManager, custom animation players (e.g., ani_player_2d) (See 13_sound_and_animation.md)
 │   │   ├── sound_manager.gd         # Singleton for managing sound playback logic
 │   │   ├── music_manager.gd         # Singleton for managing event music logic
 │   │   ├── ani_player_2d.gd         # Custom node/script for ANI playback logic
 │   │   └── audio_bus_controller.gd  # Optional script for managing audio bus effects
-│   ├── graphics/           # Scripts related to graphics utilities or managing complex effects (See 14_graphics.md)
-│   │   ├── graphics_utilities.gd    # Helper functions for graphics tasks script
-│   │   ├── post_processing.gd       # Script for custom post-processing effects
-│   │   ├── starfield_manager.gd     # Manages starfield background script
-│   │   ├── nebula_manager.gd        # Manages nebula effects/fog script
-│   │   ├── decal_manager.gd         # Manages decal creation/lifetime script
-│   │   ├── explosion_manager.gd     # Manages explosion effects script
-│   │   ├── shockwave_manager.gd     # Manages shockwave effects script
-│   │   ├── trail_manager.gd         # Manages weapon trail effects script
-│   │   ├── muzzle_flash_manager.gd  # Manages muzzle flash effects script
-│   │   ├── warp_effect_manager.gd   # Manages warp visual effects script
-│   │   └── spark_manager.gd         # Manages spark effects script
+│   │   ├── ani_player_2d.gd         # Custom node/script for ANI playback logic
+│   │   └── audio_bus_controller.gd  # Optional script for managing audio bus effects
+│   ├── graphics/           # Scripts related to graphics utilities or managing complex effects (Created directory) (See 14_graphics.md)
+│   │   ├── graphics_utilities.gd    # Helper functions for graphics tasks script (Created - Placeholder)
+│   │   ├── post_processing.gd       # Script for custom post-processing effects (Created - Placeholder)
+│   │   ├── starfield_manager.gd     # (Placeholder) Manages starfield background script
+│   │   ├── nebula_manager.gd        # (Placeholder) Manages nebula effects/fog script
+│   │   ├── decal_manager.gd         # (Placeholder) Manages decal creation/lifetime script
+│   │   ├── explosion_manager.gd     # (Placeholder) Manages explosion effects script
+│   │   ├── shockwave_manager.gd     # (Placeholder) Manages shockwave effects script
+│   │   ├── trail_manager.gd         # (Placeholder) Manages weapon trail effects script
+│   │   ├── muzzle_flash_manager.gd  # (Placeholder) Manages muzzle flash effects script
+│   │   ├── warp_effect_manager.gd   # (Placeholder) Manages warp visual effects script
+│   │   ├── spark_manager.gd         # (Placeholder) Manages spark effects script
+│   │   └── shaders/                 # Directory for .gdshader files (Created)
+│   │       ├── model_base.gdshader  # Base shader for ships/objects (Created)
+│   │       ├── nebula.gdshader      # Shader for nebula effects (Created)
+│   │       ├── starfield.gdshader   # Shader for starfield background (Created)
+│   │       ├── laser_beam.gdshader  # Shader for laser/beam effects (Created)
+│   │       └── particle.gdshader    # (Placeholder) Custom particle shaders
 │   ├── resources/          # Scripts defining custom Resource types (logic associated with .tres files)
 │   │   ├── ai/
 │   │   │   ├── ai_goal.gd           # Resource defining the structure for an AI goal.
@@ -548,6 +659,17 @@ wcsaga_godot/
 │   │   │       ├── func get_delay_bomb_arm_timer(skill: int) -> float
 │   │   │       ├── func has_flag(flag: int) -> bool
 │   │   │       └── func has_flag2(flag: int) -> bool
+│   │   ├── autopilot/ # Autopilot resource definitions (See 12_controls_and_camera.md)
+│   │   │   ├── autopilot_config.gd # Defines AutopilotConfig resource structure
+│   │   │   │   # - func get_message(msg_id: MessageID) -> String
+│   │   │   │   # - func get_sound(msg_id: MessageID) -> String
+│   │   │   └── nav_point_data.gd # Defines NavPointData resource structure
+│   │   │       # - func get_target_position() -> Vector3
+│   │   │       # - func can_select() -> bool
+│   │   │       # - func is_hidden() -> bool
+│   │   │       # - func is_no_access() -> bool
+│   │   │       # - func is_visited() -> bool
+│   │   │       # - func set_visited(visited: bool)
 │   │   ├── ship_weapon/
 │   │   │   ├── armor_data.gd        # Defines damage resistances
 │   │   │   │   ├── func get_damage_multiplier(damage_type_key) -> float
@@ -615,8 +737,13 @@ wcsaga_godot/
 │   │   ├── model_metadata.gd        # Defines ModelMetadata resource structure and helper methods
 │   │   ├── hud_config_data.gd       # Defines HUDConfigData resource structure (and related HUD sub-resources) and helper methods
 │   │   ├── music_track.gd           # Defines MusicTrack resource structure and helper methods
-│   │   ├── subtitle_data.gd         # Defines SubtitleData resource structure and helper methods
-│   │   ├── nav_point_data.gd        # Defines NavPointData resource structure and helper methods
+│   │   ├── graphics/                # Graphics-related resource definitions (Created directory)
+│   │   │   ├── material_definition.gd # (Placeholder) Base script for material resources if needed beyond ShaderMaterial
+│   │   │   └── environment_definition.gd # (Placeholder) Base script for environment resources if needed beyond WorldEnvironment
+│   │   ├── subtitles/ # Subtitle resource definitions (See 12_controls_and_camera.md)
+│   │   │   └── subtitle_data.gd     # Defines SubtitleData resource structure
+│   │   │       # - func calculate_duration() -> float
+│   │   # Removed nav_point_data.gd from here (moved to autopilot/)
 │   │   ├── scripting/ # Scripting resource definitions moved here
 │   │   │   ├── sexp_node.gd         # Defines SexpNode resource structure (if using Resource for SEXP) and helper methods
 │   │   │   ├── conditioned_hook.gd  # Defines ConditionedHook resource structure (See 08_scripting.md)
@@ -647,9 +774,10 @@ wcsaga_godot/
 │   ├── shield_impact.gdshader # Shader for shield hit effect visuals
 │   ├── cloak.gdshader        # Shader for cloaking effect visuals
 │   ├── engine_wash.gdshader  # Shader for engine wash/trail effect visuals
-│   ├── nebula.gdshader       # Shader for rendering nebula effects visuals
-│   ├── starfield.gdshader    # Shader for rendering the starfield background visuals
-│   ├── hud_static.gdshader   # Shader for HUD static/distortion effect visuals
-│   ├── wireframe.gdshader    # Shader for wireframe rendering mode visuals
-│   └── ...                   # Other custom shaders
+│   ├── nebula.gdshader       # Shader for rendering nebula effects visuals (Created)
+│   ├── starfield.gdshader    # Shader for rendering the starfield background visuals (Created)
+│   ├── laser_beam.gdshader   # Shader for laser/beam effects (Created)
+│   ├── hud_static.gdshader   # (Placeholder) Shader for HUD static/distortion effect visuals
+│   ├── wireframe.gdshader    # (Placeholder) Shader for wireframe rendering mode visuals
+│   └── particle.gdshader     # (Placeholder) Custom particle shaders
 └── project.godot           # Main Godot project configuration file

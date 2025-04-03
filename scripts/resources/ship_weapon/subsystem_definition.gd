@@ -17,6 +17,7 @@ class_name SubsystemDefinition
 	@export var awacs_radius: float = 0.0
 	@export var awacs_intensity: float = 0.0
 	@export var armor_type_idx: int = -1
+	@export var crewspot: String = "" # model_subsystem.crewspot (if MSS_FLAG_CREWPOINT is set)
 	@export var flags: int = 0 # MSS_FLAG_*
 	@export var alive_snd: int = -1
 	@export var dead_snd: int = -1

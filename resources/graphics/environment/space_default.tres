@@ -1,0 +1,22 @@
+[gd_resource type="Environment" load_steps=2 format=3 uid="uid://c4d5e6f7g8h9i"]
+
+[sub_resource type="Sky" id="Sky_abcde"]
+; sky_material = SubResource("ProceduralSkyMaterial_fghij") ; Example: Use a procedural sky initially
+; Or use a PanoramaSkyMaterial with a texture later
+
+[resource]
+background_mode = 2 ; BG_SKY
+background_energy_multiplier = 1.0
+sky = SubResource("Sky_abcde")
+ambient_light_source = 3 ; AMBIENT_SOURCE_SKY
+ambient_light_color = Color(0.2, 0.2, 0.25, 1) # Dim ambient light for space
+ambient_light_energy = 1.0
+tonemap_mode = 0 ; TONEMAP_MODE_LINEAR
+ssr_enabled = false
+ssao_enabled = false
+glow_enabled = true # Enable bloom by default, adjust parameters as needed
+glow_intensity = 0.8
+glow_strength = 1.0
+glow_bloom = 0.05 # Slight bloom effect
+glow_blend_mode = 2 # GlowBlendMode.GLOW_BLEND_MODE_ADDITIVE
+fog_enabled = false # Fog can be enabled here or via custom shader

@@ -1,0 +1,24 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://d0a1b2c3d4e5f"]
+
+[ext_resource type="Shader" path="res://scripts/graphics/shaders/model_base.gdshader" id="1_abcde"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_abcde")
+shader_parameter/use_light = true
+shader_parameter/use_fog = false
+shader_parameter/use_diffuse_map = true
+shader_parameter/use_glow_map = false
+shader_parameter/use_specular_map = false
+shader_parameter/use_normal_map = false
+shader_parameter/use_height_map = false
+shader_parameter/use_env_map = false
+shader_parameter/albedo_color = Color(1, 1, 1, 1)
+shader_parameter/emission_strength = 1.0
+shader_parameter/emission_color = Color(0, 0, 0, 1)
+shader_parameter/metallic = 0.0
+shader_parameter/roughness = 0.5
+shader_parameter/specular_intensity = 0.5
+shader_parameter/height_scale = 0.05
+shader_parameter/min_layers = 8
+shader_parameter/max_layers = 32

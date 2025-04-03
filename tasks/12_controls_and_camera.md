@@ -35,69 +35,114 @@ This component group covers player input (keyboard, mouse, joystick), control co
     *   **Configuration:** Parses `autopilot.tbl` for settings like `NavLinkDistance`, messages, sounds, and flags (`UseCutsceneBars`, `No_Autopilot_Interrupt`).
 
 *   **List Potential Godot Solutions:**
-    *   **NavPoints:** Custom `Resource` (`NavPointData.tres`) storing name, target type (Ship/Waypoint path), target identifier (ship name/waypoint path), node index (for waypoints), flags. Manage a global array or dictionary of these resources.
-    *   **Selection:** Global state variable (`current_nav_index`) managed by a Singleton or dedicated node. UI elements trigger selection functions.
-    *   **Engagement Logic:** GDScript function (`can_autopilot()`) checking conditions (distance, nearby hostiles via Area3D or physics queries, player state).
-    *   **AI Control:** Temporarily assign a specific AI state/controller script to the player ship node when autopilot is engaged. Use `NavigationAgent3D` for pathfinding towards the `NavPointData` target position.
-    *   **Time Compression:** Use `Engine.time_scale`.
-    *   **Cinematic Autopilot:** Use a separate `Camera3D` node, potentially animated with `AnimationPlayer` or controlled via script (`_physics_process` or `_process`) for smooth movement between calculated points. Use `CanvasLayer` for cutscene bars. Ship formation logic implemented in GDScript.
-    *   **Warping:** Directly set the `global_transform.origin` of the player and relevant ships.
-    *   **Messaging:** Use UI scenes (`Label`, potentially `AudioStreamPlayer`) managed by a global UI manager or the Autopilot controller. Load messages from a `ConfigFile` or custom resource equivalent to `autopilot.tbl`.
-    *   **Linking:** Use `Area3D` around the player to detect ships needing linking or periodic distance checks. Update ship state flags/properties.
-    *   **Configuration:** Load settings from a `ConfigFile` (`autopilot.cfg`).
+    *   **NavPoints:** Custom `Resource` defined by `scripts/resources/autopilot/nav_point_data.gd` (`NavPointData`), stored as `.tres` files (e.g., `resources/autopilot/nav_points/mission_x_nav_alpha.tres`). Managed by `AutopilotManager`.
+    *   **Selection:** State variable `current_nav_index` and `nav_points` array within `AutopilotManager.gd` (Singleton). UI elements call `AutopilotManager.select_next_nav()`.
+    *   **Engagement Logic:** Implemented in `AutopilotManager.can_autopilot()`, checking distance, gliding status (via `PlayerShip.physics_controller`), nearby hostiles/hazards (via `ObjectManager` queries).
+    *   **AI Control:** `AutopilotManager` disables `PlayerShipController` and enables `PlayerAutopilotController.gd` (attached to player ship). `PlayerAutopilotController` uses `NavigationAgent3D` for pathfinding based on `NavPointData` target. `AutopilotManager` sets/clears AI goals via `AIGoalManager`.
+    *   **Time Compression:** `AutopilotManager` calls `GameManager.set_time_compression()` and `GameManager.lock_time_compression()`. Ramping logic in `AutopilotManager._update_standard_autopilot()`.
+    *   **Cinematic Autopilot:** `AutopilotManager` manages state (`is_cinematic_active`), controls a dedicated `Camera3D` via `AutopilotCameraController.gd`, calculates camera positions/targets (`_setup_cinematic_autopilot`), and signals `UIManager` to show/hide cutscene bars (using `AutopilotConfig.use_cutscene_bars`).
+    *   **Warping:** Implemented in `AutopilotManager._warp_ships()`, directly manipulating `global_position` of player and carried ships (identified via `ObjectManager`). Calls `ObjectManager.retime_all_collisions()`.
+    *   **Messaging:** `AutopilotManager` emits `autopilot_message` signal with text/sound path from `AutopilotConfig`. A `UIManager` (to be implemented) listens to this signal to display messages (e.g., using `scenes/ui/autopilot_message.tscn`).
+    *   **Linking:** Periodic check (`_check_for_linking_ships`) in `AutopilotManager` uses `ObjectManager` to find nearby ships needing link, checks distance against `AutopilotConfig.link_distance`, updates ship flags (`SF2_NAVPOINT_NEEDSLINK`, `SF2_NAVPOINT_CARRY`), and sends link message.
+    *   **Configuration:** Settings loaded into `AutopilotConfig` resource (`scripts/resources/autopilot/autopilot_config.gd`) from `resources/autopilot/autopilot_config.tres`. `AutopilotManager` uses this resource.
 
 *   **Outline Target Code Structure:**
     ```
     wcsaga_godot/
     ├── resources/
     │   ├── autopilot/
-    │   │   ├── autopilot_config.tres # Stores LinkDistance, messages, etc.
-    │   │   └── nav_points/
-    │   │       └── nav_point_data.gd # Script for NavPointData resource
-    │   │       └── mission_x_nav_alpha.tres # Example NavPointData resource
+    │   │   ├── autopilot_config.tres # Stores LinkDistance, messages, etc. (Defined by autopilot_config.gd)
+    │   │   └── nav_points/           # Folder for mission-specific NavPointData resources
+    │   │       └── mission_x_nav_alpha.tres # Example NavPointData resource instance
     │   └── ...
     ├── scenes/
     │   ├── core/
-    │   │   └── autopilot_manager.tscn # Node managing autopilot state
+    │   │   # AutopilotManager is an Autoload Singleton, no scene needed
     │   └── ui/
-    │       └── autopilot_message.tscn # Scene for displaying messages
-    │       └── cutscene_bars.tscn     # Scene for cinematic bars
-    │   └── gameplay/
-    │       └── autopilot_camera.tscn # Dedicated camera for cinematics
+    │       └── autopilot_message.tscn # Scene for displaying messages (TODO)
+    │       └── cutscene_bars.tscn     # Scene for cinematic bars (TODO)
+    │   └── gameplay/ # Or utility/cameras
+    │       └── autopilot_camera.tscn # Dedicated Camera3D node with AutopilotCameraController script (TODO)
     │   └── ...
     ├── scripts/
     │   ├── core_systems/
-    │   │   └── autopilot_manager.gd # Manages state, engagement, disengagement, NavPoints
+    │   │   └── autopilot_manager.gd # Autoload: Manages state, engagement, disengagement, NavPoints, cinematics, linking, time compression.
+    │   │       # - func start_autopilot()
+    │   │       # - func end_autopilot()
+    │   │       # - func can_autopilot(send_msg: bool = false) -> bool
+    │   │       # - func select_next_nav() -> bool
+    │   │       # - func toggle_autopilot()
+    │   │       # - func load_mission_nav_points(...)
+    │   │       # - func _process(delta) # Handles checks, updates
+    │   │       # - func _send_message(...)
+    │   │       # - func _check_autopilot_conditions()
+    │   │       # - func _update_standard_autopilot(delta)
+    │   │       # - func _update_cinematic_autopilot(delta)
+    │   │       # - func _setup_cinematic_autopilot()
+    │   │       # - func _warp_ships(prewarp: bool = false)
+    │   │       # - func _check_for_linking_ships()
+    │   │       # - func _check_nearby_objects(...)
+    │   │       # - func _set_autopilot_ai_goals(engage: bool)
     │   ├── player/
-    │   │   └── player_autopilot_controller.gd # AI controller used during autopilot
+    │   │   └── player_autopilot_controller.gd # Attached to Player Ship: AI controller used during autopilot.
+    │   │       # - func set_active(active: bool)
+    │   │       # - func set_target_nav_point(nav_point: NavPointData)
+    │   │       # - func set_speed_cap(cap: float)
+    │   │       # - func _physics_process(delta) # Uses NavigationAgent3D
     │   ├── controls_camera/
-    │   │   └── autopilot_camera_controller.gd # Logic for cinematic camera movement
+    │   │   └── autopilot_camera_controller.gd # Attached to Autopilot Camera: Logic for cinematic camera movement.
+    │   │       # - func set_instant_pose(pos: Vector3, look_at_target: Vector3)
+    │   │       # - func move_to_pose(target_pos: Vector3, target_look_at: Vector3, duration: float)
+    │   │       # - func look_at_target(target_pos: Vector3)
     │   ├── resources/
-    │   │   └── nav_point_data.gd # Defines the NavPointData resource
+    │   │   └── autopilot/
+    │   │       ├── autopilot_config.gd # Defines AutopilotConfig resource structure
+    │   │       │   # - func get_message(msg_id: MessageID) -> String
+    │   │       │   # - func get_sound(msg_id: MessageID) -> String
+    │   │       └── nav_point_data.gd # Defines NavPointData resource structure
+    │   │           # - func get_target_position() -> Vector3
+    │   │           # - func can_select() -> bool
+    │   │           # - func is_hidden() -> bool
+    │   │           # - func is_no_access() -> bool
+    │   │           # - func is_visited() -> bool
+    │   │           # - func set_visited(visited: bool)
     │   └── ...
     ```
 
 *   **Identify Important Methods, Classes, and Data Structures:**
-    *   `struct NavPoint`: Core data structure for navigation targets. (Map to `NavPointData.tres`).
-    *   `struct NavMessage`: Stores message text and sound file names. (Map to data within `autopilot_config.tres`).
-    *   `StartAutopilot()`: Logic for initiating autopilot. (Map to `AutopilotManager.start_autopilot()`).
-    *   `EndAutoPilot()`: Logic for terminating autopilot. (Map to `AutopilotManager.end_autopilot()`).
-    *   `CanAutopilot()`: Checks conditions for engagement. (Map to `AutopilotManager.can_autopilot()`).
-    *   `NavSystem_Do()`: Main update loop for autopilot logic (time compression, cinematic camera updates, distance checks, linking). (Integrate into `AutopilotManager._process` or `_physics_process`).
-    *   `nav_warp()`: Ship repositioning logic. (Map to a helper function in `AutopilotManager`).
-    *   `parse_autopilot_table()`: Loading configuration. (Replace with Godot `ConfigFile` or resource loading).
-    *   `AddNav_Ship()`, `AddNav_Waypoint()`: Creating NavPoints (likely done via mission loading/parsing in Godot).
-    *   `DistanceTo()`: Calculating distance to a nav point. (Use Godot's vector math: `player.global_position.distance_to(nav_point_position)`).
-    *   Global variables: `AutoPilotEngaged`, `CurrentNav`, `Navs`, `LockAPConv`, `CinematicStarted`. (Manage state within `AutopilotManager`).
+    *   `struct NavPoint`: Core data structure for navigation targets. (Mapped to `NavPointData` resource defined by `scripts/resources/autopilot/nav_point_data.gd`).
+    *   `struct NavMessage`: Stores message text and sound file names. (Mapped to exported vars within `AutopilotConfig` resource defined by `scripts/resources/autopilot/autopilot_config.gd`).
+    *   `StartAutopilot()`: Logic for initiating autopilot. (Mapped to `AutopilotManager.start_autopilot()`).
+    *   `EndAutoPilot()`: Logic for terminating autopilot. (Mapped to `AutopilotManager.end_autopilot()`).
+    *   `CanAutopilot()`: Checks conditions for engagement. (Mapped to `AutopilotManager.can_autopilot()`).
+    *   `NavSystem_Do()`: Main update loop for autopilot logic (time compression, cinematic camera updates, distance checks, linking). (Logic integrated into `AutopilotManager._process()`).
+    *   `nav_warp()`: Ship repositioning logic. (Mapped to `AutopilotManager._warp_ships()`).
+    *   `parse_autopilot_table()`: Loading configuration. (Replaced by loading `resources/autopilot/autopilot_config.tres` into `AutopilotManager.config`).
+    *   `AddNav_Ship()`, `AddNav_Waypoint()`: Creating NavPoints. (Handled by mission loading process, which creates `NavPointData` resources and passes them to `AutopilotManager.load_mission_nav_points()`).
+    *   `DistanceTo()`: Calculating distance to a nav point. (Uses Godot's vector math: `player_ship.global_position.distance_to(target_pos)` within `AutopilotManager`).
+    *   Global variables: `AutoPilotEngaged`, `CurrentNav`, `Navs`, `LockAPConv`, `CinematicStarted`. (Mapped to state variables within `AutopilotManager`: `is_engaged`, `current_nav_index`, `nav_points`, `_lock_ap_conv_timer`, `is_cinematic_active`).
 
 *   **Identify Relations:**
-    *   Autopilot Manager interacts heavily with the Player Ship (reading state, setting AI controller, position).
-    *   Interacts with the AI System (assigning goals).
-    *   Interacts with the Camera System (controlling cinematic camera).
-    *   Interacts with the Mission System (reading flags like `MISSION_FLAG_USE_AP_CINEMATICS`, potentially loading NavPoints).
-    *   Interacts with the UI System (displaying messages, cutscene bars).
-    *   Reads configuration data (equivalent of `autopilot.tbl`).
-    *   Modifies `Engine.time_scale`.
+    *   `AutopilotManager` (Singleton) interacts with:
+        *   `PlayerShip` (`ShipBase` node): Reads position, gliding status.
+        *   `PlayerShipController` (Node script): Disables/enables via `set_active()`.
+        *   `PlayerAutopilotController` (Node script): Enables/disables via `set_active()`, sets target nav point.
+        *   `GameManager` (Autoload): Calls `lock_time_compression()`, `set_time_compression()`.
+        *   `CameraManager` (Autoload): Calls `set_active_camera()`, `reset_to_default_camera()` for cinematics.
+        *   `AutopilotCameraController` (Node script): Calls `set_instant_pose()`, `move_to_pose()`, `look_at_target()`.
+        *   `UIManager` (Autoload/Node - TBD): Emits `autopilot_message` signal, calls hypothetical `show_cutscene_bars()`.
+        *   `ObjectManager` (Autoload): Calls hypothetical `get_ships_in_radius()`, `get_objects_in_radius()`, `get_ships_with_flags()`, `retime_all_collisions()`. Reads ship flags/radius. Sets ship flags.
+        *   `AIGoalManager` (Autoload): Calls hypothetical `add_goal()`, `remove_goal_by_flag()`.
+        *   `MissionManager` (Autoload - TBD): Reads mission flags (e.g., `USE_AP_CINEMATICS`). Receives `NavPointData` array via `load_mission_nav_points()`.
+        *   `AutopilotConfig` (Resource): Reads `link_distance`, `use_cutscene_bars`, messages, etc.
+        *   `NavPointData` (Resource): Reads `target_type`, `target_identifier`, `waypoint_node_index`, flags. Calls `get_target_position()`.
+        *   `Engine`: Modifies `time_scale`.
+    *   `PlayerAutopilotController` interacts with:
+        *   `ShipBase` (Parent Node): Reads `get_max_speed()`, `get_turn_rate()`. Accesses `physics_controller`.
+        *   `NavigationAgent3D` (Sibling Node): Sets `target_position`, calls `is_navigation_finished()`, `get_next_path_position()`.
+        *   `NavPointData` (Resource): Calls `get_target_position()`.
+    *   `AutopilotCameraController` interacts with:
+        *   `Camera3D` (Parent Node): Modifies `global_position`, `global_basis`, calls `look_at()`.
 
 #### 2. Camera (`camera/camera.cpp`, `camera/camera.h`)
 
@@ -113,67 +158,113 @@ This component group covers player input (keyboard, mouse, joystick), control co
     *   **Zoom Control:** Manages camera Field of View (FOV) or zoom level. Can be set directly or interpolated. Influenced by `Sexp_zoom`.
 
 *   **List Potential Godot Solutions:**
-    *   **Camera Class:** Use Godot's built-in `Camera3D` node. Store additional metadata (name, host/target references, custom logic flags) in an attached GDScript.
-    *   **Camera ID:** Use Godot's node paths or instance IDs. For safety, could wrap node references in a custom class or check `is_instance_valid`.
-    *   **Camera Management:** A Singleton (`CameraManager.gd`) or a dedicated node in the main scene can manage a dictionary or array of active `Camera3D` nodes/scripts. Provide functions like `create_camera`, `set_active_camera`, `get_camera_by_name`.
-    *   **Smooth Transitions:** Use `Tween` node for interpolating position, rotation, and FOV (`camera.fov`). `AnimationPlayer` can also be used for more complex, pre-defined camera animations.
-    *   **Targeting/Following:** Set `Camera3D.look_at(target_node.global_position)` in `_process` or `_physics_process`. For following, update the camera's `global_transform` relative to the host node's transform.
-    *   **Custom Logic:** Implement custom behaviors directly in the camera's attached GDScript (`_process` or `_physics_process`).
-    *   **Warp Camera:** Could be a specific `Camera3D` with a script implementing the physics-based movement described, likely using `_physics_process`.
-    *   **Subtitles:** Create a UI scene (`SubtitleDisplay.tscn`) with `Label` and `TextureRect` nodes on a `CanvasLayer`. A manager script (`SubtitleManager.gd`, possibly autoloaded) queues subtitles (perhaps as custom `Resource` objects containing text, image path, timing) and controls their display, fading (using `Tween` on modulate alpha), and removal.
-    *   **Zoom Control:** Modify the `Camera3D.fov` property, potentially using `Tween` for smooth changes.
+    *   **Camera Class:** Use Godot's built-in `Camera3D` node. Attach `BaseCameraController.gd` (or derived like `CinematicCameraController`, `WarpCameraController`) script to handle logic, host/target references, and transitions.
+    *   **Camera ID:** Use Godot node references (`Camera3D`) managed by `CameraManager`. Check validity using `is_instance_valid()`.
+    *   **Camera Management:** `CameraManager.gd` (Autoload Singleton) manages a dictionary (`cameras`) of registered `Camera3D` nodes. Provides `register_camera()`, `unregister_camera()`, `get_camera_by_name()`, `set_active_camera()`, `reset_to_default_camera()`.
+    *   **Smooth Transitions:** `BaseCameraController.gd` uses `Tween` for interpolating `fov`, `global_position`, and rotation (via quaternion slerp in `_interpolate_rotation` callback). Accepts duration and potentially accel/decel parameters (TODO). `AnimationPlayer` can be used by `CinematicCameraController` for complex paths.
+    *   **Targeting/Following:** Implemented in `BaseCameraController._physics_process()`. Updates `camera.global_transform` based on `host_object` transform + offset, or uses `Basis.looking_at()` towards `target_object` position (with prediction).
+    *   **Custom Logic:** Implement custom behaviors by extending `BaseCameraController` or adding logic directly within derived controllers (e.g., `WarpCameraController`).
+    *   **Warp Camera:** Implemented as a `Camera3D` node with `WarpCameraController.gd` attached, handling physics-based movement in `_physics_process()`. Activated via `start_warp_effect()`.
+    *   **Subtitles:** `SubtitleManager.gd` (Autoload Singleton) manages a queue (`subtitle_queue`) of `SubtitleData` resources. It instances/controls `scenes/ui/subtitle_display.tscn` (a `CanvasLayer` with `Label`/`TextureRect`) via `scripts/ui/subtitle_display.gd` to handle rendering, positioning, and alpha fading in `_process()`.
+    *   **Zoom Control:** `BaseCameraController.set_zoom()` modifies `Camera3D.fov`, using `Tween` for smooth transitions. SEXP influence would likely come via mission script calls to `CameraManager.set_camera_zoom()`.
 
 *   **Outline Target Code Structure:**
     ```
     wcsaga_godot/
     ├── resources/
     │   ├── subtitles/
-    │   │   └── subtitle_data.gd # Script for SubtitleData resource
-    │   │   └── mission_x_sub_1.tres # Example SubtitleData resource
+    │   │   └── mission_x_sub_1.tres # Example SubtitleData resource instance
     │   └── ...
     ├── scenes/
     │   ├── core/
-    │   │   └── camera_manager.tscn # Node managing cameras
-    │   │   └── subtitle_manager.tscn # Node managing subtitles
+    │   │   # CameraManager and SubtitleManager are Autoloads, no scenes needed
     │   └── ui/
-    │   │   └── subtitle_display.tscn # Scene for rendering a single subtitle
-    │   └── gameplay/
-    │       └── warp_camera.tscn # Specific camera setup for warp
+    │   │   └── subtitle_display.tscn # Scene (CanvasLayer > MarginContainer > VBox > TextureRect + Label) for rendering a single subtitle.
+    │   └── gameplay/ # Or utility/cameras
+    │       └── warp_camera.tscn # Specific Camera3D node with WarpCameraController script (TODO)
+    │       └── cinematic_camera_template.tscn # Template Camera3D with CinematicCameraController (TODO)
     │   └── ...
     ├── scripts/
     │   ├── core_systems/
-    │   │   └── camera_manager.gd # Manages camera creation, switching, lookup
-    │   │   └── subtitle_manager.gd # Manages subtitle queue and display
+    │   │   └── camera_manager.gd # Autoload: Manages camera registration, switching, lookup.
+    │   │       # - func register_camera(...)
+    │   │       # - func set_active_camera(...)
+    │   │       # - func reset_to_default_camera()
+    │   │       # - func get_camera_by_name(...)
+    │   │       # - func set_camera_zoom(...) # Helper calling BaseCameraController
+    │   │       # - func set_camera_position(...) # Helper
+    │   │       # - func set_camera_rotation(...) # Helper
+    │   │       # - func set_camera_look_at(...) # Helper
+    │   │       # - func set_camera_host(...) # Helper
+    │   │       # - func set_camera_target(...) # Helper
+    │   │   └── subtitle_manager.gd # Autoload: Manages subtitle queue and display.
+    │   │       # - func queue_subtitle(subtitle_res: SubtitleData)
+    │   │       # - func queue_subtitle_params(...)
+    │   │       # - func clear_all()
+    │   │       # - func _process(delta) # Updates current subtitle display/timing
+    │   │       # - func _show_next_subtitle()
+    │   │       # - func _clear_current_subtitle()
     │   ├── controls_camera/
-    │   │   └── base_camera_controller.gd # Base script for Camera3D nodes
-    │   │   └── cinematic_camera_controller.gd # Specific logic for cutscenes
-    │   │   └── warp_camera_controller.gd # Logic for warp effect camera
+    │   │   └── base_camera_controller.gd # Attached to Camera3D: Base script for following, targeting, transitions.
+    │   │       # - func set_active(active: bool)
+    │   │       # - func set_object_host(...)
+    │   │       # - func set_object_target(...)
+    │   │       # - func set_zoom(...)
+    │   │       # - func set_position(...)
+    │   │       # - func set_rotation(...)
+    │   │       # - func set_rotation_facing(...)
+    │   │       # - func _physics_process(delta) # Handles following/targeting
+    │   │       # - func _interpolate_rotation(quat: Quaternion) # Tween callback
+    │   │   └── cinematic_camera_controller.gd # Attached to Camera3D: Specific logic for cutscenes, AnimationPlayer interaction.
+    │   │       # - func play_animation(animation_name: String)
+    │   │       # - func stop_animation()
+    │   │   └── warp_camera_controller.gd # Attached to Camera3D: Logic for warp effect camera.
+    │   │       # - func start_warp_effect(player_obj: Node3D)
+    │   │       # - func stop_warp_effect()
+    │   │       # - func _physics_process(delta) # Custom physics movement
     │   ├── resources/
-    │   │   └── subtitle_data.gd # Defines the SubtitleData resource
+    │   │   └── subtitles/
+    │   │       └── subtitle_data.gd # Defines the SubtitleData resource structure.
+    │   │           # - func calculate_duration() -> float
     │   └── ui/
-    │       └── subtitle_display.gd # Script for the subtitle UI scene
+    │       └── subtitle_display.gd # Attached to subtitle_display.tscn: Script for the subtitle UI scene.
+    │           # - func set_subtitle_data(subtitle: SubtitleData)
+    │           # - func update_display(subtitle: SubtitleData, alpha: float)
+    │           # - func clear_display()
+    │           # - func _apply_positioning()
     │   └── ...
     ```
 
 *   **Identify Important Methods, Classes, and Data Structures:**
-    *   `class camera`: Represents a single camera view. (Map to `Camera3D` + `BaseCameraController.gd`).
-    *   `class camid`: Safe handle for cameras. (Use Godot node references/paths + `is_instance_valid`).
-    *   `class warp_camera`: Physics-based camera for warp effect. (Map to `WarpCameraController.gd` on a `Camera3D`).
-    *   `class subtitle`: Data and logic for displaying subtitles. (Map to `SubtitleData.tres` resource + `SubtitleDisplay.tscn/gd` + `SubtitleManager.gd`).
-    *   `avd_movement`: Class for smooth interpolation. (Replace with `Tween` or manual interpolation in `_process`).
-    *   `cam_create()`: Creates a camera instance. (Map to `CameraManager.create_camera()`).
-    *   `cam_set_camera()`: Sets the active camera, potentially hiding HUD. (Map to `CameraManager.set_active_camera()`, which sets `Camera3D.current = true` and signals HUD manager).
-    *   `cam_reset_camera()`: Reverts to default view, restoring HUD. (Map to `CameraManager.reset_to_default_camera()`).
-    *   `camera::set_position()`, `camera::set_rotation()`, `camera::set_zoom()`: Methods for controlling camera properties, often with timing. (Map to functions in `BaseCameraController.gd` using `Tween`).
-    *   `camera::get_info()`: Retrieves the current calculated position and orientation. (Access `Camera3D.global_transform`).
-    *   `subtitles_do_frame()`: Updates and draws subtitles. (Logic within `SubtitleManager.gd` and `SubtitleDisplay.gd`).
+    *   `class camera`: Represents a single camera view. (Mapped to `Camera3D` node with attached `BaseCameraController.gd` or derived script).
+    *   `class camid`: Safe handle for cameras. (Replaced by direct `Camera3D` node references managed by `CameraManager`, using `is_instance_valid()` for safety checks).
+    *   `class warp_camera`: Physics-based camera for warp effect. (Mapped to `WarpCameraController.gd` script attached to a dedicated `Camera3D`).
+    *   `class subtitle`: Data and logic for displaying subtitles. (Mapped to `SubtitleData` resource defined by `scripts/resources/subtitles/subtitle_data.gd`. Display logic handled by `SubtitleManager.gd` and `scripts/ui/subtitle_display.gd`).
+    *   `avd_movement`: Class for smooth interpolation. (Replaced by Godot's `Tween` node, managed within `BaseCameraController.gd`).
+    *   `cam_create()`: Creates a camera instance. (Replaced by instancing camera scenes and registering them with `CameraManager.register_camera()`).
+    *   `cam_set_camera()`: Sets the active camera, potentially hiding HUD. (Mapped to `CameraManager.set_active_camera()`, which sets `Camera3D.current = true` and emits `hud_visibility_changed` signal).
+    *   `cam_reset_camera()`: Reverts to default view, restoring HUD. (Mapped to `CameraManager.reset_to_default_camera()`).
+    *   `camera::set_position()`, `camera::set_rotation()`, `camera::set_zoom()`: Methods for controlling camera properties, often with timing. (Mapped to `set_position()`, `set_rotation()`, `set_zoom()` methods in `BaseCameraController.gd`, which use `Tween` for timed transitions).
+    *   `camera::get_info()`: Retrieves the current calculated position and orientation. (Directly access `Camera3D.global_transform`).
+    *   `subtitles_do_frame()`: Updates and draws subtitles. (Logic distributed between `SubtitleManager._process()` for timing/alpha and `SubtitleDisplay.update_display()` for rendering).
 
 *   **Identify Relations:**
-    *   Camera Manager interacts with Game Objects (for hosting/targeting).
-    *   Interacts with the UI System (Subtitles, potentially hiding/showing HUD).
-    *   Interacts with the Autopilot System (for cinematic camera control).
-    *   Cameras are controlled by various systems (Player, Cutscenes, Autopilot).
-    *   Subtitle system displays text/images provided by other systems (Mission events, AI chatter).
+    *   `CameraManager` (Autoload) interacts with:
+        *   `Camera3D` nodes and their attached controllers (`BaseCameraController`, etc.): Calls methods like `set_active()`.
+        *   `UIManager` (Autoload/Node - TBD): Emits `hud_visibility_changed` signal.
+        *   Other systems (e.g., `AutopilotManager`, Mission Scripts): Call `set_active_camera()`, `reset_to_default_camera()`, and helper methods (`set_camera_zoom`, etc.).
+    *   `BaseCameraController` (and derived) interacts with:
+        *   `Camera3D` (Parent Node): Reads/writes `global_transform`, `fov`.
+        *   `Tween` (Created dynamically): Used for smooth transitions.
+        *   Host/Target `Node3D`s: Reads `global_transform`, potentially `get_velocity()`.
+    *   `SubtitleManager` (Autoload) interacts with:
+        *   `SubtitleDisplay` (Instanced Scene/Node): Calls `set_subtitle_data()`, `update_display()`, `clear_display()`. Manages its visibility.
+        *   `SubtitleData` (Resource): Reads properties like `text`, `display_time`, `fade_time`.
+        *   Other systems (e.g., `MessageManager`, Mission Scripts): Call `queue_subtitle()`.
+        *   `Time` singleton: Reads `get_ticks_msec()`.
+    *   `SubtitleDisplay` interacts with:
+        *   Internal `Label`, `TextureRect`, `MarginContainer`, `VBoxContainer` nodes.
+        *   `ResourceLoader`: Loads images specified in `SubtitleData`.
 
 #### 3. Observer (`observer/observer.cpp`, `observer/observer.h`)
 
@@ -184,32 +275,33 @@ This component group covers player input (keyboard, mouse, joystick), control co
     *   **Physics:** Observer objects have basic physics (`physics_info`), allowing them to move.
 
 *   **List Potential Godot Solutions:**
-    *   **Observer Node:** Represent observers as simple `Node3D` nodes. If a visual representation or camera view is needed, add a `Camera3D` as a child.
-    *   **Management:** A manager script (perhaps `DebugManager.gd` or part of `CameraManager.gd`) could track these observer nodes if needed.
-    *   **Physics:** If movement is required, add a `CharacterBody3D` or `RigidBody3D` component, or simply manage position via script.
-    *   **Eye Position:** Access the `global_transform` of the observer `Node3D`.
+    *   **Observer Node:** Implemented as `scenes/utility/observer_viewpoint.tscn` (a `Node3D` scene) with `scripts/controls_camera/observer_viewpoint.gd` attached. A `Camera3D` can be added as a child if needed for viewing.
+    *   **Management:** No dedicated manager created yet. Observers can be instanced directly or managed by systems that use them (e.g., Debug tools, potentially `CameraManager` if needed).
+    *   **Physics:** The C++ version had basic physics. If movement is needed in Godot, a `CharacterBody3D` could be added to the scene, or its position managed directly via script by the controlling system. The current script is minimal.
+    *   **Eye Position:** Access `ObserverViewpoint.global_transform` or use `ObserverViewpoint.get_eye_transform()`.
 
 *   **Outline Target Code Structure:**
     ```
     wcsaga_godot/
     ├── scenes/
-    │   └── utility/ # Or debug/
-    │       └── observer_viewpoint.tscn # Node3D, potentially with Camera3D child
+    │   └── utility/
+    │       └── observer_viewpoint.tscn # Node3D scene, potentially with Camera3D child.
     ├── scripts/
-    │   └── controls_camera/ # Or utility/debug
-    │       └── observer_viewpoint.gd # Script attached to the scene if logic is needed
-    │       └── observer_manager.gd # Optional: If central management is required
+    │   └── controls_camera/
+    │       └── observer_viewpoint.gd # Attached to observer_viewpoint.tscn. Minimal logic currently.
+    │           # - func get_eye_transform() -> Transform3D
     ```
 
 *   **Identify Important Methods, Classes, and Data Structures:**
-    *   `struct observer`: Stores observer state (object index, target, flags). (Map to properties in `ObserverViewpoint.gd`).
-    *   `observer_create()`: Creates the observer object. (Instantiate `observer_viewpoint.tscn`).
-    *   `observer_delete()`: Deletes the observer. (Call `queue_free()` on the node).
-    *   `observer_get_eye()`: Gets position/orientation. (Access `ObserverViewpointNode.global_transform`).
+    *   `struct observer`: Stores observer state (object index, target, flags). (Mapped to optional properties `target_obj_id`, `observer_flags` in `ObserverViewpoint.gd`).
+    *   `observer_create()`: Creates the observer object. (Mapped to instancing `scenes/utility/observer_viewpoint.tscn`).
+    *   `observer_delete()`: Deletes the observer. (Mapped to calling `queue_free()` on the `ObserverViewpoint` node).
+    *   `observer_get_eye()`: Gets position/orientation. (Mapped to `ObserverViewpoint.get_eye_transform()` which returns `global_transform`).
 
 *   **Identify Relations:**
-    *   Observer objects are part of the general Object management system in C++. In Godot, they would be nodes in the `SceneTree`.
-    *   Their purpose seems internal, possibly for debug views or specific non-player camera perspectives. They don't seem directly tied to core gameplay loops like player control or autopilot in the provided code.
+    *   `ObserverViewpoint` nodes exist within the `SceneTree`.
+    *   They are likely instanced and managed by debug systems or potentially `CameraManager` if used for specific non-player views.
+    *   They provide transform data (`get_eye_transform()`) to whatever system uses them.
 
 #### 4. General Input Handling (Inferred - Not in provided code)
 
@@ -220,31 +312,37 @@ This component group covers player input (keyboard, mouse, joystick), control co
     *   Handling different input device types.
 
 *   **List Potential Godot Solutions:**
-    *   **InputMap:** Define abstract actions (e.g., "pitch_up", "fire_primary", "target_next") in Godot's Project Settings -> Input Map. Assign default keyboard, mouse, and joystick inputs to these actions.
-    *   **Input Handling:** In scripts (e.g., `PlayerShipController.gd`), use `Input.get_axis()`, `Input.get_vector()`, `Input.is_action_pressed()`, `Input.is_action_just_pressed()` in `_physics_process` or `_unhandled_input` to react to defined actions.
-    *   **Configuration:** Create a UI scene allowing users to remap actions using `InputMap.action_erase_events()` and `InputMap.action_add_event()`. Save/load custom mappings using `InputMap.save_to_file()` / `InputMap.load_from_file()` or store in a `ConfigFile`.
-    *   **Device Handling:** Godot handles multiple device types automatically through the `InputEvent` system and `InputMap`.
+    *   **InputMap:** Actions (e.g., "pitch_up", "fire_primary", "target_next", "autopilot_toggle", "nav_cycle") defined in `project.godot` under `[input]`. Default keys/buttons assigned there.
+    *   **Input Handling:** `scripts/player/player_ship_controller.gd` uses `Input.get_axis()` in `_physics_process()` for movement axes and `Input.is_action_pressed()` within `_unhandled_input()` for button/key actions.
+    *   **Configuration:** A UI scene (`scenes/ui/control_options_menu.tscn` - TBD) with associated script (`scripts/menu_ui/control_options_menu.gd` - TBD) will allow users to remap actions using `InputMap` functions. Mappings can be saved/loaded using `InputMap.save_to_file()` / `InputMap.load_from_file()`.
+    *   **Device Handling:** Godot's `Input` singleton and `InputMap` handle device abstraction.
 
 *   **Outline Target Code Structure:**
     ```
     wcsaga_godot/
+    ├── project.godot # Contains [input] definitions
     ├── scenes/
     │   └── ui/
-    │       └── control_options_menu.tscn # UI for rebinding controls
+    │       └── control_options_menu.tscn # UI for rebinding controls (TODO)
     ├── scripts/
     │   ├── player/
-    │   │   └── player_ship_controller.gd # Handles ship movement/actions based on Input
+    │   │   └── player_ship_controller.gd # Handles ship movement/actions based on Input.
+    │   │       # - func _physics_process(delta) # Reads axes
+    │   │       # - func _unhandled_input(event) # Reads actions
+    │   │       # - func set_active(active: bool)
     │   ├── menu_ui/
-    │   │   └── control_options_menu.gd # Logic for the rebinding UI
+    │   │   └── control_options_menu.gd # Logic for the rebinding UI (TODO)
     │   └── globals/
-    │       └── input_manager.gd # Optional: Central place for input constants or complex handling
+    │       # No specific input_manager.gd created yet, using Input singleton directly.
     ```
 
 *   **Identify Important Methods, Classes, and Data Structures:**
-    *   C++ Input handling functions/classes (e.g., `read_keyboard`, `read_mouse`, `read_joystick`). (Replace with Godot `Input` singleton methods).
-    *   Control configuration data structures/files. (Replace with `InputMap` and potentially `ConfigFile`).
+    *   C++ Input handling functions/classes (e.g., `read_keyboard`, `read_mouse`, `read_joystick`, `joy_get_pos`, `key_down_count`). (Replaced by Godot `Input` singleton methods like `get_axis`, `is_action_pressed`, etc., used within `PlayerShipController.gd`).
+    *   Control configuration data structures/files. (Replaced by Godot's `InputMap` system, managed via Project Settings and the planned `control_options_menu` UI).
 
 *   **Identify Relations:**
-    *   Input handling directly affects the Player Ship's movement and actions.
-    *   Input events are processed by UI elements (for menu navigation, button clicks).
-    *   The Control Configuration UI modifies the `InputMap`.
+    *   `PlayerShipController` reads from `Input` singleton.
+    *   `PlayerShipController` calls methods on `ShipBase` (parent node) and its components (e.g., `physics_controller`, `weapon_system`).
+    *   `PlayerShipController` interacts with `AutopilotManager` (Autoload) to toggle autopilot.
+    *   UI scenes (like `control_options_menu` - TBD) interact with the `InputMap` singleton.
+    *   General UI elements process input via their own `_input` or `_gui_input` methods.

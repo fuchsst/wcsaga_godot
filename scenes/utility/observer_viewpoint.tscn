@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://d1e2f3g4h5i6j"] # Placeholder ID
+
+[ext_resource type="Script" path="res://scripts/controls_camera/observer_viewpoint.gd" id="1_xyz"] # Placeholder ID
+
+[node name="ObserverViewpoint" type="Node3D"]
+script = ExtResource("1_xyz")
+
+# Optional: Add a Camera3D as a child if this viewpoint needs to be directly viewable
+# [node name="Camera3D" type="Camera3D" parent="."]
+# current = false # Should not be the active camera by default
+
+# Optional: Add a visual representation (e.g., a small mesh) for debugging
+# [node name="DebugMesh" type="MeshInstance3D" parent="."]
+# mesh = SubResource("SphereMesh_xxxxx") # Example

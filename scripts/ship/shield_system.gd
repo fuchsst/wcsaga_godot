@@ -25,6 +25,13 @@ signal shield_strength_changed(quadrant: int, new_strength: float)
 signal shield_depleted(quadrant: int)
 signal shield_fully_recharged()
 
+# Recharge state (managed by ETS)
+# var shield_recharge_timer: float = 0.0 # Timer for recharge ticks - No longer needed here
+# var shield_recharge_index: int = 0 # Index for energy scaling (if applicable) - Stored in ShipBase
+
+# Constants
+const NUM_QUADRANTS = 4
+# const RECHARGE_INTERVAL = 0.1 # How often to apply recharge logic (in seconds) - ETS interval used instead
 
 func _ready():
 	if get_parent() is ShipBase:
@@ -44,36 +51,44 @@ func initialize_from_ship_data(ship_data: ShipData):
 		emit_signal("shield_strength_changed", i, shield_quadrants[i])
 
 
-func _process(delta):
-	# Handle shield recharge
-	shield_recharge_timer += delta
-	if shield_recharge_timer >= RECHARGE_INTERVAL:
-		var base_recharge_amount = shield_regen_rate * shield_recharge_timer # Amount per second * time elapsed
+#func _process(delta):
+	# Shield recharge is now driven by the ETS system in ShipBase calling the recharge() method.
+	# The old _process logic is removed.
 
-		# Apply energy scaling from ShipBase
-		var recharge_scale = 1.0
-		if is_instance_valid(ship_base) and ship_base.has_method("_get_ets_scale"):
-			recharge_scale = ship_base._get_ets_scale(ship_base.shield_recharge_index)
-		var recharge_amount = base_recharge_amount * recharge_scale
 
-		var total_current_strength = 0.0
-		for strength in shield_quadrants:
-			total_current_strength += strength
+# Called by the ETS system in ShipBase to provide energy for recharging.
+func recharge(energy_amount: float):
+	if energy_amount <= 0.0: return
 
-		if total_current_strength < max_shield_strength:
-			var strength_per_quad = max_shield_strength / NUM_QUADRANTS
-			var recharged_fully = true
-			for i in range(NUM_QUADRANTS):
-				if shield_quadrants[i] < strength_per_quad:
-					shield_quadrants[i] += recharge_amount / NUM_QUADRANTS # Distribute recharge
-					if shield_quadrants[i] > strength_per_quad:
-						shield_quadrants[i] = strength_per_quad
-					else:
-						recharged_fully = false # At least one quadrant is still recharging
-					emit_signal("shield_strength_changed", i, shield_quadrants[i])
-			if recharged_fully and total_current_strength >= max_shield_strength * 0.99: # Check if effectively full
-				emit_signal("shield_fully_recharged")
-		shield_recharge_timer = 0.0 # Reset timer
+	var total_current_strength = get_total_strength()
+	if total_current_strength >= max_shield_strength:
+		return # Already full
+
+	# Convert energy to shield strength (assuming 1:1 for now, adjust if needed)
+	var recharge_strength = energy_amount
+	var strength_per_quad = get_max_strength_per_quadrant()
+	var amount_per_quad = recharge_strength / float(NUM_QUADRANTS) # Distribute evenly
+	var recharged_fully = true
+
+	for i in range(NUM_QUADRANTS):
+		if shield_quadrants[i] < strength_per_quad:
+			var old_strength = shield_quadrants[i]
+			shield_quadrants[i] += amount_per_quad
+			if shield_quadrants[i] > strength_per_quad:
+				shield_quadrants[i] = strength_per_quad
+
+			if abs(shield_quadrants[i] - old_strength) > 0.01: # Only signal if changed significantly
+				emit_signal("shield_strength_changed", i, shield_quadrants[i])
+
+			if shield_quadrants[i] < strength_per_quad * 0.999: # Check if this quad is still not full
+				recharged_fully = false
+		else:
+			# This quadrant is already full
+			pass
+
+	# Check if *all* quadrants are now full
+	if recharged_fully and get_total_strength() >= max_shield_strength * 0.999:
+		emit_signal("shield_fully_recharged")
 
 
 # Called by DamageSystem or projectile collision handler

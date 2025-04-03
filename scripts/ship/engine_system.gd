@@ -47,29 +47,38 @@ func initialize_from_ship_data(ship_data: ShipData):
 	emit_signal("afterburner_fuel_updated", afterburner_fuel, afterburner_fuel_capacity)
 
 
-func _process(delta):
-	if not has_afterburner:
-		return
+#func _process(delta):
+	# Afterburner fuel recharge is now driven by the ETS system in ShipBase calling the recharge() method.
+	# Fuel consumption still happens here when the afterburner is active.
+#	if not has_afterburner:
+#		return
+#
+#	if afterburner_on:
+#		# Consume fuel
+#		afterburner_fuel -= afterburner_burn_rate * delta
+#		if afterburner_fuel <= 0.0:
+#			afterburner_fuel = 0.0
+#			stop_afterburner() # Automatically stop if fuel runs out
+#		emit_signal("afterburner_fuel_updated", afterburner_fuel, afterburner_fuel_capacity)
 
-	if afterburner_on:
-		# Consume fuel
-		afterburner_fuel -= afterburner_burn_rate * delta
-		if afterburner_fuel <= 0.0:
-			afterburner_fuel = 0.0
-			stop_afterburner() # Automatically stop if fuel runs out
+
+# Called by the ETS system in ShipBase to provide energy for recharging afterburner fuel.
+func recharge(energy_amount: float):
+	if not has_afterburner or afterburner_on or afterburner_fuel >= afterburner_fuel_capacity:
+		return # Don't recharge if off, active, or full
+
+	if energy_amount <= 0.0: return
+
+	# Convert energy to fuel (assuming 1:1 for now, adjust if needed)
+	var recharge_fuel = energy_amount
+	var old_fuel = afterburner_fuel
+
+	afterburner_fuel += recharge_fuel
+	if afterburner_fuel > afterburner_fuel_capacity:
+		afterburner_fuel = afterburner_fuel_capacity
+
+	if abs(afterburner_fuel - old_fuel) > 0.01: # Only signal if changed significantly
 		emit_signal("afterburner_fuel_updated", afterburner_fuel, afterburner_fuel_capacity)
-	else:
-		# Recharge fuel
-		if afterburner_fuel < afterburner_fuel_capacity:
-			# Apply energy scaling from ShipBase
-			var recharge_scale = 1.0
-			if is_instance_valid(ship_base) and ship_base.has_method("_get_ets_scale"):
-				recharge_scale = ship_base._get_ets_scale(ship_base.engine_recharge_index)
-
-			afterburner_fuel += afterburner_recover_rate * delta * recharge_scale
-			if afterburner_fuel > afterburner_fuel_capacity:
-				afterburner_fuel = afterburner_fuel_capacity
-			emit_signal("afterburner_fuel_updated", afterburner_fuel, afterburner_fuel_capacity)
 
 
 func start_afterburner():

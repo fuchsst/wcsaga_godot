@@ -1,0 +1,28 @@
+[gd_scene load_steps=4 format=3 uid="uid://d1e2f3g4h5i6j"]
+
+[ext_resource type="Shader" path="res://scripts/graphics/shaders/laser_beam.gdshader" id="1_laser"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_laser"]
+render_priority = 0
+shader = ExtResource("1_laser")
+shader_parameter/beam_color = Color(1, 0.8, 0.5, 1)
+shader_parameter/intensity = 2.0
+shader_parameter/texture_scroll_speed = 1.0
+shader_parameter/noise_scale = 5.0
+shader_parameter/noise_intensity = 0.1
+# shader_parameter/beam_texture = ExtResource("...") ; Assign a beam texture here later
+
+[sub_resource type="QuadMesh" id="QuadMesh_beam"]
+size = Vector2(1, 1) # Default size, will be scaled by the node
+
+[node name="BeamEffect" type="Node3D"]
+# Script will be attached later to control beam length, width, lifetime etc.
+
+[node name="BeamMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5) # Center the quad origin for scaling
+mesh = SubResource("QuadMesh_beam")
+material_override = SubResource("ShaderMaterial_laser")
+# The script attached to BeamEffect will likely scale this mesh instance
+# along its Z-axis for length and X/Y axis for width based on weapon properties.
+# Example scaling for a 100 unit long, 2 unit wide beam:
+# scale = Vector3(2, 1, 100) # Adjust Y scale if QuadMesh height is used for width

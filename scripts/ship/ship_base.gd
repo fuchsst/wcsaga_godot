@@ -9,6 +9,8 @@ class_name ShipBase
 @onready var shield_system: ShieldSystem = $ShieldSystem
 @onready var damage_system: DamageSystem = $DamageSystem
 @onready var engine_system: EngineSystem = $EngineSystem
+@onready var energy_transfer_system: EnergyTransferSystem = $EnergyTransferSystem # Added ETS node
+@onready var animation_player: AnimationPlayer = $AnimationPlayer # Assuming child node name
 # @onready var ai_controller: AIController = $AIController # If AI is a child node
 
 ## Runtime Ship State (Selected properties from C++ ship struct)
@@ -40,10 +42,23 @@ var target_subsystem_node: Node = null # Corresponds to ship.last_targeted_subob
 var is_dying: bool = false             # Related to SF_DYING
 var death_timestamp: int = 0           # ship.death_time (Timestamp in msec)
 var final_death_timestamp: int = 0     # ship.final_death_time (Timestamp in msec)
+var end_death_time: int = 0            # ship.end_death_time (Timestamp in msec) - Added
+var really_final_death_timestamp: int = 0 # ship.really_final_death_time (Timestamp in msec) - Added
 var deathroll_rotvel: Vector3 = Vector3.ZERO # ship.deathroll_rotvel
 var pre_death_explosion_happened: bool = false # ship.pre_death_explosion_happened
 var next_fireball_time: int = 0        # ship.next_fireball (Timestamp in msec)
 var death_roll_snd_channel: int = -1   # To manage the sound playback
+var large_ship_blowup_index: int = -1  # ship.large_ship_blowup_index (If using split effect) - Added
+var sub_expl_sound_handle: Array[int] = [-1, -1] # ship.sub_expl_sound_handle - Added
+var use_special_explosion: bool = false # ship.use_special_explosion - Added
+var special_exp_damage: int = 0        # ship.special_exp_damage - Added
+var special_exp_blast: int = 0         # ship.special_exp_blast - Added
+var special_exp_inner: int = 0         # ship.special_exp_inner - Added
+var special_exp_outer: int = 0         # ship.special_exp_outer - Added
+var use_shockwave: bool = false        # ship.use_shockwave - Added
+var special_exp_shockwave_speed: int = 0 # ship.special_exp_shockwave_speed - Added
+var special_hitpoints: int = -1        # ship.special_hitpoints (-1 means use default) - Added
+var special_shield: int = -1           # ship.special_shield (-1 means use default) - Added
 
 # Guardian Threshold
 var ship_guardian_threshold: int = 0   # ship.ship_guardian_threshold
@@ -61,39 +76,121 @@ var time_until_uncloak: int = 0        # Timestamp (msec) for temporary cloak
 var warpin_effect = null # Placeholder for WarpEffect node/resource instance
 var warpout_effect = null # Placeholder for WarpEffect node/resource instance
 
-# Weapon Sequences (Swarm/Corkscrew)
-var num_swarm_to_fire: int = 0         # ship.num_swarm_missiles_to_fire
-var next_swarm_fire_time: int = 0      # ship.next_swarm_fire (Timestamp)
-var num_corkscrew_to_fire: int = 0     # ship.num_corkscrew_to_fire
-var next_corkscrew_fire_time: int = 0  # ship.next_corkscrew_fire (Timestamp)
-# var next_swarm_path: int = 0         # ship.next_swarm_path (If needed for path variation)
+# Weapon Sequences (Swarm/Corkscrew) - Moved to WeaponSystem.gd
+
+# Tagging State - Added
+var tag_total: float = 0.0             # ship.tag_total
+var tag_left: float = 0.0              # ship.tag_left
+var level2_tag_total: float = 0.0      # ship.level2_tag_total
+var level2_tag_left: float = 0.0       # ship.level2_tag_left
+var time_first_tagged: int = 0         # ship.time_first_tagged (Timestamp)
+
+# Damage Sparks - Added
+var sparks: Array[Dictionary] = []     # ship.sparks [{ "pos": Vector3, "submodel_num": int, "end_time": int }]
+var num_hits: int = 0                  # ship.num_hits (Number of active sparks)
+var next_hit_spark: int = 0            # ship.next_hit_spark (Timestamp)
+
+# Engine Wash - Added
+var wash_killed: bool = false          # ship.wash_killed
+var wash_intensity: float = 0.0        # ship.wash_intensity
+var wash_rot_axis: Vector3 = Vector3.ZERO # ship.wash_rot_axis
+var wash_timestamp: int = 0            # ship.wash_timestamp
+
+# Other State - Added
+var callsign_index: int = -1           # ship.callsign_index
+var hotkey: int = -1                   # ship.hotkey
+var escort_priority: int = 0           # ship.escort_priority
+var score: int = 0                     # ship.score
+var assist_score_pct: float = 0.0      # ship.assist_score_pct
+var respawn_priority: int = 0          # ship.respawn_priority
+var cargo1: String = ""                # ship.cargo1 (Use String, convert from char)
+var wing_status_wing_index: int = -1   # ship.wing_status_wing_index
+var wing_status_wing_pos: int = -1     # ship.wing_status_wing_pos
+var alt_type_index: int = -1           # ship.alt_type_index
+var targeting_laser_bank: int = -1     # ship.targeting_laser_bank
+var targeting_laser_objnum: int = -1   # ship.targeting_laser_objnum
+var ship_max_shield_strength: float = 0.0 # ship.ship_max_shield_strength (Runtime override)
+var ship_max_hull_strength: float = 0.0 # ship.ship_max_hull_strength (Runtime override)
+var time_cargo_revealed: int = 0       # ship.time_cargo_revealed (Timestamp)
+var arrival_location: int = -1         # ship.arrival_location
+var arrival_distance: int = 0          # ship.arrival_distance
+var arrival_anchor: int = -1           # ship.arrival_anchor
+var arrival_path_mask: int = 0         # ship.arrival_path_mask
+var arrival_cue: int = -1              # ship.arrival_cue
+var arrival_delay: int = 0             # ship.arrival_delay (Milliseconds)
+var departure_location: int = -1       # ship.departure_location
+var departure_anchor: int = -1         # ship.departure_anchor
+var departure_path_mask: int = 0       # ship.departure_path_mask
+var departure_cue: int = -1            # ship.departure_cue
+var departure_delay: int = 0           # ship.departure_delay (Milliseconds)
+var wingnum: int = -1                  # ship.wingnum
+var orders_accepted: String = ""       # ship.orders_accepted
+var subsys_info: Array[Dictionary] = [] # ship.subsys_info [{ "num": int, "total_hits": float, "current_hits": float }]
+var shield_integrity: Array[float] = [] # ship.shield_integrity (Per shield tri, maybe not needed?)
+var reinforcement_index: int = -1      # ship.reinforcement_index
+var cmeasure_count: int = 0            # ship.cmeasure_count
+var current_cmeasure: int = -1         # ship.current_cmeasure
+var cmeasure_fire_stamp: int = 0       # ship.cmeasure_fire_stamp (Timestamp)
+var shield_hits: int = 0               # ship.shield_hits
+var base_texture_anim_frametime: int = 0 # ship.base_texture_anim_frametime (Timestamp)
+var total_damage_received: float = 0.0 # ship.total_damage_received
+var damage_ship: Array[float] = []     # ship.damage_ship (Damage from specific ships)
+var damage_ship_id: Array[int] = []    # ship.damage_ship_id (Signatures of damaging ships)
+var persona_index: int = -1            # ship.persona_index
+var subsys_disrupted_flags: int = 0    # ship.subsys_disrupted_flags
+var subsys_disrupted_check_timestamp: int = 0 # ship.subsys_disrupted_check_timestamp
+var create_time: int = 0               # ship.create_time (Timestamp)
+var ts_index: int = -1                 # ship.ts_index (Training stage?)
+var arc_pts: Array[Array] = []         # ship.arc_pts [[Vector3, Vector3], ...]
+var arc_timestamp: Array[int] = []     # ship.arc_timestamp
+var arc_type: Array[int] = []          # ship.arc_type
+var arc_next_time: int = 0             # ship.arc_next_time (Timestamp)
+var emp_intensity: float = -1.0        # ship.emp_intensity (-1 if inactive)
+var emp_decr: float = 0.0              # ship.emp_decr
+var lightning_stamp: int = 0           # ship.lightning_stamp
+var awacs_warning_flag: int = 0        # ship.awacs_warning_flag
+var current_viewpoint: int = 0         # ship.current_viewpoint
+var ship_replacement_textures: Array[int] = [] # ship.ship_replacement_textures
+var bay_doors_anim_done_time: int = 0  # ship.bay_doors_anim_done_time
+var bay_doors_status: int = 0          # ship.bay_doors_status (0=closed, 1=open)
+var bay_doors_wanting_open: int = 0    # ship.bay_doors_wanting_open
+var bay_doors_launched_from: int = 0   # ship.bay_doors_launched_from
+var bay_doors_need_open: bool = false  # ship.bay_doors_need_open
+var bay_doors_parent_shipnum: int = -1 # ship.bay_doors_parent_shipnum
+var secondary_point_reload_pct: Array[Array] = [] # ship.secondary_point_reload_pct [[float,...],...]
+var primary_rotate_rate: Array[float] = [] # ship.primary_rotate_rate
+var primary_rotate_ang: Array[float] = [] # ship.primary_rotate_ang
+var thrusters_start: Array[int] = []   # ship.thrusters_start
+var thrusters_sounds: Array[int] = []  # ship.thrusters_sounds
+var ammo_low_complaint_count: int = 0  # ship.ammo_low_complaint_count
 
 # Signals
 signal hull_strength_changed(new_strength: float, max_strength: float)
 signal weapon_energy_changed(new_energy: float, max_energy: float)
 signal destroyed(killer_obj_id: int)
 
-# Energy Transfer System (ETS)
-var power_output: float = 100.0        # ship_info.power_output (Base energy generation per second)
-var shield_recharge_index: int = 0     # ship.shield_recharge_index (0-100, affects recharge rate)
-var weapon_recharge_index: int = 0     # ship.weapon_recharge_index (0-100, affects recharge rate)
-var engine_recharge_index: int = 0     # ship.engine_recharge_index (0-100, affects afterburner recharge rate)
-var next_manage_ets_time: float = 0.0  # ship.next_manage_ets (Timer for ETS updates)
-const ETS_UPDATE_INTERVAL = 0.1        # How often to run ETS logic (seconds)
+# Energy Transfer System (ETS) - Indices are still needed here for the ETS node to access
+var shield_recharge_index: int = 0     # ship.shield_recharge_index (0-100)
+var weapon_recharge_index: int = 0     # ship.weapon_recharge_index (0-100)
+var engine_recharge_index: int = 0     # ship.engine_recharge_index (0-100)
+# ETS state (power_output, next_manage_ets_time) in EnergyTransferSystem.gd
 
 
 func _ready():
 	if ship_data:
 		ship_name = ship_data.ship_name # Or use mission-specific name if available
 		# Initialize state from ShipData
-		hull_strength = ship_data.max_hull_strength
+		ship_max_hull_strength = ship_data.max_hull_strength
+		hull_strength = ship_max_hull_strength
+		ship_max_shield_strength = ship_data.max_shield_strength
 		weapon_energy = ship_data.max_weapon_reserve
 		afterburner_fuel = ship_data.afterburner_fuel_capacity # EngineSystem will manage this primarily
 		current_max_speed = ship_data.max_vel.z # Assuming Z is forward
 		flags = ship_data.flags # Initialize with static flags if needed
 		flags2 = ship_data.flags2
-		power_output = ship_data.power_output # Get power output from ShipData
-		# ship_guardian_threshold = ship_data.ship_guardian_threshold # Add to ShipData resource
+		ship_guardian_threshold = ship_data.ship_guardian_threshold
+		cmeasure_count = ship_data.cmeasure_max
+		current_cmeasure = ship_data.cmeasure_type
 
 		# Configure RigidBody3D based on ShipData
 		mass = ship_data.mass # Godot property
@@ -110,23 +207,40 @@ func _ready():
 			damage_system.initialize_from_ship_data(ship_data)
 		if engine_system:
 			engine_system.initialize_from_ship_data(ship_data)
+		if energy_transfer_system: # Initialize ETS
+			energy_transfer_system.power_output = ship_data.power_output
 
-		emit_signal("hull_strength_changed", hull_strength, ship_data.max_hull_strength)
+		emit_signal("hull_strength_changed", hull_strength, ship_max_hull_strength)
+		emit_signal("weapon_energy_changed", weapon_energy, ship_data.max_weapon_reserve)
 	else:
 		printerr("ShipBase requires ShipData resource to be assigned!")
+		ship_max_hull_strength = hull_strength # Use exported value as max if no data
+		ship_max_shield_strength = 100.0 # Default if no data
 
 	obj_signature = get_instance_id() # Use Godot's instance ID as a signature for now
-	emit_signal("weapon_energy_changed", weapon_energy, ship_data.max_weapon_reserve if ship_data else weapon_energy)
+	create_time = Time.get_ticks_msec()
+
+	# Connect signals
+	if damage_system:
+		# Connect the hull_destroyed signal from DamageSystem to our handler
+		if not damage_system.hull_destroyed.is_connected(_on_hull_destroyed):
+			damage_system.hull_destroyed.connect(_on_hull_destroyed)
+		# Also connect the subsystem destroyed signal if needed elsewhere
+		# if not damage_system.subsystem_destroyed.is_connected(_on_subsystem_destroyed):
+		#     damage_system.subsystem_destroyed.connect(_on_subsystem_destroyed)
+
+	# Connect body_entered signal for collision detection
+	body_entered.connect(_on_body_entered)
 
 
 func _physics_process(delta):
-	# --- Manage Energy Transfer System (ETS) ---
-	if not is_dying:
-		_manage_ets(delta)
+	# --- Manage Death Sequence --- - Added
+	if is_dying:
+		_process_death(delta)
+
 
 	# --- Manage Weapon Sequences ---
-	if not is_dying:
-		_manage_weapon_sequences()
+	# Moved to WeaponSystem.gd
 
 	# --- Manage Cloak ---
 	if cloak_stage != 0:
@@ -138,12 +252,48 @@ func _physics_process(delta):
 	elif flags & GlobalConstants.SF_DEPART_WARP:
 		shipfx_warpout_frame(delta)
 
+	# --- Manage Sparks --- - Added
+	if num_hits > 0 and Time.get_ticks_msec() >= next_hit_spark:
+		# TODO: Implement shipfx_emit_spark logic here or call it
+		# shipfx_emit_spark(get_instance_id(), -1) # -1 for random spark
+		next_hit_spark = Time.get_ticks_msec() + randi_range(50, 100) # Schedule next spark check
+
+	# --- Manage Damaged Arcs --- - Added
+	# TODO: Implement shipfx_do_damaged_arcs_frame logic here or call it
+	# shipfx_do_damaged_arcs_frame(self)
+
+	# --- Manage Tagging --- - Added
+	if tag_left > 0.0:
+		tag_left -= delta
+		if tag_left <= 0.0:
+			tag_left = 0.0
+			tag_total = 0.0
+			# TODO: Notify AI/HUD that tag wore off?
+	if level2_tag_left > 0.0:
+		level2_tag_left -= delta
+		if level2_tag_left <= 0.0:
+			level2_tag_left = 0.0
+			level2_tag_total = 0.0
+
+	# --- Move Docked Objects ---
+	# If this ship is docked, ensure the DockingManager updates positions
+	# The manager handles the tree traversal, so we just need to trigger it once per group per frame.
+	# Calling it here ensures it happens *after* this ship's physics update.
+	# The `processed_ids` set in the manager prevents redundant updates within the same frame.
+	if Engine.has_singleton("DockingManager") and DockingManager.is_object_docked(self):
+		DockingManager.move_docked_objects(self)
+
 
 func _integrate_forces(state: PhysicsDirectBodyState3D):
 	# Reference: physics_sim_vel / physics_sim_rot in FS2 source (physics.cpp)
 	if not ship_data or is_dying: # Don't apply forces if dying
 		# Apply damping even when dying? FS2 seems to (PF_DEAD_DAMP)
 		# Godot's built-in damping should handle this if configured.
+		# If death roll is active, apply its rotation
+		if is_dying and deathroll_rotvel.length_squared() > 0.001:
+			state.angular_velocity = deathroll_rotvel
+			# Optionally decrease death roll velocity over time?
+			# deathroll_rotvel *= (1.0 - state.step * 0.1) # Example decay
 		return
 
 	var current_transform = state.transform
@@ -372,152 +522,31 @@ func _manage_weapon_sequences():
 			next_corkscrew_fire_time = 0
 
 
-# --- Energy Transfer System (ETS) ---
-func _manage_ets(delta: float):
-	next_manage_ets_time -= delta
-	if next_manage_ets_time <= 0.0:
-		next_manage_ets_time = ETS_UPDATE_INTERVAL
-
-		if not ship_data: return
-
-		var available_energy = power_output * ETS_UPDATE_INTERVAL # Use the class variable
-		var energy_needed: float = 0.0
-		var shield_request: float = 0.0
-		var weapon_request: float = 0.0
-		var engine_request: float = 0.0 # For afterburner recharge
-
-		# 1. Calculate Energy Needs
-		if shield_system and not (flags & GlobalConstants.OF_NO_SHIELDS):
-			# Shield recharge need depends on current strength vs max and regen rate
-			var max_shield_per_quad = shield_system.max_shield_strength / ShieldSystem.NUM_QUADRANTS
-			var current_total_shield = shield_system.get_total_strength()
-			var shield_deficit = shield_system.max_shield_strength - current_total_shield
-			if shield_deficit > 0.01:
-				# Request energy proportional to deficit, capped by max regen rate
-				shield_request = min(shield_deficit, ship_data.max_shield_regen_per_second * ETS_UPDATE_INTERVAL)
-				# TODO: Apply shield_recharge_index scaling if needed (FS2 logic is complex)
-				energy_needed += shield_request # Assuming 1 unit energy = 1 unit shield strength for now
-
-		if weapon_system:
-			# Weapon recharge need depends on current energy vs max and regen rate
-			var weapon_energy_deficit = ship_data.max_weapon_reserve - weapon_energy
-			if weapon_energy_deficit > 0.01:
-				weapon_request = min(weapon_energy_deficit, ship_data.max_weapon_regen_per_second * ETS_UPDATE_INTERVAL)
-				# TODO: Apply weapon_recharge_index scaling
-				energy_needed += weapon_request # Assuming 1 unit energy = 1 unit weapon reserve
-
-		if engine_system and engine_system.has_afterburner:
-			# Afterburner recharge need
-			var ab_deficit = engine_system.afterburner_fuel_capacity - engine_system.afterburner_fuel
-			if ab_deficit > 0.01 and not engine_system.afterburner_on:
-				engine_request = min(ab_deficit, engine_system.afterburner_recover_rate * ETS_UPDATE_INTERVAL)
-				# TODO: Apply engine_recharge_index scaling
-				energy_needed += engine_request # Assuming 1 unit energy = 1 unit fuel for now
-
-		# 2. Distribute Available Energy
-		var distribution_factor = 1.0
-		var energy_remaining = available_energy
-		var energy_given_total: float = 0.0
-
-		# Distribute based on priority: Shields > Weapons > Engines
-		# Apply scaling based on recharge indices
-		var shield_scale = _get_ets_scale(shield_recharge_index)
-		var weapon_scale = _get_ets_scale(weapon_recharge_index)
-		var engine_scale = _get_ets_scale(engine_recharge_index)
-
-		# Adjust requests based on scaling (higher index = potentially faster recharge allowed)
-		# Note: This is a simplified application. FS2 logic might scale the *recharge rate* itself.
-		var scaled_shield_request = shield_request * shield_scale
-		var scaled_weapon_request = weapon_request * weapon_scale
-		var scaled_engine_request = engine_request * engine_scale
-
-		# Recalculate total need based on scaled requests
-		energy_needed = scaled_shield_request + scaled_weapon_request + scaled_engine_request
-		if energy_needed > available_energy and energy_needed > 0.001:
-			distribution_factor = available_energy / energy_needed
-		else:
-			distribution_factor = 1.0 # Enough energy for all scaled requests
-
-		# 1. Give to Shields
-		if scaled_shield_request > 0 and energy_remaining > 0.001:
-			# Give based on the *scaled* request, limited by available energy and distribution factor
-			var shield_give = min(scaled_shield_request * distribution_factor, energy_remaining)
-			energy_remaining -= shield_give
-			energy_given_total += shield_give
-
-			# Recharge shields (needs ShieldSystem.recharge method or direct modification)
-			# Direct modification for now (needs refactor):
-			var strength_per_quad = shield_system.max_shield_strength / ShieldSystem.NUM_QUADRANTS
-			var amount_per_quad = shield_give / ShieldSystem.NUM_QUADRANTS
-			var recharged_fully = true
-			for i in range(ShieldSystem.NUM_QUADRANTS):
-				if shield_system.shield_quadrants[i] < strength_per_quad:
-					shield_system.shield_quadrants[i] += amount_per_quad
-					if shield_system.shield_quadrants[i] > strength_per_quad:
-						shield_system.shield_quadrants[i] = strength_per_quad
-					else:
-						recharged_fully = false
-					shield_system.emit_signal("shield_strength_changed", i, shield_system.shield_quadrants[i])
-			if recharged_fully and shield_system.get_total_strength() >= shield_system.max_shield_strength * 0.999:
-				shield_system.emit_signal("shield_fully_recharged")
-			# energy_given_total += shield_give # This seems duplicated, remove one
-
-		# 2. Give to Weapons
-		if scaled_weapon_request > 0 and energy_remaining > 0.001:
-			var weapon_give = min(scaled_weapon_request * distribution_factor, energy_remaining)
-			energy_remaining -= weapon_give
-			energy_given_total += weapon_give
-
-			var old_energy = weapon_energy
-			weapon_energy += weapon_give
-			if weapon_energy > ship_data.max_weapon_reserve: # Clamp
-				weapon_energy = ship_data.max_weapon_reserve
-			if abs(weapon_energy - old_energy) > 0.01:
-				emit_signal("weapon_energy_changed", weapon_energy, ship_data.max_weapon_reserve)
-			energy_given_total += weapon_give
-
-		# 3. Give to Engines (Afterburner)
-		if scaled_engine_request > 0 and energy_remaining > 0.001:
-			var engine_give = min(scaled_engine_request * distribution_factor, energy_remaining)
-			# energy_remaining -= engine_give # Not strictly needed as it's the last step
-			energy_given_total += engine_give
-
-			var old_fuel = engine_system.afterburner_fuel
-			engine_system.afterburner_fuel += engine_give
-			if engine_system.afterburner_fuel > engine_system.afterburner_fuel_capacity: # Clamp
-				engine_system.afterburner_fuel = engine_system.afterburner_fuel_capacity
-			if abs(engine_system.afterburner_fuel - old_fuel) > 0.01:
-				engine_system.emit_signal("afterburner_fuel_updated", engine_system.afterburner_fuel, engine_system.afterburner_fuel_capacity)
-			energy_given_total += engine_give
-
-		# Note: This is a simplified distribution. FS2 has more complex priority and scaling based on indices.
-		# Need to refine this based on detailed C++ logic (manage_ets function and Energy_levels array).
 
 
-# Placeholder function to get ETS scaling factor based on index (0-100)
-# Placeholder function to get ETS scaling factor based on index (0-100)
-# FS2 used an array `Energy_levels` which seemed to scale recharge rate, often involving a * 2.0 factor.
-# This function provides a simple linear scale from 1.0 (at index 0) to 2.0 (at index 100) as a placeholder.
-# The actual curve/values from FS2's Energy_levels should be implemented here if known.
-func _get_ets_scale(index: int) -> float:
-	var normalized_index = clamp(float(index) / 100.0, 0.0, 1.0)
-	# Linear scale from 1.0 to 2.0
-	return 1.0 + normalized_index
+# --- Damage Handling ---
 
-
-# Delegate damage taking to the DamageSystem
+# Public method called by weapons or collision handlers to apply damage.
+# Delegates the core logic to the DamageSystem node.
+# hit_pos is in global coordinates.
 func take_damage(hit_pos: Vector3, amount: float, killer_obj_id: int = -1, damage_type_key = -1, hit_subsystem: Node = null):
+	if is_dying: return # Don't take damage if already dying
+
 	if damage_system:
+		# Pass the hit position directly to the damage system
 		damage_system.apply_local_damage(hit_pos, amount, killer_obj_id, damage_type_key, hit_subsystem)
 	else:
 		# Fallback if no damage system (apply directly to hull, no shields/subsystems)
+		printerr("ShipBase %s has no DamageSystem node!" % ship_name)
 		hull_strength -= amount
-		emit_signal("hull_strength_changed", hull_strength, ship_data.max_hull_strength if ship_data else hull_strength)
+		emit_signal("hull_strength_changed", hull_strength, ship_max_hull_strength if ship_data else hull_strength)
 		if hull_strength <= 0.0:
 			hull_strength = 0.0
 			emit_signal("destroyed", killer_obj_id)
-			# start_destruction_sequence(killer_obj_id)
+			start_destruction_sequence(killer_obj_id) # Start sequence directly in fallback
 
+
+# --- Weapon Control ---
 
 # Delegate weapon firing to the WeaponSystem
 func fire_primary_weapons():
@@ -759,10 +788,11 @@ func shipfx_cloak_frame(delta: float):
 	# Update texture translation for shader effect
 	current_translation += texture_translation_key * delta
 
-	# TODO: Apply cloak_alpha and current_translation to the ship's material shader parameters
+	# Example: get_surface_override_material(0).set_shader_parameter("cloak_alpha", cloak_alpha / 255.0)
+	# Example: get_surface_override_material(0).set_shader_parameter("cloak_translation", current_translation)
 
 
-# --- Warp Functions (Stubs) ---
+# --- Warp Functions ---
 
 # Corresponds to shipfx_warpin_start
 func shipfx_warpin_start():
@@ -773,19 +803,21 @@ func shipfx_warpin_start():
 	# TODO: Check scripting override (CHA_WARPIN)
 
 	if flags & GlobalConstants.SF_NO_ARRIVAL_WARP:
-		flags &= ~GlobalConstants.SF_ARRIVING # Clear any potential stage flags
+		# Corresponds to shipfx_actually_warpin
+		flags &= ~GlobalConstants.SF_ARRIVING # Clear arrival flags
 		physics_flags &= ~GlobalConstants.PF_WARP_IN
 		print("%s arrived instantly (no warp effect)." % ship_name)
+		# TODO: Potentially trigger arrival cue/event here if needed
 		return
 
 	# TODO: Instantiate and setup WarpEffect node/scene based on ship_data.warpin_type
 	# warpin_effect = load("res://scenes/effects/warp_effect_default.tscn").instantiate()
 	# add_child(warpin_effect)
 	# warpin_effect.setup(self, GlobalConstants.WD_WARP_IN)
-	# warpin_effect.warp_start()
-	flags |= GlobalConstants.SF_ARRIVING_STAGE_1 # Set initial warp stage flag
-	print("%s starting warp-in sequence." % ship_name)
-	# TODO: Play warp-in sound start
+	# warpin_effect.warp_start() # This should handle setting flags, sounds etc.
+	flags |= GlobalConstants.SF_ARRIVING_STAGE_1 # Set initial warp stage flag (effect node might override)
+	print("%s starting warp-in sequence (Placeholder)." % ship_name)
+	# TODO: Play warp-in sound start (likely handled by effect node)
 
 
 # Corresponds to shipfx_warpin_frame
@@ -795,17 +827,14 @@ func shipfx_warpin_frame(delta: float):
 	# TODO: Call frame update on the warpin_effect node
 	# if is_instance_valid(warpin_effect):
 	#     if warpin_effect.warp_frame(delta) == 0: # warp_frame returns 0 when finished
-	#         # Warp finished
-	#         flags &= ~GlobalConstants.SF_ARRIVING # Clear arrival flags
-	#         physics_flags &= ~GlobalConstants.PF_WARP_IN
-	#         warpin_effect.queue_free()
-	#         warpin_effect = null
-	#         print("%s finished warp-in." % ship_name)
+	#         # Warp finished - Effect node should handle cleanup and flag clearing
+	#         pass
 	# else:
-	#     # Fallback if effect node is missing
+	#     # Fallback if effect node is missing - manually finish warp
+	#     print("Warp-in effect missing for %s, finishing manually." % ship_name)
 	#     flags &= ~GlobalConstants.SF_ARRIVING
 	#     physics_flags &= ~GlobalConstants.PF_WARP_IN
-	pass # Placeholder
+	pass # Placeholder - Logic driven by WarpEffect node
 
 
 # Corresponds to shipfx_warpout_start
@@ -822,19 +851,21 @@ func shipfx_warpout_start():
 
 	if flags & GlobalConstants.SF_NO_DEPARTURE_WARP:
 		flags |= GlobalConstants.SF_DEPART_WARP # Mark as departing
-		# TODO: Call ship_actually_depart() or similar logic immediately
+		# TODO: Call ship_actually_depart() or equivalent logic immediately
 		print("%s departed instantly (no warp effect)." % ship_name)
+		# ship_actually_depart(get_instance_id()) # Example call
+		queue_free() # Or mark for deletion
 		return
 
 	# TODO: Instantiate and setup WarpEffect node/scene based on ship_data.warpout_type
 	# warpout_effect = load("res://scenes/effects/warp_effect_default.tscn").instantiate()
 	# add_child(warpout_effect)
 	# warpout_effect.setup(self, GlobalConstants.WD_WARP_OUT)
-	# warpout_effect.warp_start()
-	flags |= GlobalConstants.SF_DEPART_WARP # Mark as departing
-	physics_flags |= GlobalConstants.PF_WARP_OUT # Apply warp physics
-	print("%s starting warp-out sequence." % ship_name)
-	# TODO: Play warp-out sound start
+	# warpout_effect.warp_start() # This should handle setting flags, sounds etc.
+	flags |= GlobalConstants.SF_DEPART_WARP # Mark as departing (effect node might override)
+	physics_flags |= GlobalConstants.PF_WARP_OUT # Apply warp physics (effect node might override)
+	print("%s starting warp-out sequence (Placeholder)." % ship_name)
+	# TODO: Play warp-out sound start (likely handled by effect node)
 
 
 # Corresponds to shipfx_warpout_frame
@@ -855,13 +886,244 @@ func shipfx_warpout_frame(delta: float):
 	# TODO: Call frame update on the warpout_effect node
 	# if is_instance_valid(warpout_effect):
 	#     if warpout_effect.warp_frame(delta) == 0: # warp_frame returns 0 when finished
-	#         # Warp finished - Ship will be removed by ship_actually_depart called from effect node
-	#         # We don't clear flags here, let the effect handle final cleanup signal/call
+	#         # Warp finished - Effect node should handle final departure call/signal
 	#         pass
 	# else:
-	#     # Fallback if effect node is missing - need manual cleanup
-	#     # This might happen if SF_NO_DEPARTURE_WARP was set initially but warp started anyway?
-	#     # Or if the effect failed to instantiate.
-	#     # For now, assume the effect node handles the final departure call.
-	#     pass # Placeholder
-	pass # Placeholder
+	#     # Fallback if effect node is missing
+	#     print("Warp-out effect missing for %s, departing manually." % ship_name)
+	#     # ship_actually_depart(get_instance_id())
+	#     queue_free()
+	pass # Placeholder - Logic driven by WarpEffect node
+
+
+# --- Death Sequence Logic --- Added
+# Corresponds roughly to ship_death_roll_frame
+func _process_death(delta: float):
+	var current_time_ms = Time.get_ticks_msec()
+
+	# Apply death roll rotation (handled in _integrate_forces)
+
+	# Spawn fireballs during death roll
+	if current_time_ms >= next_fireball_time:
+		# Determine fireball properties based on ship size/type
+		var fireball_type = GlobalConstants.FireballType.EXPLOSION_MEDIUM # Default
+		var fireball_size_mult = 1.0
+		if ship_data:
+			# TODO: Get fireball type from ship_data or species_info
+			# fireball_type = ship_data.get_explosion_fireball_type()
+			if ship_data.flags & (GlobalConstants.SIF_BIG_SHIP | GlobalConstants.SIF_HUGE_SHIP):
+				fireball_size_mult = 2.0 # Example scaling
+			elif ship_data.flags & GlobalConstants.SIF_SMALL_SHIP:
+				fireball_size_mult = 0.75
+
+		# Calculate random position on the ship's surface or within radius
+		var spawn_pos = global_position + Vector3(randf_range(-radius, radius), randf_range(-radius, radius), randf_range(-radius, radius)) * 0.75
+
+		# TODO: Need FireballManager singleton or equivalent
+		# FireballManager.create_fireball(spawn_pos, fireball_type, fireball_size_mult * randf_range(0.5, 1.5), get_instance_id())
+		# print("Spawn fireball at ", spawn_pos) # Placeholder
+
+		# Schedule next fireball
+		var fireball_delay = randi_range(50, 200) # Example delay
+		next_fireball_time = current_time_ms + fireball_delay
+
+	# Check for final death time
+	if current_time_ms >= final_death_timestamp:
+		# TODO: Trigger final explosion (potentially larger fireball, shockwave)
+		# ExplosionManager.create_explosion(global_position, radius * 2.0, ...)
+		# if use_shockwave: ShockwaveManager.create_shockwave(...)
+		# TODO: Call ship_cleanup() or equivalent to remove the object
+		print("%s final death!" % ship_name)
+		# TODO: Handle multiplayer death reporting/respawn logic before queue_free
+		# TODO: Stop death roll sound
+		# if death_roll_snd_channel != -1: SoundManager.stop_sound(death_roll_snd_channel)
+		queue_free() # Remove the ship node
+		return # Stop further processing
+
+	# Check for pre-death explosion (for large ships)
+	if not pre_death_explosion_happened and ship_data and \
+	   (ship_data.flags & (GlobalConstants.SIF_BIG_SHIP | GlobalConstants.SIF_HUGE_SHIP)) and \
+	   current_time_ms >= death_timestamp:
+		# TODO: Trigger pre-death large explosion effect
+		# ExplosionManager.create_explosion(global_position, radius * 1.5, ...)
+		print("%s pre-death explosion!" % ship_name)
+		pre_death_explosion_happened = true
+		# Extend final death time slightly after pre-death explosion?
+		final_death_timestamp = max(final_death_timestamp, current_time_ms + 1000) # Example extension
+
+
+# --- Tagging --- Added
+# Corresponds to ship_apply_tag
+func apply_tag(level: int, time: float, target: Node, start_pos: Vector3, ssm_index: int, ssm_team: int):
+	var current_time_ms = Time.get_ticks_msec()
+	if time_first_tagged == 0:
+		time_first_tagged = current_time_ms
+
+	if level == 1:
+		tag_left = time
+		tag_total = time
+		print("%s tagged (Level 1) for %.1f seconds" % [ship_name, time])
+	elif level == 2:
+		level2_tag_left = time
+		level2_tag_total = time
+		print("%s tagged (Level 2) for %.1f seconds" % [ship_name, time])
+	elif level == 3:
+		print("%s tagged (Level 3) - Firing SSM %d!" % [ship_name, ssm_index])
+		# TODO: Implement SSM firing logic
+		# Need a way to get SSM weapon data and fire it
+		# ssm_create(target, start_pos, ssm_index, null, ssm_team)
+		pass
+	else:
+		printerr("Invalid tag level applied to %s: %d" % [ship_name, level])
+
+
+# --- Self Destruct --- Added
+# Corresponds to ship_self_destruct
+func self_destruct():
+	if is_dying: return # Already dying
+
+	print("%s self-destructing!" % ship_name)
+	# TODO: Log self-destruct event (MissionLogManager)
+	# TODO: Send multiplayer notification if applicable
+
+	# Use ship_hit_kill with self as killer? Or a dedicated flag?
+	# FS2 uses a specific flag in ship_hit_kill for self-destruct.
+	start_destruction_sequence(get_instance_id()) # Pass self as killer ID
+	# Ensure it blows up quickly
+	final_death_timestamp = Time.get_ticks_msec() + 100
+	# Maybe force vaporization?
+	flags |= GlobalConstants.SF_VAPORIZE
+
+
+# --- Utility --- Added
+# Corresponds to obj_get_SIF
+func get_SIF() -> int:
+	return ship_data.flags if ship_data else 0
+
+# Corresponds to obj_get_SIF (second version - not needed as flags2 is direct member)
+func get_SIF2() -> int:
+	return flags2
+
+
+# --- Animation Triggering ---
+
+# Plays an animation associated with a specific trigger type and subtype.
+# Corresponds roughly to model_anim_start_type.
+func play_submodel_animation(trigger_type: int, subtype: int = -1, direction: int = 1):
+	if not animation_player:
+		printerr("ShipBase %s has no AnimationPlayer node assigned!" % ship_name)
+		return
+
+	# Construct animation name based on type/subtype/direction
+	# Example convention: "PRIMARY_BANK_0_FIRE", "DOCKING_BAY_1_OPEN", "INITIAL"
+	# This needs to match the animation names created in the AnimationPlayer resource.
+	var anim_name = _get_animation_name_for_trigger(trigger_type, subtype, direction)
+
+	if animation_player.has_animation(anim_name):
+		# TODO: Handle animation queueing, blending, or immediate playback based on FS2 logic.
+		# For now, just play the animation.
+		animation_player.play(anim_name)
+		print("Playing animation: ", anim_name)
+	else:
+		# Only print warning if it's not an expected "missing" animation like default state
+		if trigger_type != GlobalConstants.TRIGGER_TYPE_INITIAL: # Assuming INITIAL is default state
+			print("Animation not found: ", anim_name)
+
+
+# Helper to construct animation names (adjust convention as needed)
+func _get_animation_name_for_trigger(trigger_type: int, subtype: int, direction: int) -> String:
+	var base_name = GlobalConstants.TriggerType.keys()[trigger_type] # Get enum name string
+	var sub_str = ""
+	var dir_str = ""
+
+	if subtype != -1:
+		sub_str = "_" + str(subtype) # e.g., "_0" for bank 0
+
+	if direction == -1:
+		dir_str = "_REVERSE" # Or "_CLOSE", "_RETRACT", etc.
+	elif direction == 1:
+		dir_str = "_FORWARD" # Or "_OPEN", "_EXTEND", etc.
+
+	# Special case for INITIAL? Might just be the default pose.
+	if trigger_type == GlobalConstants.TRIGGER_TYPE_INITIAL:
+		return "RESET" # Godot's default animation name
+
+	return base_name + sub_str + dir_str
+
+
+# --- Collision Handling ---
+
+func _on_body_entered(body: Node3D):
+	if is_dying: return # Don't process collisions if already dying
+
+	# TODO: Implement proper collision pair checking/timing like FS2's obj_pair system
+	# For now, handle direct collisions immediately.
+
+	var hit_pos = global_position # Placeholder, need actual contact point
+
+	if body is ShipBase:
+		var other_ship: ShipBase = body
+		# Ignore self-collision
+		if other_ship == self: return
+		print("%s collided with Ship %s" % [ship_name, other_ship.ship_name])
+		# TODO: Implement ship-ship collision logic (physics, damage)
+		# This would involve logic similar to collide_ship_ship and calculate_ship_ship_collision_physics
+		var collision_info = _calculate_ship_ship_collision_physics(self, other_ship, hit_pos) # Placeholder
+		# Apply damage based on calculated impulse/info
+		var damage_to_self = collision_info.get("damage_to_a", 10.0) # Default placeholder damage
+		var damage_to_other = collision_info.get("damage_to_b", 10.0) # Default placeholder damage
+		take_damage(hit_pos, damage_to_self, other_ship.get_instance_id())
+		other_ship.take_damage(hit_pos, damage_to_other, get_instance_id())
+		# TODO: Apply physics impulses based on collision_info
+
+	elif body is AsteroidObject:
+		var asteroid: AsteroidObject = body
+		print("%s collided with Asteroid" % ship_name)
+		# TODO: Implement ship-asteroid collision logic (physics, damage)
+		# Similar to collide_asteroid_ship
+		var collision_info = _calculate_ship_asteroid_collision_physics(self, asteroid, hit_pos) # Placeholder
+		var damage_to_self = collision_info.get("damage_to_ship", 20.0) # Default placeholder damage
+		var damage_to_asteroid = collision_info.get("damage_to_asteroid", 50.0) # Default placeholder damage
+		take_damage(hit_pos, damage_to_self, asteroid.get_instance_id())
+		if asteroid.has_method("hit"):
+			asteroid.hit(self, hit_pos, damage_to_asteroid)
+		# TODO: Apply physics impulses
+
+	elif body is DebrisObject:
+		var debris: DebrisObject = body
+		print("%s collided with Debris" % ship_name)
+		# TODO: Implement ship-debris collision logic (physics, damage)
+		# Similar to collide_debris_ship
+		var collision_info = _calculate_ship_debris_collision_physics(self, debris, hit_pos) # Placeholder
+		var damage_to_self = collision_info.get("damage_to_ship", 5.0) # Default placeholder damage
+		var damage_to_debris = collision_info.get("damage_to_debris", 10.0) # Default placeholder damage
+		take_damage(hit_pos, damage_to_self, debris.get_instance_id())
+		if debris.has_method("hit"):
+			debris.hit(self, hit_pos, damage_to_debris)
+		# TODO: Apply physics impulses
+
+	# Weapon collisions are handled by the WeaponBase script (_on_body_entered)
+	# when the weapon hits the ship's body.
+
+
+# --- Placeholder Physics Calculation Functions ---
+
+# Placeholder for complex ship-ship collision physics calculation
+func _calculate_ship_ship_collision_physics(ship_a: ShipBase, ship_b: ShipBase, hit_pos: Vector3) -> Dictionary:
+	# TODO: Implement logic based on calculate_ship_ship_collision_physics
+	# Calculate relative velocity, impulse, rotational effects, etc.
+	# Return a dictionary containing calculated damage, impulse vectors, etc.
+	print("Placeholder: Calculating ship-ship collision physics...")
+	return {"damage_to_a": 10.0, "damage_to_b": 10.0} # Return placeholder damage values
+
+# Placeholder for ship-asteroid collision physics
+func _calculate_ship_asteroid_collision_physics(ship: ShipBase, asteroid: AsteroidObject, hit_pos: Vector3) -> Dictionary:
+	# TODO: Implement logic based on calculate_ship_ship_collision_physics (adapted for asteroid)
+	print("Placeholder: Calculating ship-asteroid collision physics...")
+	return {"damage_to_ship": 20.0, "damage_to_asteroid": 50.0}
+
+# Placeholder for ship-debris collision physics
+func _calculate_ship_debris_collision_physics(ship: ShipBase, debris: DebrisObject, hit_pos: Vector3) -> Dictionary:
+	# TODO: Implement logic based on calculate_ship_ship_collision_physics (adapted for debris)
+	print("Placeholder: Calculating ship-debris collision physics...")
+	return {"damage_to_ship": 5.0, "damage_to_debris": 10.0}

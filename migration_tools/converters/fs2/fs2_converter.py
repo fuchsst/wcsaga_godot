@@ -2,7 +2,6 @@
 
 import logging
 import os
-import json
 from pathlib import Path
 from typing import Dict, Any, List, Iterator, Optional
 from dataclasses import dataclass, field
@@ -50,8 +49,8 @@ class FS2Converter(BaseConverter):
     @property
     def target_extension(self) -> str:
         """File extension to convert to"""
-        return ".json"
-    
+        return ".tres"
+
     def _normalize_section_name(self, section: str) -> str:
         """Normalize section name to match FS2File field names
         
@@ -145,85 +144,286 @@ class FS2Converter(BaseConverter):
             # Log the full section content for debugging
             logger.error("Section content that failed to parse:\n%s", 
                         '\n'.join(list(lines)))
-    
-    def _dataclass_to_dict(self, obj: Any) -> Dict:
-        """Convert a dataclass instance to a dictionary
-        
-        Args:
-            obj: Object to convert
-            
-        Returns:
-            dict: Dictionary representation
-        """
-        if hasattr(obj, '__dataclass_fields__'):
-            # Convert dataclass to dict
-            result = {}
-            for field in obj.__dataclass_fields__:
-                value = getattr(obj, field)
-                if value is not None:  # Only include non-None values
-                    if isinstance(value, list):
-                        # Handle lists of dataclass objects
-                        result[field] = [
-                            self._dataclass_to_dict(item) if hasattr(item, '__dataclass_fields__') else item
-                            for item in value
-                        ]
-                    else:
-                        result[field] = self._dataclass_to_dict(value)
-            return result
-        elif isinstance(obj, list):
-            # Convert list elements
-            result = [
-                self._dataclass_to_dict(item) if hasattr(item, '__dataclass_fields__') else item
-                for item in obj
-            ]
-            return result
-        elif isinstance(obj, dict):
-            # Convert dict values
-            result = {
-                key: self._dataclass_to_dict(value) if hasattr(value, '__dataclass_fields__') else value
-                for key, value in obj.items()
-            }
-            return result
+
+    def _format_value_for_tres(self, value: Any, indent_level: int = 1) -> Optional[str]:
+        """Formats a Python value into a Godot .tres string representation."""
+        indent = "  " * indent_level
+        if isinstance(value, str):
+            # Escape quotes and backslashes within the string
+            escaped_value = value.replace('\\', '\\\\').replace('"', '\\"')
+            # Handle multi-line strings
+            if '\n' in escaped_value:
+                # Indent subsequent lines correctly
+                lines = escaped_value.split('\n')
+                indented_lines = [lines[0]] + [indent + line for line in lines[1:]]
+                return f'"""\n{indent}{"\n".join(indented_lines)}\n{indent[:-2]}"""'
+            else:
+                return f'"{escaped_value}"'
+        elif isinstance(value, bool):
+            return "true" if value else "false"
+        elif isinstance(value, int):
+             # Godot uses 64-bit ints by default in GDScript, export as standard int
+             return str(value)
+        elif isinstance(value, float):
+             # Ensure float representation includes decimal point if it's a whole number
+             # Use a reasonable precision
+             s_val = f"{value:.6f}".rstrip('0')
+             return s_val if s_val.endswith('.') else s_val + ('0' if '.' not in s_val else '')
+        elif isinstance(value, dict):
+            # Handle specific dictionary structures (Vector3, Basis, Color, SexpNode)
+            # Check for Vector3 structure
+            if all(k in value for k in ['x', 'y', 'z']) and len(value) == 3 and all(isinstance(v, (int, float)) for v in value.values()):
+                return f"Vector3({self._format_value_for_tres(value['x'])}, {self._format_value_for_tres(value['y'])}, {self._format_value_for_tres(value['z'])})"
+            # Check for Basis structure
+            elif all(k in value for k in ['x_axis', 'y_axis', 'z_axis']) and len(value) == 3:
+                 x = self._format_value_for_tres(value['x_axis'], indent_level + 1)
+                 y = self._format_value_for_tres(value['y_axis'], indent_level + 1)
+                 z = self._format_value_for_tres(value['z_axis'], indent_level + 1)
+                 # Ensure sub-vectors are formatted correctly
+                 if x and y and z:
+                     return f"Basis({x}, {y}, {z})"
+                 else:
+                     logger.warning(f"Failed to format Basis components: {value}")
+                     return "Basis()" # Default Basis
+            # Check for Color structure
+            elif all(k in value for k in ['r', 'g', 'b', 'a']) and len(value) == 4:
+                 return f"Color({self._format_value_for_tres(value['r'])}, {self._format_value_for_tres(value['g'])}, {self._format_value_for_tres(value['b'])}, {self._format_value_for_tres(value['a'])})"
+            # Check for SexpNode structure (based on placeholder parser output)
+            elif 'node_type' in value:
+                 # TODO: Implement proper SubResource formatting for SexpNode
+                 logger.warning("SexpNode formatting for .tres not fully implemented - using placeholder.")
+                 # Placeholder: represent as a dictionary string for now
+                 items = [f'"{k}": {self._format_value_for_tres(v, indent_level + 1)}' for k, v in value.items() if v is not None]
+                 return f"{{ {', '.join(items)} }}" # Not valid .tres, needs SubResource
+            else:
+                 # Generic dictionary formatting
+                 items = [f"{self._format_value_for_tres(k, indent_level + 1)}: {self._format_value_for_tres(v, indent_level + 1)}" for k, v in value.items() if v is not None]
+                 items_str = f",\n{indent}".join(items)
+                 return f"{{\n{indent}{items_str}\n{indent[:-2]}}}"
+        elif isinstance(value, list):
+            if not value:
+                return "[]"
+            # Format arrays of simple types or resources
+            formatted_items = [self._format_value_for_tres(item, indent_level + 1) for item in value]
+            valid_items = [item for item in formatted_items if item is not None]
+            if not valid_items:
+                return "[]"
+
+            # Determine array type hint (needs improvement for resource types)
+            first_item = value[0]
+            type_hint = ""
+            # Basic type hinting (improve this based on actual resource types)
+            if all(isinstance(item, str) for item in value): type_hint = ": PackedStringArray"
+            elif all(isinstance(item, int) for item in value): type_hint = ": PackedInt64Array" # Use 64-bit for safety
+            elif all(isinstance(item, float) for item in value): type_hint = ": PackedFloat64Array"
+            elif all(isinstance(item, dict) and 'node_type' in item for item in value): type_hint = ": Array[Resource]" # Placeholder for SexpNode array
+            elif all(isinstance(item, dict) for item in value): type_hint = ": Array[Dictionary]" # Generic dictionary array
+            elif all(isinstance(item, list) for item in value): type_hint = ": Array[Array]" # Array of arrays
+            else: type_hint = ": Array[Resource]" # Generic resource array
+
+            # Multi-line formatting for readability if items are complex or numerous
+            if any(isinstance(item, (dict, list)) for item in value) or len(valid_items) > 5:
+                 items_str = f",\n{indent}".join(valid_items)
+                 return f"[\n{indent}{items_str}\n{indent[:-2]}]{type_hint}"
+            else:
+                 return f"[{', '.join(valid_items)}]{type_hint}"
+        elif value is None:
+             return "null"
         else:
-            # Return primitive types as-is
-            return obj
-    
+            # Attempt to convert unknown types to string as a fallback
+            logger.warning(f"Unsupported type for .tres formatting: {type(value)}, attempting str()")
+            try:
+                return f'"{str(value)}"' # Represent as string if possible
+            except:
+                 logger.error(f"Could not convert value of type {type(value)} to string.")
+                 return None # Skip unsupported types
+
+    def _write_tres_file(self, fs2_data: FS2File, output_path: Path):
+        """Writes the parsed FS2 data to a Godot .tres file."""
+        # TODO: Determine the correct script path dynamically if needed, or assume MissionData
+        script_path = "res://scripts/resources/mission/mission_data.gd" # Adjust if needed
+        # TODO: Generate or assign unique UIDs more robustly
+        uid_base = re.sub(r'[^a-zA-Z0-9]', '_', output_path.stem) # Basic sanitization
+        uid = f"uid://res_{uid_base}_{os.urandom(4).hex()}"
+
+        # TODO: Manage ExtResource IDs properly, especially for nested resources
+        ext_resource_id = "1_res" # Placeholder ID, needs better management
+
+        # TODO: Handle SubResource creation for nested SexpNodes, etc.
+        sub_resources = {}
+        sub_resource_counter = 1
+
+        def format_value_recursive(value: Any, indent_level: int = 1) -> Optional[str]:
+            """Recursive helper to format values and handle SubResources."""
+            nonlocal sub_resource_counter
+            indent = "  " * indent_level
+
+            # Handle SexpNode specifically for SubResource creation
+            if isinstance(value, dict) and 'node_type' in value:
+                # Generate a unique ID for this SubResource based on its content? Hash?
+                # For now, just assign sequential IDs.
+                sub_id = f"SubResource_{sub_resource_counter}"
+                sub_resource_counter += 1
+
+                # Store the SubResource definition
+                sub_resources[sub_id] = {
+                    "type": "Resource", # Base type
+                    "script": "res://scripts/scripting/sexp/sexp_node.gd", # Path to SexpNode script
+                    "data": value # The actual data for this node
+                }
+                return f'SubResource("{sub_id}")'
+
+            # Handle lists recursively
+            elif isinstance(value, list):
+                formatted_items = [format_value_recursive(item, indent_level + 1) for item in value]
+                valid_items = [item for item in formatted_items if item is not None]
+                if not valid_items: return "[]"
+
+                # Determine type hint (simplified)
+                first_item = value[0]
+                type_hint = ""
+                if all(isinstance(item, str) for item in value): type_hint = ": PackedStringArray"
+                elif all(isinstance(item, int) for item in value): type_hint = ": PackedInt64Array"
+                elif all(isinstance(item, float) for item in value): type_hint = ": PackedFloat64Array"
+                elif all(isinstance(item, dict) and 'node_type' in item for item in value): type_hint = ": Array[Resource]" # SexpNode array
+                elif all(isinstance(item, dict) for item in value): type_hint = ": Array[Dictionary]"
+                elif all(isinstance(item, list) for item in value): type_hint = ": Array[Array]"
+                else: type_hint = ": Array[Resource]" # Assume Resource for mixed/other complex types
+
+                if any("\n" in item for item in valid_items) or len(valid_items) > 5:
+                    items_str = f",\n{indent}".join(valid_items)
+                    return f"[\n{indent}{items_str}\n{indent[:-2]}]{type_hint}"
+                else:
+                    return f"[{', '.join(valid_items)}]{type_hint}"
+
+            # Handle other types using the base formatter
+            else:
+                return self._format_value_for_tres(value, indent_level)
+
+
+        # --- Start writing the file ---
+        with open(output_path, 'w', encoding='utf-8') as f:
+            # --- Write Header ---
+            # Calculate load_steps based on ExtResources + SubResources
+            # For now, assume 1 ExtResource (the main script) + SubResources
+            # This needs refinement if other ExtResources are used.
+            # Placeholder: load_steps=2 initially, will be updated later if sub_resources exist.
+            f.write(f"[gd_resource type=\"Resource\" script_class=\"MissionData\" load_steps=2 format=3 uid=\"{uid}\"]\n\n")
+            f.write(f"[ext_resource type=\"Script\" path=\"{script_path}\" id=\"{ext_resource_id}\"]\n")
+            # Placeholder for SexpNode script ExtResource - will add later if needed
+            sexp_ext_res_id = None
+
+            # --- Write Main Resource Properties ---
+            resource_lines = []
+            resource_lines.append(f"script = ExtResource(\"{ext_resource_id}\")")
+
+            for field_name in fs2_data.__dataclass_fields__:
+                value = getattr(fs2_data, field_name)
+                godot_prop_name = field_name
+                if godot_prop_name.startswith("_"): continue
+
+                formatted_value = format_value_recursive(value) # Use recursive formatter
+
+                if formatted_value is not None:
+                    resource_lines.append(f"{godot_prop_name} = {formatted_value}")
+                else:
+                    logger.warning(f"Skipping property '{godot_prop_name}' due to unsupported value type: {type(value)}")
+
+            # --- Write SubResources (if any) ---
+            if sub_resources:
+                 # Add SexpNode script as ExtResource if not already present
+                 sexp_script_path = "res://scripts/scripting/sexp/sexp_node.gd"
+                 # Check if we already have an ExtResource for this path (unlikely here)
+                 # For simplicity, assign a new ID. Proper management needed for complex cases.
+                 sexp_ext_res_id = "2_sexp" # Placeholder
+                 f.write(f"[ext_resource type=\"Script\" path=\"{sexp_script_path}\" id=\"{sexp_ext_res_id}\"]\n")
+
+                 # Update load_steps in the header (requires re-writing or placeholder update)
+                 # This is tricky with streaming write. Ideally, collect all content first.
+                 # For now, we'll write subresources after the main resource block.
+
+                 f.write("\n") # Separator
+
+                 for sub_id, sub_data in sub_resources.items():
+                     f.write(f"[sub_resource type=\"{sub_data['type']}\" id=\"{sub_id}\"]\n")
+                     # Assuming sub_data['script'] holds the path
+                     # Find or use the correct ExtResource ID for the script
+                     script_ext_id = sexp_ext_res_id # Use the ID defined above
+                     f.write(f"script = ExtResource(\"{script_ext_id}\")\n")
+                     # Write the properties of the sub-resource
+                     for prop, val in sub_data['data'].items():
+                         formatted_sub_val = format_value_recursive(val, 2) # Indent sub-resource props
+                         if formatted_sub_val is not None:
+                             f.write(f"{prop} = {formatted_sub_val}\n")
+                     f.write("\n") # Blank line after sub-resource
+
+            # --- Write the main resource block content ---
+            f.write("\n[resource]\n")
+            for line in resource_lines:
+                f.write(line + "\n")
+
+            # Note: Updating load_steps accurately requires either:
+            # 1. Knowing all ExtResources and SubResources beforehand.
+            # 2. Writing to a temporary buffer, calculating steps, writing header, then content.
+            # The current approach might result in an incorrect load_steps value if SubResources are added.
+
+
     def convert_file(self, input_path: Path, output_path: Path) -> bool:
-        """Convert a .fs2 file to JSON format
-        
+        """Convert a .fs2 file to Godot .tres format
+
         Args:
             input_path: Path to input .fs2 file
-            output_path: Path to write converted JSON file
-            
+            output_path: Path to write converted .tres file
+
         Returns:
             bool: True if conversion successful, False otherwise
         """
+        self._reset_parser_state() # Reset state for each file
         logger.info("Starting conversion of %s", input_path)
         try:
             # Read input file
             logger.debug("Reading input file %s", input_path)
-            with open(input_path, 'r', encoding='utf-8') as f:
-                content = f.read()
+            # Try common encodings if utf-8 fails
+            encodings_to_try = ['utf-8', 'latin-1', 'cp1252']
+            content = None
+            for encoding in encodings_to_try:
+                try:
+                    with open(input_path, 'r', encoding=encoding) as f:
+                        content = f.read()
+                    logger.debug(f"Successfully read {input_path} with encoding {encoding}")
+                    break # Stop trying encodings once successful
+                except UnicodeDecodeError:
+                    logger.warning(f"Failed to read {input_path} with encoding {encoding}, trying next...")
+                except Exception as e:
+                     logger.error(f"Error reading {input_path} with encoding {encoding}: {e}")
+                     # Don't break here, allow trying other encodings
+
+            if content is None:
+                 logger.error(f"Could not read {input_path} with any attempted encoding.")
+                 return False
+
             logger.debug("Successfully read %d bytes", len(content))
-            
+
             # Parse content
             logger.debug("Starting parsing of file content")
             parsed_data = self._parse_fs2_file(content)
             logger.debug("Successfully parsed file content")
-            
-            # Convert dataclass to dictionary for JSON serialization
-            logger.debug("Converting parsed data to JSON-compatible format")
-            json_data = self._dataclass_to_dict(parsed_data)
-            
-            # Write converted JSON
-            output_path = output_path.with_suffix('.json')
-            logger.debug("Writing output to %s", output_path)
-            with open(output_path, 'w', encoding='utf-8') as f:
-                json.dump(json_data, f, indent=2)
-            
-            logger.info("Successfully converted %s to %s", input_path, output_path)    
+
+            # Write converted .tres file
+            # Ensure output path has .tres extension
+            output_tres_path = output_path.with_suffix(self.target_extension)
+            logger.debug("Writing output to %s", output_tres_path)
+            self._write_tres_file(parsed_data, output_tres_path)
+
+            logger.info("Successfully converted %s to %s", input_path, output_tres_path)
             return True
-            
+
+        except ValueError as e:
+            logger.error(f"Parsing error in {input_path} near line {self.current_line_num + 1}: {e}")
+            return False
         except Exception as e:
-            logger.error("Error converting %s: %s", input_path, str(e), exc_info=True)
+            logger.error(f"Unexpected error converting {input_path}: {e}", exc_info=True)
+            # Optionally remove partially created output file on error
+            # if output_tres_path.exists():
+            #     output_tres_path.unlink()
             return False
