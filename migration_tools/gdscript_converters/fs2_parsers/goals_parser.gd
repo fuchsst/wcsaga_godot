@@ -1,24 +1,16 @@
 # migration_tools/gdscript_converters/fs2_parsers/goals_parser.gd
-extends RefCounted # Or BaseFS2Parser
+extends BaseFS2Parser
 class_name GoalsParser
 
 # --- Dependencies ---
 const MissionObjectiveData = preload("res://scripts/resources/mission/mission_objective_data.gd")
 const SexpNode = preload("res://scripts/scripting/sexp/sexp_node.gd")
-const GlobalConstants = preload("res://scripts/globals/global_constants.gd") # For goal types/flags
+const SexpParserFS2 = preload("res://migration_tools/gdscript_converters/fs2_parsers/sexp_parser.gd")
+const GlobalConstants = preload("res://scripts/globals/global_constants.gd")
 
 # --- Parser State ---
-var _lines: PackedStringArray
-var _current_line_num: int = 0 # Local counter
-
-# --- SEXP Operator Mapping (Placeholder - Copied for now, centralize later) ---
-const OPERATOR_MAP: Dictionary = {
-	"true": SexpNode.SexpOperator.OP_TRUE, "false": SexpNode.SexpOperator.OP_FALSE,
-	"and": SexpNode.SexpOperator.OP_AND, "or": SexpNode.SexpOperator.OP_OR, "not": SexpNode.SexpOperator.OP_NOT,
-	"event-true": SexpNode.SexpOperator.OP_EVENT_TRUE, "goal-true": SexpNode.SexpOperator.OP_GOAL_TRUE,
-	"is-destroyed": SexpNode.SexpOperator.OP_IS_DESTROYED,
-	# ... add all others ...
-}
+# Inherited: _lines, _current_line_num
+var _sexp_parser = SexpParserFS2.new()
 
 # --- Main Parse Function ---
 # Takes the full list of lines and the starting index for this section.
@@ -33,17 +25,16 @@ func parse(lines_array: PackedStringArray, start_line_index: int) -> Dictionary:
 
 	# Loop through $Type: blocks for each goal definition
 	while _peek_line() != null and _peek_line().begins_with("$Type:"):
-		var goal_data = _parse_single_goal()
+		var goal_data: MissionObjectiveData = _parse_single_goal()
 		if goal_data:
 			goals_array.append(goal_data)
 		else:
 			# Error occurred in parsing this goal, try to recover
 			printerr(f"Failed to parse goal starting near line {_current_line_num}. Attempting to skip to next '$Type:' or '#'.")
-			while true:
-				var line = _peek_line()
-				if line == null or line.begins_with("$Type:") or line.begins_with("#"):
-					break
-				_read_line() # Consume the problematic lines
+			_skip_to_next_section_or_token("$Type:")
+
+	# Skip any remaining lines until the next section marker '#'
+	_skip_to_next_section_or_token("#")
 
 	print(f"Finished parsing #Goals section. Found {goals_array.size()} goals.")
 	return { "data": goals_array, "next_line": _current_line_num }
@@ -56,16 +47,13 @@ func _parse_single_goal() -> MissionObjectiveData:
 
 	# Parse Goal Type
 	var type_str = _parse_required_token("$Type:")
-	match type_str.to_lower():
-		"primary": goal_data.objective_type = GlobalConstants.GoalType.PRIMARY
-		"secondary": goal_data.objective_type = GlobalConstants.GoalType.SECONDARY
-		"bonus": goal_data.objective_type = GlobalConstants.GoalType.BONUS
-		_:
-			printerr(f"Unknown goal type '{type_str}' at line {_current_line_num}")
-			goal_data.objective_type = GlobalConstants.GoalType.PRIMARY # Default?
+	if type_str == null: return null
+	goal_data.objective_type = GlobalConstants.lookup_goal_type(type_str)
 
 	# Parse Name
-	goal_data.objective_name = _parse_required_token("+Name:")
+	var name_str = _parse_required_token("+Name:")
+	if name_str == null: return null
+	goal_data.objective_name = name_str
 
 	# Parse Message (can be $Message: or $MessageNew:)
 	var msg_token = _parse_optional_token("$Message:")
@@ -73,102 +61,40 @@ func _parse_single_goal() -> MissionObjectiveData:
 		goal_data.message = msg_token # Single line message
 	else:
 		# Consume $MessageNew: token before parsing multi-text
-		_parse_required_token("$MessageNew:")
+		if not _parse_required_token("$MessageNew:"): return null
 		goal_data.message = _parse_multitext()
 
-	# Optional Rating (not stored in MissionObjectiveData)
-	_parse_optional_token("$Rating:")
+	# Optional Rating
+	var rating_str = _parse_optional_token("$Rating:")
+	goal_data.rating = int(rating_str) if rating_str != null and rating_str.is_valid_int() else 0
 
 	# Parse SEXP Formula
-	var formula_str = _parse_required_token("$Formula:")
-	goal_data.formula = _parse_sexp(formula_str) # Assuming _parse_sexp handles raw string
+	if not _parse_required_token("$Formula:"): return null
+	var sexp_result = _sexp_parser.parse_sexp_from_string_array(_lines, _current_line_num)
+	if sexp_result and sexp_result.has("sexp_node") and sexp_result["sexp_node"] != null:
+		goal_data.formula = sexp_result["sexp_node"]
+		_current_line_num = sexp_result["next_line"] # Update line number
+		print(f"Parsed SEXP formula for goal '{goal_data.objective_name}', next line is {_current_line_num}")
+	else:
+		printerr(f"GoalsParser: Failed to parse SEXP formula for goal '{goal_data.objective_name}'")
+		return null # Fail parsing this goal if SEXP is invalid
 
 	# Optional Flags
 	if _parse_optional_token("+Invalid:") != null or _parse_optional_token("+Invalid") != null:
-		goal_data.objective_type |= GlobalConstants.GoalType.INVALID # Combine with type using bitwise OR
+		goal_data.objective_type |= GlobalConstants.GOAL_FLAG_INVALID
 
 	if _parse_optional_token("+No music") != null:
-		# TODO: Define MGF_NO_MUSIC in GlobalConstants if not already present
-		# goal_data.flags |= GlobalConstants.MGF_NO_MUSIC # Placeholder
-		pass
+		goal_data.flags |= GlobalConstants.MGF_NO_MUSIC
 
 	# Optional Score
-	goal_data.score = int(_parse_optional_token("+Score:") or "0")
+	var score_str = _parse_optional_token("+Score:")
+	goal_data.score = int(score_str) if score_str != null and score_str.is_valid_int() else 0
 
 	# Optional Team
-	goal_data.team = int(_parse_optional_token("+Team:") or "0")
+	var team_str = _parse_optional_token("+Team:")
+	if team_str != null:
+		goal_data.team = GlobalConstants.lookup_iff_index(team_str)
+	else:
+		goal_data.team = 0 # Default team if not specified
 
 	return goal_data
-
-
-# --- Helper Functions (Duplicated for now, move to Base later) ---
-
-func _peek_line() -> String:
-	if _current_line_num < _lines.size():
-		return _lines[_current_line_num].strip_edges()
-	return null
-
-func _read_line() -> String:
-	var line = _peek_line()
-	if line != null:
-		_current_line_num += 1
-	return line
-
-func _skip_whitespace_and_comments():
-	while true:
-		var line = _peek_line()
-		if line == null: break
-		if line and not line.begins_with(';'): break
-		_current_line_num += 1
-
-func _parse_required_token(expected_token: String) -> String:
-	_skip_whitespace_and_comments()
-	var line = _read_line()
-	if line == null or not line.begins_with(expected_token):
-		printerr(f"Error: Expected '{expected_token}' but found '{line}' at line {_current_line_num}")
-		return ""
-	return line.substr(expected_token.length()).strip_edges()
-
-func _parse_optional_token(expected_token: String) -> String:
-	_skip_whitespace_and_comments()
-	var line = _peek_line()
-	if line != null and line.begins_with(expected_token):
-		_read_line()
-		return line.substr(expected_token.length()).strip_edges()
-	return null
-
-func _parse_multitext() -> String:
-	var text_lines: PackedStringArray = []
-	while true:
-		var line = _read_line()
-		if line == null:
-			printerr("Error: Unexpected end of file while parsing multi-text")
-			break
-		if line.strip_edges() == "#end_multi_text":
-			break
-		text_lines.append(line)
-	return "\n".join(text_lines)
-
-func _parse_sexp(sexp_string_raw : String) -> SexpNode:
-	# TODO: Implement actual SEXP parsing
-	print(f"Warning: SEXP parsing not implemented. Placeholder for: {sexp_string_raw.left(50)}...")
-	var node = SexpNode.new()
-	# Placeholder logic
-	if sexp_string_raw == "(true)":
-		node.node_type = SexpNode.SexpNodeType.ATOM
-		node.atom_subtype = SexpNode.SexpAtomSubtype.OPERATOR
-		node.text = "true"
-		node.op_code = OPERATOR_MAP.get("true", -1)
-	elif sexp_string_raw == "(false)":
-		node.node_type = SexpNode.SexpNodeType.ATOM
-		node.atom_subtype = SexpNode.SexpAtomSubtype.OPERATOR
-		node.text = "false"
-		node.op_code = OPERATOR_MAP.get("false", -1)
-	else:
-		node.node_type = SexpNode.SexpNodeType.LIST
-		var child_node = SexpNode.new()
-		child_node.node_type = SexpNode.SexpNodeType.ATOM
-		child_node.atom_subtype = SexpNode.SexpAtomSubtype.STRING
-		child_node.text = sexp_string_raw
-		node.children.append(child_node)
-	return node

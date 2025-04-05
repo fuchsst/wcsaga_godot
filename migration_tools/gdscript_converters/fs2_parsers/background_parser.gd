@@ -1,13 +1,12 @@
 # migration_tools/gdscript_converters/fs2_parsers/background_parser.gd
-extends RefCounted # Or BaseFS2Parser
+extends BaseFS2Parser
 class_name BackgroundParser
 
 # --- Dependencies ---
 # None specific needed for basic parsing, but might need constants later
 
 # --- Parser State ---
-var _lines: PackedStringArray
-var _current_line_num: int = 0 # Local counter
+# Inherited: _lines, _current_line_num
 
 # --- Main Parse Function ---
 # Takes the full list of lines and the starting index for this section.
@@ -25,7 +24,6 @@ func parse(lines_array: PackedStringArray, start_line_index: int) -> Dictionary:
 		"nebula_bank": 0,
 		"nebula_heading": 0,
 		"envmap_name": "",
-		# TODO: Add fields for suns and star bitmaps if needed
 		"suns": [],
 		"star_bitmaps": []
 	}
@@ -102,39 +100,3 @@ func parse(lines_array: PackedStringArray, start_line_index: int) -> Dictionary:
 	print("Finished parsing #Background bitmaps section.")
 	return { "data": background_data, "next_line": _current_line_num }
 
-
-# --- Helper Functions (Duplicated for now, move to Base later) ---
-
-func _peek_line() -> String:
-	if _current_line_num < _lines.size():
-		return _lines[_current_line_num].strip_edges()
-	return null
-
-func _read_line() -> String:
-	var line = _peek_line()
-	if line != null:
-		_current_line_num += 1
-	return line
-
-func _skip_whitespace_and_comments():
-	while true:
-		var line = _peek_line()
-		if line == null: break
-		if line and not line.begins_with(';'): break
-		_current_line_num += 1
-
-func _parse_required_token(expected_token: String) -> String:
-	_skip_whitespace_and_comments()
-	var line = _read_line()
-	if line == null or not line.begins_with(expected_token):
-		printerr(f"Error: Expected '{expected_token}' but found '{line}' at line {_current_line_num}")
-		return ""
-	return line.substr(expected_token.length()).strip_edges()
-
-func _parse_optional_token(expected_token: String) -> String:
-	_skip_whitespace_and_comments()
-	var line = _peek_line()
-	if line != null and line.begins_with(expected_token):
-		_read_line()
-		return line.substr(expected_token.length()).strip_edges()
-	return null

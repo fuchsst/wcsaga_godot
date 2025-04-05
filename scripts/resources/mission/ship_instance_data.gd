@@ -24,6 +24,7 @@ extends Resource
 @export var cargo1_name: String = "Nothing" # Name of the cargo (lookup index later)
 @export var flags: int = 0 # Corresponds to P_SF_* flags
 @export var flags2: int = 0 # Corresponds to P2_SF2_* flags
+@export var escort_priority: int = 0 # Priority if this ship is an escort target
 @export var orders_accepted: int = -1 # Bitmask for allowed orders (-1 means use default)
 @export var group: int = 0 # Multiplayer grouping?
 @export var score: int = 0 # Points for destroying this ship
@@ -32,6 +33,7 @@ extends Resource
 @export var hotkey: int = -1 # 0-9 for F5-F12, -1 for none
 @export var respawn_priority: int = 0 # For multiplayer respawn ordering
 @export var net_signature: int = 0 # Network signature for multiplayer
+@export var kamikaze_damage: float = 0.0 # Damage dealt on kamikaze attack
 
 # --- Arrival / Departure ---
 @export var arrival_location: int = 0 # Enum: ARRIVE_AT_LOCATION, etc.
@@ -88,3 +90,4 @@ extends Resource
 @export var wing_status_wing_index: int = -1 # Runtime HUD info
 @export var wing_status_wing_pos: int = -1 # Runtime HUD info
 @export var respawn_count: int = 0 # Runtime multiplayer info
+@export var alternate_iff_colors: Dictionary = {} # Key: team index (int), Value: Color override (Color)

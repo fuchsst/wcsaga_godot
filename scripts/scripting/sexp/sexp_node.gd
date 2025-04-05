@@ -88,42 +88,16 @@ func get_child(index: int) -> SexpNode:
 
 func _get_property_list() -> Array:
 	var properties: Array = []
+	# TODO: Implement logic to conditionally add properties based on node_type/atom_subtype
+	# Example:
+	# properties.append({"name": "node_type", "type": TYPE_INT, "usage": PROPERTY_USAGE_DEFAULT})
+	# if node_type == SexpConstants.SEXP_ATOM:
+	# 	properties.append({"name": "atom_subtype", "type": TYPE_INT, "usage": PROPERTY_USAGE_DEFAULT})
+	# 	properties.append({"name": "text", "type": TYPE_STRING, "usage": PROPERTY_USAGE_DEFAULT})
+	# 	if atom_subtype == SexpConstants.SEXP_ATOM_OPERATOR:
+	# 		properties.append({"name": "op_code", "type": TYPE_INT, "usage": PROPERTY_USAGE_DEFAULT})
+	# elif node_type == SexpConstants.SEXP_LIST:
+	# 	properties.append({"name": "children", "type": TYPE_ARRAY, "usage": PROPERTY_USAGE_DEFAULT, "hint": PROPERTY_HINT_ARRAY_TYPE, "hint_string": "%d/%d:%s" % [Variant.Type.OBJECT, PROPERTY_HINT_RESOURCE_TYPE, "SexpNode"]})
 
-	properties.append({
-		"name": "node_type",
-		"type": TYPE_INT,
-		"usage": PROPERTY_USAGE_DEFAULT,
-		"hint": PROPERTY_HINT_ENUM,
-		"hint_string": "Not Used:%d,List:%d,Atom:%d" % [SexpConstants.SEXP_NOT_USED, SexpConstants.SEXP_LIST, SexpConstants.SEXP_ATOM]
-	})
-
-	if node_type == SexpConstants.SEXP_ATOM:
-		properties.append({
-			"name": "atom_subtype",
-			"type": TYPE_INT,
-			"usage": PROPERTY_USAGE_DEFAULT,
-			"hint": PROPERTY_HINT_ENUM,
-			"hint_string": "List:%d,Operator:%d,Number:%d,String:%d" % [SexpConstants.SEXP_ATOM_LIST, SexpConstants.SEXP_ATOM_OPERATOR, SexpConstants.SEXP_ATOM_NUMBER, SexpConstants.SEXP_ATOM_STRING]
-		})
-		properties.append({
-			"name": "text",
-			"type": TYPE_STRING,
-			"usage": PROPERTY_USAGE_DEFAULT
-		})
-		if atom_subtype == SexpConstants.SEXP_ATOM_OPERATOR:
-			properties.append({
-				"name": "op_code",
-				"type": TYPE_INT,
-				"usage": PROPERTY_USAGE_DEFAULT
-				# TODO: Could add hint_string with operator names if feasible
-			})
-	elif node_type == SexpConstants.SEXP_LIST:
-		properties.append({
-			"name": "children",
-			"type": TYPE_ARRAY,
-			"usage": PROPERTY_USAGE_DEFAULT,
-			"hint": PROPERTY_HINT_ARRAY_TYPE,
-			"hint_string": "%s/%s:%s" % [Variant.Type.OBJECT, PROPERTY_HINT_RESOURCE_TYPE, "SexpNode"] # Specify array holds SexpNode resources
-		})
-
+	# For now, just return the basic list to fix the error
 	return properties

@@ -1,24 +1,41 @@
 # migration_tools/gdscript_converters/fs2_parsers/wings_parser.gd
-extends RefCounted # Or BaseFS2Parser
+extends BaseFS2Parser
 class_name WingsParser
 
 # --- Dependencies ---
 const WingInstanceData = preload("res://scripts/resources/mission/wing_instance_data.gd")
 const SexpNode = preload("res://scripts/scripting/sexp/sexp_node.gd")
-# TODO: Preload AIGoal if needed for parsing $AI Goals:
+const SexpParser = preload("res://migration_tools/gdscript_converters/fs2_parsers/sexp_parser.gd")
+const GlobalConstants = preload("res://scripts/globals/global_constants.gd")
+const AIGoal = preload("res://scripts/resources/ai/ai_goal.gd")
 
 # --- Parser State ---
-var _lines: PackedStringArray
-var _current_line_num: int = 0 # Local counter
+# Inherited: _lines, _current_line_num
+var _sexp_parser = SexpParserFS2.new()
 
-# --- SEXP Operator Mapping (Placeholder - Copied for now, centralize later) ---
-const OPERATOR_MAP: Dictionary = {
-	"true": SexpNode.SexpOperator.OP_TRUE, "false": SexpNode.SexpOperator.OP_FALSE,
-	"and": SexpNode.SexpOperator.OP_AND, "or": SexpNode.SexpOperator.OP_OR, "not": SexpNode.SexpOperator.OP_NOT,
-	"event-true": SexpNode.SexpOperator.OP_EVENT_TRUE, "goal-true": SexpNode.SexpOperator.OP_GOAL_TRUE,
-	"is-destroyed": SexpNode.SexpOperator.OP_IS_DESTROYED,
-	# ... add all others ...
+# --- Mappings (Placeholders - Move to GlobalConstants or dedicated mapping script) ---
+const ARRIVAL_LOCATION_MAP: Dictionary = {
+	"Hyperspace": 0, "Near Ship": 1, "In front of ship": 2, "Docking Bay": 3,
 }
+const DEPARTURE_LOCATION_MAP: Dictionary = {
+	"Hyperspace": 0, "Docking Bay": 1,
+}
+
+# --- Wing Flag Mappings (Based on C++ WF_* defines) ---
+const WING_FLAG_MAP: Dictionary = {
+	"ignore-count": GlobalConstants.WF_IGNORE_COUNT,
+	"reinforcement": GlobalConstants.WF_REINFORCEMENT,
+	"no-arrival-music": GlobalConstants.WF_NO_ARRIVAL_MUSIC,
+	"no-arrival-message": GlobalConstants.WF_NO_ARRIVAL_MESSAGE,
+	"no-arrival-warp": GlobalConstants.WF_NO_ARRIVAL_WARP,
+	"no-departure-warp": GlobalConstants.WF_NO_DEPARTURE_WARP,
+	"no-dynamic": GlobalConstants.WF_NO_DYNAMIC,
+	"nav-carry-status": GlobalConstants.WF_NAV_CARRY,
+	"no-arrival-log": GlobalConstants.WF_NO_ARRIVAL_LOG,
+	"no-departure-log": GlobalConstants.WF_NO_DEPARTURE_LOG,
+	# Add other flags as needed (e.g., WF_EXPANDED, WF_RESET_REINFORCEMENT - though these might be runtime)
+}
+
 
 # --- Main Parse Function ---
 # Takes the full list of lines and the starting index for this section.
@@ -33,17 +50,16 @@ func parse(lines_array: PackedStringArray, start_line_index: int) -> Dictionary:
 
 	# Loop through $Name: blocks for each wing definition
 	while _peek_line() != null and _peek_line().begins_with("$Name:"):
-		var wing_data = _parse_single_wing()
+		var wing_data: WingInstanceData = _parse_single_wing()
 		if wing_data:
 			wings_array.append(wing_data)
 		else:
 			# Error occurred in parsing this wing, try to recover
 			printerr(f"Failed to parse wing starting near line {_current_line_num}. Attempting to skip to next '$Name:' or '#'.")
-			while true:
-				var line = _peek_line()
-				if line == null or line.begins_with("$Name:") or line.begins_with("#"):
-					break
-				_read_line() # Consume the problematic lines
+			_skip_to_next_section_or_token("$Name:")
+
+	# Skip any remaining lines until the next section marker '#'
+	_skip_to_next_section_or_token("#")
 
 	print(f"Finished parsing #Wings section. Found {wings_array.size()} wings.")
 	return { "data": wings_array, "next_line": _current_line_num }
@@ -53,138 +69,200 @@ func parse(lines_array: PackedStringArray, start_line_index: int) -> Dictionary:
 func _parse_single_wing() -> WingInstanceData:
 	"""Parses one $Name: block for a wing instance."""
 	var wing_data = WingInstanceData.new()
-	wing_data.wing_name = _parse_required_token("$Name:")
+
+	var name_str = _parse_required_token("$Name:")
+	if name_str == null: return null
+	wing_data.wing_name = name_str
 
 	# Optional Squad Logo
 	var logo_str = _parse_optional_token("+Squad Logo:")
-	if logo_str != null: wing_data.squad_logo_filename = logo_str
+	if logo_str != null and logo_str.to_lower() != "none":
+		# Assuming logo is PNG in interface/squads
+		wing_data.squad_logo_filename = "res://assets/interface/squads/" + logo_str.get_basename() + ".png"
+	else:
+		wing_data.squad_logo_filename = ""
 
-	wing_data.num_waves = int(_parse_required_token("$Waves:"))
-	wing_data.wave_threshold = int(_parse_required_token("$Wave Threshold:"))
-	wing_data.special_ship_index = int(_parse_required_token("$Special Ship:"))
+
+	var waves_str = _parse_required_token("$Waves:")
+	if waves_str == null: return null
+	wing_data.num_waves = waves_str.to_int()
+
+	var threshold_str = _parse_required_token("$Wave Threshold:")
+	if threshold_str == null: return null
+	wing_data.wave_threshold = threshold_str.to_int()
+
+	var special_ship_str = _parse_required_token("$Special Ship:")
+	if special_ship_str == null: return null
+	wing_data.special_ship_index = special_ship_str.to_int()
 
 	# --- Arrival ---
 	var arrival_loc_str = _parse_required_token("$Arrival Location:")
-	# TODO: Convert arrival_loc_str to enum/int
-	# wing_data.arrival_location = GlobalConstants.lookup_arrival_location(arrival_loc_str)
-	wing_data.arrival_distance = int(_parse_optional_token("+Arrival Distance:") or "0")
+	if arrival_loc_str == null: return null
+	wing_data.arrival_location = ARRIVAL_LOCATION_MAP.get(arrival_loc_str, 0) # Default Hyperspace
+
+	var arrival_dist_str = _parse_optional_token("+Arrival Distance:")
+	wing_data.arrival_distance = int(arrival_dist_str) if arrival_dist_str != null and arrival_dist_str.is_valid_int() else 0
+
 	wing_data.arrival_anchor_name = _parse_optional_token("$Arrival Anchor:") or ""
-	# TODO: Parse Arrival Paths (+Arrival Paths:) - How is this stored? Bitmask or list?
-	_parse_optional_token("+Arrival Paths:") # Consume for now
-	wing_data.arrival_delay_ms = int(_parse_optional_token("+Arrival delay:") or "0") * 1000 # Note: FS2 uses '+Arrival delay:'
-	var arrival_cue_str = _parse_required_token("$Arrival Cue:")
-	if arrival_cue_str.begins_with("$Formula:"):
-		arrival_cue_str = arrival_cue_str.substr(len("$Formula:")).strip_edges()
-		wing_data.arrival_cue_sexp = _parse_sexp(arrival_cue_str)
+
+	# Arrival Paths
+	var arrival_paths_str = _parse_optional_token("+Arrival Paths:")
+	if arrival_paths_str != null:
+		wing_data.arrival_path_name = arrival_paths_str # Store name, resolve later
+
+	var arrival_delay_str = _parse_optional_token("+Arrival delay:") # Note: FS2 uses '+Arrival delay:'
+	wing_data.arrival_delay_ms = int(arrival_delay_str) * 1000 if arrival_delay_str != null and arrival_delay_str.is_valid_int() else 0
+
+	# Arrival Cue SEXP
+	if not _parse_required_token("$Arrival Cue:"): return null
+	var next_line_peek = _peek_line()
+	if next_line_peek != null and next_line_peek.begins_with("("): # Check if SEXP follows directly
+		var sexp_result = _sexp_parser.parse_sexp_from_string_array(_lines, _current_line_num)
+		if sexp_result and sexp_result.has("sexp_node") and sexp_result["sexp_node"] != null:
+			wing_data.arrival_cue_sexp = sexp_result["sexp_node"]
+			_current_line_num = sexp_result["next_line"]
+		else:
+			printerr(f"WingsParser: Failed to parse SEXP for Arrival Cue for wing {wing_data.wing_name}")
+			# Continue, cue will be null
+	else:
+		print(f"Warning: Assuming simple/empty Arrival Cue for wing {wing_data.wing_name}")
+		pass # Cue remains null
 
 	# --- Departure ---
 	var departure_loc_str = _parse_required_token("$Departure Location:")
-	# TODO: Convert departure_loc_str to enum/int
-	# wing_data.departure_location = GlobalConstants.lookup_departure_location(departure_loc_str)
+	if departure_loc_str == null: return null
+	wing_data.departure_location = DEPARTURE_LOCATION_MAP.get(departure_loc_str, 0) # Default Hyperspace
+
 	wing_data.departure_anchor_name = _parse_optional_token("$Departure Anchor:") or ""
-	# TODO: Parse Departure Paths (+Departure Paths:)
-	_parse_optional_token("+Departure Paths:") # Consume for now
-	wing_data.departure_delay_ms = int(_parse_optional_token("+Departure delay:") or "0") * 1000 # Note: FS2 uses '+Departure delay:'
-	var departure_cue_str = _parse_required_token("$Departure Cue:")
-	if departure_cue_str.begins_with("$Formula:"):
-		departure_cue_str = departure_cue_str.substr(len("$Formula:")).strip_edges()
-		wing_data.departure_cue_sexp = _parse_sexp(departure_cue_str)
+
+	# Departure Paths
+	var departure_paths_str = _parse_optional_token("+Departure Paths:")
+	if departure_paths_str != null:
+		wing_data.departure_path_name = departure_paths_str # Store name, resolve later
+
+	var departure_delay_str = _parse_optional_token("+Departure delay:") # Note: FS2 uses '+Departure delay:'
+	wing_data.departure_delay_ms = int(departure_delay_str) * 1000 if departure_delay_str != null and departure_delay_str.is_valid_int() else 0
+
+	# Departure Cue SEXP
+	if not _parse_required_token("$Departure Cue:"): return null
+	next_line_peek = _peek_line()
+	if next_line_peek != null and next_line_peek.begins_with("("): # Check if SEXP follows directly
+		var sexp_result = _sexp_parser.parse_sexp_from_string_array(_lines, _current_line_num)
+		if sexp_result and sexp_result.has("sexp_node") and sexp_result["sexp_node"] != null:
+			wing_data.departure_cue_sexp = sexp_result["sexp_node"]
+			_current_line_num = sexp_result["next_line"]
+		else:
+			printerr(f"WingsParser: Failed to parse SEXP for Departure Cue for wing {wing_data.wing_name}")
+			# Continue, cue will be null
+	else:
+		print(f"Warning: Assuming simple/empty Departure Cue for wing {wing_data.wing_name}")
+		pass # Cue remains null
 
 	# --- Ships in Wing ---
 	var ships_line = _parse_required_token("$Ships:")
-	# FS2 stores ship names directly here, separated by spaces/tabs/commas?
-	# Need to handle potential quotes around names. Assume space-separated for now.
-	# Use regex or more robust splitting if needed.
-	var raw_names = ships_line.split(" ", false) # Split by space, don't skip empty
-	for name in raw_names:
-		var clean_name = name.strip_edges()
-		if clean_name: # Add only non-empty names
+	if ships_line == null: return null
+	# Split by comma first, then handle potential quotes and spaces
+	var ship_name_parts = ships_line.split(",", false)
+	for part in ship_name_parts:
+		var clean_name = part.strip_edges().trim_prefix('"').trim_suffix('"')
+		if clean_name:
 			wing_data.ship_names.append(clean_name)
 
 	# --- AI Goals ---
-	var ai_goals_str = _parse_optional_token("$AI Goals:")
-	if ai_goals_str != null and ai_goals_str.begins_with("$Formula:"):
-		ai_goals_str = ai_goals_str.substr(len("$Formula:")).strip_edges()
-		# TODO: Parse the SEXP and potentially convert it into an array of AIGoal resources
-		# This requires defining AIGoal resource and how SEXPs map to it.
-		# For now, maybe store the raw SEXP node?
-		# wing_data.ai_goals = [_parse_sexp(ai_goals_str)] # Placeholder: Store root SEXP
-		print(f"TODO: Parse AI Goals SEXP for wing {wing_data.wing_name}")
-
+	next_line_peek = _peek_line()
+	if next_line_peek != null and next_line_peek.begins_with("$AI Goals:"):
+		_read_line() # Consume the token line
+		var sexp_result = _sexp_parser.parse_sexp_from_string_array(_lines, _current_line_num)
+		if sexp_result and sexp_result.has("sexp_node") and sexp_result["sexp_node"] != null:
+			var goal_sexp = sexp_result["sexp_node"]
+			wing_data.ai_goals = _convert_sexp_to_ai_goals(goal_sexp)
+			_current_line_num = sexp_result["next_line"]
+		else:
+			printerr(f"WingsParser: Failed to parse SEXP for AI Goals for wing {wing_data.wing_name}")
+			# Continue parsing wing, but goals will be empty
 
 	# --- Hotkey ---
-	wing_data.hotkey = int(_parse_optional_token("+Hotkey:") or "-1")
+	var hotkey_str = _parse_optional_token("+Hotkey:")
+	wing_data.hotkey = int(hotkey_str) if hotkey_str != null and hotkey_str.is_valid_int() else -1
 
 	# --- Flags ---
-	# TODO: Implement robust flag parsing based on GlobalConstants definitions for WF_* flags
 	var flags_str = _parse_optional_token("+Flags:")
 	if flags_str != null:
-		# wing_data.flags = _parse_flags_bitmask(flags_str, GlobalConstants.WingFlags) # Placeholder
-		pass
+		wing_data.flags = _parse_flags_bitmask(flags_str, WING_FLAG_MAP)
 
 	# --- Wave Delay ---
-	wing_data.wave_delay_min = int(_parse_optional_token("+Wave Delay Min:") or "0") * 1000
-	wing_data.wave_delay_max = int(_parse_optional_token("+Wave Delay Max:") or "0") * 1000
+	var wave_min_str = _parse_optional_token("+Wave Delay Min:")
+	wing_data.wave_delay_min = int(wave_min_str) * 1000 if wave_min_str != null and wave_min_str.is_valid_int() else 0
+
+	var wave_max_str = _parse_optional_token("+Wave Delay Max:")
+	wing_data.wave_delay_max = int(wave_max_str) * 1000 if wave_max_str != null and wave_max_str.is_valid_int() else 0
 
 	return wing_data
 
 
-# --- Helper Functions (Duplicated for now, move to Base later) ---
+func _convert_sexp_to_ai_goals(sexp_node: SexpNode) -> Array[AIGoal]:
+	"""Converts a SEXP node tree (list of lists) into an array of AIGoal resources."""
+	var goals_array: Array[AIGoal] = []
+	if sexp_node == null or sexp_node.node_type != SexpConstants.SEXP_LIST:
+		printerr("WingsParser: AI Goals SEXP is not a list or is null.")
+		return goals_array
 
-func _peek_line() -> String:
-	if _current_line_num < _lines.size():
-		return _lines[_current_line_num].strip_edges()
-	return null
+	for child_node in sexp_node.children:
+		if child_node.node_type != SexpConstants.SEXP_LIST or child_node.children.is_empty():
+			printerr("WingsParser: AI Goal entry is not a list or is empty.")
+			continue
 
-func _read_line() -> String:
-	var line = _peek_line()
-	if line != null:
-		_current_line_num += 1
-	return line
+		var goal_res = AIGoal.new()
+		var op_node = child_node.children[0]
 
-func _skip_whitespace_and_comments():
-	while true:
-		var line = _peek_line()
-		if line == null: break
-		if line and not line.begins_with(';'): break
-		_current_line_num += 1
+		if op_node.node_type != SexpConstants.SEXP_ATOM or op_node.atom_subtype != SexpConstants.SEXP_ATOM_OPERATOR:
+			printerr("WingsParser: First element of AI Goal list is not an operator.")
+			continue
 
-func _parse_required_token(expected_token: String) -> String:
-	_skip_whitespace_and_comments()
-	var line = _read_line()
-	if line == null or not line.begins_with(expected_token):
-		printerr(f"Error: Expected '{expected_token}' but found '{line}' at line {_current_line_num}")
-		return ""
-	return line.substr(expected_token.length()).strip_edges()
+		goal_res.ai_mode = op_node.op_code # Assuming op_code maps directly to AI mode enum
+		goal_res.priority = -1 # Default priority, FS2 might not specify it here
 
-func _parse_optional_token(expected_token: String) -> String:
-	_skip_whitespace_and_comments()
-	var line = _peek_line()
-	if line != null and line.begins_with(expected_token):
-		_read_line()
-		return line.substr(expected_token.length()).strip_edges()
-	return null
+		# Parse arguments based on the operator (ai_mode)
+		# This requires knowing the argument structure for each AI goal SEXP
+		# Example placeholder logic:
+		match goal_res.ai_mode:
+			GlobalConstants.AI_GOAL_CHASE_ANY, \
+			GlobalConstants.AI_GOAL_DESTROY_SUBSYSTEM, \
+			GlobalConstants.AI_GOAL_DISABLE_SHIP, \
+			GlobalConstants.AI_GOAL_DISARM_SHIP, \
+			GlobalConstants.AI_GOAL_GUARD, \
+			GlobalConstants.AI_GOAL_ATTACK_ANY, \
+			GlobalConstants.AI_GOAL_IGNORE, \
+			GlobalConstants.AI_GOAL_IGNORE_NEW, \
+			GlobalConstants.AI_GOAL_KEEP_SAFE_DISTANCE, \
+			GlobalConstants.AI_GOAL_STAY_NEAR_SHIP, \
+			GlobalConstants.AI_GOAL_DOCK:
+				if child_node.children.size() > 1:
+					var target_node = child_node.children[1]
+					if target_node.node_type == SexpConstants.SEXP_ATOM:
+						goal_res.target_name = target_node.text # Store name, resolve later
+					else: printerr("WingsParser: Expected atom for target name in AI Goal.")
+				else: printerr("WingsParser: Missing target name for AI Goal.")
+				# TODO: Parse optional priority if present (usually last arg?)
 
-func _parse_sexp(sexp_string_raw : String) -> SexpNode:
-	# TODO: Implement actual SEXP parsing
-	print(f"Warning: SEXP parsing not implemented. Placeholder for: {sexp_string_raw.left(50)}...")
-	var node = SexpNode.new()
-	# Placeholder logic
-	if sexp_string_raw == "(true)":
-		node.node_type = SexpNode.SexpNodeType.ATOM
-		node.atom_subtype = SexpNode.SexpAtomSubtype.OPERATOR
-		node.text = "true"
-		node.op_code = OPERATOR_MAP.get("true", -1)
-	elif sexp_string_raw == "(false)":
-		node.node_type = SexpNode.SexpNodeType.ATOM
-		node.atom_subtype = SexpNode.SexpAtomSubtype.OPERATOR
-		node.text = "false"
-		node.op_code = OPERATOR_MAP.get("false", -1)
-	else:
-		node.node_type = SexpNode.SexpNodeType.LIST
-		var child_node = SexpNode.new()
-		child_node.node_type = SexpNode.SexpNodeType.ATOM
-		child_node.atom_subtype = SexpNode.SexpAtomSubtype.STRING
-		child_node.text = sexp_string_raw
-		node.children.append(child_node)
-	return node
+			GlobalConstants.AI_GOAL_WAYPOINTS, \
+			GlobalConstants.AI_GOAL_WAYPOINTS_ONCE:
+				if child_node.children.size() > 1:
+					var path_node = child_node.children[1]
+					if path_node.node_type == SexpConstants.SEXP_ATOM:
+						goal_res.target_name = path_node.text # Store path name
+					else: printerr("WingsParser: Expected atom for path name in AI Goal.")
+				else: printerr("WingsParser: Missing path name for AI Goal.")
+				# TODO: Parse optional priority
+
+			# Add cases for other AI goals (stay-still, form-on-wing, etc.)
+			_:
+				print(f"Warning: AI Goal SEXP conversion not fully implemented for operator code {goal_res.ai_mode}")
+				# Store raw SEXP text as a fallback?
+				# goal_res.raw_sexp_text = child_node.to_string() # Assuming SexpNode has to_string()
+
+		goals_array.append(goal_res)
+
+	return goals_array
+
+# --- Helper Functions are now inherited from BaseFS2Parser ---

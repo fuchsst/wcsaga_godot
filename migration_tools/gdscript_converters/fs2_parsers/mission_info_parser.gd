@@ -1,14 +1,13 @@
 # migration_tools/gdscript_converters/fs2_parsers/mission_info_parser.gd
-extends RefCounted # Or BaseFS2Parser if we add it later
+extends BaseFS2Parser
 class_name MissionInfoParser
 
 # --- Dependencies (Assume these are loaded/available) ---
 const MissionData = preload("res://scripts/resources/mission/mission_data.gd")
-const GlobalConstants = preload("res://scripts/globals/global_constants.gd") # Assuming flags are here
+const GlobalConstants = preload("res://scripts/globals/global_constants.gd")
 
-# --- Parser State (Passed in or managed by main converter) ---
-var _lines: PackedStringArray
-var _current_line_num: int = 0 # Local counter for this parser's scope
+# --- Parser State ---
+# Inherited: _lines, _current_line_num
 
 # --- Main Parse Function ---
 # Takes the full list of lines and the starting index for this section.
@@ -24,11 +23,27 @@ func parse(lines_array: PackedStringArray, start_line_index: int) -> Dictionary:
 	# Required fields
 	# $Version: is read but not directly stored currently
 	var version_str = _parse_required_token("$Version:")
-	mission_info["mission_title"] = _parse_required_token("$Name:")
-	mission_info["author"] = _parse_required_token("$Author:") # Store if needed later
-	mission_info["created"] = _parse_required_token("$Created:") # Store if needed later
-	mission_info["modified"] = _parse_required_token("$Modified:") # Store if needed later
-	mission_info["mission_notes"] = _parse_multitext() # $Notes: consumed by _parse_required_token
+	if version_str == null: return { "data": null, "next_line": _current_line_num }
+
+	var name_str = _parse_required_token("$Name:")
+	if name_str == null: return { "data": null, "next_line": _current_line_num }
+	mission_info["mission_title"] = name_str
+
+	var author_str = _parse_required_token("$Author:")
+	if author_str == null: return { "data": null, "next_line": _current_line_num }
+	mission_info["author"] = author_str # Store if needed later
+
+	var created_str = _parse_required_token("$Created:")
+	if created_str == null: return { "data": null, "next_line": _current_line_num }
+	mission_info["created"] = created_str # Store if needed later
+
+	var modified_str = _parse_required_token("$Modified:")
+	if modified_str == null: return { "data": null, "next_line": _current_line_num }
+	mission_info["modified"] = modified_str # Store if needed later
+
+	# $Notes: token is consumed here, then _parse_multitext reads until next token
+	if not _parse_required_token("$Notes:"): return { "data": null, "next_line": _current_line_num }
+	mission_info["mission_notes"] = _parse_multitext()
 
 	# Optional fields
 	var desc_token = _parse_optional_token("$Mission Desc:")
@@ -46,18 +61,14 @@ func parse(lines_array: PackedStringArray, start_line_index: int) -> Dictionary:
 		print(f"Warning: Using old '+Game Type:' format: {game_type_str}. Prefer '+Game Type Flags:'.")
 		# TODO: Implement mapping from old string names to flags if needed
 		mission_info["game_type"] = 1 # Default to Single Player
+	else:
+		mission_info["game_type"] = 1 # Default if neither is present
 
 	var flags_str = _parse_optional_token("+Flags:")
 	if flags_str != null:
 		mission_info["flags"] = flags_str.to_int()
 	else:
 		mission_info["flags"] = 0
-
-	# Update boolean flags based on MISSION_FLAG_* constants
-	# These will be set on the main MissionData resource later
-	# mission_info["full_nebula"] = (mission_info["flags"] & GlobalConstants.MISSION_FLAG_FULLNEB) != 0
-	# mission_info["red_alert"] = (mission_info["flags"] & GlobalConstants.MISSION_FLAG_RED_ALERT) != 0
-	# mission_info["scramble"] = (mission_info["flags"] & GlobalConstants.MISSION_FLAG_SCRAMBLE) != 0
 
 	# NebAwacs
 	var neb_awacs_str = _parse_optional_token("+NebAwacs:")
@@ -131,69 +142,36 @@ func parse(lines_array: PackedStringArray, start_line_index: int) -> Dictionary:
 
 	# Loading Screens
 	var load640 = _parse_optional_token("$Load Screen 640:")
-	if load640 != null: mission_info["loading_screen_640"] = load640
+	if load640 != null and load640.to_lower() != "none":
+		mission_info["loading_screen_640"] = "res://assets/interface/" + load640.get_basename() + ".png" # Assuming PNG
+	else:
+		mission_info["loading_screen_640"] = ""
 	var load1024 = _parse_optional_token("$Load Screen 1024:")
-	if load1024 != null: mission_info["loading_screen_1024"] = load1024
+	if load1024 != null and load1024.to_lower() != "none":
+		mission_info["loading_screen_1024"] = "res://assets/interface/" + load1024.get_basename() + ".png" # Assuming PNG
+	else:
+		mission_info["loading_screen_1024"] = ""
+
 
 	# Skybox
 	var skybox_model_str = _parse_optional_token("$Skybox model:")
-	if skybox_model_str != null: mission_info["skybox_model"] = skybox_model_str
+	if skybox_model_str != null and skybox_model_str.to_lower() != "none":
+		mission_info["skybox_model"] = "res://assets/models/" + skybox_model_str.get_basename() + ".glb" # Assuming GLB
+	else:
+		mission_info["skybox_model"] = ""
 	var skybox_flags_str = _parse_optional_token("+Skybox Flags:")
-	if skybox_flags_str != null: mission_info["skybox_flags"] = skybox_flags_str.to_int()
+	if skybox_flags_str != null:
+		mission_info["skybox_flags"] = skybox_flags_str.to_int()
+	else:
+		mission_info["skybox_flags"] = GlobalConstants.DEFAULT_NMODEL_FLAGS # Use default if not specified
 
 	# AI Profile
 	var ai_profile_str = _parse_optional_token("$AI Profile:")
 	if ai_profile_str != null: mission_info["ai_profile_name"] = ai_profile_str
 
+	# Skip remaining lines until the next section marker '#'
+	_skip_to_next_section_or_token("#")
+
 	print("Finished parsing #Mission Info section.")
 	# Return the dictionary and the line number *after* the last consumed line
 	return { "data": mission_info, "next_line": _current_line_num }
-
-
-# --- Helper Functions (Duplicated for now, move to Base later) ---
-
-func _peek_line() -> String:
-	if _current_line_num < _lines.size():
-		return _lines[_current_line_num].strip_edges()
-	return null
-
-func _read_line() -> String:
-	var line = _peek_line()
-	if line != null:
-		_current_line_num += 1
-	return line
-
-func _skip_whitespace_and_comments():
-	while true:
-		var line = _peek_line()
-		if line == null: break
-		if line and not line.begins_with(';'): break
-		_current_line_num += 1
-
-func _parse_required_token(expected_token: String) -> String:
-	_skip_whitespace_and_comments()
-	var line = _read_line()
-	if line == null or not line.begins_with(expected_token):
-		printerr(f"Error: Expected '{expected_token}' but found '{line}' at line {_current_line_num}")
-		return ""
-	return line.substr(expected_token.length()).strip_edges()
-
-func _parse_optional_token(expected_token: String) -> String:
-	_skip_whitespace_and_comments()
-	var line = _peek_line()
-	if line != null and line.begins_with(expected_token):
-		_read_line()
-		return line.substr(expected_token.length()).strip_edges()
-	return null
-
-func _parse_multitext() -> String:
-	var text_lines: PackedStringArray = []
-	while true:
-		var line = _read_line()
-		if line == null:
-			printerr("Error: Unexpected end of file while parsing multi-text")
-			break
-		if line.strip_edges() == "#end_multi_text":
-			break
-		text_lines.append(line)
-	return "\n".join(text_lines)

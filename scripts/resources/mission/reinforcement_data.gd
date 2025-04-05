@@ -4,8 +4,10 @@
 class_name ReinforcementData
 extends Resource
 
+enum ReinforcementType { ATTACK_PROTECT = 0, REPAIR_REARM = 1 }
+
 @export var name: String = "" # Name of the ship or wing to reinforce
-@export var type: String = "Attack/Protect" # Type description (e.g., "Attack/Protect", "Repair/Rearm")
+@export var type: ReinforcementType = ReinforcementType.ATTACK_PROTECT # Type of reinforcement (attack/protect or repair/rearm)
 @export var total_uses: int = 1 # How many times this reinforcement can be called
 @export var arrival_delay_seconds: int = 0 # Delay before arrival after being called
 

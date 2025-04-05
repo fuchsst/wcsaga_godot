@@ -21,13 +21,13 @@ const AIGoal = preload("res://scripts/resources/ai/ai_goal.gd")
 @export var arrival_location: int = 0 # Enum: ARRIVE_AT_LOCATION, etc.
 @export var arrival_distance: int = 0
 @export var arrival_anchor_name: String = "" # Name of anchor object/waypoint
-@export var arrival_path_mask: int = -1 # Index into path restrictions or bitmask
+@export var arrival_path_name: String = "" # Name of the path restriction (if any)
 @export var arrival_cue_sexp: SexpNode = null # SexpNode resource
 @export var arrival_delay_ms: int = 0 # Delay in milliseconds after cue is true
 
 @export var departure_location: int = 0 # Corresponds to DEPARTURE_* enum
 @export var departure_anchor_name: String = "" # Name of anchor object/waypoint
-@export var departure_path_mask: int = -1 # Index into path restrictions or bitmask
+@export var departure_path_name: String = "" # Name of the path restriction (if any)
 @export var departure_cue_sexp: SexpNode = null # SexpNode resource
 @export var departure_delay_ms: int = 0 # Delay in milliseconds after cue is true
 

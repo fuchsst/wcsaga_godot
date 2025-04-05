@@ -1,56 +1,80 @@
 # migration_tools/gdscript_converters/fs2_parsers/debriefing_parser.gd
-extends RefCounted # Or BaseFS2Parser
+extends BaseFS2Parser
 class_name DebriefingParser
 
 # --- Dependencies ---
-# TODO: Preload DebriefingData, DebriefingStageData, SexpNode
+const DebriefingData = preload("res://scripts/resources/mission/debriefing_data.gd")
+const DebriefingStageData = preload("res://scripts/resources/mission/debriefing_stage_data.gd")
 const SexpNode = preload("res://scripts/scripting/sexp/sexp_node.gd")
+const SexpParser = preload("res://migration_tools/gdscript_converters/fs2_parsers/sexp_parser.gd")
 
 # --- Parser State ---
-var _lines: PackedStringArray
-var _current_line_num: int = 0
-
-# --- SEXP Operator Mapping (Placeholder) ---
-const OPERATOR_MAP: Dictionary = {
-	"true": SexpNode.SexpOperator.OP_TRUE, "false": SexpNode.SexpOperator.OP_FALSE,
-	# ... add others ...
-}
+# Inherited: _lines, _current_line_num
+var _sexp_parser = SexpParser.new()
 
 # --- Main Parse Function ---
+# Parses a single #Debriefing_info section from the lines array starting at start_line_index.
+# Returns a Dictionary: { "data": DebriefingData, "next_line": int }
 func parse(lines_array: PackedStringArray, start_line_index: int) -> Dictionary:
 	_lines = lines_array
 	_current_line_num = start_line_index
-	var debriefings_array: Array = [] # Array[DebriefingData] - One per team
 
-	print("Parsing #Debriefing_info section(s)...")
-
-	# Similar to Briefing, FS2 might have multiple #Debriefing_info sections for teams.
-	# This parser handles one block at a time.
-
-	var debriefing_data = Resource.new() # Replace with DebriefingData.new()
-	# TODO: Set script path for DebriefingData
-	# debriefing_data.set_script(preload("res://scripts/resources/mission/debriefing_data.gd"))
-	debriefing_data.stages = [] # Initialize stages array
+	var debriefing_data = DebriefingData.new()
 
 	# Parse number of stages
 	var num_stages_str = _parse_required_token("$Num stages:")
-	var num_stages = int(num_stages_str) if num_stages_str.is_valid_int() else 0
-	# debriefing_data.num_stages = num_stages # Store if needed, or just use array size
+	if num_stages_str == null:
+		printerr("DebriefingParser: Expected $Num stages:")
+		return { "data": null, "next_line": _current_line_num }
+	var num_stages = num_stages_str.to_int()
+
+	print(f"Parsing {num_stages} debriefing stages...")
 
 	# Parse each stage
 	var stage_count = 0
 	while _peek_line() != null and _peek_line().begins_with("$Formula:"):
-		var stage_data = _parse_single_stage()
-		if stage_data:
-			debriefing_data.stages.append(stage_data)
+		var stage_data = DebriefingStageData.new()
+
+		# Parse SEXP Formula
+		_read_line() # Consume the $Formula: line itself
+		var sexp_result = _sexp_parser.parse_sexp_from_string_array(_lines, _current_line_num)
+		if sexp_result and sexp_result.has("sexp_node") and sexp_result["sexp_node"] != null:
+			stage_data.formula_sexp = sexp_result["sexp_node"]
+			_current_line_num = sexp_result["next_line"] # Update line number
+			print(f"Parsed SEXP formula for debriefing stage {stage_count}, next line is {_current_line_num}")
 		else:
-			printerr(f"Failed to parse debriefing stage starting near line {_current_line_num}.")
-			# Attempt to skip to the next potential stage start or section end
-			while true:
-				var line = _peek_line()
-				if line == null or line.begins_with("$Formula:") or line.begins_with("#"):
-					break
-				_read_line()
+			printerr(f"DebriefingParser: Failed to parse SEXP formula for stage {stage_count}")
+			# Skip to next potential stage or end of section on SEXP error
+			_skip_to_next_stage_or_section()
+			continue # Try parsing next stage if possible
+
+		# Parse Main Text
+		if not _parse_required_token("$multi text"):
+			printerr(f"DebriefingParser: Expected $multi text for stage {stage_count}")
+			_skip_to_next_stage_or_section()
+			continue
+		stage_data.text = _parse_multitext()
+
+		# Parse Voice Filename
+		var voice_str = _parse_required_token("$Voice:")
+		if voice_str == null:
+			printerr(f"DebriefingParser: Expected $Voice: for stage {stage_count}")
+			_skip_to_next_stage_or_section()
+			continue
+		if voice_str.to_lower() != "none":
+			# Prepend path and assume .ogg format
+			stage_data.voice_path = "res://assets/voices/" + voice_str.get_basename() + ".ogg"
+		else:
+			stage_data.voice_path = "" # Store empty string for "none"
+
+		# Parse Recommendation Text
+		if not _parse_required_token("$Recommendation text:"):
+			printerr(f"DebriefingParser: Expected $Recommendation text: for stage {stage_count}")
+			_skip_to_next_stage_or_section()
+			continue
+		stage_data.recommendation_text = _parse_multitext()
+
+		debriefing_data.stages.append(stage_data)
 		stage_count += 1
 		if stage_count >= num_stages: # Stop after parsing expected number of stages
 			break
@@ -58,107 +82,18 @@ func parse(lines_array: PackedStringArray, start_line_index: int) -> Dictionary:
 	if stage_count != num_stages:
 		printerr(f"Warning: Expected {num_stages} debriefing stages but parsed {stage_count}.")
 
-	# Skip remaining lines until next section
-	while _peek_line() != null and not _peek_line().begins_with("#"):
-		_read_line()
+	# Skip remaining lines until next section marker '#'
+	_skip_to_next_stage_or_section()
 
-	debriefings_array.append(debriefing_data) # Add the parsed data for this team
-
-	print(f"Finished parsing one #Debriefing_info section.")
-	return { "data": debriefing_data, "next_line": _current_line_num } # Return single debriefing data
+	print(f"Finished parsing debriefing section. Consumed lines up to {_current_line_num}")
+	return { "data": debriefing_data, "next_line": _current_line_num }
 
 
-# --- Debriefing Stage Parsing Helper ---
-func _parse_single_stage() -> Dictionary:
-	"""Parses one debriefing stage block."""
-	var stage_data: Dictionary = {} # Use Dictionary for now, replace with DebriefingStageData
 
-	# Parse SEXP Formula
-	var formula_str = _parse_required_token("$Formula:")
-	stage_data["formula"] = _parse_sexp(formula_str) # Assuming _parse_sexp handles raw string
-
-	# Parse Main Text
-	_parse_required_token("$multi text") # Consume token
-	stage_data["main_text"] = _parse_multitext()
-
-	# Parse Voice Filename
-	stage_data["voice_filename"] = _parse_required_token("$Voice:")
-
-	# Parse Recommendation Text
-	_parse_required_token("$Recommendation text:") # Consume token
-	stage_data["recommendation_text"] = _parse_multitext()
-
-	return stage_data
-
-
-# --- Helper Functions (Duplicated for now, move to Base later) ---
-
-func _peek_line() -> String:
-	if _current_line_num < _lines.size():
-		return _lines[_current_line_num].strip_edges()
-	return null
-
-func _read_line() -> String:
-	var line = _peek_line()
-	if line != null:
-		_current_line_num += 1
-	return line
-
-func _skip_whitespace_and_comments():
+func _skip_to_next_stage_or_section():
+	"""Skips lines until the next $Formula or # marker or EOF."""
 	while true:
 		var line = _peek_line()
-		if line == null: break
-		if line and not line.begins_with(';'): break
-		_current_line_num += 1
-
-func _parse_required_token(expected_token: String) -> String:
-	_skip_whitespace_and_comments()
-	var line = _read_line()
-	if line == null or not line.begins_with(expected_token):
-		printerr(f"Error: Expected '{expected_token}' but found '{line}' at line {_current_line_num}")
-		return ""
-	return line.substr(expected_token.length()).strip_edges()
-
-func _parse_optional_token(expected_token: String) -> String:
-	_skip_whitespace_and_comments()
-	var line = _peek_line()
-	if line != null and line.begins_with(expected_token):
+		if line == null or line.begins_with("$Formula:") or line.begins_with("#"):
+			break
 		_read_line()
-		return line.substr(expected_token.length()).strip_edges()
-	return null
-
-func _parse_multitext() -> String:
-	var text_lines: PackedStringArray = []
-	while true:
-		var line = _read_line()
-		if line == null:
-			printerr("Error: Unexpected end of file while parsing multi-text")
-			break
-		if line.strip_edges() == "#end_multi_text":
-			break
-		text_lines.append(line)
-	return "\n".join(text_lines)
-
-func _parse_sexp(sexp_string_raw : String) -> SexpNode:
-	# TODO: Implement actual SEXP parsing
-	print(f"Warning: SEXP parsing not implemented. Placeholder for: {sexp_string_raw.left(50)}...")
-	var node = SexpNode.new()
-	# Placeholder logic
-	if sexp_string_raw == "(true)":
-		node.node_type = SexpNode.SexpNodeType.ATOM
-		node.atom_subtype = SexpNode.SexpAtomSubtype.OPERATOR
-		node.text = "true"
-		node.op_code = OPERATOR_MAP.get("true", -1)
-	elif sexp_string_raw == "(false)":
-		node.node_type = SexpNode.SexpNodeType.ATOM
-		node.atom_subtype = SexpNode.SexpAtomSubtype.OPERATOR
-		node.text = "false"
-		node.op_code = OPERATOR_MAP.get("false", -1)
-	else:
-		node.node_type = SexpNode.SexpNodeType.LIST
-		var child_node = SexpNode.new()
-		child_node.node_type = SexpNode.SexpNodeType.ATOM
-		child_node.atom_subtype = SexpNode.SexpAtomSubtype.STRING
-		child_node.text = sexp_string_raw
-		node.children.append(child_node)
-	return node

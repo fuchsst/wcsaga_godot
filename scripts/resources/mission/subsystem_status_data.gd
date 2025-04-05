@@ -16,7 +16,7 @@ extends Resource
 @export var secondary_ammo_percent: Array[int] = [100]
 
 # AI Class override for turrets
-@export var ai_class_index: int = -999 # Use SUBSYS_STATUS_NO_CHANGE (-999)
+@export var ai_class_name: String = "" # Name of AIProfile resource, empty means no change
 
 # Cargo override for subsystems that can hold cargo
 @export var cargo_name: String = "" # Name of cargo (lookup index later)

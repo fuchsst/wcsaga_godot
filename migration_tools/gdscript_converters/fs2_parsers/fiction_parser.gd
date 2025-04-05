@@ -1,13 +1,12 @@
 # migration_tools/gdscript_converters/fs2_parsers/fiction_parser.gd
-extends RefCounted # Or BaseFS2Parser
+extends BaseFS2Parser # Changed from RefCounted
 class_name FictionParser
 
 # --- Dependencies ---
 # None specific needed for basic parsing
 
 # --- Parser State ---
-var _lines: PackedStringArray
-var _current_line_num: int = 0 # Local counter
+# Inherited: _lines, _current_line_num
 
 # --- Main Parse Function ---
 # Takes the full list of lines and the starting index for this section.
@@ -24,53 +23,25 @@ func parse(lines_array: PackedStringArray, start_line_index: int) -> Dictionary:
 	print("Parsing #Fiction Viewer section...")
 
 	# Required $File:
-	fiction_data["file"] = _parse_required_token("$File:")
+	var file_str = _parse_required_token("$File:")
+	if file_str == null: return { "data": null, "next_line": _current_line_num } # Error handled in helper
+	if file_str and file_str.to_lower() != "none":
+		# Assuming fiction files remain .txt but are moved
+		fiction_data["file"] = "res://assets/fiction/" + file_str.get_file() # Keep extension
+	else:
+		fiction_data["file"] = ""
 
 	# Optional $Font:
 	var font_str = _parse_optional_token("$Font:")
-	if font_str != null:
-		fiction_data["font"] = font_str
+	if font_str != null and font_str.to_lower() != "none":
+		# Assuming fonts are converted to .ttf or .otf
+		# We need to determine the final extension. Let's assume .ttf for now.
+		fiction_data["font"] = "res://assets/fonts/" + font_str.get_basename() + ".ttf"
+	else:
+		fiction_data["font"] = ""
 
 	# Skip any remaining lines until the next section
-	while _peek_line() != null and not _peek_line().begins_with("#"):
-		_read_line()
+	_skip_to_next_section_or_token("#") # Skip until next section marker
 
 	print("Finished parsing #Fiction Viewer section.")
 	return { "data": fiction_data, "next_line": _current_line_num }
-
-
-# --- Helper Functions (Duplicated for now, move to Base later) ---
-
-func _peek_line() -> String:
-	if _current_line_num < _lines.size():
-		return _lines[_current_line_num].strip_edges()
-	return null
-
-func _read_line() -> String:
-	var line = _peek_line()
-	if line != null:
-		_current_line_num += 1
-	return line
-
-func _skip_whitespace_and_comments():
-	while true:
-		var line = _peek_line()
-		if line == null: break
-		if line and not line.begins_with(';'): break
-		_current_line_num += 1
-
-func _parse_required_token(expected_token: String) -> String:
-	_skip_whitespace_and_comments()
-	var line = _read_line()
-	if line == null or not line.begins_with(expected_token):
-		printerr(f"Error: Expected '{expected_token}' but found '{line}' at line {_current_line_num}")
-		return ""
-	return line.substr(expected_token.length()).strip_edges()
-
-func _parse_optional_token(expected_token: String) -> String:
-	_skip_whitespace_and_comments()
-	var line = _peek_line()
-	if line != null and line.begins_with(expected_token):
-		_read_line()
-		return line.substr(expected_token.length()).strip_edges()
-	return null

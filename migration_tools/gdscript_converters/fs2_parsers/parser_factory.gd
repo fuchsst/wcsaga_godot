@@ -18,6 +18,7 @@ const BriefingParser = preload("res://migration_tools/gdscript_converters/fs2_pa
 const DebriefingParser = preload("res://migration_tools/gdscript_converters/fs2_parsers/debriefing_parser.gd")
 const VariablesParser = preload("res://migration_tools/gdscript_converters/fs2_parsers/variables_parser.gd")
 const MusicParser = preload("res://migration_tools/gdscript_converters/fs2_parsers/music_parser.gd")
+const PersonaParser = preload("res://migration_tools/gdscript_converters/fs2_parsers/persona_parser.gd")
 # TODO: Add preloads for other parsers as they are created (Players, Cutscenes, etc.)
 
 
@@ -38,6 +39,7 @@ const PARSER_MAP: Dictionary = {
 	"debriefing_info": DebriefingParser, # Assumes main converter handles multiple team debriefings
 	"sexp_variables": VariablesParser, # Maps #Variables to sexp_variables
 	"music": MusicParser,
+	"personas": PersonaParser,
 	# TODO: Add mappings for other sections
 	# "players": PlayersParser,
 	# "cutscenes": CutscenesParser,

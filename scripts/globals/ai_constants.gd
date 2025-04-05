@@ -180,23 +180,47 @@ enum GoalAchievableState {
 	SATISFIED = 4
 }
 
-# --- Subsystem Types (for targeting preferences, etc.) ---
-# These might need to align with enums defined elsewhere (e.g., in ShipSubsystem)
-enum SubsystemType {
+# --- AI Goal Types (ai_goals.h - AIG_*) ---
+# These map to SEXP operators like 'attack-ship', 'guard-wing', etc.
+# The exact integer values should match the SEXP operator codes if possible.
+enum AIGoalType {
 	NONE = 0,
-	ENGINE = 1,
-	TURRET = 2,
-	RADAR = 3,
-	NAVIGATION = 4,
-	COMMUNICATION = 5,
-	WEAPONS = 6,
-	SENSORS = 7,
-	SOLAR = 8,
-	GAS_COLLECT = 9,
-	ACTIVATION = 10,
-	UNKNOWN = 11
+	GUARD_SHIP = 1,
+	GUARD_WING = 2,
+	ATTACK_SHIP = 3,
+	ATTACK_WING = 4,
+	DISABLE_SHIP = 5,
+	DISABLE_SUBSYSTEM = 6,
+	DISARM_SHIP = 7,
+	IGNORE_SHIP = 8,
+	IGNORE_WING = 9,
+	FORM_ON_WING = 10,
+	UNDOCK = 11,
+	DOCK = 12,
+	WAYPOINTS = 13,
+	WAYPOINTS_ONCE = 14,
+	CHASE_ANY = 15,
+	EVADE_SHIP = 16,
+	STAY_NEAR_SHIP = 17,
+	KEEP_SAFE_DISTANCE = 18,
+	REPAIR_SHIP = 19,
+	REARM_SHIP = 20,
+	WARP_OUT = 21,
+	DESTROY_SUBSYSTEM = 22,
+	GUARD_WAYPOINT_PATH = 23,
+	CHASE_WEAPON = 24,
+	ATTACK_ANY = 25,
+	PLAYER_START_AI = 26,
+	IGNORE_NEW = 27,
+	EVADE_WEAPON = 28,
+	STAY_STILL = 29,
+	PLAY_DEAD = 30,
+	BAY_EMERGE = 31,
+	BAY_DEPART = 32,
+	SENTRYGUN = 33,
+	FLY_TO_SHIP = 34,
+	# MAX_AI_GOALS = 35 # Use count instead
 }
-
 
 # --- AI Profile Flags (AIPF_*) ---
 # Controls AI capabilities/rules, often loaded from ai_profiles.tbl
@@ -227,3 +251,51 @@ const AIPF_FIX_AI_CLASS_BUG = 1 << 31 # Fix for a potential bug related to AI cl
 const AIPF2_TURRETS_IGNORE_TARGET_RADIUS = 1 << 0 # Turrets ignore target radius in range checks
 const AIPF2_CAP_VS_CAP_COLLISIONS = 1 << 1 # Enable collision detection between capital ships
 # TODO: Add other AIPF2 flags from analysis or tables
+
+# --- AI Behavior Lookup (ai.h - AIM_*) ---
+const _ai_behavior_map: Dictionary = {
+	"Chase": AIMode.CHASE,
+	"Evade": AIMode.EVADE,
+	"Get behind": AIMode.GET_BEHIND,
+	"Stay Near": AIMode.STAY_NEAR,
+	"Still": AIMode.STILL,
+	"Guard": AIMode.GUARD,
+	"Avoid": AIMode.AVOID,
+	"Waypoints": AIMode.WAYPOINTS,
+	"Dock": AIMode.DOCK,
+	"None": AIMode.NONE,
+	"Big Ship": AIMode.BIGSHIP,
+	"Path": AIMode.PATH,
+	"Be Rearmed": AIMode.BE_REARMED,
+	"Safety": AIMode.SAFETY,
+	"Evade Weapon": AIMode.EVADE_WEAPON,
+	"Strafe": AIMode.STRAFE,
+	"Play Dead": AIMode.PLAY_DEAD,
+	"Bay Emerge": AIMode.BAY_EMERGE,
+	"Bay Depart": AIMode.BAY_DEPART,
+	"Sentry Gun": AIMode.SENTRYGUN,
+	"Warp Out": AIMode.WARP_OUT,
+	"Fly to Ship": AIMode.FLY_TO_SHIP,
+}
+
+static func lookup_ai_behavior(behavior_name: String) -> int:
+	if _ai_behavior_map.has(behavior_name):
+		return _ai_behavior_map[behavior_name]
+	printerr(f"Unknown AI Behavior name: '{behavior_name}'. Defaulting to NONE.")
+	return AIMode.NONE
+
+# --- AI Class Lookup ---
+# This needs to be populated from ai_classes.tbl or similar
+var ai_class_list: Array[String] = [] # Populated by load_resource_lists
+var _ai_class_name_to_index: Dictionary = {}
+
+static func lookup_ai_class_index(class_name: String) -> int:
+	if class_name.is_empty():
+		return -1 # Or default index?
+	var lower_name = class_name.to_lower()
+	if _ai_class_name_to_index.has(lower_name):
+		return _ai_class_name_to_index[lower_name]
+	printerr(f"AI Class name not found: '{class_name}'")
+	return -1 # Or default index?
+
+# TODO: Load AI Class list in load_resource_lists

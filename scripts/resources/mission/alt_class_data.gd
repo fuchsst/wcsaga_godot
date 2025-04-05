@@ -3,6 +3,6 @@
 class_name AltClassData
 extends Resource
 
-@export var ship_class_index: int = -1 # Index into GlobalConstants ship list
-@export var variable_index: int = -1 # SEXP variable index controlling this class (if any)
-@export var default_to_this_class: bool = false # If this is the default alternate class
+@export var ship_class_name: String = "" # Name of the ShipData resource
+@export var variable_name: String = "" # SEXP variable name controlling this class (if any)
+@export var is_default: bool = false # If this is the default alternate class
