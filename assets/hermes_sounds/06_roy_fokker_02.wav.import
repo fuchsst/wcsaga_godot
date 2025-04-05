@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://jsinfkkiv6ck"
-valid=false
+path="res://.godot/imported/06_roy_fokker_02.wav-34fe4016bef39ca95fb2053b6e4d8811.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/06_roy_fokker_02.wav"
+dest_files=["res://.godot/imported/06_roy_fokker_02.wav-34fe4016bef39ca95fb2053b6e4d8811.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://ba5t6k8yiiyqa"
-valid=false
+path="res://.godot/imported/isis_08.wav-26bbe9f11f73d99a601439d506609b9e.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/isis_08.wav"
+dest_files=["res://.godot/imported/isis_08.wav-26bbe9f11f73d99a601439d506609b9e.sample"]
 
 [params]
 

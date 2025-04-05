@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://b6wh5uvyq1s7o"
-valid=false
+path="res://.godot/imported/11_new_zealand_control_03.wav-7763428d41f1e8874e45156eb94eafe4.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/11_new_zealand_control_03.wav"
+dest_files=["res://.godot/imported/11_new_zealand_control_03.wav-7763428d41f1e8874e45156eb94eafe4.sample"]
 
 [params]
 

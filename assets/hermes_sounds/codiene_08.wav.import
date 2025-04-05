@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dof1f78syjqi3"
-valid=false
+path="res://.godot/imported/codiene_08.wav-14018647a298104ed2d21fc074e7c838.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/codiene_08.wav"
+dest_files=["res://.godot/imported/codiene_08.wav-14018647a298104ed2d21fc074e7c838.sample"]
 
 [params]
 

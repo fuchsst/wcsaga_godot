@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cbxs3sbbv8t7l"
-valid=false
+path="res://.godot/imported/18_vidmaster_02.wav-60c35272b344ed19387c2abe14e49bf0.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/18_vidmaster_02.wav"
+dest_files=["res://.godot/imported/18_vidmaster_02.wav-60c35272b344ed19387c2abe14e49bf0.sample"]
 
 [params]
 

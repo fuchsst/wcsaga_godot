@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bq8kpp6uis2g7"
-valid=false
+path="res://.godot/imported/icefire_19.wav-6320b93212b68f4c1839a0a23834ce02.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/icefire_19.wav"
+dest_files=["res://.godot/imported/icefire_19.wav-6320b93212b68f4c1839a0a23834ce02.sample"]
 
 [params]
 

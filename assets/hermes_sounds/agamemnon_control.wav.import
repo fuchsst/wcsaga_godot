@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dpmv3qc5vvk3i"
-valid=false
+path="res://.godot/imported/agamemnon_control.wav-587ac2ce6a9547eb4e1d053724ee9e27.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/agamemnon_control.wav"
+dest_files=["res://.godot/imported/agamemnon_control.wav-587ac2ce6a9547eb4e1d053724ee9e27.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cj5wq80o8brgd"
-valid=false
+path="res://.godot/imported/45_athena_control_01.wav-4abb05100a53919c3f8e074fae4d9441.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/45_athena_control_01.wav"
+dest_files=["res://.godot/imported/45_athena_control_01.wav-4abb05100a53919c3f8e074fae4d9441.sample"]
 
 [params]
 

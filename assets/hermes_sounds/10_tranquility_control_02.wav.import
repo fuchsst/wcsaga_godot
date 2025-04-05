@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dut231kwjs0t5"
-valid=false
+path="res://.godot/imported/10_tranquility_control_02.wav-0f189ceeb5e489d732af67db3c4e0535.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/10_tranquility_control_02.wav"
+dest_files=["res://.godot/imported/10_tranquility_control_02.wav-0f189ceeb5e489d732af67db3c4e0535.sample"]
 
 [params]
 

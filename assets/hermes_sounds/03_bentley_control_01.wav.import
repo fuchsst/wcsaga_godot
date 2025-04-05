@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://ghdxddqucabp"
-valid=false
+path="res://.godot/imported/03_bentley_control_01.wav-4ef0f5e1213d48513ef7723200f1591f.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/03_bentley_control_01.wav"
+dest_files=["res://.godot/imported/03_bentley_control_01.wav-4ef0f5e1213d48513ef7723200f1591f.sample"]
 
 [params]
 

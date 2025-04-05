@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://4032x6o80o7v"
-valid=false
+path="res://.godot/imported/18_karajorma_01.wav-3f588c823b073f2eaf3e5d9ae85fb75f.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/18_karajorma_01.wav"
+dest_files=["res://.godot/imported/18_karajorma_01.wav-3f588c823b073f2eaf3e5d9ae85fb75f.sample"]
 
 [params]
 

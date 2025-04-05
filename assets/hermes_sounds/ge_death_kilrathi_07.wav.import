@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bfgugna16whrb"
-valid=false
+path="res://.godot/imported/ge_death_kilrathi_07.wav-a203fa8850648a216061a7fc0ed94e06.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/ge_death_kilrathi_07.wav"
+dest_files=["res://.godot/imported/ge_death_kilrathi_07.wav-a203fa8850648a216061a7fc0ed94e06.sample"]
 
 [params]
 

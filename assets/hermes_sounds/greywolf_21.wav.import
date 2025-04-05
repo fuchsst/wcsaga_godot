@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dmkb2ivm0xuo1"
-valid=false
+path="res://.godot/imported/greywolf_21.wav-58ba1de3db3e7362f8270b6f0ff51586.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/greywolf_21.wav"
+dest_files=["res://.godot/imported/greywolf_21.wav-58ba1de3db3e7362f8270b6f0ff51586.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bfrf48kdwnv8b"
-valid=false
+path="res://.godot/imported/50_antfish_01.wav-f5d05ce85f80a51648b18f4c42b8116d.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/50_antfish_01.wav"
+dest_files=["res://.godot/imported/50_antfish_01.wav-f5d05ce85f80a51648b18f4c42b8116d.sample"]
 
 [params]
 

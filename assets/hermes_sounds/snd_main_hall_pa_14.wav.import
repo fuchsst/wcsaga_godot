@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://b517tp7tmkmgh"
-valid=false
+path="res://.godot/imported/snd_main_hall_pa_14.wav-38df1ada9e5cb94daf71d7b3c4c014c1.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/snd_main_hall_pa_14.wav"
+dest_files=["res://.godot/imported/snd_main_hall_pa_14.wav-38df1ada9e5cb94daf71d7b3c4c014c1.sample"]
 
 [params]
 

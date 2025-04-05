@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dncgf5diymn6i"
-valid=false
+path="res://.godot/imported/02_pothead_03.wav-be54003546b710e56dae2d72741105e5.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/02_pothead_03.wav"
+dest_files=["res://.godot/imported/02_pothead_03.wav-be54003546b710e56dae2d72741105e5.sample"]
 
 [params]
 

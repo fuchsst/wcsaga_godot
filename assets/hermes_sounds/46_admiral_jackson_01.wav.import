@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://b1j2afsnguva4"
-valid=false
+path="res://.godot/imported/46_admiral_jackson_01.wav-5835d61489d91aad834c9bd860653028.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/46_admiral_jackson_01.wav"
+dest_files=["res://.godot/imported/46_admiral_jackson_01.wav-5835d61489d91aad834c9bd860653028.sample"]
 
 [params]
 

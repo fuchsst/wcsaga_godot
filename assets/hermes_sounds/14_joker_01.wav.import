@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://mk7otte76v0u"
-valid=false
+path="res://.godot/imported/14_joker_01.wav-c6bbaf8f49d37626ee53aa7957c34768.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/14_joker_01.wav"
+dest_files=["res://.godot/imported/14_joker_01.wav-c6bbaf8f49d37626ee53aa7957c34768.sample"]
 
 [params]
 

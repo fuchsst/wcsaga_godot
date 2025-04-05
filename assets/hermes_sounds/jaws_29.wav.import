@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://knmyvff20nh8"
-valid=false
+path="res://.godot/imported/jaws_29.wav-1ca1aacd9db61b4481439858e79e5acb.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/jaws_29.wav"
+dest_files=["res://.godot/imported/jaws_29.wav-1ca1aacd9db61b4481439858e79e5acb.sample"]
 
 [params]
 

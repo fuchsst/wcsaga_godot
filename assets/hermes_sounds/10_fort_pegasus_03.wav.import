@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bsbaqpjk56du3"
-valid=false
+path="res://.godot/imported/10_fort_pegasus_03.wav-535ce07b07249731642810da18855cf4.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/10_fort_pegasus_03.wav"
+dest_files=["res://.godot/imported/10_fort_pegasus_03.wav-535ce07b07249731642810da18855cf4.sample"]
 
 [params]
 

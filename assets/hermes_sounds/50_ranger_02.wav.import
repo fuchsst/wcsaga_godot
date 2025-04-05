@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bcd6e6mi60d2c"
-valid=false
+path="res://.godot/imported/50_ranger_02.wav-52c7c9bf07879ae2b415740f0d7ef291.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/50_ranger_02.wav"
+dest_files=["res://.godot/imported/50_ranger_02.wav-52c7c9bf07879ae2b415740f0d7ef291.sample"]
 
 [params]
 

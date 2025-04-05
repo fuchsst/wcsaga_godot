@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bi1lgnujje1mc"
-valid=false
+path="res://.godot/imported/quincy_control.wav-924838006aba5673d0a0f3d7caaf1e02.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/quincy_control.wav"
+dest_files=["res://.godot/imported/quincy_control.wav-924838006aba5673d0a0f3d7caaf1e02.sample"]
 
 [params]
 

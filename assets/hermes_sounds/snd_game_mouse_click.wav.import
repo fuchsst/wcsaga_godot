@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://ctshq7pesvp4y"
-valid=false
+path="res://.godot/imported/snd_game_mouse_click.wav-5f6d50a8ba887bcceb930ffdcd16c604.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/snd_game_mouse_click.wav"
+dest_files=["res://.godot/imported/snd_game_mouse_click.wav-5f6d50a8ba887bcceb930ffdcd16c604.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://c77dyj8t7hcby"
-valid=false
+path="res://.godot/imported/48_primate_18.wav-113438476053cefd53931bc73baa872b.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/48_primate_18.wav"
+dest_files=["res://.godot/imported/48_primate_18.wav-113438476053cefd53931bc73baa872b.sample"]
 
 [params]
 

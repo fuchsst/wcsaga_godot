@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://8eoqs6ul861"
-valid=false
+path="res://.godot/imported/05_wedge_01.wav-65f7ddbd2c2e7e80a1148696ae3a2729.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/05_wedge_01.wav"
+dest_files=["res://.godot/imported/05_wedge_01.wav-65f7ddbd2c2e7e80a1148696ae3a2729.sample"]
 
 [params]
 

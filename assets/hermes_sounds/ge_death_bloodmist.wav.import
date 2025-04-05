@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bsel4l61r7eyv"
-valid=false
+path="res://.godot/imported/ge_death_bloodmist.wav-2fcf684ddd538fb93eb3bc030c200c3e.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/ge_death_bloodmist.wav"
+dest_files=["res://.godot/imported/ge_death_bloodmist.wav-2fcf684ddd538fb93eb3bc030c200c3e.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cft14mu1tqhei"
-valid=false
+path="res://.godot/imported/gisborne_control.wav-f65e44fb326d890f6ff8b060a612ffeb.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/gisborne_control.wav"
+dest_files=["res://.godot/imported/gisborne_control.wav-f65e44fb326d890f6ff8b060a612ffeb.sample"]
 
 [params]
 

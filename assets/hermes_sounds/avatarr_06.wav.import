@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cc1c6pcbq5r40"
-valid=false
+path="res://.godot/imported/avatarr_06.wav-3bff891c1f8bc9afa6f30cd6d2a38820.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/avatarr_06.wav"
+dest_files=["res://.godot/imported/avatarr_06.wav-3bff891c1f8bc9afa6f30cd6d2a38820.sample"]
 
 [params]
 

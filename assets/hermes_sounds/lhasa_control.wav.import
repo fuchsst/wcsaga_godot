@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://c7ls4qv8ww387"
-valid=false
+path="res://.godot/imported/lhasa_control.wav-7487ae7cdc4181ca6858ba6e803ea25a.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/lhasa_control.wav"
+dest_files=["res://.godot/imported/lhasa_control.wav-7487ae7cdc4181ca6858ba6e803ea25a.sample"]
 
 [params]
 

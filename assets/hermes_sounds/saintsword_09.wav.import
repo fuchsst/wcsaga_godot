@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cyatu1pt87puo"
-valid=false
+path="res://.godot/imported/saintsword_09.wav-041813d548faf89e84253ee7ec8b6b91.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/saintsword_09.wav"
+dest_files=["res://.godot/imported/saintsword_09.wav-041813d548faf89e84253ee7ec8b6b91.sample"]
 
 [params]
 

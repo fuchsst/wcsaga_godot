@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://b2k2xp8soqqdu"
-valid=false
+path="res://.godot/imported/42_davy_crockett_control_04.wav-b09769d59467c38633d4f6e538e9ae1d.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/42_davy_crockett_control_04.wav"
+dest_files=["res://.godot/imported/42_davy_crockett_control_04.wav-b09769d59467c38633d4f6e538e9ae1d.sample"]
 
 [params]
 

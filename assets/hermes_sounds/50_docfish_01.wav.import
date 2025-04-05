@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cdd45xemnlnjc"
-valid=false
+path="res://.godot/imported/50_docfish_01.wav-1dec3a2e1ec27268ff3b63c49c02ce17.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/50_docfish_01.wav"
+dest_files=["res://.godot/imported/50_docfish_01.wav-1dec3a2e1ec27268ff3b63c49c02ce17.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dfd2856gly4x0"
-valid=false
+path="res://.godot/imported/snd_briefing_static.wav-a2b669017fc3bf424d09940659126dd0.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/snd_briefing_static.wav"
+dest_files=["res://.godot/imported/snd_briefing_static.wav-a2b669017fc3bf424d09940659126dd0.sample"]
 
 [params]
 

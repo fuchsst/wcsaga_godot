@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://rpxpfnpo8thm"
-valid=false
+path="res://.godot/imported/invercagill_control.wav-8925e8dcacaf0f3e2e531c603e5d3ee5.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/invercagill_control.wav"
+dest_files=["res://.godot/imported/invercagill_control.wav-8925e8dcacaf0f3e2e531c603e5d3ee5.sample"]
 
 [params]
 

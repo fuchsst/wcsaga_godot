@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://d4ju6aokshklt"
-valid=false
+path="res://.godot/imported/49_louis_b_p_control_04.wav-8aa30a42f28d1e9050f804f1891ec59b.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/49_louis_b_p_control_04.wav"
+dest_files=["res://.godot/imported/49_louis_b_p_control_04.wav-8aa30a42f28d1e9050f804f1891ec59b.sample"]
 
 [params]
 

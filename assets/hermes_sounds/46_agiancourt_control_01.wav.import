@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://kf2kk8rvxryj"
-valid=false
+path="res://.godot/imported/46_agiancourt_control_01.wav-f1167389556bbf7431834b72c5839081.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/46_agiancourt_control_01.wav"
+dest_files=["res://.godot/imported/46_agiancourt_control_01.wav-f1167389556bbf7431834b72c5839081.sample"]
 
 [params]
 

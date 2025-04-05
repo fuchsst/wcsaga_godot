@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bbvdepknaymi8"
-valid=false
+path="res://.godot/imported/loguth_20.wav-05cd48493f8faae06b57dfbfdfb6f57b.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/loguth_20.wav"
+dest_files=["res://.godot/imported/loguth_20.wav-05cd48493f8faae06b57dfbfdfb6f57b.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://d4ffwsjo8k1o2"
-valid=false
+path="res://.godot/imported/46_vanoc_control_01.wav-71226035eacb10b20135bbbf3ef0ec17.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/46_vanoc_control_01.wav"
+dest_files=["res://.godot/imported/46_vanoc_control_01.wav-71226035eacb10b20135bbbf3ef0ec17.sample"]
 
 [params]
 

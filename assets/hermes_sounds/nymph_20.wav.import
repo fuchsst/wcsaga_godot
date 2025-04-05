@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cnqm72gqxw6s6"
-valid=false
+path="res://.godot/imported/nymph_20.wav-75289444b16bb97e98f3a2da14796bae.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/nymph_20.wav"
+dest_files=["res://.godot/imported/nymph_20.wav-75289444b16bb97e98f3a2da14796bae.sample"]
 
 [params]
 

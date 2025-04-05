@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dwsuqd42c6eae"
-valid=false
+path="res://.godot/imported/38_olympia_control_01.wav-b72ac5ae9f4b17183920cf1ca67a8b64.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/38_olympia_control_01.wav"
+dest_files=["res://.godot/imported/38_olympia_control_01.wav-b72ac5ae9f4b17183920cf1ca67a8b64.sample"]
 
 [params]
 

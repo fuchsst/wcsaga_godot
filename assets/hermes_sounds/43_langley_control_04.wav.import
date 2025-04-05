@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://08wqsa0o6cgo"
-valid=false
+path="res://.godot/imported/43_langley_control_04.wav-ba9fbcad6c2ec0e45e0d65517c75995c.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/43_langley_control_04.wav"
+dest_files=["res://.godot/imported/43_langley_control_04.wav-ba9fbcad6c2ec0e45e0d65517c75995c.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://doy28k3abtmma"
-valid=false
+path="res://.godot/imported/tresh_26.wav-88df6d9529583df562268cfd2e5e961c.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/tresh_26.wav"
+dest_files=["res://.godot/imported/tresh_26.wav-88df6d9529583df562268cfd2e5e961c.sample"]
 
 [params]
 

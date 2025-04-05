@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://brw1fd2unkpr8"
-valid=false
+path="res://.godot/imported/46_deathfang_02.wav-8efdc17bd72fa8369103aeca0bbd6a0f.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/46_deathfang_02.wav"
+dest_files=["res://.godot/imported/46_deathfang_02.wav-8efdc17bd72fa8369103aeca0bbd6a0f.sample"]
 
 [params]
 

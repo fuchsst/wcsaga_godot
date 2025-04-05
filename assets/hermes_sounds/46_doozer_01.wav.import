@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://8yk6qar8t0kl"
-valid=false
+path="res://.godot/imported/46_doozer_01.wav-b641463dcb707c2b0c8e150f9fd97e63.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/46_doozer_01.wav"
+dest_files=["res://.godot/imported/46_doozer_01.wav-b641463dcb707c2b0c8e150f9fd97e63.sample"]
 
 [params]
 

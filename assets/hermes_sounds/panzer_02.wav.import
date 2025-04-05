@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://detp4vrpmuj6d"
-valid=false
+path="res://.godot/imported/panzer_02.wav-80e399d50eb403cdaf17a4a8f36a9ce2.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/panzer_02.wav"
+dest_files=["res://.godot/imported/panzer_02.wav-80e399d50eb403cdaf17a4a8f36a9ce2.sample"]
 
 [params]
 

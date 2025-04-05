@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://de82by3ny1edg"
-valid=false
+path="res://.godot/imported/32_bloodmist_04.wav-36139cfd4d7efdf39eaa858869121266.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/32_bloodmist_04.wav"
+dest_files=["res://.godot/imported/32_bloodmist_04.wav-36139cfd4d7efdf39eaa858869121266.sample"]
 
 [params]
 

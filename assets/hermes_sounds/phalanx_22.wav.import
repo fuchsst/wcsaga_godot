@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://babngg4ttm8pr"
-valid=false
+path="res://.godot/imported/phalanx_22.wav-4b0f429db15ff6088603b23d6d0b67d1.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/phalanx_22.wav"
+dest_files=["res://.godot/imported/phalanx_22.wav-4b0f429db15ff6088603b23d6d0b67d1.sample"]
 
 [params]
 

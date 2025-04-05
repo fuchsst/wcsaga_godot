@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bh53ap5t4jyn0"
-valid=false
+path="res://.godot/imported/floyd_23.wav-df83c525b2e5220ec43bd64ef2fefaf0.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/floyd_23.wav"
+dest_files=["res://.godot/imported/floyd_23.wav-df83c525b2e5220ec43bd64ef2fefaf0.sample"]
 
 [params]
 

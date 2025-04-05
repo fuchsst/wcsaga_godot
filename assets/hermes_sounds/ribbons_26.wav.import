@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cgx662mhfhwxc"
-valid=false
+path="res://.godot/imported/ribbons_26.wav-556f98da6f552e975142091c229abc38.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/ribbons_26.wav"
+dest_files=["res://.godot/imported/ribbons_26.wav-556f98da6f552e975142091c229abc38.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://ywhidmgocggy"
-valid=false
+path="res://.godot/imported/40_armageddon_control_02.wav-5ff426745fe162c64eb1b71ef28a7c15.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/40_armageddon_control_02.wav"
+dest_files=["res://.godot/imported/40_armageddon_control_02.wav-5ff426745fe162c64eb1b71ef28a7c15.sample"]
 
 [params]
 

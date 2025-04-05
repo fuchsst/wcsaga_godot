@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://yrrxcxshfcjh"
-valid=false
+path="res://.godot/imported/18_battleaxe_control_07.wav-08f87dfa39c5862868cf95489b340148.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/18_battleaxe_control_07.wav"
+dest_files=["res://.godot/imported/18_battleaxe_control_07.wav-08f87dfa39c5862868cf95489b340148.sample"]
 
 [params]
 

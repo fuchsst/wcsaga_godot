@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://d2jcsb155url2"
-valid=false
+path="res://.godot/imported/viking_16.wav-5527e56e32c760449d8e995f3a056cc3.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/viking_16.wav"
+dest_files=["res://.godot/imported/viking_16.wav-5527e56e32c760449d8e995f3a056cc3.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bcrj1e000wbdd"
-valid=false
+path="res://.godot/imported/26_psychopath_07.wav-d90846c1868d6792aa8c6ef87074add1.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/26_psychopath_07.wav"
+dest_files=["res://.godot/imported/26_psychopath_07.wav-d90846c1868d6792aa8c6ef87074add1.sample"]
 
 [params]
 

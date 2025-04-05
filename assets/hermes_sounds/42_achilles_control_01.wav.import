@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bv6up3lok47ry"
-valid=false
+path="res://.godot/imported/42_achilles_control_01.wav-1d76f5e7500d669b2a9889ef56890437.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/42_achilles_control_01.wav"
+dest_files=["res://.godot/imported/42_achilles_control_01.wav-1d76f5e7500d669b2a9889ef56890437.sample"]
 
 [params]
 

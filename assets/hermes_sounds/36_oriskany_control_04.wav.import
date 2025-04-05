@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://d1spqm4jsdq2k"
-valid=false
+path="res://.godot/imported/36_oriskany_control_04.wav-522a88398ae621655da71ca02d74b026.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/36_oriskany_control_04.wav"
+dest_files=["res://.godot/imported/36_oriskany_control_04.wav-522a88398ae621655da71ca02d74b026.sample"]
 
 [params]
 

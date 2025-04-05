@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dlwv8gs2wxnwv"
-valid=false
+path="res://.godot/imported/pr_01_g_custer_control_01.wav-41bf3a0ea1b68c410c4bcab39d8ae94a.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/pr_01_g_custer_control_01.wav"
+dest_files=["res://.godot/imported/pr_01_g_custer_control_01.wav-41bf3a0ea1b68c410c4bcab39d8ae94a.sample"]
 
 [params]
 

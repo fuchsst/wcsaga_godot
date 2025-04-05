@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bhca8egn7gvys"
-valid=false
+path="res://.godot/imported/bourrasque_control.wav-89b236f600e737341155a0089c782570.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/bourrasque_control.wav"
+dest_files=["res://.godot/imported/bourrasque_control.wav-89b236f600e737341155a0089c782570.sample"]
 
 [params]
 

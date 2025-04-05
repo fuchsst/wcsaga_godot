@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://354kdeedbtjp"
-valid=false
+path="res://.godot/imported/05_haderak_01.wav-24e80accdbdab8a397ca2b98061ea6a0.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/05_haderak_01.wav"
+dest_files=["res://.godot/imported/05_haderak_01.wav-24e80accdbdab8a397ca2b98061ea6a0.sample"]
 
 [params]
 

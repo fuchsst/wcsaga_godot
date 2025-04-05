@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://uik4w2pq5sis"
-valid=false
+path="res://.godot/imported/karlskrona_control.wav-929fc903ce36bd1b16f184caf4866fc8.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/karlskrona_control.wav"
+dest_files=["res://.godot/imported/karlskrona_control.wav-929fc903ce36bd1b16f184caf4866fc8.sample"]
 
 [params]
 

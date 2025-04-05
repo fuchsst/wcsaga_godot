@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://4kx0c4sdtcia"
-valid=false
+path="res://.godot/imported/ge_pirate_taunt_03.wav-f09625bd9d8309cb247891dbf4b4166e.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/ge_pirate_taunt_03.wav"
+dest_files=["res://.godot/imported/ge_pirate_taunt_03.wav-f09625bd9d8309cb247891dbf4b4166e.sample"]
 
 [params]
 

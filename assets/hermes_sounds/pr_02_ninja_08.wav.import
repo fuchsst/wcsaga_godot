@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://d1tbfxb6qlyul"
-valid=false
+path="res://.godot/imported/pr_02_ninja_08.wav-d3f9d364172ebb824fcb6c1785413aae.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/pr_02_ninja_08.wav"
+dest_files=["res://.godot/imported/pr_02_ninja_08.wav-d3f9d364172ebb824fcb6c1785413aae.sample"]
 
 [params]
 

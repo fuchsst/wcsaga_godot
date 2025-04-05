@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://chbpts87jqu5m"
-valid=false
+path="res://.godot/imported/madman_25.wav-5ca116d2d92413f1525ef23e42dcdee7.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/madman_25.wav"
+dest_files=["res://.godot/imported/madman_25.wav-5ca116d2d92413f1525ef23e42dcdee7.sample"]
 
 [params]
 

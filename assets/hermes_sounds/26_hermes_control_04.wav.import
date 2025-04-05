@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://ck1qq4iyne4ju"
-valid=false
+path="res://.godot/imported/26_hermes_control_04.wav-0e3c96d2f97cd917c1efa3d5cfeb8104.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/26_hermes_control_04.wav"
+dest_files=["res://.godot/imported/26_hermes_control_04.wav-0e3c96d2f97cd917c1efa3d5cfeb8104.sample"]
 
 [params]
 

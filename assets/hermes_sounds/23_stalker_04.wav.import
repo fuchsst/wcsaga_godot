@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bq5g4v5w4fv5s"
-valid=false
+path="res://.godot/imported/23_stalker_04.wav-4b4b4fa1688412341a16b388934b975c.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/23_stalker_04.wav"
+dest_files=["res://.godot/imported/23_stalker_04.wav-4b4b4fa1688412341a16b388934b975c.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://nw0vhmff26c0"
-valid=false
+path="res://.godot/imported/ge_drakhai_taunt_07.wav-6b461a85bcc0adaa24b9e5e20f0a9e2f.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/ge_drakhai_taunt_07.wav"
+dest_files=["res://.godot/imported/ge_drakhai_taunt_07.wav-6b461a85bcc0adaa24b9e5e20f0a9e2f.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://danmqhqs321ww"
-valid=false
+path="res://.godot/imported/41_talon_control_01.wav-2189489052997dbc108eec4bca388007.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/41_talon_control_01.wav"
+dest_files=["res://.godot/imported/41_talon_control_01.wav-2189489052997dbc108eec4bca388007.sample"]
 
 [params]
 

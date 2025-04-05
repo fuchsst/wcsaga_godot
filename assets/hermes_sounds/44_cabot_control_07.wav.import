@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://c81xh7o708ogv"
-valid=false
+path="res://.godot/imported/44_cabot_control_07.wav-6562a66d7702ee740b6700080df41f4a.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/44_cabot_control_07.wav"
+dest_files=["res://.godot/imported/44_cabot_control_07.wav-6562a66d7702ee740b6700080df41f4a.sample"]
 
 [params]
 

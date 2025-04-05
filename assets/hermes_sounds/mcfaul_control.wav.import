@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://flar3gtklcq3"
-valid=false
+path="res://.godot/imported/mcfaul_control.wav-510911c0398abe5555d90f16f55c76bf.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/mcfaul_control.wav"
+dest_files=["res://.godot/imported/mcfaul_control.wav-510911c0398abe5555d90f16f55c76bf.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://n34wuxhmdwch"
-valid=false
+path="res://.godot/imported/whangarei_control.wav-36a51a9d0a5fcb4b892c421b0260f9e9.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/whangarei_control.wav"
+dest_files=["res://.godot/imported/whangarei_control.wav-36a51a9d0a5fcb4b892c421b0260f9e9.sample"]
 
 [params]
 

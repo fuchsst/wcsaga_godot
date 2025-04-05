@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cbs5glyo856lk"
-valid=false
+path="res://.godot/imported/stingray_27.wav-b9ee66bc4ccbaa35aa26d08b0da19c86.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/stingray_27.wav"
+dest_files=["res://.godot/imported/stingray_27.wav-b9ee66bc4ccbaa35aa26d08b0da19c86.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://brucvptaoqpjv"
-valid=false
+path="res://.godot/imported/seymour_08.wav-b7e4a861841bc306ebd72ddcf4e26a56.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/seymour_08.wav"
+dest_files=["res://.godot/imported/seymour_08.wav-b7e4a861841bc306ebd72ddcf4e26a56.sample"]
 
 [params]
 

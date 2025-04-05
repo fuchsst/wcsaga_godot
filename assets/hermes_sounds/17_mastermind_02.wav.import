@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://yjtdqh4qgyij"
-valid=false
+path="res://.godot/imported/17_mastermind_02.wav-899ac9785ae33e32791a044d1b296c88.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/17_mastermind_02.wav"
+dest_files=["res://.godot/imported/17_mastermind_02.wav-899ac9785ae33e32791a044d1b296c88.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://c0li7685mmod2"
-valid=false
+path="res://.godot/imported/50_twilight_04.wav-2b79c3ede213df92f76fb4124911fb73.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/50_twilight_04.wav"
+dest_files=["res://.godot/imported/50_twilight_04.wav-2b79c3ede213df92f76fb4124911fb73.sample"]
 
 [params]
 

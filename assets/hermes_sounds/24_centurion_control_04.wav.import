@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bo0oqf1nu3p0k"
-valid=false
+path="res://.godot/imported/24_centurion_control_04.wav-a9c010780918f5eab7b35fa43360434f.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/24_centurion_control_04.wav"
+dest_files=["res://.godot/imported/24_centurion_control_04.wav-a9c010780918f5eab7b35fa43360434f.sample"]
 
 [params]
 

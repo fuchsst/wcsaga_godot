@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://rrkk2u2tyque"
-valid=false
+path="res://.godot/imported/05_backslash_02.wav-17a5af306f98553494f61378e19f4e60.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/05_backslash_02.wav"
+dest_files=["res://.godot/imported/05_backslash_02.wav-17a5af306f98553494f61378e19f4e60.sample"]
 
 [params]
 

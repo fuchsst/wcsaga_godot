@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://c123vlxupqesd"
-valid=false
+path="res://.godot/imported/cordoba_05.wav-c91020ae0fbbd7d4cc3a998424a7b3f3.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/cordoba_05.wav"
+dest_files=["res://.godot/imported/cordoba_05.wav-c91020ae0fbbd7d4cc3a998424a7b3f3.sample"]
 
 [params]
 

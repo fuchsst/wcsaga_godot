@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://ckcd0f7uo86t1"
-valid=false
+path="res://.godot/imported/gloucester_control.wav-5cbe8aa078e3835d97f244e5f62917b0.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/gloucester_control.wav"
+dest_files=["res://.godot/imported/gloucester_control.wav-5cbe8aa078e3835d97f244e5f62917b0.sample"]
 
 [params]
 

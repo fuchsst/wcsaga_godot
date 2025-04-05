@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://chfes8mmo3un4"
-valid=false
+path="res://.godot/imported/50_chaos-1_05.wav-19902b8e4724dcf4d0dabcf0cd7cba6a.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/50_chaos-1_05.wav"
+dest_files=["res://.godot/imported/50_chaos-1_05.wav-19902b8e4724dcf4d0dabcf0cd7cba6a.sample"]
 
 [params]
 

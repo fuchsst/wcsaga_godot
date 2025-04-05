@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cvsx8b5l6t0ou"
-valid=false
+path="res://.godot/imported/skuld_23.wav-048f6c456a8f89eaebd820b8da1a192a.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/skuld_23.wav"
+dest_files=["res://.godot/imported/skuld_23.wav-048f6c456a8f89eaebd820b8da1a192a.sample"]
 
 [params]
 

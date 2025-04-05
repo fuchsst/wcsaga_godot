@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dvyos71metvsr"
-valid=false
+path="res://.godot/imported/06_kettle_19.wav-edcecabffb0a461757a990c7f8376927.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/06_kettle_19.wav"
+dest_files=["res://.godot/imported/06_kettle_19.wav-edcecabffb0a461757a990c7f8376927.sample"]
 
 [params]
 

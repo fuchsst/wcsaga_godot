@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://583d8qew7htf"
-valid=false
+path="res://.godot/imported/46_chief_enginerr_02.wav-ae60800eef6ed617510bbfe4c269687a.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/46_chief_enginerr_02.wav"
+dest_files=["res://.godot/imported/46_chief_enginerr_02.wav-ae60800eef6ed617510bbfe4c269687a.sample"]
 
 [params]
 

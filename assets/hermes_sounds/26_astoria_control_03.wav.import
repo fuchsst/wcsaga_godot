@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dbb32ruc0ij3p"
-valid=false
+path="res://.godot/imported/26_astoria_control_03.wav-97d9219874f66315386b7ed88ab5d02b.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/26_astoria_control_03.wav"
+dest_files=["res://.godot/imported/26_astoria_control_03.wav-97d9219874f66315386b7ed88ab5d02b.sample"]
 
 [params]
 

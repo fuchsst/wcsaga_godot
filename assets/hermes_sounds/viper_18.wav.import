@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://djftnywjjhaik"
-valid=false
+path="res://.godot/imported/viper_18.wav-a9cf2e86be176f2be7787d931693881c.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/viper_18.wav"
+dest_files=["res://.godot/imported/viper_18.wav-a9cf2e86be176f2be7787d931693881c.sample"]
 
 [params]
 

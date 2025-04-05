@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dp00guuemar8p"
-valid=false
+path="res://.godot/imported/sachsen_control.wav-6f445d29c0d6c4f20edd32359461bdb0.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/sachsen_control.wav"
+dest_files=["res://.godot/imported/sachsen_control.wav-6f445d29c0d6c4f20edd32359461bdb0.sample"]
 
 [params]
 

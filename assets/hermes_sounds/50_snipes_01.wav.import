@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bkrtf06j3bnpt"
-valid=false
+path="res://.godot/imported/50_snipes_01.wav-227cde77d831c1af85f6d9777acc6856.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/50_snipes_01.wav"
+dest_files=["res://.godot/imported/50_snipes_01.wav-227cde77d831c1af85f6d9777acc6856.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://d1k0nw7cxl1a4"
-valid=false
+path="res://.godot/imported/ragnarok_16.wav-1b1802a66a5e6ed92184f7040484da55.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/ragnarok_16.wav"
+dest_files=["res://.godot/imported/ragnarok_16.wav-1b1802a66a5e6ed92184f7040484da55.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://c0hq3t3ol87ql"
-valid=false
+path="res://.godot/imported/hoobler_05.wav-73a34194771afc262c95fd34764c4113.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/hoobler_05.wav"
+dest_files=["res://.godot/imported/hoobler_05.wav-73a34194771afc262c95fd34764c4113.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://o5j2cu14rh2u"
-valid=false
+path="res://.godot/imported/50_apatherian_02.wav-c3e2b8f54349b6d207b7ee054b49e9dc.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/50_apatherian_02.wav"
+dest_files=["res://.godot/imported/50_apatherian_02.wav-c3e2b8f54349b6d207b7ee054b49e9dc.sample"]
 
 [params]
 

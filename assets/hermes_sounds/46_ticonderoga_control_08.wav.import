@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://b61cgro72ln22"
-valid=false
+path="res://.godot/imported/46_ticonderoga_control_08.wav-08cf2b6c671a13a31945d0441c85a85f.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/46_ticonderoga_control_08.wav"
+dest_files=["res://.godot/imported/46_ticonderoga_control_08.wav-08cf2b6c671a13a31945d0441c85a85f.sample"]
 
 [params]
 

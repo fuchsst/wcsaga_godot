@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://gm88cgxavsqj"
-valid=false
+path="res://.godot/imported/whanganui_control.wav-37dab27d85469d7fbf2b190748371654.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/whanganui_control.wav"
+dest_files=["res://.godot/imported/whanganui_control.wav-37dab27d85469d7fbf2b190748371654.sample"]
 
 [params]
 

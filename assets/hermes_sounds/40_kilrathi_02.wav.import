@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cvfol54i6g2df"
-valid=false
+path="res://.godot/imported/40_kilrathi_02.wav-1b64fb67a1951cd542d9a8298d839330.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/40_kilrathi_02.wav"
+dest_files=["res://.godot/imported/40_kilrathi_02.wav-1b64fb67a1951cd542d9a8298d839330.sample"]
 
 [params]
 

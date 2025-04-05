@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cp7n7hpa4ikyy"
-valid=false
+path="res://.godot/imported/47_hawk_29.wav-d8bf0e2ff17abb57c65033316af54802.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/47_hawk_29.wav"
+dest_files=["res://.godot/imported/47_hawk_29.wav-d8bf0e2ff17abb57c65033316af54802.sample"]
 
 [params]
 

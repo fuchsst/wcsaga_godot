@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cyo7arob44wb3"
-valid=false
+path="res://.godot/imported/snd_reset_pressed.wav-3f32e02fa5d38e68a3e9e7add8b28cba.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/snd_reset_pressed.wav"
+dest_files=["res://.godot/imported/snd_reset_pressed.wav-3f32e02fa5d38e68a3e9e7add8b28cba.sample"]
 
 [params]
 

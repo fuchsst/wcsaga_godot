@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://ckfvmlwbcyxsn"
-valid=false
+path="res://.godot/imported/06_fort_crockett_control_07.wav-1c5674ea69d99f33c458eadf7f5d728e.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/06_fort_crockett_control_07.wav"
+dest_files=["res://.godot/imported/06_fort_crockett_control_07.wav-1c5674ea69d99f33c458eadf7f5d728e.sample"]
 
 [params]
 

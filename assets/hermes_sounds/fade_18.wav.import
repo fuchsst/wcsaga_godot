@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cta0vjxdr00hn"
-valid=false
+path="res://.godot/imported/fade_18.wav-041398befe2f9766c3a96b4c766a1e35.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/fade_18.wav"
+dest_files=["res://.godot/imported/fade_18.wav-041398befe2f9766c3a96b4c766a1e35.sample"]
 
 [params]
 

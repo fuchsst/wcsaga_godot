@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://crua44if4x8go"
-valid=false
+path="res://.godot/imported/little_john_12.wav-207cc0add3c76d2edf151da3619f2ecf.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/little_john_12.wav"
+dest_files=["res://.godot/imported/little_john_12.wav-207cc0add3c76d2edf151da3619f2ecf.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dsymahbvfl6ri"
-valid=false
+path="res://.godot/imported/42_denver_control_01.wav-59af76731d5bd5042b27d522727bf428.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/42_denver_control_01.wav"
+dest_files=["res://.godot/imported/42_denver_control_01.wav-59af76731d5bd5042b27d522727bf428.sample"]
 
 [params]
 

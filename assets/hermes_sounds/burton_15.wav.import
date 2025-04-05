@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cflukgc0b40tf"
-valid=false
+path="res://.godot/imported/burton_15.wav-727b4d4175e0a223713798716ee81e33.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/burton_15.wav"
+dest_files=["res://.godot/imported/burton_15.wav-727b4d4175e0a223713798716ee81e33.sample"]
 
 [params]
 

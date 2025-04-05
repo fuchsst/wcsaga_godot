@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://g2khbv6rqny3"
-valid=false
+path="res://.godot/imported/naugrim_07.wav-b23e39b3fe85a65020a83b3cac6ca10c.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/naugrim_07.wav"
+dest_files=["res://.godot/imported/naugrim_07.wav-b23e39b3fe85a65020a83b3cac6ca10c.sample"]
 
 [params]
 

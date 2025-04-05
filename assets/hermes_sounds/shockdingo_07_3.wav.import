@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dnydbgygqdhrh"
-valid=false
+path="res://.godot/imported/shockdingo_07_3.wav-8f49d672a71bedc88079ba2d651d8ab7.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/shockdingo_07_3.wav"
+dest_files=["res://.godot/imported/shockdingo_07_3.wav-8f49d672a71bedc88079ba2d651d8ab7.sample"]
 
 [params]
 

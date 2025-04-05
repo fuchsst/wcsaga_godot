@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dp217pelqif8s"
-valid=false
+path="res://.godot/imported/41_perseus_control_05.wav-e98438a90b8987c5e0bb4cbb45ea46fb.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/41_perseus_control_05.wav"
+dest_files=["res://.godot/imported/41_perseus_control_05.wav-e98438a90b8987c5e0bb4cbb45ea46fb.sample"]
 
 [params]
 

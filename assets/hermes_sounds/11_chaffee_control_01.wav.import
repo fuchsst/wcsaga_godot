@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bqkql6hygmpbh"
-valid=false
+path="res://.godot/imported/11_chaffee_control_01.wav-4a05029e87ef0e00e9791509c34ca0e9.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/11_chaffee_control_01.wav"
+dest_files=["res://.godot/imported/11_chaffee_control_01.wav-4a05029e87ef0e00e9791509c34ca0e9.sample"]
 
 [params]
 

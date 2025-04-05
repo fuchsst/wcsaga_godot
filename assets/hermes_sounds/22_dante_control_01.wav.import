@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dx3n80sajbf0l"
-valid=false
+path="res://.godot/imported/22_dante_control_01.wav-802e7fbcdfdd1342c9873c030da8ff36.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/22_dante_control_01.wav"
+dest_files=["res://.godot/imported/22_dante_control_01.wav-802e7fbcdfdd1342c9873c030da8ff36.sample"]
 
 [params]
 

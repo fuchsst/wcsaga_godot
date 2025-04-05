@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dort4gc0jiemi"
-valid=false
+path="res://.godot/imported/50_shorty_01.wav-0a6d723a67313ecfb71b3aa8d912d86f.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/50_shorty_01.wav"
+dest_files=["res://.godot/imported/50_shorty_01.wav-0a6d723a67313ecfb71b3aa8d912d86f.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://5ejnpfchv4so"
-valid=false
+path="res://.godot/imported/vaillancourt_control.wav-0aaaa6a8c420cd8237f46a7c276cb007.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/vaillancourt_control.wav"
+dest_files=["res://.godot/imported/vaillancourt_control.wav-0aaaa6a8c420cd8237f46a7c276cb007.sample"]
 
 [params]
 

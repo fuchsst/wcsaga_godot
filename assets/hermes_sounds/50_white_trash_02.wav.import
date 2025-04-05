@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://ca4gkke237h1v"
-valid=false
+path="res://.godot/imported/50_white_trash_02.wav-61d0fb4acc78752e1fbe1af81aead45c.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/50_white_trash_02.wav"
+dest_files=["res://.godot/imported/50_white_trash_02.wav-61d0fb4acc78752e1fbe1af81aead45c.sample"]
 
 [params]
 

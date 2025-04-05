@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://q4mks31t6n62"
-valid=false
+path="res://.godot/imported/50_rotherham_control_04.wav-995d8ec65b2d2c1df9af280af9f51b6d.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/50_rotherham_control_04.wav"
+dest_files=["res://.godot/imported/50_rotherham_control_04.wav-995d8ec65b2d2c1df9af280af9f51b6d.sample"]
 
 [params]
 

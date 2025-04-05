@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cv34xhuhg8gbx"
-valid=false
+path="res://.godot/imported/44_trenton_control_01.wav-436513896840ee66a6033633c56d4995.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/44_trenton_control_01.wav"
+dest_files=["res://.godot/imported/44_trenton_control_01.wav-436513896840ee66a6033633c56d4995.sample"]
 
 [params]
 

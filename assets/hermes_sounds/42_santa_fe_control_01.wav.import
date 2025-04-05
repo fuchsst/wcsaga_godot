@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cewb8vyqu7xj7"
-valid=false
+path="res://.godot/imported/42_santa_fe_control_01.wav-f61038089da8049046cfced546948ef0.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/42_santa_fe_control_01.wav"
+dest_files=["res://.godot/imported/42_santa_fe_control_01.wav-f61038089da8049046cfced546948ef0.sample"]
 
 [params]
 

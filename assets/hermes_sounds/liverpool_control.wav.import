@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bcmrca0jgilov"
-valid=false
+path="res://.godot/imported/liverpool_control.wav-d5d408ffabb19cc1dd3dacc6fa416fd9.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/liverpool_control.wav"
+dest_files=["res://.godot/imported/liverpool_control.wav-d5d408ffabb19cc1dd3dacc6fa416fd9.sample"]
 
 [params]
 

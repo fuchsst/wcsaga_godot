@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bcklgxj4c56nl"
-valid=false
+path="res://.godot/imported/46_captain_mcallister_04.wav-f77e72c28fec273486204d90af438f9a.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/46_captain_mcallister_04.wav"
+dest_files=["res://.godot/imported/46_captain_mcallister_04.wav-f77e72c28fec273486204d90af438f9a.sample"]
 
 [params]
 

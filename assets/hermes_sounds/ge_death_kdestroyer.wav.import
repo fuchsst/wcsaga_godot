@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://clh8f037sgdpu"
-valid=false
+path="res://.godot/imported/ge_death_kdestroyer.wav-f27c55ad653d2b2023f6db3978a3c34e.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/ge_death_kdestroyer.wav"
+dest_files=["res://.godot/imported/ge_death_kdestroyer.wav-f27c55ad653d2b2023f6db3978a3c34e.sample"]
 
 [params]
 

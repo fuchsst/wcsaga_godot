@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://d3hhcr3j64bv0"
-valid=false
+path="res://.godot/imported/pr_02_aurora_control_01.wav-d9a0856be2e0e676b1e357c99dac820d.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/pr_02_aurora_control_01.wav"
+dest_files=["res://.godot/imported/pr_02_aurora_control_01.wav-d9a0856be2e0e676b1e357c99dac820d.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bwi0bseqma1du"
-valid=false
+path="res://.godot/imported/pr_05_dover_control_02.wav-5098061a8828f5e6097b4d845b084199.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/pr_05_dover_control_02.wav"
+dest_files=["res://.godot/imported/pr_05_dover_control_02.wav-5098061a8828f5e6097b4d845b084199.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://c163ap14aa1n2"
-valid=false
+path="res://.godot/imported/17_assassin_03.wav-77de4cb5249dc10383b8b4f59451012f.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/17_assassin_03.wav"
+dest_files=["res://.godot/imported/17_assassin_03.wav-77de4cb5249dc10383b8b4f59451012f.sample"]
 
 [params]
 

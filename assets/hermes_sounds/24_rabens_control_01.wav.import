@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://ph25yg86lfbx"
-valid=false
+path="res://.godot/imported/24_rabens_control_01.wav-d09893d0d2684a026084c9add0489fdf.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/24_rabens_control_01.wav"
+dest_files=["res://.godot/imported/24_rabens_control_01.wav-d09893d0d2684a026084c9add0489fdf.sample"]
 
 [params]
 

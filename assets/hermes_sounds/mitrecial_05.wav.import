@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://culqbp66bguj8"
-valid=false
+path="res://.godot/imported/mitrecial_05.wav-5b1cc04b32708af92febdcdc00a6ffb4.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/mitrecial_05.wav"
+dest_files=["res://.godot/imported/mitrecial_05.wav-5b1cc04b32708af92febdcdc00a6ffb4.sample"]
 
 [params]
 

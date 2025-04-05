@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cocwpyh3tc5o7"
-valid=false
+path="res://.godot/imported/darkness_25.wav-18bae25a3ede0b2987c752149ccbb435.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/darkness_25.wav"
+dest_files=["res://.godot/imported/darkness_25.wav-18bae25a3ede0b2987c752149ccbb435.sample"]
 
 [params]
 

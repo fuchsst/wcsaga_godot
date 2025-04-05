@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dgu7uoqpno58b"
-valid=false
+path="res://.godot/imported/41_repulse_control_03.wav-dcd78a6b87819add8f6900020c1d736c.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/41_repulse_control_03.wav"
+dest_files=["res://.godot/imported/41_repulse_control_03.wav-dcd78a6b87819add8f6900020c1d736c.sample"]
 
 [params]
 

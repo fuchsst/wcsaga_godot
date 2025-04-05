@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bpa0dik71imy8"
-valid=false
+path="res://.godot/imported/arjak_22.wav-9492411f676d50028ee3d3ad4cc6f557.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/arjak_22.wav"
+dest_files=["res://.godot/imported/arjak_22.wav-9492411f676d50028ee3d3ad4cc6f557.sample"]
 
 [params]
 

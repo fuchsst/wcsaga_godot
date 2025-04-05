@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dkw6wm83pymwo"
-valid=false
+path="res://.godot/imported/47_deathstroke_06.wav-325b9285bc6948b18fb57befdf118723.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/47_deathstroke_06.wav"
+dest_files=["res://.godot/imported/47_deathstroke_06.wav-325b9285bc6948b18fb57befdf118723.sample"]
 
 [params]
 

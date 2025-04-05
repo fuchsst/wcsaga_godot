@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bi34mxy0kxb05"
-valid=false
+path="res://.godot/imported/karnes_control.wav-9a24d041dc6b18d780aa1c8409447d3f.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/karnes_control.wav"
+dest_files=["res://.godot/imported/karnes_control.wav-9a24d041dc6b18d780aa1c8409447d3f.sample"]
 
 [params]
 

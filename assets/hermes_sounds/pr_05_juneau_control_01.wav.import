@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://q15ghl1trwak"
-valid=false
+path="res://.godot/imported/pr_05_juneau_control_01.wav-564d8673a943a3abc33938c02a331237.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/pr_05_juneau_control_01.wav"
+dest_files=["res://.godot/imported/pr_05_juneau_control_01.wav-564d8673a943a3abc33938c02a331237.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cs5rpxk8whrc1"
-valid=false
+path="res://.godot/imported/braunschweig_control.wav-ad25611830b05bb42079d15ef416a748.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/braunschweig_control.wav"
+dest_files=["res://.godot/imported/braunschweig_control.wav-ad25611830b05bb42079d15ef416a748.sample"]
 
 [params]
 

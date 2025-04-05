@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://da8nlaq2ook6p"
-valid=false
+path="res://.godot/imported/09_halo_round_control_08.wav-237693fdf7586c30f606cb1dcf5d33ce.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/09_halo_round_control_08.wav"
+dest_files=["res://.godot/imported/09_halo_round_control_08.wav-237693fdf7586c30f606cb1dcf5d33ce.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bm54x4lvk8ybq"
-valid=false
+path="res://.godot/imported/valkyrie_11.wav-b7196914b6bca722fd2e5dee9048298f.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/valkyrie_11.wav"
+dest_files=["res://.godot/imported/valkyrie_11.wav-b7196914b6bca722fd2e5dee9048298f.sample"]
 
 [params]
 

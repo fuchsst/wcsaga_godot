@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bhrupmjluwma4"
-valid=false
+path="res://.godot/imported/ge_kilrathi_taunt_01.wav-94a80b800309400aab10e49e6b992343.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/ge_kilrathi_taunt_01.wav"
+dest_files=["res://.godot/imported/ge_kilrathi_taunt_01.wav-94a80b800309400aab10e49e6b992343.sample"]
 
 [params]
 

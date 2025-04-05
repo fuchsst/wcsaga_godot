@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://3yqfvsgi6njl"
-valid=false
+path="res://.godot/imported/50_barr_04.wav-b4a9f4963d42b411d02e8478b079b830.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/50_barr_04.wav"
+dest_files=["res://.godot/imported/50_barr_04.wav-b4a9f4963d42b411d02e8478b079b830.sample"]
 
 [params]
 

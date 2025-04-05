@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cd7rcp54ihk3i"
-valid=false
+path="res://.godot/imported/ge_death_drakhai_02.wav-58c4d5d63a1bc4c02137036c06f0d7e7.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/ge_death_drakhai_02.wav"
+dest_files=["res://.godot/imported/ge_death_drakhai_02.wav-58c4d5d63a1bc4c02137036c06f0d7e7.sample"]
 
 [params]
 

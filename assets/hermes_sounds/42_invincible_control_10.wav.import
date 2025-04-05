@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://d110141de5suk"
-valid=false
+path="res://.godot/imported/42_invincible_control_10.wav-5ca48713229cfec76a247420e15374ae.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/42_invincible_control_10.wav"
+dest_files=["res://.godot/imported/42_invincible_control_10.wav-5ca48713229cfec76a247420e15374ae.sample"]
 
 [params]
 

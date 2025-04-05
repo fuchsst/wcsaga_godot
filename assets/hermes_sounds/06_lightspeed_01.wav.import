@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bua0hx40cc621"
-valid=false
+path="res://.godot/imported/06_lightspeed_01.wav-17fe16b7f9c0e9b15ccdc7e153b8d2d7.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/06_lightspeed_01.wav"
+dest_files=["res://.godot/imported/06_lightspeed_01.wav-17fe16b7f9c0e9b15ccdc7e153b8d2d7.sample"]
 
 [params]
 

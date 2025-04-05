@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dl47oc0ceojrp"
-valid=false
+path="res://.godot/imported/ge_computer_04.wav-f1a9437ed09dbad31835f0e51da305b5.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/ge_computer_04.wav"
+dest_files=["res://.godot/imported/ge_computer_04.wav-f1a9437ed09dbad31835f0e51da305b5.sample"]
 
 [params]
 

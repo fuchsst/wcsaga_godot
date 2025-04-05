@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cqr1pgy0eb05a"
-valid=false
+path="res://.godot/imported/snd_icon_highlight.wav-4736fb89add046392ea05a5bf91da161.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/snd_icon_highlight.wav"
+dest_files=["res://.godot/imported/snd_icon_highlight.wav-4736fb89add046392ea05a5bf91da161.sample"]
 
 [params]
 

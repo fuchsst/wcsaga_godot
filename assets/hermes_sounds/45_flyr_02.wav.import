@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://nylvg3v5kgfm"
-valid=false
+path="res://.godot/imported/45_flyr_02.wav-43c8ec89355e35eeb4943c178a2f7061.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/45_flyr_02.wav"
+dest_files=["res://.godot/imported/45_flyr_02.wav-43c8ec89355e35eeb4943c178a2f7061.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bqd15fs4qrcld"
-valid=false
+path="res://.godot/imported/32_honeybear_23.wav-e650a9014256bdbaf0011ac1549d8064.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/32_honeybear_23.wav"
+dest_files=["res://.godot/imported/32_honeybear_23.wav-e650a9014256bdbaf0011ac1549d8064.sample"]
 
 [params]
 

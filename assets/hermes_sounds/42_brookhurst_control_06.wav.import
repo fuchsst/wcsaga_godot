@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dclvqlt32gsvj"
-valid=false
+path="res://.godot/imported/42_brookhurst_control_06.wav-1730147b776b5b8bd9b9085704f23a56.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/42_brookhurst_control_06.wav"
+dest_files=["res://.godot/imported/42_brookhurst_control_06.wav-1730147b776b5b8bd9b9085704f23a56.sample"]
 
 [params]
 

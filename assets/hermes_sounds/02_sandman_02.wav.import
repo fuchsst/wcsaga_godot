@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cv88ahqoa0k11"
-valid=false
+path="res://.godot/imported/02_sandman_02.wav-d8e53d27b6513f0f330d90e1255fef6e.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/02_sandman_02.wav"
+dest_files=["res://.godot/imported/02_sandman_02.wav-d8e53d27b6513f0f330d90e1255fef6e.sample"]
 
 [params]
 

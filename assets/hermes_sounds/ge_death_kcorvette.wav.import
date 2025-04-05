@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bghry1t5cws4n"
-valid=false
+path="res://.godot/imported/ge_death_kcorvette.wav-166fa0357a05f751c8c715532020c998.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/ge_death_kcorvette.wav"
+dest_files=["res://.godot/imported/ge_death_kcorvette.wav-166fa0357a05f751c8c715532020c998.sample"]
 
 [params]
 

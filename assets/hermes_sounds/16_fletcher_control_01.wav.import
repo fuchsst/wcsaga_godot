@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://4geti0vqib7h"
-valid=false
+path="res://.godot/imported/16_fletcher_control_01.wav-a1300fa8fb34cc020cd9c37cec9cbe08.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/16_fletcher_control_01.wav"
+dest_files=["res://.godot/imported/16_fletcher_control_01.wav-a1300fa8fb34cc020cd9c37cec9cbe08.sample"]
 
 [params]
 

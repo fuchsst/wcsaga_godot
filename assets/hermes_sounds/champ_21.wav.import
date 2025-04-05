@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cdjfgge38sbcr"
-valid=false
+path="res://.godot/imported/champ_21.wav-55a92388651bec1ed2d22bee9788b4af.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/champ_21.wav"
+dest_files=["res://.godot/imported/champ_21.wav-55a92388651bec1ed2d22bee9788b4af.sample"]
 
 [params]
 

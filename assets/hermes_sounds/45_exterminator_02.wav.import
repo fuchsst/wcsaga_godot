@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cklh0e3mw8kkf"
-valid=false
+path="res://.godot/imported/45_exterminator_02.wav-db4755221dc22c29647f52a6b757d9f3.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/45_exterminator_02.wav"
+dest_files=["res://.godot/imported/45_exterminator_02.wav-db4755221dc22c29647f52a6b757d9f3.sample"]
 
 [params]
 

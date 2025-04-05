@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cd0ew63igp420"
-valid=false
+path="res://.godot/imported/barlow_control.wav-e24577b4370322707fe210170f7ee67f.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/barlow_control.wav"
+dest_files=["res://.godot/imported/barlow_control.wav-e24577b4370322707fe210170f7ee67f.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://q1fm8st6j5p1"
-valid=false
+path="res://.godot/imported/tiger_20.wav-de4fc544c7c30687c85577860f6b25d2.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/tiger_20.wav"
+dest_files=["res://.godot/imported/tiger_20.wav-de4fc544c7c30687c85577860f6b25d2.sample"]
 
 [params]
 

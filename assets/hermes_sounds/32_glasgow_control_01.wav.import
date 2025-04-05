@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://ccd7j4xpcy0dg"
-valid=false
+path="res://.godot/imported/32_glasgow_control_01.wav-2b40efbec6eeb468a9bea748e28a94e0.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/32_glasgow_control_01.wav"
+dest_files=["res://.godot/imported/32_glasgow_control_01.wav-2b40efbec6eeb468a9bea748e28a94e0.sample"]
 
 [params]
 

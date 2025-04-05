@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://lvcysl6rwbnt"
-valid=false
+path="res://.godot/imported/limdaepl.wav-d28e67636db476782d25fd5a4b2bfeaf.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/limdaepl.wav"
+dest_files=["res://.godot/imported/limdaepl.wav-d28e67636db476782d25fd5a4b2bfeaf.sample"]
 
 [params]
 

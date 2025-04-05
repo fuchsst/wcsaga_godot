@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bsk8y41cg1oi3"
-valid=false
+path="res://.godot/imported/20_challenger_control_01.wav-d9fc4101b2d742f07c2d9637655386da.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/20_challenger_control_01.wav"
+dest_files=["res://.godot/imported/20_challenger_control_01.wav-d9fc4101b2d742f07c2d9637655386da.sample"]
 
 [params]
 

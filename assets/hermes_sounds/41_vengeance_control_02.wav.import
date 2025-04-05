@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bo0ovknx3oad7"
-valid=false
+path="res://.godot/imported/41_vengeance_control_02.wav-ec304e5560d838d5f02ffa1126f4c73f.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/41_vengeance_control_02.wav"
+dest_files=["res://.godot/imported/41_vengeance_control_02.wav-ec304e5560d838d5f02ffa1126f4c73f.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://daw6ml5ej44y2"
-valid=false
+path="res://.godot/imported/40_doragon_02.wav-f9c2faf784e90c3292f8dbab4961c463.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/40_doragon_02.wav"
+dest_files=["res://.godot/imported/40_doragon_02.wav-f9c2faf784e90c3292f8dbab4961c463.sample"]
 
 [params]
 

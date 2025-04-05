@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cchay7cx6ppu4"
-valid=false
+path="res://.godot/imported/gata_22.wav-e0cffefe40d76c5f1f14b4ffc76068ad.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/gata_22.wav"
+dest_files=["res://.godot/imported/gata_22.wav-e0cffefe40d76c5f1f14b4ffc76068ad.sample"]
 
 [params]
 

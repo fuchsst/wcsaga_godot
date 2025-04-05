@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://eh22ib2780k0"
-valid=false
+path="res://.godot/imported/weirdozzy_15.wav-878b0412cde9e61f8b6bd2222e88aa5d.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/weirdozzy_15.wav"
+dest_files=["res://.godot/imported/weirdozzy_15.wav-878b0412cde9e61f8b6bd2222e88aa5d.sample"]
 
 [params]
 

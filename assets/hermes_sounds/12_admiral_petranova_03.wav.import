@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://0bxgctt1fnjf"
-valid=false
+path="res://.godot/imported/12_admiral_petranova_03.wav-44234fcdf6dbc71dd7d3f210846557f1.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/12_admiral_petranova_03.wav"
+dest_files=["res://.godot/imported/12_admiral_petranova_03.wav-44234fcdf6dbc71dd7d3f210846557f1.sample"]
 
 [params]
 

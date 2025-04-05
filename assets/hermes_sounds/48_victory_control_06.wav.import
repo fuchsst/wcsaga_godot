@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://edfnqedkyw6e"
-valid=false
+path="res://.godot/imported/48_victory_control_06.wav-8992d5518c06487921d062e5ed8c3509.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/48_victory_control_06.wav"
+dest_files=["res://.godot/imported/48_victory_control_06.wav-8992d5518c06487921d062e5ed8c3509.sample"]
 
 [params]
 

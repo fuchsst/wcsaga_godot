@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cm4ni7mgddhff"
-valid=false
+path="res://.godot/imported/03_john_pj_control_01.wav-40af470b7da4d0d1bc29676228c402d5.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/03_john_pj_control_01.wav"
+dest_files=["res://.godot/imported/03_john_pj_control_01.wav-40af470b7da4d0d1bc29676228c402d5.sample"]
 
 [params]
 

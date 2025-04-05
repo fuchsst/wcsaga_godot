@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dlruvmgmsh2fs"
-valid=false
+path="res://.godot/imported/ge_drakhai_gloat_01.wav-a136f98e7b9a7cb8434971d8cca5d84c.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/ge_drakhai_gloat_01.wav"
+dest_files=["res://.godot/imported/ge_drakhai_gloat_01.wav-a136f98e7b9a7cb8434971d8cca5d84c.sample"]
 
 [params]
 

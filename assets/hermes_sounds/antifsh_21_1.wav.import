@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cbcj3tsajgg50"
-valid=false
+path="res://.godot/imported/antifsh_21_1.wav-870f4ab70832cc0a6bbc9e6f07400719.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/antifsh_21_1.wav"
+dest_files=["res://.godot/imported/antifsh_21_1.wav-870f4ab70832cc0a6bbc9e6f07400719.sample"]
 
 [params]
 

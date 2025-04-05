@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://blrsf5wklvnfd"
-valid=false
+path="res://.godot/imported/pr_03_wellington_control_01.wav-e6708dbb4f0255560ce4d9f69b57e7d4.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/pr_03_wellington_control_01.wav"
+dest_files=["res://.godot/imported/pr_03_wellington_control_01.wav-e6708dbb4f0255560ce4d9f69b57e7d4.sample"]
 
 [params]
 

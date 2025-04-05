@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://3qf8h5pvb2wd"
-valid=false
+path="res://.godot/imported/23_cydonia_01.wav-1cbfaf19d11e9fa5cb4e90c5133bc872.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/23_cydonia_01.wav"
+dest_files=["res://.godot/imported/23_cydonia_01.wav-1cbfaf19d11e9fa5cb4e90c5133bc872.sample"]
 
 [params]
 

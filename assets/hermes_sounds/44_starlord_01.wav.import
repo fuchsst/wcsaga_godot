@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://b026krxkx3buq"
-valid=false
+path="res://.godot/imported/44_starlord_01.wav-3694dabf973483ed29bb7aa3a9d77a78.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/44_starlord_01.wav"
+dest_files=["res://.godot/imported/44_starlord_01.wav-3694dabf973483ed29bb7aa3a9d77a78.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cqs0geguu6l1y"
-valid=false
+path="res://.godot/imported/17_flanker_02.wav-072bcb0eebfc41a20bce6a13df685b53.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/17_flanker_02.wav"
+dest_files=["res://.godot/imported/17_flanker_02.wav-072bcb0eebfc41a20bce6a13df685b53.sample"]
 
 [params]
 

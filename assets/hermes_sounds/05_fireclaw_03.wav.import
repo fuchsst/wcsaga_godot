@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dmph2y8fiyqsp"
-valid=false
+path="res://.godot/imported/05_fireclaw_03.wav-6a4c902b812486f8dfe64775f72a1a56.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/05_fireclaw_03.wav"
+dest_files=["res://.godot/imported/05_fireclaw_03.wav-6a4c902b812486f8dfe64775f72a1a56.sample"]
 
 [params]
 

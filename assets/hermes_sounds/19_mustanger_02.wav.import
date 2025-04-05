@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://6cuus6eq5nj8"
-valid=false
+path="res://.godot/imported/19_mustanger_02.wav-e57e1899dcd64acd7ee49ce370f1f341.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/19_mustanger_02.wav"
+dest_files=["res://.godot/imported/19_mustanger_02.wav-e57e1899dcd64acd7ee49ce370f1f341.sample"]
 
 [params]
 

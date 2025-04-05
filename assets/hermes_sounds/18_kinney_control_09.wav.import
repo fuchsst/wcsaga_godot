@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://wnql75fjrjnh"
-valid=false
+path="res://.godot/imported/18_kinney_control_09.wav-5ee93c81f3270a569f13eb015fff68ba.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/18_kinney_control_09.wav"
+dest_files=["res://.godot/imported/18_kinney_control_09.wav-5ee93c81f3270a569f13eb015fff68ba.sample"]
 
 [params]
 

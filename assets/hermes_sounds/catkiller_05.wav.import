@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://ir0cxbn8kk5w"
-valid=false
+path="res://.godot/imported/catkiller_05.wav-5e898ea34836bdd73c399e4689329450.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/catkiller_05.wav"
+dest_files=["res://.godot/imported/catkiller_05.wav-5e898ea34836bdd73c399e4689329450.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cynxs5lrecdrl"
-valid=false
+path="res://.godot/imported/06_moonsword_01.wav-4304ceb853ee89b50872c87bef6d9dd0.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/06_moonsword_01.wav"
+dest_files=["res://.godot/imported/06_moonsword_01.wav-4304ceb853ee89b50872c87bef6d9dd0.sample"]
 
 [params]
 

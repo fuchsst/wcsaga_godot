@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bbowtpcfydjup"
-valid=false
+path="res://.godot/imported/50_saratoga_control_01.wav-92208ea0ee031322081b08be04272237.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/50_saratoga_control_01.wav"
+dest_files=["res://.godot/imported/50_saratoga_control_01.wav-92208ea0ee031322081b08be04272237.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://baqsixo3pqcj5"
-valid=false
+path="res://.godot/imported/44_admiral_rumley_03.wav-e59c6b0fd094f890935cf34bbb0c8ea5.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/44_admiral_rumley_03.wav"
+dest_files=["res://.godot/imported/44_admiral_rumley_03.wav-e59c6b0fd094f890935cf34bbb0c8ea5.sample"]
 
 [params]
 

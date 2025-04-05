@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://c5e7acyh80qmv"
-valid=false
+path="res://.godot/imported/pr_03_kennedy_control_03.wav-692a7a90f492e1c5e25838ea9f16b2eb.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/pr_03_kennedy_control_03.wav"
+dest_files=["res://.godot/imported/pr_03_kennedy_control_03.wav-692a7a90f492e1c5e25838ea9f16b2eb.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://c2j7tmwttexmy"
-valid=false
+path="res://.godot/imported/22_torgo_control_04.wav-774245d1dd967c9e4cff45ed283abdbf.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/22_torgo_control_04.wav"
+dest_files=["res://.godot/imported/22_torgo_control_04.wav-774245d1dd967c9e4cff45ed283abdbf.sample"]
 
 [params]
 

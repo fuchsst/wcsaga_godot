@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://s37gskccpr5e"
-valid=false
+path="res://.godot/imported/26_captain_koolan_08.wav-dc91dd7e4b6fbf3d8fa400abc86292ae.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/26_captain_koolan_08.wav"
+dest_files=["res://.godot/imported/26_captain_koolan_08.wav-dc91dd7e4b6fbf3d8fa400abc86292ae.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bas1lexoddwib"
-valid=false
+path="res://.godot/imported/28_lee_01.wav-36c612333536134e642d2b32e9690e8a.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/28_lee_01.wav"
+dest_files=["res://.godot/imported/28_lee_01.wav-36c612333536134e642d2b32e9690e8a.sample"]
 
 [params]
 

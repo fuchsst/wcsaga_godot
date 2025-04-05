@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://coatkfitntwf"
-valid=false
+path="res://.godot/imported/28_captain_moran_05.wav-ddb7c0554804dda606def8ae854ce8db.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/28_captain_moran_05.wav"
+dest_files=["res://.godot/imported/28_captain_moran_05.wav-ddb7c0554804dda606def8ae854ce8db.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://paqnw1hi7yhl"
-valid=false
+path="res://.godot/imported/smartcat_25.wav-48f50f3366d1b757d6c92c553fb3f4c0.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/smartcat_25.wav"
+dest_files=["res://.godot/imported/smartcat_25.wav-48f50f3366d1b757d6c92c553fb3f4c0.sample"]
 
 [params]
 

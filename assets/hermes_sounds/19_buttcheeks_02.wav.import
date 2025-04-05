@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://delwbp6677cn8"
-valid=false
+path="res://.godot/imported/19_buttcheeks_02.wav-09482b17346eb43d694864d7d73a6192.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/19_buttcheeks_02.wav"
+dest_files=["res://.godot/imported/19_buttcheeks_02.wav-09482b17346eb43d694864d7d73a6192.sample"]
 
 [params]
 

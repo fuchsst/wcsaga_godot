@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cjx5xqxesemr6"
-valid=false
+path="res://.godot/imported/09_bradshaw_control_05.wav-db113f4242b57a180f79aa370668d599.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/09_bradshaw_control_05.wav"
+dest_files=["res://.godot/imported/09_bradshaw_control_05.wav-db113f4242b57a180f79aa370668d599.sample"]
 
 [params]
 

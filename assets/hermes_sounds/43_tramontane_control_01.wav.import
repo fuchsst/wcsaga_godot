@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://c702xnfxk56de"
-valid=false
+path="res://.godot/imported/43_tramontane_control_01.wav-33d0ff7cefd2be2573a8acc2b569cf8c.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/43_tramontane_control_01.wav"
+dest_files=["res://.godot/imported/43_tramontane_control_01.wav-33d0ff7cefd2be2573a8acc2b569cf8c.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://p124wrd32two"
-valid=false
+path="res://.godot/imported/eightball_26.wav-93c3a7adf3822ed88da8dec77d8c57e5.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/eightball_26.wav"
+dest_files=["res://.godot/imported/eightball_26.wav-93c3a7adf3822ed88da8dec77d8c57e5.sample"]
 
 [params]
 

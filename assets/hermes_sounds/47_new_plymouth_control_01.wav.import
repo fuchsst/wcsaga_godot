@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cvf45txkar7yd"
-valid=false
+path="res://.godot/imported/47_new_plymouth_control_01.wav-37eadf45a82c277b9b57dcc62e1d4ffe.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/47_new_plymouth_control_01.wav"
+dest_files=["res://.godot/imported/47_new_plymouth_control_01.wav-37eadf45a82c277b9b57dcc62e1d4ffe.sample"]
 
 [params]
 

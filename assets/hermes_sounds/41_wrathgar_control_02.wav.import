@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://clgs48v4d07sd"
-valid=false
+path="res://.godot/imported/41_wrathgar_control_02.wav-b06481ef1952f9775e34b29729b34032.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/41_wrathgar_control_02.wav"
+dest_files=["res://.godot/imported/41_wrathgar_control_02.wav-b06481ef1952f9775e34b29729b34032.sample"]
 
 [params]
 

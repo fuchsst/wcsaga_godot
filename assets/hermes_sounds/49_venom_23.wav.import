@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://kubfhjnwq7rv"
-valid=false
+path="res://.godot/imported/49_venom_23.wav-53b5aad5faa4f964a94d28db6c8eb2e6.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/49_venom_23.wav"
+dest_files=["res://.godot/imported/49_venom_23.wav-53b5aad5faa4f964a94d28db6c8eb2e6.sample"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://g7fq4p67bu1d"
-valid=false
+path="res://.godot/imported/43_tassafaronga_control_02.wav-3e702886a88c1bc809b64ff68bc5a1e7.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/43_tassafaronga_control_02.wav"
+dest_files=["res://.godot/imported/43_tassafaronga_control_02.wav-3e702886a88c1bc809b64ff68bc5a1e7.sample"]
 
 [params]
 

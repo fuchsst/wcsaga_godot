@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://ibhwb63cft6t"
-valid=false
+path="res://.godot/imported/43_dellaciel_02.wav-2411743984fafb6bb5f4ccb14ac4a1b1.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/43_dellaciel_02.wav"
+dest_files=["res://.godot/imported/43_dellaciel_02.wav-2411743984fafb6bb5f4ccb14ac4a1b1.sample"]
 
 [params]
 

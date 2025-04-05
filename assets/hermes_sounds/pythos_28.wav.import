@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://br4vxnl5obhg6"
-valid=false
+path="res://.godot/imported/pythos_28.wav-f6662b56e2ed7544302e004b6f881178.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/pythos_28.wav"
+dest_files=["res://.godot/imported/pythos_28.wav-f6662b56e2ed7544302e004b6f881178.sample"]
 
 [params]
 

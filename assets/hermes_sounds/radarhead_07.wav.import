@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://qvi2dpoipj4e"
-valid=false
+path="res://.godot/imported/radarhead_07.wav-d49ecafe8735c36b7aff2970c0886d91.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/radarhead_07.wav"
+dest_files=["res://.godot/imported/radarhead_07.wav-d49ecafe8735c36b7aff2970c0886d91.sample"]
 
 [params]
 

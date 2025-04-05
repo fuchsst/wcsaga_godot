@@ -3,11 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://eipfofe85ag8"
-valid=false
+path="res://.godot/imported/kimchee_28.wav-f3e5d3b08c298b9e0b21344c429f26e0.sample"
 
 [deps]
 
 source_file="res://assets/hermes_sounds/kimchee_28.wav"
+dest_files=["res://.godot/imported/kimchee_28.wav-f3e5d3b08c298b9e0b21344c429f26e0.sample"]
 
 [params]
 
