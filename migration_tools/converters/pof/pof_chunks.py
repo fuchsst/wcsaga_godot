@@ -1,203 +1,201 @@
-"""
-POF chunk handlers.
-Provides functions for reading and writing POF file chunks.
-"""
+#!/usr/bin/env python3
+import struct
+import logging
+from typing import BinaryIO, Tuple, Dict, Any, List
 
-from __future__ import annotations
-from typing import List, Tuple, Dict, Optional
-from dataclasses import dataclass, field
-from .pof_binary import POFReader, POFWriter
 from .vector3d import Vector3D
-from .binary_data import ChunkHeader
 
-# Chunk IDs
-CHUNK_HDR2 = 'HDR2'  # Header chunk
-CHUNK_TXTR = 'TXTR'  # Texture chunk
-CHUNK_OBJ2 = 'OBJ2'  # Object/geometry chunk
-CHUNK_PINF = 'PINF'  # Model info chunk
-CHUNK_EYE  = 'EYE '  # Eye points chunk
-CHUNK_SPCL = 'SPCL'  # Special points chunk
-CHUNK_GPNT = 'GPNT'  # Gun points chunk
-CHUNK_MPNT = 'MPNT'  # Missile points chunk
-CHUNK_TGUN = 'TGUN'  # Turret guns chunk
-CHUNK_TMIS = 'TMIS'  # Turret missiles chunk
-CHUNK_DOCK = 'DOCK'  # Docking points chunk
-CHUNK_FUEL = 'FUEL'  # Thruster chunk
-CHUNK_SHLD = 'SHLD'  # Shield mesh chunk
-CHUNK_INSG = 'INSG'  # Insignia chunk
-CHUNK_PATH = 'PATH'  # Path chunk
-CHUNK_GLOW = 'GLOW'  # Glow points chunk
-CHUNK_SLDC = 'SLDC'  # Shield collision chunk
+logger = logging.getLogger(__name__)
 
-def read_textures(reader: POFReader) -> List[str]:
-    """Read texture chunk."""
-    num_textures = reader.read_int32()
-    textures = []
-    for _ in range(num_textures):
-        textures.append(reader.read_pof_string())
-    return textures
+# POF Chunk IDs (from modelsinc.h)
+ID_OHDR = 0x32524448  # HDR2
+ID_SOBJ = 0x324a424f  # OBJ2
+ID_TXTR = 0x52545854  # TXTR
+ID_INFO = 0x464e4950  # PINF
+ID_GRID = 0x44495247  # GRID (Unused?)
+ID_SPCL = 0x4c435053  # SPCL
+ID_PATH = 0x48544150  # PATH
+ID_GPNT = 0x544e5047  # GPNT (Gun points)
+ID_MPNT = 0x544e504d  # MPNT (Missile points)
+ID_DOCK = 0x4b434f44  # DOCK
+ID_TGUN = 0x4e554754  # TGUN (Turret Gun?) - Deprecated? Handled in SOBJ?
+ID_TMIS = 0x53494d54  # TMIS (Turret Missile?) - Deprecated? Handled in SOBJ?
+ID_FUEL = 0x4c455546  # FUEL (Thrusters)
+ID_SHLD = 0x444c4853  # SHLD (Shield mesh)
+ID_EYE  = 0x20455945  # EYE (Eye points)
+ID_INSG = 0x47534e49  # INSG (Insignia)
+ID_ACEN = 0x4e454341  # ACEN (Autocenter)
+ID_GLOW = 0x574f4c47  # GLOW (Glow points)
+# ID_GLOX = 0x584f4c47 # GLOX (Seems unused in FS2 source?)
+ID_SLDC = 0x43444c53  # SLDC (Shield Collision Tree)
 
-def write_textures(writer: POFWriter, textures: List[str]) -> None:
-    """Write texture chunk."""
-    writer.write_bytes(CHUNK_TXTR.encode('ascii'))
-    pos = writer.get_position()
-    writer.write_int32(0)  # Placeholder for chunk size
-    
-    writer.write_int32(len(textures))
-    for texture in textures:
-        writer.write_pof_string(texture)
-        
-    size = writer.get_position() - pos - 4
-    writer.set_position(pos)
-    writer.write_int32(size)
-    writer.set_position(pos + size + 4)
+# BSP Chunk IDs (from modelinterp.cpp and modelsinc.h)
+OP_EOF = 0
+OP_DEFPOINTS = 1
+OP_FLATPOLY = 2
+OP_TMAPPOLY = 3
+OP_SORTNORM = 4
+OP_BOUNDBOX = 5
 
-def read_model_info(reader: POFReader) -> List[str]:
-    """Read model info strings."""
-    model_info = []
-    
-    # Read raw data
-    data = reader.read_bytes(reader.chunk_size)
-    if not data:
-        return []
+# Constants
+MAX_NAME_LEN = 32
+MAX_PROP_LEN = 256
+MAX_DEBRIS_OBJECTS = 32
+MAX_MODEL_DETAIL_LEVELS = 8
+MAX_MODEL_TEXTURES = 35 # From model.h, adjust if needed
+MAX_SLOTS = 25 # Max gun/missile slots per bank
+MAX_DOCK_SLOTS = 2
+MAX_TFP = 10 # Max turret firing points
+MAX_EYES = 10
+MAX_SPLIT_PLANE = 5
+MAX_REPLACEMENT_TEXTURES = MAX_MODEL_TEXTURES * 5 # From model.h TM_NUM_TYPES
 
-    # Split into null-terminated strings
-    current_str = bytearray()
-    for byte in data:
-        if byte == 0:
-            if current_str:
-                try:
-                    model_info.append(current_str.decode('ascii'))
-                except UnicodeDecodeError:
-                    pass  # Skip invalid strings
-                current_str = bytearray()
+# Helper functions for reading binary data
+def read_int(f: BinaryIO) -> int:
+    """Reads a 4-byte signed integer."""
+    try:
+        return struct.unpack('<i', f.read(4))[0]
+    except struct.error:
+        logger.error("Failed to read int (EOF?)")
+        raise EOFError("Could not read 4 bytes for int.")
+
+def read_uint(f: BinaryIO) -> int:
+    """Reads a 4-byte unsigned integer."""
+    try:
+        return struct.unpack('<I', f.read(4))[0]
+    except struct.error:
+        logger.error("Failed to read uint (EOF?)")
+        raise EOFError("Could not read 4 bytes for uint.")
+
+def read_short(f: BinaryIO) -> int:
+    """Reads a 2-byte signed short."""
+    try:
+        return struct.unpack('<h', f.read(2))[0]
+    except struct.error:
+        logger.error("Failed to read short (EOF?)")
+        raise EOFError("Could not read 2 bytes for short.")
+
+def read_ushort(f: BinaryIO) -> int:
+    """Reads a 2-byte unsigned short."""
+    try:
+        return struct.unpack('<H', f.read(2))[0]
+    except struct.error:
+        logger.error("Failed to read ushort (EOF?)")
+        raise EOFError("Could not read 2 bytes for ushort.")
+
+def read_float(f: BinaryIO) -> float:
+    """Reads a 4-byte float."""
+    try:
+        return struct.unpack('<f', f.read(4))[0]
+    except struct.error:
+        logger.error("Failed to read float (EOF?)")
+        raise EOFError("Could not read 4 bytes for float.")
+
+def read_byte(f: BinaryIO) -> int:
+    """Reads a 1-byte signed byte."""
+    try:
+        return struct.unpack('<b', f.read(1))[0]
+    except struct.error:
+        logger.error("Failed to read byte (EOF?)")
+        raise EOFError("Could not read 1 byte for byte.")
+
+def read_ubyte(f: BinaryIO) -> int:
+    """Reads a 1-byte unsigned byte."""
+    try:
+        return struct.unpack('<B', f.read(1))[0]
+    except struct.error:
+        logger.error("Failed to read ubyte (EOF?)")
+        raise EOFError("Could not read 1 byte for ubyte.")
+
+def read_vector(f: BinaryIO) -> Vector3D:
+    """Reads a 12-byte vector."""
+    try:
+        x, y, z = struct.unpack('<fff', f.read(12))
+        return Vector3D(x, y, z)
+    except struct.error:
+        logger.error("Failed to read vector (EOF?)")
+        raise EOFError("Could not read 12 bytes for vector.")
+
+def read_matrix(f: BinaryIO) -> List[List[float]]:
+    """Reads a 36-byte 3x3 matrix."""
+    try:
+        m = []
+        for _ in range(3):
+            m.append(list(struct.unpack('<fff', f.read(12))))
+        return m
+    except struct.error:
+        logger.error("Failed to read matrix (EOF?)")
+        raise EOFError("Could not read 36 bytes for matrix.")
+
+def read_string(f: BinaryIO, max_len: int) -> str:
+    """Reads a null-terminated string, ensuring max length."""
+    chars = []
+    count = 0
+    try:
+        while count < max_len:
+            byte = f.read(1)
+            if not byte or byte == b'\x00':
+                break
+            chars.append(byte)
+            count += 1
+        # Read and discard remaining bytes if max_len was hit before null terminator
+        if count == max_len:
+            while True:
+                byte = f.read(1)
+                if not byte or byte == b'\x00':
+                    break
+        return b"".join(chars).decode('utf-8', errors='replace')
+    except EOFError:
+        logger.warning(f"EOF reached while reading string (max_len={max_len}). Returning partial string.")
+        return b"".join(chars).decode('utf-8', errors='replace')
+
+
+def read_string_len(f: BinaryIO, max_len: int) -> str:
+    """Reads a length-prefixed string."""
+    try:
+        length = read_int(f)
+        if length <= 0:
+            return ""
+        if length >= max_len:
+            logger.warning(f"String length {length} exceeds max {max_len}, truncating.")
+            data = f.read(max_len - 1)
+            f.seek(length - (max_len - 1), 1) # Skip remaining bytes
+            return data.decode('utf-8', errors='replace') + '\0' # Ensure null termination conceptually
         else:
-            current_str.append(byte)
-            
-    return model_info
+            data = f.read(length)
+            # POF strings might not be null-terminated in the file after the length prefix
+            return data.decode('utf-8', errors='replace')
+    except EOFError:
+        logger.error("EOF reached while reading length-prefixed string.")
+        raise # Re-raise EOFError
 
-def write_model_info(writer: POFWriter, model_info: List[str]) -> None:
-    """Write model info strings."""
-    writer.write_bytes(CHUNK_PINF.encode('ascii'))
-    pos = writer.get_position()
-    writer.write_int32(0)  # Placeholder for chunk size
-    
-    # Write null-terminated strings
-    for info in model_info:
-        writer.write_bytes(info.encode('ascii') + b'\0')
-        
-    size = writer.get_position() - pos - 4
-    writer.set_position(pos)
-    writer.write_int32(size)
-    writer.set_position(pos + size + 4)
+# --- Chunk Header Reading ---
 
-def read_eyes(reader: POFReader) -> List[Tuple[int, Vector3D, Vector3D]]:
-    """Read eye points."""
-    num_eyes = reader.read_int32()
-    eyes = []
-    for _ in range(num_eyes):
-        sobj_num = reader.read_int32()
-        offset = reader.read_vector3d()
-        normal = reader.read_vector3d()
-        eyes.append((sobj_num, offset, normal))
-    return eyes
+def read_chunk_header(f: BinaryIO) -> Tuple[int, int]:
+    """Reads the 8-byte chunk header (ID and Length)."""
+    chunk_id = read_uint(f)
+    chunk_len = read_int(f)
+    return chunk_id, chunk_len
 
-def write_eyes(writer: POFWriter, eyes: List[Tuple[int, Vector3D, Vector3D]]) -> None:
-    """Write eye points."""
-    writer.write_bytes(CHUNK_EYE.encode('ascii'))
-    pos = writer.get_position()
-    writer.write_int32(0)  # Placeholder for chunk size
-    
-    writer.write_int32(len(eyes))
-    for sobj_num, offset, normal in eyes:
-        writer.write_int32(sobj_num)
-        writer.write_vector3d(offset)
-        writer.write_vector3d(normal)
-        
-    size = writer.get_position() - pos - 4
-    writer.set_position(pos)
-    writer.write_int32(size)
-    writer.set_position(pos + size + 4)
+# --- Unknown Chunk Handling ---
+def read_unknown_chunk(f: BinaryIO, length: int, chunk_id: int) -> None:
+    """Skips an unknown chunk."""
+    try:
+        # Attempt to decode the chunk ID as ASCII for logging
+        chunk_id_str = struct.pack('<I', chunk_id).decode('ascii', errors='replace')
+    except:
+        chunk_id_str = "Invalid ID"
+    logger.warning(f"Skipping unknown chunk '{chunk_id_str}' (ID: {chunk_id:08X}) of length {length}")
+    try:
+        f.seek(length, 1)
+    except Exception as e:
+         logger.error(f"Error seeking past unknown chunk {chunk_id_str}: {e}")
+         raise EOFError(f"Could not seek past unknown chunk {chunk_id_str}")
 
-def read_specials(reader: POFReader) -> List[Tuple[str, str, Vector3D, float]]:
-    """Read special points."""
-    num_specials = reader.read_int32()
-    specials = []
-    for _ in range(num_specials):
-        name = reader.read_pof_string()
-        properties = reader.read_pof_string()
-        point = reader.read_vector3d()
-        radius = reader.read_float32()
-        specials.append((name, properties, point, radius))
-    return specials
 
-def write_specials(writer: POFWriter, 
-                  specials: List[Tuple[str, str, Vector3D, float]]) -> None:
-    """Write special points."""
-    writer.write_bytes(CHUNK_SPCL.encode('ascii'))
-    pos = writer.get_position()
-    writer.write_int32(0)  # Placeholder for chunk size
-    
-    writer.write_int32(len(specials))
-    for name, properties, point, radius in specials:
-        writer.write_pof_string(name)
-        writer.write_pof_string(properties)
-        writer.write_vector3d(point)
-        writer.write_float32(radius)
-        
-    size = writer.get_position() - pos - 4
-    writer.set_position(pos)
-    writer.write_int32(size)
-    writer.set_position(pos + size + 4)
-
-def read_weapons(reader: POFReader, weapon_type: int) -> List[Tuple[Vector3D, Vector3D]]:
-    """Read weapon points (guns or missiles)."""
-    num_slots = reader.read_int32()
-    weapons = []
-    for _ in range(num_slots):
-        num_points = reader.read_int32()
-        points = []
-        for _ in range(num_points):
-            point = reader.read_vector3d()
-            normal = reader.read_vector3d()
-            points.append((point, normal))
-        weapons.extend(points)
-    return weapons
-
-def write_weapons(writer: POFWriter, weapons: List[Tuple[Vector3D, Vector3D]], 
-                 weapon_type: int) -> None:
-    """Write weapon points (guns or missiles)."""
-    chunk_id = CHUNK_GPNT if weapon_type == 0 else CHUNK_MPNT
-    writer.write_bytes(chunk_id.encode('ascii'))
-    pos = writer.get_position()
-    writer.write_int32(0)  # Placeholder for chunk size
-    
-    # Group weapons into slots of 8
-    slot_size = 8
-    num_slots = (len(weapons) + slot_size - 1) // slot_size
-    writer.write_int32(num_slots)
-    
-    for slot in range(num_slots):
-        start = slot * slot_size
-        end = min(start + slot_size, len(weapons))
-        slot_weapons = weapons[start:end]
-        
-        writer.write_int32(len(slot_weapons))
-        for point, normal in slot_weapons:
-            writer.write_vector3d(point)
-            writer.write_vector3d(normal)
-            
-    size = writer.get_position() - pos - 4
-    writer.set_position(pos)
-    writer.write_int32(size)
-    writer.set_position(pos + size + 4)
-
-# TODO: Add remaining chunk handlers for:
-# - TGUN/TMIS (turrets)
-# - DOCK (docking points)
-# - FUEL (thrusters)
-# - SHLD (shield mesh)
-# - INSG (insignias)
-# - PATH (paths)
-# - GLOW (glow points)
-# - SLDC (shield collision)
+# --- BSP Parsing ---
+# Moved to pof_misc_parser.py
+def parse_bsp_data(bsp_bytes: bytes, pof_version: int) -> Dict[str, Any]:
+     """Placeholder - Actual implementation is in pof_misc_parser.py"""
+     logger.warning("parse_bsp_data called from pof_chunks.py - should be called from pof_misc_parser.py")
+     return {'vertices': [], 'normals': [], 'uvs': [], 'polygons': []}

@@ -347,6 +347,14 @@ enum HookActionType {
 	KEYPRESSED = 17, KEYRELEASED = 18, ONSTATESTART = 19, ONSTATEEND = 20
 }
 
+# --- Flag Definitions (Mirroring C++) ---
+# IFFF Flags
+const IFFF_SUPPORT_ALLOWED = (1 << 0)
+const IFFF_EXEMPT_FROM_ALL_TEAMS_AT_WAR = (1 << 1)
+const IFFF_ORDERS_HIDDEN = (1 << 2)
+const IFFF_ORDERS_SHOWN = (1 << 3)
+const IFFF_WING_NAME_HIDDEN = (1 << 4)
+
 # --- Statistics Types (Placeholder) ---
 enum StatType { SCORE, KILLS_TOTAL }
 
