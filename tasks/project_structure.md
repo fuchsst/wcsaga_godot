@@ -2,7 +2,6 @@
 
 This document outlines the target directory and file structure for the Godot project, based on the component analysis.
 
-```
 wcsaga_godot/
 ├── addons/                 # Godot addons (external plugins)
 │   ├── gfred2/             # GFRED Mission Editor Plugin (See 02_mission_editor.md)
@@ -143,76 +142,86 @@ wcsaga_godot/
 ├── scripts/                # GDScript files, organized by component
 │   ├── ai/                 # AIController, AI behaviors, targeting, pathfinding, AIProfile script (See 01_ai.md)
 │   │   ├── ai_controller.gd         # Main AI logic node, manages state, orchestrates BT/components.
-│   │   │   ├── func set_mode(new_mode: AIConstants.AIMode, new_submode: int = 0)
-│   │   │   ├── func set_target(target_node: Node3D)
-│   │   │   ├── func set_targeted_subsystem(subsystem: Node, parent_id: int)
-│   │   │   ├── func add_goal(goal: AIGoal)
-│   │   │   ├── func clear_goals()
-│   │   │   ├── func has_flag(flag: int) -> bool
-│   │   │   ├── func set_flag(flag: int, value: bool)
-│   │   │   └── func get_target_position() -> Vector3
+│   │   │   ├── func set_mode(new_mode: AIConstants.AIMode, new_submode: int = 0) # Sets the AI's current mode and submode.
+│   │   │   ├── func set_target(target_node: Node3D) # Sets the AI's current target object.
+│   │   │   ├── func set_targeted_subsystem(subsystem: Node, parent_id: int) # Sets the specific subsystem to target on the current target object.
+│   │   │   ├── func add_goal(goal: AIGoal) # Adds a goal to the AI's goal queue via the AIGoalManager.
+│   │   │   ├── func clear_goals() # Clears all goals for this AI via the AIGoalManager.
+│   │   │   ├── func has_flag(flag: int) -> bool # Checks if a specific AIF_* flag is set.
+│   │   │   ├── func set_flag(flag: int, value: bool) # Sets or clears a specific AIF_* flag.
+│   │   │   └── func get_target_position() -> Vector3 # Gets the global position of the current target (or targeted subsystem).
 │   │   ├── perception_component.gd  # Handles sensing environment, targets, threats.
-│   │   │   └── func update_perception(delta: float)
+│   │   │   ├── func update_perception(delta: float) # Main update loop for perception tasks.
+│   │   │   └── func is_ignore_object(check_target_id: int) -> bool # Checks if a target ID is on the ignore list.
 │   │   ├── ai_goal_manager.gd     # Manages the AI goal queue, prioritization, and selection.
-│   │   │   ├── func add_goal(controller: AIController, new_goal: AIGoal) -> bool
-│   │   │   ├── func remove_goal(controller: AIController, goal_signature: int)
-│   │   │   ├── func clear_goals(controller: AIController)
-│   │   │   └── func process_goals(controller: AIController)
+│   │   │   ├── func add_goal(controller: AIController, new_goal: AIGoal) -> bool # Adds a new goal to the queue.
+│   │   │   ├── func remove_goal(controller: AIController, goal_signature: int) # Removes a goal by its signature.
+│   │   │   ├── func clear_goals(controller: AIController) # Removes all goals for the AI.
+│   │   │   ├── func get_active_goal() -> AIGoal # Returns the currently active goal resource.
+│   │   │   └── func process_goals(controller: AIController) # Validates, sorts, and activates the highest priority achievable goal.
 │   │   ├── ai_state_machine.gd    # (Optional) State machine implementation (or use LimboAI BTState)
 │   │   ├── ai_behavior_tree.gd    # (Optional) Base/helper for LimboAI BehaviorTree resources
 │   │   ├── ai_blackboard.gd       # (Optional) LimboAI blackboard resource script
 │   │   ├── behaviors/           # LimboAI action/condition scripts defining specific behaviors.
-│   │   │   ├── approach_target.gd   # BTAction: Steers towards target position
-│   │   │   │   └── func _tick() -> Status
-│   │   │   ├── chase_target.gd      # BTAction: Basic chase movement towards target
-│   │   │   │   └── func _tick() -> Status
-│   │   │   ├── deploy_countermeasure.gd # BTAction: Triggers countermeasure deployment
-│   │   │   │   └── func _tick() -> Status
-│   │   │   ├── fire_primary.gd      # BTAction: Triggers primary weapon fire
-│   │   │   │   └── func _tick() -> Status
-│   │   │   ├── has_target.gd        # BTCondition: Checks if AI has a target
-│   │   │   │   └── func _tick() -> Status
-│   │   │   ├── is_missile_locked.gd # BTCondition: Checks if AI is locked by a missile
-│   │   │   │   └── func _tick() -> Status
-│   │   │   ├── is_target_in_range.gd # BTCondition: Checks if target is within weapon range
-│   │   │   │   └── func _tick() -> Status
-│   │   │   ├── select_primary_weapon.gd # BTAction: Selects primary weapon bank
-│   │   │   │   └── func _tick() -> Status
-│   │   │   └── select_secondary_weapon.gd # BTAction: Selects secondary weapon bank
-│   │   │       └── func _tick() -> Status
+│   │   │   ├── approach_target.gd   # BTAction: Steers towards target position.
+│   │   │   │   └── func _tick() -> Status # Executes the approach logic each frame.
+│   │   │   ├── chase_target.gd      # BTAction: Basic chase movement towards target.
+│   │   │   │   └── func _tick() -> Status # Executes the chase logic each frame.
+│   │   │   ├── deploy_countermeasure.gd # BTAction: Triggers countermeasure deployment.
+│   │   │   │   └── func _tick() -> Status # Sets the deploy flag on the blackboard.
+│   │   │   ├── fire_primary.gd      # BTAction: Triggers primary weapon fire.
+│   │   │   │   └── func _tick() -> Status # Sets the fire flag on the blackboard.
+│   │   │   ├── has_target.gd        # BTCondition: Checks if AI has a target.
+│   │   │   │   └── func _tick() -> Status # Reads 'has_target' from blackboard.
+│   │   │   ├── is_missile_locked.gd # BTCondition: Checks if AI is locked by a missile.
+│   │   │   │   └── func _tick() -> Status # Reads 'is_missile_locked' from blackboard.
+│   │   │   ├── is_target_in_range.gd # BTCondition: Checks if target is within weapon range.
+│   │   │   │   └── func _tick() -> Status # Reads target distance and compares to weapon range.
+│   │   │   ├── select_primary_weapon.gd # BTAction: Selects primary weapon bank based on target/situation.
+│   │   │   │   └── func _tick() -> Status # Calls ship's 'set_selected_primary_bank_ai'.
+│   │   │   ├── select_secondary_weapon.gd # BTAction: Selects secondary weapon bank based on target/situation.
+│   │   │   │   └── func _tick() -> Status # Calls ship's 'set_selected_secondary_bank_ai'.
+│   │   │   └── should_deploy_countermeasure.gd # BTCondition: Checks if countermeasures should be deployed based on lock, cooldown, and skill.
+│   │   │       └── func _tick() -> Status # Performs the check.
 │   │   ├── navigation/          # (Placeholder) Navigation related scripts (path_follower, collision_avoidance)
 │   │   ├── targeting/           # (Placeholder) Targeting related scripts (targeting_system, stealth_detector)
-│   │   └── turret/              # (Placeholder) Turret specific AI script (turret_ai)
+│   │   └── turret/              # Turret specific AI scripts
+│   │       └── turret_ai.gd     # Manages independent AI logic for a turret subsystem.
+│   │           └── func _physics_process(delta: float) # Main update loop for turret AI.
 │   ├── core_systems/       # GameManager, ObjectManager, GameSequenceManager, PlayerData, ScoringManager, etc. (See 04_core_systems.md)
 │   │   ├── game_manager.gd          # Main game state, loop integration, time, pausing logic
-│   │   │   ├── func pause_game()
-│   │   │   ├── func unpause_game()
-│   │   │   ├── func toggle_pause()
-│   │   │   ├── func set_time_compression(factor: float)
-│   │   │   ├── func get_time_compression() -> float
-│   │   │   ├── func get_mission_time() -> float
-│   │   │   └── func reset_mission_time()
+│   │   │   ├── func pause_game() # Pauses the game tree.
+│   │   │   ├── func unpause_game() # Unpauses the game tree.
+│   │   │   ├── func toggle_pause() # Toggles the pause state.
+│   │   │   ├── func set_time_compression(factor: float) # Sets Engine.time_scale.
+│   │   │   ├── func get_time_compression() -> float # Gets Engine.time_scale.
+│   │   │   ├── func get_mission_time() -> float # Gets the current mission time.
+│   │   │   └── func reset_mission_time() # Resets mission time to zero.
 │   │   ├── object_manager.gd        # Object tracking, lookup by signature/ID logic
-│   │   │   ├── func register_object(obj: Node, signature: int = -1)
-│   │   │   ├── func unregister_object(obj: Node)
-│   │   │   ├── func get_object_by_id(id: int) -> Node
-│   │   │   ├── func get_object_by_signature(signature: int) -> Node
-│   │   │   ├── func get_all_ships() -> Array[Node]
-│   │   │   ├── func get_all_weapons() -> Array[Node]
-│   │   │   ├── func get_next_signature() -> int
-│   │   │   └── func clear_all_objects()
+│   │   │   ├── func register_object(obj: Node, signature: int = -1) # Adds an object to the manager.
+│   │   │   ├── func unregister_object(obj: Node) # Removes an object from the manager.
+│   │   │   ├── func get_object_by_id(id: int) -> Node # Finds an object by its instance ID.
+│   │   │   ├── func get_object_by_signature(signature: int) -> Node # Finds an object by its signature.
+│   │   │   ├── func get_all_ships() -> Array[Node] # Returns all registered ships.
+│   │   │   ├── func get_all_weapons() -> Array[Node] # Returns all registered weapons.
+│   │   │   ├── func get_next_signature() -> int # Generates a unique signature (Placeholder).
+│   │   │   └── func clear_all_objects() # Clears all tracked objects.
 │   │   ├── base_object.gd           # Base script class for all game objects (ships, weapons, etc.), incorporating logic from C++ object.cpp
-│   │   │   ├── func get_object_type() -> GlobalConstants.ObjectType
-│   │   │   ├── func get_signature() -> int
-│   │   │   ├── func set_flag(flag: int)
-│   │   │   ├── func clear_flag(flag: int)
-│   │   │   ├── func has_flag(flag: int) -> bool
-│   │   │   ├── func set_parent_object(parent_obj: Node)
-│   │   │   ├── func get_parent_object() -> Node
-│   │   │   ├── func apply_damage(damage: float, source_pos: Vector3, source_obj: Node = null)
-│   │   │   ├── func get_team() -> int
-│   │   │   ├── func is_destroyed() -> bool
-│   │   │   └── func is_arriving() -> bool
+│   │   │   ├── func get_object_type() -> GlobalConstants.ObjectType # Returns the object's type enum.
+│   │   │   ├── func get_signature() -> int # Returns the object's unique signature.
+│   │   │   ├── func set_flag(flag: int) # Sets an object flag (OF_*).
+│   │   │   ├── func clear_flag(flag: int) # Clears an object flag.
+│   │   │   ├── func has_flag(flag: int) -> bool # Checks if an object flag is set.
+│   │   │   ├── func set_parent_object(parent_obj: Node) # Sets the parent object reference.
+│   │   │   ├── func get_parent_object() -> Node # Gets the parent object node.
+│   │   │   ├── func apply_damage(damage: float, source_pos: Vector3, source_obj: Node = null, damage_type_key = -1) # Virtual method for applying damage.
+│   │   │   ├── func get_team() -> int # Virtual method to get team affiliation.
+│   │   │   ├── func is_destroyed() -> bool # Virtual method to check if destroyed/dying.
+│   │   │   ├── func is_arriving() -> bool # Virtual method to check if in arrival sequence.
+│   │   │   ├── func assign_sound(sound_index: int, offset: Vector3 = Vector3.ZERO, is_main_engine: bool = false) -> int # Assigns a looping sound (Placeholder).
+│   │   │   ├── func stop_sound(handle: int = -1) # Stops assigned sounds (Placeholder).
+│   │   │   ├── func is_docked() -> bool # Checks if the object is docked.
+│   │   │   └── func is_dead_docked() -> bool # Checks if the object is dead-docked.
 │   │   ├── game_sequence_manager.gd # State machine logic for game states (menu, briefing, gameplay, etc.)
 │   │   ├── scoring_manager.gd       # Scoring, rank, medal evaluation logic
 │   │   ├── species_manager.gd       # Manages loading/accessing SpeciesInfo resources
@@ -402,8 +411,46 @@ wcsaga_godot/
 │   ├── hud/                # HUDManager, HUDGauge base, specific gauge scripts (Radar, Shields, TargetBox, etc.) (See 06_hud_system.md)
 │   │   ├── hud.gd                   # Main HUD controller script (attached to hud.tscn)
 │   │   ├── hud_manager.gd           # Singleton for config loading, applying settings logic
-│   │   ├── gauges/                  # Scripts for individual gauges (hud_gauge_base, hud_radar_base, hud_shield_gauge, hud_directives_gauge, etc.)
-│   │   ├── effects/                 # Scripts for HUD visual effects (hud_shake_effect, hud_static_overlay)
+│   │   ├── gauges/                  # Scripts for individual gauges
+│   │   │   ├── hud_gauge_base.gd   # Base class for common gauge logic
+│   │   │   ├── hud_attacking_count_gauge.gd
+│   │   │   ├── hud_auto_gauges.gd
+│   │   │   ├── hud_brackets.gd
+│   │   │   ├── hud_cmeasure_gauge.gd
+│   │   │   ├── hud_damage_gauge.gd
+│   │   │   ├── hud_directives_gauge.gd
+│   │   │   ├── hud_escort_gauge.gd
+│   │   │   ├── hud_ets_gauge.gd
+│   │   │   ├── hud_kills_gauge.gd
+│   │   │   ├── hud_lag_gauge.gd
+│   │   │   ├── hud_lead_indicator.gd
+│   │   │   ├── hud_lock_gauge.gd
+│   │   │   ├── hud_message_box_gauge.gd
+│   │   │   ├── hud_message_gauge.gd
+│   │   │   ├── hud_missile_warning_gauge.gd
+│   │   │   ├── hud_mission_time_gauge.gd
+│   │   │   ├── hud_objectives_notify_gauge.gd
+│   │   │   ├── hud_offscreen_indicator_gauge.gd
+│   │   │   ├── hud_offscreen_range_gauge.gd
+│   │   │   ├── hud_radar_base.gd
+│   │   │   ├── hud_radar_orb.gd
+│   │   │   ├── hud_radar_standard.gd
+│   │   │   ├── hud_reticle_gauge.gd
+│   │   │   ├── hud_shield_gauge.gd
+│   │   │   ├── hud_support_gauge.gd
+│   │   │   ├── hud_talking_head_gauge.gd
+│   │   │   ├── hud_target_mini_icon_gauge.gd
+│   │   │   ├── hud_target_monitor.gd
+│   │   │   ├── hud_text_flash_gauge.gd
+│   │   │   ├── hud_threat_gauge.gd
+│   │   │   ├── hud_throttle_gauge.gd
+│   │   │   ├── hud_weapon_linking_gauge.gd
+│   │   │   ├── hud_weapons_gauge.gd
+│   │   │   ├── hud_wingman_gauge.gd
+│   │   │   └── radar_blip.gd       # Class for radar blips
+│   │   ├── effects/              # Scripts for HUD visual effects
+│   │   │   ├── hud_shake_effect.gd
+│   │   │   └── hud_static_overlay.gd
 │   │   └── squad_message_manager.gd # Singleton for squad message logic
 │   ├── mission_system/     # Mission logic, helpers, UI scripts (See 07_mission_system.md)
 │   │   ├── mission_manager.gd       # Singleton: Orchestrates mission lifecycle, state. Delegates evaluation.

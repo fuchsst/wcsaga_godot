@@ -7,6 +7,7 @@ extends Node
 
 # Preload constants and resources for easy access
 const AIConst = preload("res://scripts/globals/ai_constants.gd")
+const GlobalConstants = preload("res://scripts/globals/global_constants.gd")
 const AIGoal = preload("res://scripts/resources/ai_goal.gd")
 
 const MAX_AI_GOALS = 5 # From ai.h
@@ -82,6 +83,12 @@ func clear_goals(controller: AIController):
 	# Set AI mode back to default behavior (e.g., idle or patrol)
 	controller.set_mode(AIConstants.AIMode.NONE)
 	print("AI Goal (%s): Cleared all goals." % controller.get_parent().name)
+
+func get_active_goal() -> AIGoal:
+	# Returns the currently active goal resource, or null if none is active.
+	if active_goal_index >= 0 and active_goal_index < goals.size():
+		return goals[active_goal_index]
+	return null
 
 func process_goals(controller: AIController):
 	# 1. Validate existing goals and mark for purging if needed
@@ -168,7 +175,6 @@ func _is_goal_achievable(controller: AIController, goal: AIGoal) -> AIConstants.
 	# TODO: Integrate with WingManager for wing-related checks.
 	# TODO: Integrate with WaypointManager for path checks.
 	# TODO: Implement docking point validation and availability checks (DockingManager).
-	# TODO: Implement subsystem validation checks (target ship methods).
 
 	# Handle goals that are always achievable or don't have specific targets
 	match goal.ai_mode:
@@ -236,6 +242,26 @@ func _is_goal_achievable(controller: AIController, goal: AIGoal) -> AIConstants.
 				# if MissionLogManager.has_departed(goal.target_name):
 				#	 return AIConstants.GoalAchievableState.NOT_ACHIEVABLE
 
+				# Check if target is disabled (SF_DISABLED flag) - Requires target_node to be ShipBase or similar
+				if target_node.has_method("has_flag") and target_node.has_flag(GlobalConstants.SF_DISABLED):
+					# Check if goal requires a non-disabled target
+					match goal.ai_mode:
+						AIGoal.GoalMode.CHASE, AIGoal.GoalMode.CHASE_WING, \
+						AIGoal.GoalMode.EVADE_SHIP, AIGoal.GoalMode.STAY_NEAR_SHIP, \
+						AIGoal.GoalMode.FLY_TO_SHIP:
+							return AIConstants.GoalAchievableState.NOT_ACHIEVABLE # Cannot chase/evade/etc. a disabled ship
+						AIGoal.GoalMode.DISABLE_SHIP:
+							return AIConstants.GoalAchievableState.SATISFIED # Already disabled
+						_:
+							pass # Other goals might still be valid
+
+				# Check if target is disarmed (SF2_PRIMARIES_LOCKED | SF2_SECONDARIES_LOCKED)
+				if target_node.has_method("has_flag") and \
+				   target_node.has_flag(GlobalConstants.SF2_PRIMARIES_LOCKED) and \
+				   target_node.has_flag(GlobalConstants.SF2_SECONDARIES_LOCKED):
+					if goal.ai_mode == AIGoal.GoalMode.DISARM_SHIP:
+						return AIConstants.GoalAchievableState.SATISFIED # Already disarmed
+
 	# --- Specific checks based on goal mode and target status ---
 	match goal.ai_mode:
 		AIGoal.GoalMode.DOCK:
@@ -272,34 +298,65 @@ func _is_goal_achievable(controller: AIController, goal: AIGoal) -> AIConstants.
 		AIGoal.GoalMode.DESTROY_SUBSYSTEM:
 			# Basic checks: Target ship must exist and not be destroyed (handled above)
 			if not is_instance_valid(target_node): return AIConstants.GoalAchievableState.NOT_ACHIEVABLE
-			# Resolve subsystem name to node/index if needed
-			if goal.subsystem_node == null or not is_instance_valid(goal.subsystem_node):
+
+			# Resolve subsystem name to node/index if needed (and not already resolved/invalidated)
+			# Use SUBSYS_NEEDS_FIXUP flag to attempt resolution only once or if previously failed
+			if goal.has_flag(AIGoal.GoalFlags.SUBSYS_NEEDS_FIXUP):
 				if target_node.has_method("find_subsystem_node"):
-					goal.subsystem_node = target_node.find_subsystem_node(goal.subsystem_name)
+					var found_subsystem = target_node.find_subsystem_node(goal.subsystem_name)
+					if is_instance_valid(found_subsystem):
+						goal.subsystem_node = found_subsystem # Store the Node reference
+						goal.set_flag(AIGoal.GoalFlags.SUBSYS_NEEDS_FIXUP, false) # Mark as resolved
+						print("AIGoalManager: Resolved subsystem '%s' for goal %d." % [goal.subsystem_name, goal.signature])
+					else:
+						# Subsystem name not found on target ship
+						printerr("AIGoalManager: Could not resolve subsystem '%s' on target '%s' for goal %d." % [goal.subsystem_name, target_node.name, goal.signature])
+						return AIConstants.GoalAchievableState.NOT_ACHIEVABLE # Cannot resolve
 				else:
-					printerr("AIGoalManager: Target ship %s missing find_subsystem_node method." % target_node.name)
+					# Target ship doesn't have the required method
+					printerr("AIGoalManager: Target ship %s missing find_subsystem_node method for goal %d." % [target_node.name, goal.signature])
 					return AIConstants.GoalAchievableState.NOT_ACHIEVABLE
-			# Check if subsystem exists and is not already destroyed
+
+			# Check if the stored subsystem node reference is still valid
 			if not is_instance_valid(goal.subsystem_node):
-				return AIConstants.GoalAchievableState.NOT_ACHIEVABLE # Subsystem doesn't exist
+				# If it was previously resolved but now invalid (e.g., ship structure changed?), goal is unachievable
+				if not goal.has_flag(AIGoal.GoalFlags.SUBSYS_NEEDS_FIXUP):
+					printerr("AIGoalManager: Previously resolved subsystem for goal %d is no longer valid." % goal.signature)
+					return AIConstants.GoalAchievableState.NOT_ACHIEVABLE
+				else:
+					# This case should ideally not happen if resolution failed above, but handle defensively
+					printerr("AIGoalManager: Subsystem node is invalid and needs fixup for goal %d (should have failed resolution)." % goal.signature)
+					return AIConstants.GoalAchievableState.NOT_ACHIEVABLE
+
+			# Check if the valid subsystem is already destroyed
 			if goal.subsystem_node.has_method("is_destroyed") and goal.subsystem_node.is_destroyed():
 				return AIConstants.GoalAchievableState.SATISFIED # Already destroyed
-			pass # Placeholder for other checks
+
+			# If subsystem exists and is not destroyed, the goal is achievable (pending other checks)
 
 		AIGoal.GoalMode.DISABLE_SHIP:
 			# Basic checks: Target ship must exist and not be destroyed (handled above)
 			if not is_instance_valid(target_node): return AIConstants.GoalAchievableState.NOT_ACHIEVABLE
-			# Check if target ship's engines are already disabled
-			if target_node.has_method("are_engines_disabled") and target_node.are_engines_disabled():
+			# Check if target ship is already disabled (using flag check)
+			if target_node.has_flag(GlobalConstants.SF_DISABLED):
 				return AIConstants.GoalAchievableState.SATISFIED
+			# Alternative check using engine subsystem status (more robust)
+			# TODO: Need a reliable way to check if *all* engines are destroyed/disabled
+			# if target_node.has_method("are_engines_disabled") and target_node.are_engines_disabled():
+			#	 return AIConstants.GoalAchievableState.SATISFIED
 			pass # Placeholder
 
 		AIGoal.GoalMode.DISARM_SHIP:
 			# Basic checks: Target ship must exist and not be destroyed (handled above)
 			if not is_instance_valid(target_node): return AIConstants.GoalAchievableState.NOT_ACHIEVABLE
-			# Check if target ship's turrets/weapons are already disabled/destroyed
-			if target_node.has_method("are_weapons_disabled") and target_node.are_weapons_disabled():
+			# Check if target ship is already disarmed (using flags)
+			if target_node.has_flag(GlobalConstants.SF2_PRIMARIES_LOCKED) and \
+			   target_node.has_flag(GlobalConstants.SF2_SECONDARIES_LOCKED):
 				return AIConstants.GoalAchievableState.SATISFIED
+			# Alternative check using weapon/turret subsystem status (more robust)
+			# TODO: Need a reliable way to check if *all* weapons/turrets are destroyed/disabled
+			# if target_node.has_method("are_weapons_disabled") and target_node.are_weapons_disabled():
+			#	 return AIConstants.GoalAchievableState.SATISFIED
 			pass # Placeholder
 
 		AIGoal.GoalMode.IGNORE, AIGoal.GoalMode.IGNORE_NEW:
@@ -413,17 +470,28 @@ func _execute_goal(controller: AIController, goal: AIGoal):
 		AIGoal.GoalMode.DESTROY_SUBSYSTEM:
 			if is_instance_valid(target_node):
 				controller.set_target(target_node)
-				# Resolve subsystem name to node reference and set on controller
-				var subsystem_node = null
-				if target_node.has_method("find_subsystem_node"):
-					subsystem_node = target_node.find_subsystem_node(goal.subsystem_name)
+				# Resolve subsystem name to node reference (might have been done in _is_goal_achievable)
+				var subsystem_node = goal.subsystem_node # Use the potentially pre-resolved node
+				if not is_instance_valid(subsystem_node) or goal.has_flag(AIGoal.GoalFlags.SUBSYS_NEEDS_FIXUP):
+					# Attempt resolution again if needed
+					if target_node.has_method("find_subsystem_node"):
+						subsystem_node = target_node.find_subsystem_node(goal.subsystem_name)
+						if is_instance_valid(subsystem_node):
+							goal.subsystem_node = subsystem_node # Store resolved node
+							goal.set_flag(AIGoal.GoalFlags.SUBSYS_NEEDS_FIXUP, false)
+						else:
+							subsystem_node = null # Ensure it's null if not found
+					else:
+						subsystem_node = null # Target doesn't have the method
+
+				# Set the targeted subsystem on the controller
 				if is_instance_valid(subsystem_node):
 					controller.set_targeted_subsystem(subsystem_node, target_node.get_instance_id())
-					goal.subsystem_node = subsystem_node # Store resolved node
+					print("AI Goal (%s): Targeting subsystem '%s' on '%s'" % [controller.get_parent().name, goal.subsystem_name, target_node.name])
 				else:
-					printerr("Could not find subsystem '%s' on target '%s'" % [goal.subsystem_name, target_node.name])
-					# Optionally, target center mass if subsystem not found?
-					controller.set_targeted_subsystem(null, -1)
+					# Fallback: Target center mass if subsystem not found or invalid
+					printerr("AIGoalManager: Could not find/resolve subsystem '%s' on target '%s' for goal %d. Targeting center." % [goal.subsystem_name, target_node.name, goal.signature])
+					controller.set_targeted_subsystem(null, target_node.get_instance_id()) # Pass parent ID even if subsystem is null
 
 				controller.set_mode(AIConstants.AIMode.CHASE, AIConstants.ChaseSubmode.ATTACK) # Attack parent ship
 			else:

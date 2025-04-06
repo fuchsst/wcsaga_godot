@@ -97,6 +97,7 @@ var support_ship_object_id: int = -1 # Instance ID of the support ship servicing
 var support_ship_signature: int = -1
 var next_rearm_request_timer: float = 0.0 # Timer for next allowed rearm request
 var abort_rearm_timer: float = -1.0 # Timer to auto-abort rearm if support doesn't arrive
+var cmeasure_cooldown_timer: float = 0.0 # Timer for countermeasure cooldown
 
 # Timers & State
 var next_predict_pos_timer: float = 0.0
@@ -344,6 +345,9 @@ func _update_timers(delta: float):
 	if resume_goal_timer > 0.0: # Use -1 as inactive state
 		resume_goal_timer = max(-1.0, resume_goal_timer - delta) # Clamp at -1
 
+	# Countermeasure Timer
+	cmeasure_cooldown_timer = max(0.0, cmeasure_cooldown_timer - delta)
+
 	# Update ignore list timers
 	var current_time = Time.get_ticks_msec() / 1000.0
 	for i in range(ignore_new_list.size() - 1, -1, -1):
@@ -393,6 +397,19 @@ func _update_blackboard():
 	# TODO: Add ammo levels if needed by BT (requires methods on WeaponSystem)
 	# blackboard.set_var("primary_ammo_pct", ship.get_primary_ammo_percentage() if ship.has_method("get_primary_ammo_percentage") else 1.0)
 	# blackboard.set_var("secondary_ammo_pct", ship.get_secondary_ammo_percentage() if ship.has_method("get_secondary_ammo_percentage") else 1.0)
+
+	# Target Status (Shields/Hull) - Requires target node to have these methods
+	var target_shield_pct = 1.0
+	var target_hull_pct = 1.0
+	if target_object_id != -1:
+		var target_node = instance_from_id(target_object_id)
+		if is_instance_valid(target_node):
+			if target_node.has_method("get_shield_percentage"):
+				target_shield_pct = target_node.get_shield_percentage()
+			if target_node.has_method("get_hull_percentage"):
+				target_hull_pct = target_node.get_hull_percentage()
+	blackboard.set_var("target_shield_pct", target_shield_pct)
+	blackboard.set_var("target_hull_pct", target_hull_pct)
 
 	# Threat Info
 	blackboard.set_var("has_danger_weapon", danger_weapon_objnum != -1)

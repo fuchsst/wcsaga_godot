@@ -98,8 +98,7 @@ func _find_potential_targets():
 	var enemy_team_mask = iff_manager.get_attackee_mask(my_team) # Assumes IFFManager method
 
 	# Get potential targets (ships for now, expand later)
-	# TODO: Need ObjectManager integration
-	var potential_targets = [] # Placeholder: object_manager.get_all_ships()
+	var potential_targets = object_manager.get_all_ships() # Use ObjectManager
 
 	for target_ship in potential_targets:
 		if not is_instance_valid(target_ship): continue # Skip invalid instances
@@ -126,11 +125,21 @@ func _find_potential_targets():
 			continue
 
 		# 4. Check targetability flags (requires methods/properties on target_ship)
-		# TODO: Check SF_DYING, SIF_NAVBUOY, OF_PROTECTED, SF_ARRIVING flags
-		# Example: if target_ship.is_dying(): continue
-		# Example: if target_ship.ship_info.has_flag(ShipInfo.SIF_NAVBUOY): continue
-		# Example: if target_ship.has_flag(BaseObject.OF_PROTECTED): continue
-		# Example: if target_ship.is_arriving(): continue
+		# Check if dying (SF_DYING)
+		if target_ship.has_method("is_dying") and target_ship.is_dying():
+			continue
+		# Check if arriving (SF_ARRIVING)
+		if target_ship.has_method("is_arriving") and target_ship.is_arriving():
+			continue
+		# Check if protected (OF_PROTECTED)
+		if target_ship.has_flag(GlobalConstants.OF_PROTECTED):
+			continue
+		# Check if Nav Buoy (SIF_NAVBUOY) - Requires access to ShipData
+		if target_ship.has_method("get_ship_data"):
+			var target_ship_data = target_ship.get_ship_data()
+			if target_ship_data and (target_ship_data.flags & GlobalConstants.SIF_NAVBUOY):
+				continue
+		# TODO: Add check for SIF_NO_SHIP_TYPE if needed
 
 		# 5. Check distance/sensor range
 		var dist_sq = ship.global_position.distance_squared_to(target_ship.global_position)
@@ -141,15 +150,65 @@ func _find_potential_targets():
 		# TODO: Implement is_target_visible(target_ship)
 		# if not is_target_visible(target_ship): continue
 
-		# 7. Check max attackers (Placeholder - needs num_enemies_attacking helper)
-		# TODO: Get max_attackers from controller profile
-		# var max_attackers = controller.ai_profile.get_max_attackers(controller.skill_level)
-		# if num_enemies_attacking(target_id) >= max_attackers: continue
+		# 7. Check max attackers
+		if controller.ai_profile: # Ensure profile is loaded
+			var max_attackers = controller.ai_profile.get_max_attackers(controller.skill_level)
+			# num_enemies_attacking needs ObjectManager integration to be fully functional
+			if num_enemies_attacking(target_id) >= max_attackers:
+				continue
+		else:
+			# Fallback if no profile? Or skip check? Let's skip for now.
+			# printerr("PerceptionComponent: AI Profile not set on controller, cannot check max attackers.")
+			pass
 
-		# --- Select Best Target (Nearest valid enemy for now) ---
-		# TODO: Add more sophisticated target selection logic (threat level, goal priority)
-		if dist_sq < nearest_dist_sq:
-			nearest_dist_sq = dist_sq
+		# --- Calculate Score ---
+		var current_score = 0.0
+		var best_score = -INF # Initialize best score to negative infinity
+
+		# Factor 1: Distance (higher score for closer targets)
+		# Simple inverse square distance, add epsilon to avoid division by zero
+		const SCORE_DIST_FACTOR = 1000000.0 # Adjust as needed
+		current_score += SCORE_DIST_FACTOR / (dist_sq + 1.0)
+
+		# Factor 2: Target Type (Placeholder - Needs ShipData access)
+		# Example: Prioritize bombers or specific threats
+		if target_ship.has_method("get_ship_data"):
+			var target_ship_data = target_ship.get_ship_data()
+			if target_ship_data:
+				if target_ship_data.flags & GlobalConstants.SIF_BOMBER:
+					current_score *= 1.5 # Prioritize bombers
+				# Add other type priorities (e.g., support ships, specific classes)
+				# elif target_ship_data.flags & GlobalConstants.SIF_SUPPORT:
+				#     current_score *= 0.5 # Deprioritize support ships?
+
+		# Factor 3: Goal Relevance (Placeholder - Needs GoalManager access)
+		if controller.goal_manager and controller.goal_manager.has_method("get_active_goal"):
+			var active_goal = controller.goal_manager.get_active_goal() # Need this method implemented
+			if active_goal and is_instance_valid(target_ship):
+				# Check if target matches goal target name (ship or wing leader)
+				if active_goal.target_name == target_ship.name:
+					current_score *= 2.0 # High priority if it's the goal target
+				# TODO: Add check if target is part of the goal wing
+
+		# Factor 4: Threat Level (Placeholder - Needs target AI state/weapon info)
+		# Example: Prioritize targets attacking self or guard target
+		var target_ai = target_ship.find_child("AIController", false, false) # Check if target has AI
+		if target_ai and target_ai is AIController:
+			# Check if target is attacking self
+			if target_ai.target_object_id == ship.get_instance_id():
+				current_score *= 1.8 # Prioritize attacker
+			# Check if target is attacking guard target (if guarding)
+			elif controller.mode == AIConst.AIMode.GUARD and controller.guard_target_object_id != -1:
+				if target_ai.target_object_id == controller.guard_target_object_id:
+					current_score *= 1.7 # Prioritize threat to guard target
+
+		# Factor 5: Lethality (Placeholder - Needs AIController.lethality calculation)
+		# Higher lethality targets might be prioritized or deprioritized based on strategy
+		# current_score *= (1.0 + target_ai.lethality * 0.01) # Example: slightly prioritize more lethal targets
+
+		# --- Compare Score ---
+		if current_score > best_score:
+			best_score = current_score
 			best_target_id = target_id
 
 	# --- Update Target ---
@@ -185,7 +244,7 @@ func _evaluate_threats():
 		printerr("PerceptionComponent: ObjectManager missing get_all_weapons() method!")
 		return
 
-	var active_weapons = [] # Placeholder: object_manager.get_all_weapons()
+	var active_weapons = object_manager.get_all_weapons() # Use ObjectManager
 	var my_ship_node = ship # Cache for clarity
 	var my_ship_id = my_ship_node.get_instance_id()
 
@@ -213,9 +272,57 @@ func _evaluate_threats():
 		# - Is it a laser/projectile (not missile)?
 		# - Is it hostile?
 		# - Is it close enough (e.g., < 1500m)?
-		# - Is it heading towards us (dot product > 0.5)?
-		# - Compare danger level (distance, dot product) with current danger_weapon_objnum
-		pass # Placeholder for dumbfire threat assessment
+		# --- Check for Dangerous Dumbfire Weapons ---
+		# Based on ai_update_danger_weapon
+		var weapon_data: WeaponData = weapon_node.weapon_data if weapon_node.has_method("get_weapon_data") else null # Assuming projectile has weapon_data ref
+		if weapon_data and not (weapon_data.flags & GlobalConstants.WIF_HOMING):
+			# Check if hostile (Placeholder - Needs IFFManager and weapon team info)
+			var is_hostile = true # Placeholder - Assume hostile for now
+			# if weapon_node.has_method("get_owner_team"):
+			#     var weapon_team = weapon_node.get_owner_team()
+			#     if not iff_manager.iff_x_attacks_y(weapon_team, my_team):
+			#         is_hostile = false
+
+			if is_hostile:
+				var dist = my_ship_node.global_position.distance_to(weapon_node.global_position)
+				const DANGER_RANGE = 1500.0 # Max range to consider dumbfire a threat
+
+				if dist < DANGER_RANGE:
+					var vec_from_weapon = (my_ship_node.global_position - weapon_node.global_position).normalized()
+					var dot_from_weapon = weapon_node.global_transform.basis.z.dot(-vec_from_weapon) # Assuming -Z is forward for weapon
+
+					const DANGER_DOT_THRESHOLD = 0.5 # Weapon must be generally heading towards us
+
+					if dot_from_weapon > DANGER_DOT_THRESHOLD:
+						# Compare danger level with current danger weapon
+						var current_danger_dist = 99999.0
+						var current_danger_dot = 0.0
+						if controller.danger_weapon_objnum != -1:
+							var current_danger_node = instance_from_id(controller.danger_weapon_objnum)
+							if is_instance_valid(current_danger_node):
+								current_danger_dist = my_ship_node.global_position.distance_to(current_danger_node.global_position)
+								var vec_from_current_danger = (my_ship_node.global_position - current_danger_node.global_position).normalized()
+								current_danger_dot = current_danger_node.global_transform.basis.z.dot(-vec_from_current_danger)
+							else:
+								# Current danger weapon is invalid, reset
+								controller.danger_weapon_objnum = -1
+								controller.danger_weapon_signature = -1
+
+						# Compare danger level (closer and more direct is more dangerous)
+						# Using a simple combined score: dot * (1 / (dist + 1))
+						var new_danger_score = dot_from_weapon / (dist + 1.0)
+						var current_danger_score = 0.0
+						if controller.danger_weapon_objnum != -1:
+							# Calculate score for the current danger weapon if it's still valid
+							if current_danger_dist < INF: # Check if current danger node was valid
+								current_danger_score = current_danger_dot / (current_danger_dist + 1.0)
+							else:
+								# Current danger node was invalid, force replacement
+								current_danger_score = -INF
+
+						if new_danger_score > current_danger_score:
+							controller.danger_weapon_objnum = weapon_node.get_instance_id()
+							controller.danger_weapon_signature = weapon_node.get_meta("signature", weapon_node.get_instance_id())
 
 
 func _update_target_status(delta: float):
@@ -265,6 +372,76 @@ func _update_target_status(delta: float):
 	else:
 		controller.time_enemy_near = 0.0 # Reset if too far
 
+	# --- Update Aspect Lock ---
+	_update_aspect_lock(target_node, target_pos, delta)
+
+
+func _update_aspect_lock(target_node: Node3D, target_pos: Vector3, delta: float):
+	# Corresponds to update_aspect_lock_information
+	var weapon_system = ship.get_node_or_null("WeaponSystem") # Assuming standard name
+	if not weapon_system:
+		controller.current_target_is_locked = false
+		controller.aspect_locked_time = 0.0
+		return
+
+	var current_secondary_bank = weapon_system.current_secondary_bank
+	if current_secondary_bank < 0 or current_secondary_bank >= weapon_system.num_secondary_banks:
+		controller.current_target_is_locked = false
+		controller.aspect_locked_time = 0.0
+		return
+
+	var weapon_index = weapon_system.secondary_bank_weapons[current_secondary_bank]
+	if weapon_index < 0:
+		controller.current_target_is_locked = false
+		controller.aspect_locked_time = 0.0
+		return
+
+	var weapon_data: WeaponData = GlobalConstants.get_weapon_data(weapon_index)
+	if not weapon_data or not (weapon_data.flags & GlobalConstants.WIF_LOCKED_HOMING):
+		# Weapon doesn't require aspect lock
+		controller.current_target_is_locked = false
+		controller.aspect_locked_time = 0.0
+		return
+
+	# Check if target is within weapon range (use weapon_data.weapon_range)
+	var dist_sq = ship.global_position.distance_squared_to(target_pos)
+	if dist_sq > weapon_data.weapon_range * weapon_data.weapon_range:
+		controller.current_target_is_locked = false
+		controller.aspect_locked_time = 0.0 # Reset lock if out of range
+		return
+
+	# Calculate dot product to target
+	var vec_to_enemy = (target_pos - ship.global_position).normalized()
+	var dot_to_enemy = ship.global_transform.basis.z.dot(-vec_to_enemy) # Assuming -Z is forward
+
+	# Define aspect lock threshold (from ai.h MIN_TRACKABLE_ASPECT_DOT)
+	const MIN_ASPECT_DOT = 0.992
+
+	# Check for Javelin missiles needing engine subsystem visibility
+	if weapon_data.flags & GlobalConstants.WIF_HOMING_JAVELIN:
+		if not _is_engine_subsystem_visible(target_node):
+			# If engine not visible, decrease lock time faster and prevent locking
+			controller.aspect_locked_time = max(0.0, controller.aspect_locked_time - delta * 2.0) # Decrease faster if aspect lost
+			controller.current_target_is_locked = false
+			return # Cannot maintain lock without engine visibility
+
+	if dot_to_enemy > MIN_ASPECT_DOT:
+		controller.aspect_locked_time += delta
+	#         controller.current_target_is_locked = false
+	#         return
+
+	if dot_to_enemy > MIN_ASPECT_DOT:
+		controller.aspect_locked_time += delta
+		if controller.aspect_locked_time >= weapon_data.min_lock_time:
+			controller.aspect_locked_time = weapon_data.min_lock_time # Clamp at max
+			controller.current_target_is_locked = true
+		else:
+			controller.current_target_is_locked = false # Still locking
+	else:
+		# Decrease lock time if aspect is lost (faster decrease than gain)
+		controller.aspect_locked_time = max(0.0, controller.aspect_locked_time - delta * 2.0)
+		controller.current_target_is_locked = false
+
 
 func _update_stealth_visibility():
 	# Handles visibility updates for stealth targets.
@@ -313,24 +490,68 @@ func _check_stealth_visibility(stealth_target: Node3D) -> int:
 	# - AWACS level (needs SensorSubsystem/AWACSManager integration)
 	# - Line of Sight check (PhysicsDirectSpaceState3D.intersect_ray)
 
-	# Basic distance check (simplified)
+	# 1. Basic distance check
 	var dist = ship.global_position.distance_to(stealth_target.global_position)
-	var max_stealth_dist = AIConst.STEALTH_MAX_VIEW_DIST * 1.0 # TODO: Apply skill scaler
+	# Apply skill scaler (using accuracy as placeholder, needs refinement)
+	# Higher accuracy = better detection = larger effective max_stealth_dist
+	var skill_scaler = 1.0 + (controller.accuracy - 0.5) # Example: 0.7 to 1.2 for accuracy 0.2 to 0.7
+	var max_stealth_dist = AIConst.STEALTH_MAX_VIEW_DIST * skill_scaler
 
-	if dist < max_stealth_dist:
-		# Basic cone check (simplified)
-		var vec_to_stealth = (stealth_target.global_position - ship.global_position).normalized()
-		var dot_to_stealth = ship.global_transform.basis.z.dot(vec_to_stealth) # Assuming -Z is forward
-		var needed_dot = AIConst.STEALTH_VIEW_CONE_DOT # TODO: Apply skill scaler and distance factor
+	if dist >= max_stealth_dist:
+		return AIConst.STEALTH_INVISIBLE # Too far
 
-		if dot_to_stealth > needed_dot:
-			# TODO: Add LoS check
-			# TODO: Add AWACS check
-			return AIConst.STEALTH_VISIBLE # Or FULLY_TARGETABLE based on more checks
+	# 2. Basic cone check
+	var vec_to_stealth = (stealth_target.global_position - ship.global_position).normalized()
+	# Assuming -Z is forward for the viewing ship
+	var dot_to_stealth = ship.global_transform.basis.z.dot(-vec_to_stealth)
+	# Apply skill scaler and distance factor to needed_dot
+	# Higher accuracy = wider effective cone (lower needed_dot)
+	# Closer distance = wider effective cone
+	var dist_factor = clamp(1.0 - (dist / max_stealth_dist), 0.1, 1.0) # Wider cone when closer
+	var skill_dot_scaler = 1.0 - (controller.accuracy - 0.5) * 0.5 # Example: 1.15 to 0.85 for accuracy 0.2 to 0.7
+	var needed_dot = AIConst.STEALTH_VIEW_CONE_DOT * skill_dot_scaler / dist_factor
+	needed_dot = clamp(needed_dot, -1.0, 0.999) # Clamp needed_dot (cosine value)
+
+	if dot_to_stealth <= needed_dot:
+		return AIConst.STEALTH_INVISIBLE # Outside view cone
+
+	# 3. Line of Sight (LoS) Check
+	var space_state = get_world_3d().direct_space_state
+	# Use physics layers to ignore self, potentially other specific layers
+	var exclude_array = [ship.get_rid()] # Exclude self
+	var query = PhysicsRayQueryParameters3D.create(ship.global_position, stealth_target.global_position, ship.collision_mask, exclude_array)
+	var result = space_state.intersect_ray(query)
+
+	if result:
+		# Hit something between viewer and target
+		# Check if the hit object is actually the target (or very close to it)
+		var hit_collider = result.get("collider")
+		if is_instance_valid(hit_collider) and hit_collider != stealth_target:
+			# Check distance to hit point vs distance to target
+			var dist_to_hit = ship.global_position.distance_to(result.get("position"))
+			if dist_to_hit < dist * 0.98: # Allow small tolerance
+				# print("LoS blocked by ", hit_collider.name)
+				return AIConst.STEALTH_INVISIBLE # LoS blocked
+
+	# 4. AWACS Check (Placeholder)
+	# TODO: Get AWACS level from SensorSubsystem or AWACSManager
+	var awacs_level = 0.0 # Placeholder - Get combined AWACS level at stealth_target position
+	# Example: if Engine.has_singleton("AWACSManager"):
+	#             awacs_level = AWACSManager.get_awacs_level(stealth_target.global_position, ship.team)
+	const AWACS_TARGETABLE_THRESHOLD = 0.4 # Example threshold from FS2 code
+
+	if awacs_level >= AWACS_TARGETABLE_THRESHOLD:
+		# AWACS makes it fully targetable regardless of LoS/Cone (within sensor range)
+		# Check sensor range again, as AWACS might exceed visual stealth range
+		if dist < controller.sensor_range:
+			return AIConst.STEALTH_FULLY_TARGETABLE
 		else:
-			return AIConst.STEALTH_INVISIBLE
-	else:
-		return AIConst.STEALTH_INVISIBLE
+			return AIConst.STEALTH_INVISIBLE # Outside sensor range even with AWACS
+
+	# If passes distance, cone, LoS checks (but below AWACS targetable threshold)
+	# It's visible but maybe not fully targetable by all systems?
+	# FS2 differentiates between VISIBLE and FULLY_TARGETABLE based on AWACS.
+	return AIConst.STEALTH_VISIBLE
 
 
 func _update_perception_timers():
@@ -375,6 +596,19 @@ func is_ignore_object(check_target_id: int) -> bool:
 	return false
 
 
+# Placeholder function to check engine visibility for Javelin missiles
+func _is_engine_subsystem_visible(target_node: Node3D) -> bool:
+	# TODO: Implement this check properly
+	# Needs to:
+	# 1. Find the engine subsystem(s) on the target_node (e.g., using find_subsystem_node_by_type).
+	# 2. Get the world position of the engine subsystem(s).
+	# 3. Perform a Line-of-Sight (LoS) check from the viewing ship (self.ship) to the engine position(s).
+	#    Use PhysicsDirectSpaceState3D.intersect_ray, excluding self and potentially the target ship itself.
+	# 4. Return true if at least one engine subsystem is visible, false otherwise.
+	# print("Placeholder: Checking engine visibility for Javelin lock...")
+	return true # Assume visible for now
+
+
 # Helper function to count how many other AI ships are currently targeting the given target_id
 # TODO: This needs access to all other AIControllers, likely via ObjectManager
 func num_enemies_attacking(target_id: int) -> int:
@@ -390,8 +624,7 @@ func num_enemies_attacking(target_id: int) -> int:
 
 	var object_manager = Engine.get_singleton("ObjectManager")
 	var iff_manager = Engine.get_singleton("IFFManager")
-	# TODO: Need ObjectManager integration
-	var all_ships = [] # Placeholder: object_manager.get_all_ships()
+	var all_ships = object_manager.get_all_ships()
 
 	var target_node = instance_from_id(target_id)
 	if not is_instance_valid(target_node) or not target_node.has_method("get_team"):
