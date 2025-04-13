@@ -58,6 +58,7 @@ var last_fired_weapon_index: int = -1
 var last_fired_weapon_signature: int = 0 # For tracking specific projectile instances if needed
 var detonate_weapon_time: int = 0 # Timestamp for remote detonation
 
+
 # Signals
 signal primary_fired(bank_index: int, weapon_index: int)
 signal secondary_fired(bank_index: int, weapon_index: int)
@@ -328,7 +329,8 @@ func can_fire_secondary(bank_index: int) -> bool:
 
 
 # Fires the currently selected secondary bank or a specific bank if overridden.
-func fire_secondary(allow_swarm: bool = false, bank_index_override: int = -1) -> bool:
+# is_sequence_shot: If true, bypasses sequence initiation (called by ShipBase._manage_weapon_sequences)
+func fire_secondary(is_sequence_shot: bool = false, bank_index_override: int = -1) -> bool:
 	if secondaries_locked:
 		return false
 
@@ -338,44 +340,60 @@ func fire_secondary(allow_swarm: bool = false, bank_index_override: int = -1) ->
 
 	var fired = false
 	if can_fire_secondary(bank_to_fire):
-		var weapon_index = secondary_bank_weapons[current_secondary_bank]
+		var weapon_index = secondary_bank_weapons[bank_to_fire] # Use bank_to_fire here
 		var weapon_data: WeaponData = GlobalConstants.get_weapon_data(weapon_index)
 		if not weapon_data:
 			printerr("WeaponSystem: Could not get WeaponData for index %d in fire_secondary" % weapon_index)
 			return false
 
-		# Handle sequence initiation (Swarm/Corkscrew) - Only if NOT overriding bank
-		var is_sequence_start = false
-		if bank_index_override == -1: # Don't initiate sequence if a specific bank is forced (turret likely won't handle sequence)
-			if weapon_data.flags & GlobalConstants.WIF_SWARM and not allow_swarm:
+		# --- Sequence Initiation ---
+		# Only initiate if this is NOT a subsequent shot in an ongoing sequence
+		if not is_sequence_shot:
+			if weapon_data.flags & GlobalConstants.WIF_SWARM:
 				if is_instance_valid(ship_base):
 					ship_base.num_swarm_to_fire = weapon_data.swarm_count
 					ship_base.next_swarm_fire_time = Time.get_ticks_msec() # Start immediately
-				print("Initiating swarm sequence (%d missiles)..." % ship_base.num_swarm_to_fire)
-				is_sequence_start = true
-				fired = true # Indicate sequence started
-			else:
-				printerr("WeaponSystem: Cannot initiate swarm, invalid ship_base.")
-			elif weapon_data.flags & GlobalConstants.WIF_CORKSCREW and not allow_swarm:
+					print("Initiating swarm sequence (%d missiles)..." % ship_base.num_swarm_to_fire)
+					# Don't fire the first shot here; _manage_weapon_sequences will handle it.
+					# Set cooldown for the bank to prevent immediate refire before sequence starts.
+					next_secondary_fire_stamp[bank_to_fire] = Time.get_ticks_msec() + int(weapon_data.fire_wait * 1000)
+					last_secondary_fire_stamp[bank_to_fire] = Time.get_ticks_msec()
+					# Cycle bank immediately after initiating sequence
+					_cycle_secondary_bank(bank_to_fire)
+					return true # Indicate sequence started successfully
+				else:
+					printerr("WeaponSystem: Cannot initiate swarm sequence, invalid ship_base.")
+					return false
+			elif weapon_data.flags & GlobalConstants.WIF_CORKSCREW:
 				if is_instance_valid(ship_base):
 					ship_base.num_corkscrew_to_fire = weapon_data.cs_num_fired
 					ship_base.next_corkscrew_fire_time = Time.get_ticks_msec() # Start immediately
-				print("Initiating corkscrew sequence (%d missiles)..." % ship_base.num_corkscrew_to_fire)
-				is_sequence_start = true
-				fired = true # Indicate sequence started
-			else:
-				printerr("WeaponSystem: Cannot initiate corkscrew, invalid ship_base.")
+					print("Initiating corkscrew sequence (%d missiles)..." % ship_base.num_corkscrew_to_fire)
+					# Don't fire the first shot here; _manage_weapon_sequences will handle it.
+					next_secondary_fire_stamp[bank_to_fire] = Time.get_ticks_msec() + int(weapon_data.fire_wait * 1000)
+					last_secondary_fire_stamp[bank_to_fire] = Time.get_ticks_msec()
+					_cycle_secondary_bank(bank_to_fire)
+					return true # Indicate sequence started successfully
+				else:
+					printerr("WeaponSystem: Cannot initiate corkscrew sequence, invalid ship_base.")
+					return false
 
-		# If it's not a sequence start OR if allow_swarm is true (meaning ShipBase is firing the next shot in sequence)
-		if not is_sequence_start:
-			# Normal fire or sequence continuation fire
-			if _fire_weapon_bank(bank_to_fire, false):
-				fired = true
+		# --- Normal Fire or Sequence Continuation Fire ---
+		# If we reach here, it's either not a sequence weapon, OR is_sequence_shot is true.
+		if _fire_weapon_bank(bank_to_fire, false):
+			fired = true
 
-		# Cycle bank only if a weapon was actually fired (or sequence started) AND no override was given
+		# Cycle bank only if a weapon was actually fired AND no override was given
+		# (Sequence shots use override, so bank won't cycle automatically here)
 		if fired and bank_index_override == -1:
-			# Find the *next* bank that actually has a weapon assigned
-			var next_bank = bank_to_fire
+			_cycle_secondary_bank(bank_to_fire)
+
+	return fired
+
+# Helper function to cycle secondary bank
+func _cycle_secondary_bank(fired_bank_index: int):
+	if num_secondary_banks > 1:
+		var next_bank = fired_bank_index
 			var attempts = 0
 			while attempts < num_secondary_banks:
 				next_bank = (next_bank + 1) % num_secondary_banks
@@ -736,4 +754,4 @@ func get_weapon_energy_pct() -> float:
 	return 0.0
 
 # TODO: Add functions for rearming, handling weapon destruction, etc.
-# TODO: Integrate with turret subsystems if applicable.
+	# TODO: Integrate with turret subsystems if applicable.

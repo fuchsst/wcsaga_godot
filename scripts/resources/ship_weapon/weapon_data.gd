@@ -20,7 +20,8 @@ class_name WeaponData
 @export var render_type: int = GlobalConstants.WRT_NONE # weapon_info.render_type (WRT_*)
 
 ## Model and Visuals (POF/Laser)
-@export var pof_file: String = "" # weapon_info.pofbitmap_name (if WRT_POF)
+@export var pof_file: String = "" # weapon_info.pofbitmap_name (if WRT_POF) - Path to the original POF model file for the projectile itself (if any)
+@export var projectile_scene_path: String = "" # Path to the Godot scene (.tscn) to instantiate when firing
 @export var hud_target_lod: int = 0 # weapon_info.hud_target_lod
 @export var laser_bitmap: String = "" # weapon_info.laser_bitmap.filename (if WRT_LASER)
 @export var laser_glow_bitmap: String = "" # weapon_info.laser_glow_bitmap.filename (if WRT_LASER)

@@ -675,6 +675,41 @@ enum GoalType {
 }
 const GOAL_FLAG_INVALID = GoalType.INVALID # Alias for parser
 
+# --- Physics Layers (Example Setup - Adjust based on project needs) ---
+# Layer 1: Ships
+# Layer 2: Weapons (Projectiles)
+# Layer 3: Asteroids
+# Layer 4: Debris
+# Layer 5: Jump Nodes
+# Layer 6: Beams (Special case, might need separate handling)
+# Layer 7: Shockwaves (Area effects)
+# ... Reserve others ...
+# Layer 10: Environment (Static geometry?)
+const COLLISION_LAYER_SHIP = 1 << 0       # 1
+const COLLISION_LAYER_WEAPON = 1 << 1     # 2
+const COLLISION_LAYER_ASTEROID = 1 << 2   # 4
+const COLLISION_LAYER_DEBRIS = 1 << 3     # 8
+const COLLISION_LAYER_JUMP_NODE = 1 << 4  # 16
+const COLLISION_LAYER_BEAM = 1 << 5       # 32
+const COLLISION_LAYER_SHOCKWAVE = 1 << 6  # 64
+const COLLISION_LAYER_ENVIRONMENT = 1 << 9 # 512
+
+# --- Collision Masks (What each layer collides WITH) ---
+# Ships collide with Ships, Weapons, Asteroids, Debris, Environment
+const COLLISION_MASK_SHIP = COLLISION_LAYER_SHIP | COLLISION_LAYER_WEAPON | COLLISION_LAYER_ASTEROID | COLLISION_LAYER_DEBRIS | COLLISION_LAYER_ENVIRONMENT
+# Weapons collide with Ships, Asteroids, Debris, Environment (Potentially other weapons? e.g., flak vs missile)
+const COLLISION_MASK_WEAPON = COLLISION_LAYER_SHIP | COLLISION_LAYER_ASTEROID | COLLISION_LAYER_DEBRIS | COLLISION_LAYER_ENVIRONMENT # | COLLISION_LAYER_WEAPON
+# Asteroids collide with Ships, Weapons, Asteroids, Debris, Environment
+const COLLISION_MASK_ASTEROID = COLLISION_LAYER_SHIP | COLLISION_LAYER_WEAPON | COLLISION_LAYER_ASTEROID | COLLISION_LAYER_DEBRIS | COLLISION_LAYER_ENVIRONMENT
+# Debris collides with Ships, Weapons, Asteroids, Debris, Environment
+const COLLISION_MASK_DEBRIS = COLLISION_LAYER_SHIP | COLLISION_LAYER_WEAPON | COLLISION_LAYER_ASTEROID | COLLISION_LAYER_DEBRIS | COLLISION_LAYER_ENVIRONMENT
+# Jump Nodes likely only need to detect Ships entering (using Area3D, mask = SHIP)
+const COLLISION_MASK_JUMP_NODE_AREA = COLLISION_LAYER_SHIP
+# Beams collide with Ships, Asteroids, Debris (handled by RayCast mask)
+const COLLISION_MASK_BEAM = COLLISION_LAYER_SHIP | COLLISION_LAYER_ASTEROID | COLLISION_LAYER_DEBRIS
+# Shockwaves affect Ships, Asteroids, Debris, Weapons (handled by query mask)
+const COLLISION_MASK_SHOCKWAVE = COLLISION_LAYER_SHIP | COLLISION_LAYER_ASTEROID | COLLISION_LAYER_DEBRIS | COLLISION_LAYER_WEAPON
+
 # --- Goal Type Lookup ---
 const _goal_type_map: Dictionary = {
 	"primary": GoalType.PRIMARY,

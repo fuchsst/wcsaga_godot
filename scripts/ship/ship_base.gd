@@ -76,7 +76,11 @@ var time_until_uncloak: int = 0        # Timestamp (msec) for temporary cloak
 var warpin_effect = null # Placeholder for WarpEffect node/resource instance
 var warpout_effect = null # Placeholder for WarpEffect node/resource instance
 
-# Weapon Sequences (Swarm/Corkscrew) - Moved to WeaponSystem.gd
+# Weapon Sequences (Swarm/Corkscrew) - State managed here, logic in _physics_process
+var num_swarm_to_fire: int = 0         # ship.num_swarm_missiles_to_fire
+var next_swarm_fire_time: int = 0      # ship.next_swarm_fire (Timestamp)
+var num_corkscrew_to_fire: int = 0     # ship.num_corkscrew_to_fire
+var next_corkscrew_fire_time: int = 0  # ship.next_corkscrew_fire (Timestamp)
 
 # Tagging State - Added
 var tag_total: float = 0.0             # ship.tag_total
@@ -282,6 +286,9 @@ func _physics_process(delta):
 	# The `processed_ids` set in the manager prevents redundant updates within the same frame.
 	if Engine.has_singleton("DockingManager") and DockingManager.is_object_docked(self):
 		DockingManager.move_docked_objects(self)
+
+	# --- Manage Weapon Sequences --- - Added
+	_manage_weapon_sequences()
 
 
 func _integrate_forces(state: PhysicsDirectBodyState3D):
@@ -1127,3 +1134,119 @@ func _calculate_ship_debris_collision_physics(ship: ShipBase, debris: DebrisObje
 	# TODO: Implement logic based on calculate_ship_ship_collision_physics (adapted for debris)
 	print("Placeholder: Calculating ship-debris collision physics...")
 	return {"damage_to_ship": 5.0, "damage_to_debris": 10.0}
+
+
+# --- EMP Effect Handling ---
+
+# Called by EMP projectiles/effects
+func apply_emp_effect(intensity: float, time: float):
+	if not ship_data:
+		printerr("ShipBase %s cannot apply EMP effect: Missing ShipData." % ship_name)
+		return
+
+	print("%s hit by EMP! Intensity: %.1f, Time: %.1f" % [ship_name, intensity, time])
+
+	# Calculate disruption duration based on intensity and time
+	# Apply EMP resistance modifier from ship_data
+	var resistance = ship_data.emp_resistance_mod if ship_data else 0.0
+	var effective_intensity = clamp(intensity * (1.0 - resistance), 0.0, GlobalConstants.EMP_INTENSITY_MAX)
+	var disruption_duration_ms = int(time * 1000 * (effective_intensity / GlobalConstants.EMP_INTENSITY_MAX)) # Simplified scaling
+
+	if disruption_duration_ms <= 0: return
+
+	# Iterate through all child nodes that are ShipSubsystem instances
+	# Using get_children() is simple but might not be robust if subsystems are nested deeper.
+	# A better approach might be to maintain a list/group of subsystems.
+	for child in get_children():
+		if child is ShipSubsystem:
+			var subsys: ShipSubsystem = child
+			# Don't disrupt already destroyed subsystems
+			if not subsys.is_destroyed:
+				# Apply disruption - the disrupt method should handle stacking/timing
+				subsys.disrupt(disruption_duration_ms)
+				# print("  Disrupting subsystem: %s for %d ms" % [subsys.name, disruption_duration_ms])
+
+	# TODO: Add EMP visual/audio effect on the ship itself?
+	# EffectManager.create_emp_ship_effect(self)
+	# SoundManager.play_sound_3d(GameSounds.SND_EMP_HIT_SHIP, global_position)
+
+
+# --- Weapon Sequence Management --- - Added
+
+# Called from _physics_process to handle firing subsequent missiles in sequences
+func _manage_weapon_sequences():
+	var current_time_ms = Time.get_ticks_msec()
+
+	# Swarm Missile Sequence
+	if num_swarm_to_fire > 0 and current_time_ms >= next_swarm_fire_time:
+		# Check if the *currently selected* secondary is still a swarm missile
+		var current_secondary_bank_idx = weapon_system.current_secondary_bank
+		if weapon_system and current_secondary_bank_idx >= 0 and current_secondary_bank_idx < weapon_system.num_secondary_banks:
+			var weapon_index = weapon_system.secondary_bank_weapons[current_secondary_bank_idx]
+			if weapon_index >= 0:
+				var weapon_data: WeaponData = GlobalConstants.get_weapon_data(weapon_index)
+				if weapon_data and weapon_data.flags & GlobalConstants.WIF_SWARM:
+					# Check if we *can* fire (ammo, cooldown might have changed)
+					# Pass 'true' to fire_secondary to indicate it's part of a sequence
+					if weapon_system.fire_secondary(true, current_secondary_bank_idx):
+						num_swarm_to_fire -= 1
+						if num_swarm_to_fire > 0:
+							# Schedule next shot
+							var delay = weapon_data.swarm_wait # Assuming swarm_wait is in ms
+							next_swarm_fire_time = current_time_ms + delay
+						else:
+							# Sequence finished
+							next_swarm_fire_time = 0
+					else:
+						# Failed to fire (e.g., out of ammo mid-sequence) - Abort sequence
+						num_swarm_to_fire = 0
+						next_swarm_fire_time = 0
+				else:
+					# Weapon changed mid-sequence? Abort.
+					num_swarm_to_fire = 0
+					next_swarm_fire_time = 0
+			else:
+				# No weapon in bank? Abort.
+				num_swarm_to_fire = 0
+				next_swarm_fire_time = 0
+		else:
+			# Invalid weapon system or bank index? Abort.
+			num_swarm_to_fire = 0
+			next_swarm_fire_time = 0
+
+	# Corkscrew Missile Sequence
+	if num_corkscrew_to_fire > 0 and current_time_ms >= next_corkscrew_fire_time:
+		# Check if the *currently selected* secondary is still a corkscrew missile
+		var current_secondary_bank_idx = weapon_system.current_secondary_bank
+		if weapon_system and current_secondary_bank_idx >= 0 and current_secondary_bank_idx < weapon_system.num_secondary_banks:
+			var weapon_index = weapon_system.secondary_bank_weapons[current_secondary_bank_idx]
+			if weapon_index >= 0:
+				var weapon_data: WeaponData = GlobalConstants.get_weapon_data(weapon_index)
+				if weapon_data and weapon_data.flags & GlobalConstants.WIF_CORKSCREW:
+					# Check if we *can* fire
+					# Pass 'true' to fire_secondary to indicate it's part of a sequence
+					if weapon_system.fire_secondary(true, current_secondary_bank_idx):
+						num_corkscrew_to_fire -= 1
+						if num_corkscrew_to_fire > 0:
+							# Schedule next shot
+							var delay = weapon_data.cs_delay # Assuming cs_delay is in ms
+							next_corkscrew_fire_time = current_time_ms + delay
+						else:
+							# Sequence finished
+							next_corkscrew_fire_time = 0
+					else:
+						# Failed to fire - Abort sequence
+						num_corkscrew_to_fire = 0
+						next_corkscrew_fire_time = 0
+				else:
+					# Weapon changed mid-sequence? Abort.
+					num_corkscrew_to_fire = 0
+					next_corkscrew_fire_time = 0
+			else:
+				# No weapon in bank? Abort.
+				num_corkscrew_to_fire = 0
+				next_corkscrew_fire_time = 0
+		else:
+			# Invalid weapon system or bank index? Abort.
+			num_corkscrew_to_fire = 0
+			next_corkscrew_fire_time = 0

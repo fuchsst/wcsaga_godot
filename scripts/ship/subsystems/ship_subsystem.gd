@@ -174,3 +174,17 @@ func get_health_percentage() -> float:
 
 func is_functional() -> bool:
 	return not is_destroyed and not is_disrupted
+
+
+func get_world_position() -> Vector3:
+	"""Calculates and returns the current world position of the subsystem."""
+	if not is_instance_valid(ship_base) or not subsystem_definition:
+		# Fallback to node's global position if references are missing
+		printerr("ShipSubsystem: Cannot calculate world position - missing ship_base or definition.")
+		return global_position
+
+	# Get the offset from the definition
+	var local_offset = subsystem_definition.pnt
+
+	# Transform the local offset by the ship's current global transform
+	return ship_base.global_transform * local_offset

@@ -1,0 +1,58 @@
+[gd_scene load_steps=5 format=3 uid="uid://c5q6r7s8t9u0v"]
+
+[ext_resource type="Script" path="res://scripts/effects/explosion_effect.gd" id="1_explosion_script"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_particle"]
+albedo_color = Color(1, 0.6, 0.2, 1) # Orange-ish
+emission_enabled = true
+emission = Color(1, 0.4, 0.1, 1)
+emission_energy_multiplier = 2.0
+shading_mode = 0 # Unshaded
+particle_billboard_mode = 3 # Particle Billboard
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_explosion"]
+emission_shape = 1 # Sphere
+emission_sphere_radius = 0.5
+particle_flag_disable_z = true
+direction = Vector3(0, 0, 0)
+spread = 180.0
+initial_velocity_min = 5.0
+initial_velocity_max = 25.0
+gravity = Vector3(0, 0, 0)
+scale_min = 0.5
+scale_max = 2.0
+color = Color(1, 1, 1, 1) # Use material color
+hue_variation_min = -0.1
+hue_variation_max = 0.1
+
+[sub_resource type="SphereMesh" id="SphereMesh_particle"]
+material = SubResource("StandardMaterial3D_particle")
+radius = 0.1
+height = 0.2
+
+[node name="ExplosionBase" type="Node3D"]
+script = ExtResource("1_explosion_script")
+
+[node name="GPUParticles" type="GPUParticles3D" parent="."]
+amount = 50
+lifetime = 1.0
+one_shot = true
+explosiveness = 0.9
+process_material = SubResource("ParticleProcessMaterial_explosion")
+draw_pass_1 = SubResource("SphereMesh_particle")
+
+[node name="OmniLight" type="OmniLight3D" parent="."]
+light_color = Color(1, 0.7, 0.3, 1)
+light_energy = 16.0
+light_negative = false
+light_specular = 0.5
+shadow_enabled = false
+omni_range = 20.0
+omni_attenuation = 1.0 # Linear
+
+[node name="AudioPlayer" type="AudioStreamPlayer3D" parent="."]
+# Assign specific explosion sound stream here or in ExplosionEffect script based on type
+bus = &"SFX" # Assign to SFX bus

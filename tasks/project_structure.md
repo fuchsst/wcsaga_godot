@@ -828,3 +828,4 @@ wcsaga_godot/
 │   ├── wireframe.gdshader    # (Placeholder) Shader for wireframe rendering mode visuals
 │   └── particle.gdshader     # (Placeholder) Custom particle shaders
 └── project.godot           # Main Godot project configuration file
+

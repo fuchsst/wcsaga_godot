@@ -26,7 +26,12 @@ class_name SoundEntry
 # Sound priority for instance limiting (maps roughly to original logic).
 # Higher value means higher priority.
 # Corresponds to SND_PRIORITY_* constants conceptually.
-@export var priority: int = 1 # Default priority
+# Using SoundManager.SoundPriority enum values is recommended.
+@export var priority: int = SoundManager.SoundPriority.DEFAULT
+
+# Sound category for volume control via audio buses.
+enum Category { MASTER, MUSIC, VOICE, INTERFACE, SFX, AMBIENT }
+@export var category: Category = Category.SFX # Default to SFX
 
 # Internal signature/handle from original game (optional, for reference).
 @export var original_sig: int = -1
@@ -40,11 +45,7 @@ func _init(p_id_name := "", p_path := "", p_volume := 1.0, p_min := 1.0, p_max :
 	preload = p_preload
 	priority = p_priority
 	original_sig = p_orig_sig
-	if audio_stream_path != "":
-		# Attempt to preload if specified, handle potential errors gracefully.
-		# Actual preloading might be better handled by the SoundManager during init.
-		# audio_stream = load(audio_stream_path) if preload else null
-		pass
+	# Category needs to be set after initialization, likely during parsing/loading.
 
 func get_stream() -> AudioStream:
 	"""Lazily loads the AudioStream if not already loaded."""
