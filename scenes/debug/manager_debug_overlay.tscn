@@ -1,0 +1,116 @@
+[gd_scene load_steps=2 format=3 uid="uid://bd7k8qhbqvl1w"]
+
+[ext_resource type="Script" path="res://scripts/debug/manager_debug_overlay.gd" id="1_0k2mv"]
+
+[node name="ManagerDebugOverlay" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("1_0k2mv")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -400.0
+modulate = Color(1, 1, 1, 0.8)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+
+[node name="Title" type="Label" parent="Panel/VBoxContainer"]
+layout_mode = 2
+text = "WCS Manager Status"
+theme_type_variation = &"HeaderLarge"
+
+[node name="HSeparator" type="HSeparator" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="ObjectManager" type="VBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Panel/VBoxContainer/ObjectManager"]
+layout_mode = 2
+text = "Object Manager"
+theme_type_variation = &"HeaderMedium"
+
+[node name="Stats" type="RichTextLabel" parent="Panel/VBoxContainer/ObjectManager"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 80)
+fit_content = true
+
+[node name="HSeparator2" type="HSeparator" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="GameStateManager" type="VBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Panel/VBoxContainer/GameStateManager"]
+layout_mode = 2
+text = "Game State Manager"
+theme_type_variation = &"HeaderMedium"
+
+[node name="Stats" type="RichTextLabel" parent="Panel/VBoxContainer/GameStateManager"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 60)
+fit_content = true
+
+[node name="HSeparator3" type="HSeparator" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="PhysicsManager" type="VBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Panel/VBoxContainer/PhysicsManager"]
+layout_mode = 2
+text = "Physics Manager"
+theme_type_variation = &"HeaderMedium"
+
+[node name="Stats" type="RichTextLabel" parent="Panel/VBoxContainer/PhysicsManager"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 80)
+fit_content = true
+
+[node name="HSeparator4" type="HSeparator" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="InputManager" type="VBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Panel/VBoxContainer/InputManager"]
+layout_mode = 2
+text = "Input Manager"
+theme_type_variation = &"HeaderMedium"
+
+[node name="Stats" type="RichTextLabel" parent="Panel/VBoxContainer/InputManager"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 80)
+fit_content = true
+
+[node name="HSeparator5" type="HSeparator" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Controls" type="HBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="ToggleButton" type="Button" parent="Panel/VBoxContainer/Controls"]
+layout_mode = 2
+text = "Hide (F12)"
+
+[node name="RefreshButton" type="Button" parent="Panel/VBoxContainer/Controls"]
+layout_mode = 2
+text = "Refresh"
+
+[connection signal="pressed" from="Panel/VBoxContainer/Controls/ToggleButton" to="." method="_on_toggle_button_pressed"]
+[connection signal="pressed" from="Panel/VBoxContainer/Controls/RefreshButton" to="." method="_on_refresh_button_pressed"]
