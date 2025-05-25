@@ -27,6 +27,14 @@ var max_fps_history: int = 30
 # References
 var viewport: MissionViewport3D
 var camera: MissionCamera3D
+var object_selector: ObjectSelector
+
+# Box selection visual
+var is_drawing_box_selection: bool = false
+var box_selection_start: Vector2
+var box_selection_end: Vector2
+var box_selection_color: Color = Color(0.5, 0.8, 1.0, 0.3)
+var box_selection_border_color: Color = Color(0.5, 0.8, 1.0, 0.8)
 
 func _ready() -> void:
 	setup_ui_components()
@@ -40,11 +48,17 @@ func _ready() -> void:
 func setup_viewport(mission_viewport: MissionViewport3D) -> void:
 	viewport = mission_viewport
 	camera = viewport.mission_camera
+	object_selector = viewport.object_selector
 	
 	# Connect signals
 	if camera:
 		camera.camera_moved.connect(_on_camera_moved)
 		camera.view_changed.connect(_on_view_changed)
+	
+	if object_selector:
+		object_selector.box_selection_started.connect(_on_box_selection_started)
+		object_selector.box_selection_updated.connect(_on_box_selection_updated)
+		object_selector.box_selection_finished.connect(_on_box_selection_finished)
 
 ## Sets up all UI components.
 func setup_ui_components() -> void:
@@ -245,3 +259,44 @@ func _on_camera_moved(camera_node: MissionCamera3D) -> void:
 
 func _on_view_changed(is_orthogonal: bool) -> void:
 	set_view_mode(is_orthogonal)
+
+## Draw override for custom drawing
+func _draw() -> void:
+	# Draw box selection if active
+	if is_drawing_box_selection:
+		draw_box_selection()
+
+## Draw the box selection rectangle
+func draw_box_selection() -> void:
+	var rect: Rect2 = Rect2()
+	rect.position = Vector2(
+		min(box_selection_start.x, box_selection_end.x),
+		min(box_selection_start.y, box_selection_end.y)
+	)
+	rect.size = Vector2(
+		abs(box_selection_end.x - box_selection_start.x),
+		abs(box_selection_end.y - box_selection_start.y)
+	)
+	
+	# Draw filled rectangle
+	draw_rect(rect, box_selection_color)
+	
+	# Draw border
+	draw_rect(rect, box_selection_border_color, false, 2.0)
+
+## Box selection signal handlers
+
+func _on_box_selection_started() -> void:
+	is_drawing_box_selection = true
+	box_selection_start = get_global_mouse_position()
+	box_selection_end = box_selection_start
+	queue_redraw()
+
+func _on_box_selection_updated(rect: Rect2) -> void:
+	if is_drawing_box_selection:
+		box_selection_end = get_global_mouse_position()
+		queue_redraw()
+
+func _on_box_selection_finished(rect: Rect2) -> void:
+	is_drawing_box_selection = false
+	queue_redraw()

@@ -100,7 +100,7 @@ func get_formatted_date(format: String = "MMM DD, YYYY at HH:MM") -> String:
 ## Get playtime formatted as string
 func get_formatted_playtime() -> String:
 	var hours: int = int(real_playtime / 3600)
-	var minutes: int = int((real_playtime % 3600) / 60)
+	var minutes: int = int((real_playtime % 3600.0) / 60)
 	
 	if hours > 0:
 		return str(hours) + "h " + str(minutes) + "m"
@@ -214,7 +214,10 @@ func calculate_checksum(save_data: PackedByteArray) -> String:
 		return ""
 	
 	# Use SHA-256 for integrity checking
-	var hash: PackedByteArray = save_data.sha256_buffer()
+	var ctx = HashingContext.new()
+	ctx.start(HashingContext.HASH_SHA256)
+	ctx.update(save_data)
+	var hash: PackedByteArray = ctx.finish()
 	return hash.hex_encode()
 
 ## Verify checksum matches save data

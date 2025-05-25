@@ -1,4 +1,4 @@
-extends GdUnitTestSuite
+# extends GdUnitTestSuite  # Requires GdUnit framework to be installed
 
 ## Test suite for MissionData validation and functionality
 ## Tests STORY-005 acceptance criteria implementation

@@ -69,7 +69,7 @@ var primary_banks: Array[WeaponBank] = []
 var secondary_banks: Array[WeaponBank] = []
 
 # AI properties
-class AIGoal:
+class MissionAIGoal:
 	enum Type {
 		WAYPOINTS,
 		WAYPOINTS_ONCE,
@@ -100,7 +100,7 @@ class AIGoal:
 	var dockee_point := ""  # For docking
 	var subsystem_name := ""  # For destroy subsystem
 
-var ai_goals: Array[AIGoal] = []
+var ai_goals: Array[MissionAIGoal] = []
 var ai_class := -1  # -1 means use default AI class
 
 # Object flags  
@@ -121,7 +121,7 @@ var ai_class := -1  # -1 means use default AI class
 @export var kamikaze_damage := 0
 
 # Subsystems
-class Subsystem:
+class MissionSubsystem:
 	var name := ""
 	var current_hits := -1.0  # -1 means use default health
 	var cargo_name := ""
@@ -132,7 +132,7 @@ class Subsystem:
 	var secondary_banks: Array[int] = []
 	var bank_capacities: Array[float] = []  # Ammo percentages (0-100)
 
-var subsystems: Array[Subsystem] = []
+var subsystems: Array[MissionSubsystem] = []
 
 # Hierarchy
 var parent: MissionObject = null
@@ -173,13 +173,13 @@ func set_global_transform(global_transform: Transform3D) -> void:
 		rotation = global_transform.basis.get_euler()
 		scale = global_transform.basis.get_scale()
 
-func add_subsystem(name: String) -> Subsystem:
-	var subsystem = Subsystem.new()
+func add_subsystem(name: String) -> MissionSubsystem:
+	var subsystem = MissionSubsystem.new()
 	subsystem.name = name
 	subsystems.append(subsystem)
 	return subsystem
 
-func get_subsystem(name: String) -> Subsystem:
+func get_subsystem(name: String) -> MissionSubsystem:
 	for subsystem in subsystems:
 		if subsystem.name == name:
 			return subsystem
@@ -197,8 +197,8 @@ func add_secondary_bank(weapon_index: int, ammo_pct := 100.0) -> void:
 	bank.ammo_pct = ammo_pct
 	secondary_banks.append(bank)
 
-func add_ai_goal(goal_type: AIGoal.Type, target := "", priority := 50) -> AIGoal:
-	var goal = AIGoal.new()
+func add_ai_goal(goal_type: MissionAIGoal.Type, target := "", priority := 50) -> MissionAIGoal:
+	var goal = MissionAIGoal.new()
 	goal.type = goal_type
 	goal.target_name = target
 	goal.priority = priority
@@ -234,16 +234,16 @@ func validate() -> Array:
 			# Validate AI goals
 			for goal in ai_goals:
 				match goal.type:
-					AIGoal.Type.DOCK, AIGoal.Type.UNDOCK:
+					MissionAIGoal.Type.DOCK, MissionAIGoal.Type.UNDOCK:
 						if goal.docker_point.is_empty() or goal.dockee_point.is_empty():
 							errors.append("Ship '%s' has dock goal with missing dock points" % name)
-					AIGoal.Type.DESTROY_SUBSYSTEM:
+					MissionAIGoal.Type.DESTROY_SUBSYSTEM:
 						if goal.subsystem_name.is_empty():
 							errors.append("Ship '%s' has destroy subsystem goal with no target" % name)
-					AIGoal.Type.CHASE, AIGoal.Type.GUARD, AIGoal.Type.EVADE_SHIP, AIGoal.Type.STAY_NEAR_SHIP:
+					MissionAIGoal.Type.CHASE, MissionAIGoal.Type.GUARD, MissionAIGoal.Type.EVADE_SHIP, MissionAIGoal.Type.STAY_NEAR_SHIP:
 						if goal.target_name.is_empty():
 							errors.append("Ship '%s' has AI goal with no target ship" % name)
-					AIGoal.Type.CHASE_WING, AIGoal.Type.GUARD_WING:
+					MissionAIGoal.Type.CHASE_WING, MissionAIGoal.Type.GUARD_WING:
 						if goal.target_name.is_empty():
 							errors.append("Ship '%s' has AI goal with no target wing" % name)
 			

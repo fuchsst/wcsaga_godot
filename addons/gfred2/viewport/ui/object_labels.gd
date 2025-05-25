@@ -179,11 +179,11 @@ func calculate_label_priority(obj: MissionObjectNode3D, distance: float, is_sele
 	# Important object types get bonus priority
 	if obj.mission_object:
 		match obj.object_type:
-			MissionObject.ObjectType.SHIP:
+			MissionObject.Type.SHIP:
 				priority += 100.0
-			MissionObject.ObjectType.JUMP_NODE:
+			MissionObject.Type.JUMP_NODE:
 				priority += 50.0
-			MissionObject.ObjectType.WAYPOINT:
+			MissionObject.Type.WAYPOINT:
 				priority += 25.0
 	
 	return priority

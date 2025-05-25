@@ -21,6 +21,7 @@ var mission_camera: MissionCamera3D
 var object_selector: ObjectSelector
 var grid_node: Node3D
 var environment_node: WorldEnvironment
+var undo_redo_manager: UndoRedoManager
 
 # Mission data
 var current_mission: MissionData
@@ -35,6 +36,7 @@ func _ready() -> void:
 	setup_viewport()
 	setup_camera()
 	setup_object_selector()
+	setup_undo_redo()
 	setup_grid()
 	setup_environment()
 	setup_input_handling()
@@ -78,6 +80,15 @@ func setup_object_selector() -> void:
 	object_selector.objects_selected.connect(_on_objects_selected)
 	object_selector.objects_deselected.connect(_on_objects_deselected)
 	object_selector.selection_cleared.connect(_on_selection_cleared)
+
+## Initializes the undo/redo system for transformations.
+func setup_undo_redo() -> void:
+	undo_redo_manager = UndoRedoManager.new()
+	
+	# Connect to signals for UI updates
+	undo_redo_manager.history_changed.connect(_on_undo_redo_history_changed)
+	undo_redo_manager.undo_performed.connect(_on_undo_performed)
+	undo_redo_manager.redo_performed.connect(_on_redo_performed)
 
 ## Creates the 3D grid overlay for spatial reference.
 func setup_grid() -> void:
@@ -157,6 +168,9 @@ func create_mission_object_node(obj_data: MissionObject) -> MissionObjectNode3D:
 	# Connect object signals
 	obj_node.object_clicked.connect(_on_object_clicked)
 	obj_node.transform_changed.connect(_on_object_transformed)
+	
+	# Setup undo/redo tracking
+	setup_object_transform_tracking(obj_node)
 	
 	return obj_node
 
@@ -264,10 +278,10 @@ func create_grid_mesh() -> ArrayMesh:
 
 ## Handles input events for viewport interaction.
 func _input(event: InputEvent) -> void:
-	if not visible or not is_inside_tree():
+	if not is_inside_tree():
 		return
 	
-	# Handle selection shortcuts
+	# Handle selection and editing shortcuts
 	if event is InputEventKey and event.pressed:
 		match event.keycode:
 			KEY_A:
@@ -280,6 +294,20 @@ func _input(event: InputEvent) -> void:
 			KEY_DELETE:
 				delete_selected_objects()
 				get_viewport().set_input_as_handled()
+			KEY_Z:
+				if event.ctrl_pressed and not event.shift_pressed:
+					# Ctrl+Z for undo
+					perform_undo()
+					get_viewport().set_input_as_handled()
+				elif event.ctrl_pressed and event.shift_pressed:
+					# Ctrl+Shift+Z for redo
+					perform_redo()
+					get_viewport().set_input_as_handled()
+			KEY_Y:
+				if event.ctrl_pressed:
+					# Ctrl+Y for redo (alternative)
+					perform_redo()
+					get_viewport().set_input_as_handled()
 
 ## Selects all mission objects.
 func select_all_objects() -> void:
@@ -387,3 +415,74 @@ func _on_object_transformed(obj_node: MissionObjectNode3D) -> void:
 func _on_camera_moved(camera: MissionCamera3D) -> void:
 	# Camera state is automatically saved by the camera controller
 	pass
+
+## Undo/Redo system methods
+
+## Perform undo operation
+func perform_undo() -> void:
+	if undo_redo_manager and undo_redo_manager.can_undo():
+		undo_redo_manager.undo()
+
+## Perform redo operation
+func perform_redo() -> void:
+	if undo_redo_manager and undo_redo_manager.can_redo():
+		undo_redo_manager.redo()
+
+## Check if undo is available
+func can_undo() -> bool:
+	return undo_redo_manager and undo_redo_manager.can_undo()
+
+## Check if redo is available
+func can_redo() -> bool:
+	return undo_redo_manager and undo_redo_manager.can_redo()
+
+## Get undo action name
+func get_undo_action_name() -> String:
+	if undo_redo_manager:
+		return undo_redo_manager.get_undo_action_name()
+	return ""
+
+## Get redo action name
+func get_redo_action_name() -> String:
+	if undo_redo_manager:
+		return undo_redo_manager.get_redo_action_name()
+	return ""
+
+## Setup object transformation tracking for undo/redo
+func setup_object_transform_tracking(obj_node: MissionObjectNode3D) -> void:
+	if not obj_node:
+		return
+	
+	# Connect transformation signals
+	obj_node.transformation_started.connect(_on_object_transformation_started.bind(obj_node))
+	obj_node.transformation_changed.connect(_on_object_transformation_changed.bind(obj_node))
+	obj_node.transformation_finished.connect(_on_object_transformation_finished.bind(obj_node))
+
+## Handle start of object transformation
+func _on_object_transformation_started(obj_node: MissionObjectNode3D) -> void:
+	if undo_redo_manager:
+		undo_redo_manager.begin_action("Move Object")
+		undo_redo_manager.capture_object_state(obj_node)
+
+## Handle ongoing object transformation
+func _on_object_transformation_changed(obj_node: MissionObjectNode3D) -> void:
+	if undo_redo_manager:
+		undo_redo_manager.update_object_state(obj_node)
+
+## Handle end of object transformation
+func _on_object_transformation_finished(obj_node: MissionObjectNode3D) -> void:
+	if undo_redo_manager:
+		undo_redo_manager.commit_action()
+
+## Handle undo/redo history changes
+func _on_undo_redo_history_changed(can_undo: bool, can_redo: bool) -> void:
+	# Signal for UI updates - can be connected to menu items, toolbar buttons, etc.
+	pass
+
+## Handle undo operation performed
+func _on_undo_performed(action_name: String) -> void:
+	print("Undo performed: ", action_name)
+
+## Handle redo operation performed
+func _on_redo_performed(action_name: String) -> void:
+	print("Redo performed: ", action_name)

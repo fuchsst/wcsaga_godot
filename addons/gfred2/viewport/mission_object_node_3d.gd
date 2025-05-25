@@ -10,6 +10,11 @@ signal object_clicked(object: MissionObjectNode3D, multi_select: bool)
 signal transform_changed(object: MissionObjectNode3D)
 signal properties_requested(object: MissionObjectNode3D)
 
+# Transformation signals for undo/redo system
+signal transformation_started()
+signal transformation_changed()
+signal transformation_finished()
+
 @export var selection_color: Color = Color.YELLOW
 @export var hover_color: Color = Color.WHITE
 @export var default_color: Color = Color.GRAY
@@ -406,3 +411,16 @@ func _on_mouse_entered() -> void:
 
 func _on_mouse_exited() -> void:
 	set_hovered(false)
+
+## Sync current transform to mission data
+func sync_to_mission_data() -> void:
+	if not mission_object:
+		return
+	
+	# Update mission object position and rotation
+	mission_object.position = global_position
+	mission_object.rotation = global_rotation
+	mission_object.scale = global_scale
+	
+	# Emit signal for other systems that need to know about the change
+	transform_changed.emit(self)
