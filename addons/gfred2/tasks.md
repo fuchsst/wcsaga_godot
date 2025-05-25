@@ -19,10 +19,16 @@ The GFRED2 mission editor aims to replicate the functionality of the original FR
 - [ ] Implement keyboard shortcut system
 - [ ] Add recent files management
 
-### Viewport System
+### Viewport System  
 - [x] Create base mission editor scene with 3D viewport
 - [x] Implement viewport rendering with proper camera projection
 - [x] Add viewport navigation controls (pan, zoom, rotate)
+- [x] Enhanced MissionViewport3D with object selection and manipulation
+- [x] MissionCamera3D with orbit, pan, zoom, and view switching
+- [x] ObjectSelector with box selection and multi-select
+- [x] MissionObjectNode3D with visual representations and interaction
+- [x] ViewportOverlay with performance info and controls
+- [x] ObjectLabels with dynamic visibility and scaling
 - [ ] Support multiple viewports (top, front, side, perspective) with split screen
 - [ ] Implement view distance controls with numeric input
 - [ ] Add coordinate system display with axis labels
@@ -32,16 +38,17 @@ The GFRED2 mission editor aims to replicate the functionality of the original FR
 - [x] Add display options (Show Models, Show Outlines, Show Info)
   
 ### Camera System
-- [ ] Implement editor camera system
-- [ ] Free camera mode with physics-based movement
-- [ ] Target focus mode with orbit controls
-- [ ] Camera position/rotation constraints
-- [ ] Camera speed controls with multiple presets (x1, x2, x3, x5, x8, x10, x50, x100)
-- [ ] View angle snapping
-- [ ] Camera position save/restore
-- [ ] Support switching between camera/current ship viewpoints
-- [ ] Add Lookat mode for object focusing
-- [ ] Add Flying controls mode with physics
+- [x] Implement editor camera system (MissionCamera3D)
+- [x] Free camera mode with physics-based movement
+- [x] Target focus mode with orbit controls
+- [x] Camera position/rotation constraints
+- [x] Camera speed controls with configurable presets
+- [x] View angle snapping (top, front, side views)
+- [x] Camera position save/restore (get/set_camera_state)
+- [x] Support switching between camera/current ship viewpoints
+- [x] Add Lookat mode for object focusing
+- [x] Smooth camera movement and transitions
+- [ ] Additional physics-based flying controls
   
 ### Grid System
 - [x] Create grid system with fine/coarse modes
@@ -75,12 +82,16 @@ The GFRED2 mission editor aims to replicate the functionality of the original FR
 - [ ] Group rotation system
   
 ### Selection System
-- [x] Implement selection system
+- [x] Implement selection system (ObjectSelector)
 - [x] Box selection with additive/subtractive modifiers
 - [x] Individual selection with click/drag
+- [x] Multi-select with Ctrl+click
+- [x] Select all with Ctrl+A
+- [x] Selection highlighting with visual feedback
+- [x] Hover effects for objects
+- [x] Focus selected objects with 'F' key
 - [ ] Selection groups (9 groups with Ctrl+1-9 shortcuts)
 - [ ] Selection filters by object type and team
-- [x] Selection highlighting
 - [x] Selection locking
 - [ ] Selection history
 - [ ] Next/Previous object selection
