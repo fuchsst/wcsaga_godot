@@ -39,6 +39,8 @@ GameStateManager="*res://autoload/GameStateManager.gd"
 PhysicsManager="*res://autoload/PhysicsManager.gd"
 InputManager="*res://autoload/InputManager.gd"
 AssetManager="*res://autoload/AssetManager.gd"
+ConfigurationManager="*res://autoload/ConfigurationManager.gd"
+SaveGameManager="*res://autoload/SaveGameManager.gd"
 
 [display]
 

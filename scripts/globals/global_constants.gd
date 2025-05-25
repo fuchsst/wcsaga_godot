@@ -1,8 +1,8 @@
 # scripts/globals/global_constants.gd
 # Defines global constants and enums used throughout the game.
 # Also provides helper functions for looking up resource indices by name.
-class_name GlobalConstants
-extends RefCounted # Use RefCounted as it primarily holds constants/enums
+# This is an autoload singleton - no class_name needed
+extends Node
 
 # --- Preload Resource Definitions (Needed for lookups) ---
 # Preload resource *scripts* to access their class definitions if needed,
@@ -12,7 +12,7 @@ const WeaponData = preload("res://scripts/resources/ship_weapon/weapon_data.gd")
 const PersonaData = preload("res://scripts/resources/mission/persona_data.gd")
 const SpeciesInfo = preload("res://scripts/resources/game_data/species_info.gd")
 const ArmorData = preload("res://scripts/resources/ship_weapon/armor_data.gd")
-const IffDefsData = preload("res://resources/game_data/iff_defs.tres") # TODO: create
+# const IffDefsData = preload("res://resources/game_data/iff_defs.tres") # TODO: create when resource exists
 
 # --- Object Types (Mirroring OBJ_*) ---
 enum ObjectType {
@@ -374,7 +374,7 @@ const IFF_DEFS_PATH = "res://resources/game_data/iff_defs.tres"
 const SPECIES_DATA_PATH = "res://resources/game_data/species/"
 # Add paths for other resources as needed
 
-# --- Global Lists (Loaded at runtime, e.g., in GameManager or specific managers) ---
+# --- Global Lists (Loaded at runtime) ---
 # These store the loaded resources or names for lookup.
 var weapon_list: Array[WeaponData] = [] # Store loaded resources directly
 var ship_list: Array[ShipData] = []   # Store loaded resources directly
@@ -383,6 +383,7 @@ var species_list: Array[SpeciesInfo] = [] # Array of loaded SpeciesInfo resource
 var damage_type_list: Array[String] = [] # Array of damage type names
 var persona_list: Array[PersonaData] = [] # Store loaded resources directly
 var iff_list: Array[String] = [] # Array of IFF names
+var cargo_list: Array[String] = [] # Array of cargo names
 
 # --- Lookup Dictionaries (Populated by load_resource_lists) ---
 var _ship_name_to_index: Dictionary = {}
@@ -397,7 +398,7 @@ var _cargo_name_to_index: Dictionary = {}
 func _ready():
 	load_resource_lists()
 
-static func load_resource_lists():
+func load_resource_lists():
 	print("GlobalConstants: Loading resource lists...")
 	# Clear existing lists and caches
 	weapon_list.clear()
@@ -427,7 +428,7 @@ static func load_resource_lists():
 				if res is ShipData:
 					ship_list.append(res) # Store the loaded resource
 				else:
-					printerr(f"Failed to load ShipData resource: {file_name}")
+					printerr("Failed to load ShipData resource: " + file_name)
 			file_name = ship_dir.get_next()
 		ship_dir.list_dir_end()
 		# Sort by name for consistent index mapping
@@ -435,9 +436,9 @@ static func load_resource_lists():
 		# Populate lookup dictionary
 		for i in range(ship_list.size()):
 			_ship_name_to_index[ship_list[i].ship_name.to_lower()] = i
-		print(f"Loaded {ship_list.size()} ships.")
+		print("Loaded " + str(ship_list.size()) + " ships.")
 	else:
-		printerr(f"Could not open ship resource directory: {SHIP_DATA_PATH}")
+		printerr("Could not open ship resource directory: " + SHIP_DATA_PATH)
 
 	# --- Load Weapon Data ---
 	print("Loading weapon list...")
@@ -451,7 +452,7 @@ static func load_resource_lists():
 				if res is WeaponData:
 					weapon_list.append(res) # Store the loaded resource
 				else:
-					printerr(f"Failed to load WeaponData resource: {file_name}")
+					printerr("Failed to load WeaponData resource: " + file_name)
 			file_name = weapon_dir.get_next()
 		weapon_dir.list_dir_end()
 		# Sort by name for consistent index mapping
@@ -459,9 +460,9 @@ static func load_resource_lists():
 		# Populate lookup dictionary
 		for i in range(weapon_list.size()):
 			_weapon_name_to_index[weapon_list[i].weapon_name.to_lower()] = i
-		print(f"Loaded {weapon_list.size()} weapons.")
+		print("Loaded " + str(weapon_list.size()) + " weapons.")
 	else:
-		printerr(f"Could not open weapon resource directory: {WEAPON_DATA_PATH}")
+		printerr("Could not open weapon resource directory: " + WEAPON_DATA_PATH)
 
 	# --- Load Armor Names ---
 	print("Loading armor list...")
@@ -476,16 +477,16 @@ static func load_resource_lists():
 				if res is ArmorData and res.has("armor_name"):
 					armor_list.append(res.armor_name)
 				else:
-					printerr(f"Failed to load or get name from armor resource: {file_name}")
+					printerr("Failed to load or get name from armor resource: " + file_name)
 			file_name = armor_dir.get_next()
 		armor_dir.list_dir_end()
 		armor_list.sort()
 		# Populate lookup dictionary
 		for i in range(armor_list.size()):
 			_armor_name_to_index[armor_list[i].to_lower()] = i
-		print(f"Loaded {armor_list.size()} armor names.")
+		print("Loaded " + str(armor_list.size()) + " armor names.")
 	else:
-		printerr(f"Could not open armor resource directory: {ARMOR_DATA_PATH}")
+		printerr("Could not open armor resource directory: " + ARMOR_DATA_PATH)
 
 	# --- Load IFF Names ---
 	print("Loading IFF list...")
@@ -496,9 +497,9 @@ static func load_resource_lists():
 		# Populate lookup dictionary
 		for i in range(iff_list.size()):
 			_iff_name_to_index[iff_list[i].to_lower()] = i
-		print(f"Loaded {iff_list.size()} IFF names from {IFF_DEFS_PATH}.")
+		print("Loaded " + str(iff_list.size()) + " IFF names from " + IFF_DEFS_PATH + ".")
 	else:
-		printerr(f"Failed to load or parse IFF definitions from: {IFF_DEFS_PATH}. Using defaults.")
+		printerr("Failed to load or parse IFF definitions from: " + IFF_DEFS_PATH + ". Using defaults.")
 		# Fallback defaults if loading fails
 		iff_list = ["Terran", "Hostile", "Neutral", "Unknown", "Traitor"]
 		for i in range(iff_list.size()):
@@ -516,7 +517,7 @@ static func load_resource_lists():
 				if res is SpeciesInfo:
 					species_list.append(res)
 				else:
-					printerr(f"Failed to load SpeciesInfo resource: {file_name}")
+					printerr("Failed to load SpeciesInfo resource: " + file_name)
 			file_name = species_dir.get_next()
 		species_dir.list_dir_end()
 		# Sort by name? Or rely on file order? Let's sort.
@@ -524,9 +525,9 @@ static func load_resource_lists():
 		# Populate lookup dictionary
 		for i in range(species_list.size()):
 			_species_name_to_index[species_list[i].species_name.to_lower()] = i
-		print(f"Loaded {species_list.size()} species.")
+		print("Loaded " + str(species_list.size()) + " species.")
 	else:
-		printerr(f"Could not open species resource directory: {SPECIES_DATA_PATH}")
+		printerr("Could not open species resource directory: " + SPECIES_DATA_PATH)
 
 	# --- Load Damage Types ---
 	# TODO: Implement loading damage types (maybe from armor types?)
@@ -544,7 +545,7 @@ static func load_resource_lists():
 				if res is PersonaData:
 					persona_list.append(res)
 				else:
-					printerr(f"Failed to load PersonaData resource: {file_name}")
+					printerr("Failed to load PersonaData resource: " + file_name)
 			file_name = persona_dir.get_next()
 		persona_dir.list_dir_end()
 		# Sort by name for consistent index mapping? Or rely on load order? Let's sort.
@@ -552,9 +553,9 @@ static func load_resource_lists():
 		# Populate lookup dictionary
 		for i in range(persona_list.size()):
 			_persona_name_to_index[persona_list[i].name.to_lower()] = i
-		print(f"Loaded {persona_list.size()} personas.")
+		print("Loaded " + str(persona_list.size()) + " personas.")
 	else:
-		printerr(f"Could not open persona resource directory: {PERSONA_DATA_PATH}")
+		printerr("Could not open persona resource directory: " + PERSONA_DATA_PATH)
 
 	# --- Load Cargo Names (Placeholder - needs actual loading from tables.tbl or similar) ---
 	print("Loading cargo list... (Placeholder)")
@@ -567,21 +568,21 @@ static func load_resource_lists():
 
 # --- Helper Functions ---
 	# Get WeaponData by index (list is preloaded)
-static func get_weapon_data(index: int) -> WeaponData:
+func get_weapon_data(index: int) -> WeaponData:
 	if index < 0 or index >= weapon_list.size():
 		printerr("Invalid weapon index requested: ", index)
 		return null
 	return weapon_list[index]
 
 # Get ShipData by index (list is preloaded)
-static func get_ship_data(index: int) -> ShipData:
+func get_ship_data(index: int) -> ShipData:
 	if index < 0 or index >= ship_list.size():
 		printerr("Invalid ship index requested: ", index)
 		return null
 	return ship_list[index]
 
 # Get ArmorData by index (list is preloaded)
-static func get_armor_data(index: int) -> Resource: # Return generic Resource
+func get_armor_data(index: int) -> Resource: # Return generic Resource
 	if index < 0 or index >= armor_list.size():
 		printerr("Invalid armor index requested: ", index)
 		return null
@@ -600,70 +601,70 @@ static func get_armor_data(index: int) -> Resource: # Return generic Resource
 		return null
 
 # Get PersonaData by index (list is preloaded)
-static func get_persona_data(index: int) -> PersonaData:
+func get_persona_data(index: int) -> PersonaData:
 	if index < 0 or index >= persona_list.size():
 		printerr("Invalid persona index requested: ", index)
 		return null
 	return persona_list[index]
 
 # Helper to find persona index by name (case-insensitive)
-static func lookup_persona_index(persona_name: String) -> int:
+func lookup_persona_index(persona_name: String) -> int:
 	if persona_name.is_empty():
 		return -1
 	var lower_name = persona_name.to_lower()
 	if _persona_name_to_index.has(lower_name):
 		return _persona_name_to_index[lower_name]
-	printerr(f"Persona name not found: '{persona_name}'")
+	printerr("Persona name not found: '" + persona_name + "'")
 	return -1
 
 # Helper to find ship index by name (case-insensitive)
-static func lookup_ship_index(ship_name: String) -> int:
+func lookup_ship_index(ship_name: String) -> int:
 	if ship_name.is_empty():
 		return -1
 	var lower_name = ship_name.to_lower()
 	if _ship_name_to_index.has(lower_name):
 		return _ship_name_to_index[lower_name]
-	printerr(f"Ship name not found: '{ship_name}'")
+	printerr("Ship name not found: '" + ship_name + "'")
 	return -1
 
 # Helper to find weapon index by name (case-insensitive)
-static func lookup_weapon_index(weapon_name: String) -> int:
+func lookup_weapon_index(weapon_name: String) -> int:
 	if weapon_name.is_empty():
 		return -1
 	var lower_name = weapon_name.to_lower()
 	if _weapon_name_to_index.has(lower_name):
 		return _weapon_name_to_index[lower_name]
-	printerr(f"Weapon name not found: '{weapon_name}'")
+	printerr("Weapon name not found: '" + weapon_name + "'")
 	return -1
 
 # Helper to find armor index by name (case-insensitive)
-static func lookup_armor_index(armor_name: String) -> int:
+func lookup_armor_index(armor_name: String) -> int:
 	if armor_name.is_empty():
 		return -1
 	var lower_name = armor_name.to_lower()
 	if _armor_name_to_index.has(lower_name):
 		return _armor_name_to_index[lower_name]
-	printerr(f"Armor name not found: '{armor_name}'")
+	printerr("Armor name not found: '" + armor_name + "'")
 	return -1
 
 # Helper to find IFF index by name (case-insensitive)
-static func lookup_iff_index(iff_name: String) -> int:
+func lookup_iff_index(iff_name: String) -> int:
 	if iff_name.is_empty():
 		return -1
 	var lower_name = iff_name.to_lower()
 	if _iff_name_to_index.has(lower_name):
 		return _iff_name_to_index[lower_name]
-	printerr(f"IFF name not found: '{iff_name}'")
+	printerr("IFF name not found: '" + iff_name + "'")
 	return -1 # Or default to a specific IFF?
 
 # Helper to find Species index by name (case-insensitive)
-static func lookup_species_index(species_name: String) -> int:
+func lookup_species_index(species_name: String) -> int:
 	if species_name.is_empty():
 		return -1
 	var lower_name = species_name.to_lower()
 	if _species_name_to_index.has(lower_name):
 		return _species_name_to_index[lower_name]
-	printerr(f"Species name not found: '{species_name}'")
+	printerr("Species name not found: '" + species_name + "'")
 	return -1 # Or default to Terran (0)?
 
 # --- Goal Types (missiongoals.h - PRIMARY_GOAL, etc.) ---
@@ -717,15 +718,15 @@ const _goal_type_map: Dictionary = {
 	"bonus": GoalType.BONUS,
 }
 
-static func lookup_goal_type(type_name: String) -> int:
+func lookup_goal_type(type_name: String) -> int:
 	var lower_name = type_name.to_lower()
 	if _goal_type_map.has(lower_name):
 		return _goal_type_map[lower_name]
-	printerr(f"Unknown goal type name: '{type_name}'. Defaulting to PRIMARY.")
+	printerr("Unknown goal type name: '" + type_name + "'. Defaulting to PRIMARY.")
 	return GoalType.PRIMARY
 
 # --- Cargo Lookup ---
-static func lookup_cargo_index(cargo_name: String) -> int:
+func lookup_cargo_index(cargo_name: String) -> int:
 	if cargo_name.is_empty() or cargo_name.to_lower() == "nothing":
 		return -1 # Assuming -1 means no cargo
 	var lower_name = cargo_name.to_lower()
@@ -733,7 +734,7 @@ static func lookup_cargo_index(cargo_name: String) -> int:
 		return _cargo_name_to_index[lower_name]
 	# If not found, maybe add it dynamically? Or require it to be pre-defined?
 	# For now, let's add dynamically and warn.
-	printerr(f"Cargo name '{cargo_name}' not preloaded. Adding dynamically.")
+	printerr("Cargo name '" + cargo_name + "' not preloaded. Adding dynamically.")
 	var new_index = cargo_list.size()
 	cargo_list.append(cargo_name)
 	_cargo_name_to_index[lower_name] = new_index
@@ -747,16 +748,16 @@ const _departure_location_map: Dictionary = {
 	"Hyperspace": 0, "Docking Bay": 1,
 }
 
-static func lookup_arrival_location(loc_name: String) -> int:
+func lookup_arrival_location(loc_name: String) -> int:
 	if _arrival_location_map.has(loc_name):
 		return _arrival_location_map[loc_name]
-	printerr(f"Unknown Arrival Location: '{loc_name}'. Defaulting to Hyperspace.")
+	printerr("Unknown Arrival Location: '" + loc_name + "'. Defaulting to Hyperspace.")
 	return 0
 
-static func lookup_departure_location(loc_name: String) -> int:
+func lookup_departure_location(loc_name: String) -> int:
 	if _departure_location_map.has(loc_name):
 		return _departure_location_map[loc_name]
-	printerr(f"Unknown Departure Location: '{loc_name}'. Defaulting to Hyperspace.")
+	printerr("Unknown Departure Location: '" + loc_name + "'. Defaulting to Hyperspace.")
 	return 0
 
 
