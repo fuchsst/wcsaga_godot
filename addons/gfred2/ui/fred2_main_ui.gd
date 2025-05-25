@@ -21,8 +21,10 @@ var left_vsplit: VSplitContainer
 var right_panel: VBoxContainer
 
 var viewport_container: SubViewport
-var property_editor: ObjectPropertyEditor
+var property_inspector: ObjectPropertyInspector
 var object_hierarchy: ObjectHierarchy
+var sexp_editor: VisualSexpEditor
+var sexp_editor_panel: Panel
 
 # Menu and toolbar
 var menu_bar: MenuBar
@@ -85,18 +87,21 @@ func _create_basic_viewport() -> void:
 	viewport_container.add_child(light)
 
 func _setup_right_panel() -> void:
-	"""Setup the right panel with hierarchy and properties."""
-	# Right side vertical split (hierarchy | properties)
+	"""Setup the right panel with hierarchy, properties, and SEXP editor."""
+	# Right side vertical split (hierarchy | properties | sexp)
 	left_vsplit = VSplitContainer.new()
-	left_vsplit.custom_minimum_size.x = 300
+	left_vsplit.custom_minimum_size.x = 350
 	left_vsplit.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	main_hsplit.add_child(left_vsplit)
 	
 	# Object hierarchy (top)
 	_setup_object_hierarchy()
 	
-	# Property editor (bottom)
+	# Property editor (middle)
 	_setup_property_editor()
+	
+	# SEXP editor (bottom) - initially hidden
+	_setup_sexp_editor()
 
 func _setup_object_hierarchy() -> void:
 	"""Setup the object hierarchy panel."""
@@ -137,14 +142,49 @@ func _setup_property_editor() -> void:
 	property_header.add_theme_font_size_override("font_size", 14)
 	property_vbox.add_child(property_header)
 	
-	# Property editor component
+	# Property inspector component
 	if property_editor_scene:
-		property_editor = property_editor_scene.instantiate()
+		property_inspector = property_editor_scene.instantiate()
 	else:
-		property_editor = ObjectPropertyEditor.new()
+		property_inspector = ObjectPropertyInspector.new()
 	
-	property_editor.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	property_vbox.add_child(property_editor)
+	property_inspector.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	property_vbox.add_child(property_inspector)
+
+func _setup_sexp_editor() -> void:
+	"""Setup the SEXP expression editor panel."""
+	sexp_editor_panel = Panel.new()
+	sexp_editor_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	sexp_editor_panel.visible = false  # Initially hidden
+	left_vsplit.add_child(sexp_editor_panel)
+	
+	var sexp_vbox: VBoxContainer = VBoxContainer.new()
+	sexp_editor_panel.add_child(sexp_vbox)
+	
+	# Header with toggle button
+	var sexp_header: HBoxContainer = HBoxContainer.new()
+	sexp_vbox.add_child(sexp_header)
+	
+	var sexp_header_label: Label = Label.new()
+	sexp_header_label.text = "SEXP Editor"
+	sexp_header_label.add_theme_font_size_override("font_size", 14)
+	sexp_header.add_child(sexp_header_label)
+	
+	var header_spacer: Control = Control.new()
+	header_spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sexp_header.add_child(header_spacer)
+	
+	var close_btn: Button = Button.new()
+	close_btn.text = "×"
+	close_btn.tooltip_text = "Close SEXP editor"
+	close_btn.pressed.connect(_hide_sexp_editor)
+	sexp_header.add_child(close_btn)
+	
+	# SEXP editor component
+	sexp_editor = VisualSexpEditor.new()
+	sexp_editor.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	sexp_editor.show_toolbar = false  # Use integrated toolbar
+	sexp_vbox.add_child(sexp_editor)
 
 func _setup_menu_toolbar() -> void:
 	"""Setup menu bar and toolbar."""
@@ -227,10 +267,12 @@ func _setup_tools_menu() -> void:
 	menu_bar.add_child(tools_menu)
 	menu_bar.set_menu_title(3, "Tools")
 	
-	tools_menu.add_item("Validate Mission", 1)
-	tools_menu.add_item("Mission Statistics", 2)
+	tools_menu.add_item("SEXP Editor", 1)
 	tools_menu.add_separator()
-	tools_menu.add_item("Preferences...", 3)
+	tools_menu.add_item("Validate Mission", 2)
+	tools_menu.add_item("Mission Statistics", 3)
+	tools_menu.add_separator()
+	tools_menu.add_item("Preferences...", 4)
 	
 	tools_menu.id_pressed.connect(_on_tools_menu_selected)
 
@@ -279,9 +321,15 @@ func _connect_signals() -> void:
 		object_hierarchy.object_visibility_changed.connect(_on_object_visibility_changed)
 	
 	# Property editor signals
-	if property_editor:
-		property_editor.property_changed.connect(_on_property_changed)
-		property_editor.validation_error.connect(_on_validation_error)
+	if property_inspector:
+		property_inspector.property_changed.connect(_on_property_changed)
+		property_inspector.validation_error.connect(_on_validation_error)
+		property_inspector.sexp_edit_requested.connect(_on_sexp_edit_requested)
+	
+	# SEXP editor signals
+	if sexp_editor:
+		sexp_editor.expression_changed.connect(_on_sexp_expression_changed)
+		sexp_editor.expression_validated.connect(_on_sexp_expression_validated)
 	
 	# Mission manager signals
 	if mission_object_manager:
@@ -321,9 +369,10 @@ func _on_view_menu_selected(id: int) -> void:
 
 func _on_tools_menu_selected(id: int) -> void:
 	match id:
-		1: _validate_mission()
-		2: _show_mission_stats()
-		3: _show_preferences()
+		1: _toggle_sexp_editor()
+		2: _validate_mission()
+		3: _show_mission_stats()
+		4: _show_preferences()
 
 # File operations
 func _new_mission() -> void:
@@ -402,8 +451,8 @@ func _update_ui_for_mission() -> void:
 	if object_hierarchy:
 		object_hierarchy.set_mission_data(mission_data)
 	
-	if property_editor:
-		property_editor.edit_object(null)  # Clear current selection
+	if property_inspector:
+		property_inspector.edit_objects([])  # Clear current selection
 
 # Edit operations
 func _undo() -> void:
@@ -464,11 +513,26 @@ func _show_mission_stats() -> void:
 func _show_preferences() -> void:
 	print("Show preferences - TODO: Implement")
 
+func _toggle_sexp_editor() -> void:
+	"""Toggle the SEXP editor visibility."""
+	if sexp_editor_panel:
+		sexp_editor_panel.visible = not sexp_editor_panel.visible
+
+func _show_sexp_editor() -> void:
+	"""Show the SEXP editor panel."""
+	if sexp_editor_panel:
+		sexp_editor_panel.visible = true
+
+func _hide_sexp_editor() -> void:
+	"""Hide the SEXP editor panel."""
+	if sexp_editor_panel:
+		sexp_editor_panel.visible = false
+
 # Signal handlers
 func _on_object_selected(object_data: MissionObjectData) -> void:
 	"""Handle object selection from hierarchy."""
-	if property_editor:
-		property_editor.edit_object(object_data)
+	if property_inspector:
+		property_inspector.edit_objects([object_data])
 	
 	if mission_object_manager:
 		mission_object_manager.set_selection([object_data])
@@ -504,26 +568,42 @@ func _on_object_deleted(object_data: MissionObjectData) -> void:
 	if object_hierarchy:
 		object_hierarchy.refresh_hierarchy()
 	
-	if property_editor:
-		property_editor.edit_object(null)
+	if property_inspector:
+		property_inspector.edit_objects([])
 
 func _on_object_modified(object_data: MissionObjectData) -> void:
 	"""Handle object modifications from manager."""
-	if property_editor and property_editor.current_object == object_data:
-		property_editor.refresh_properties()
+	if property_inspector and object_data in property_inspector.current_objects:
+		property_inspector.refresh_current_objects()
 
 func _on_manager_selection_changed(selected_objects: Array[MissionObjectData]) -> void:
 	"""Handle selection changes from manager."""
 	if object_hierarchy:
 		object_hierarchy.select_objects(selected_objects)
 	
-	# Update property editor for single selection
-	if selected_objects.size() == 1:
-		if property_editor:
-			property_editor.edit_object(selected_objects[0])
-	else:
-		if property_editor:
-			property_editor.edit_object(null)
+	# Update property inspector for selection (supports single and multi-select)
+	if property_inspector:
+		property_inspector.edit_objects(selected_objects)
+
+func _on_sexp_expression_changed(sexp_code: String) -> void:
+	"""Handle SEXP expression changes."""
+	# TODO: Apply SEXP expression to selected mission objects
+	print("SEXP expression changed: ", sexp_code)
+
+func _on_sexp_expression_validated(is_valid: bool, errors: Array[String]) -> void:
+	"""Handle SEXP expression validation results."""
+	if not is_valid:
+		print("SEXP validation errors: ", errors)
+
+func _on_sexp_edit_requested(property_name: String, current_expression: String) -> void:
+	"""Handle request to edit SEXP expression from property inspector."""
+	_show_sexp_editor()
+	
+	if sexp_editor:
+		# Load the current expression into the visual editor
+		sexp_editor.load_expression_from_text(current_expression)
+		# Store the property name for when changes are made
+		sexp_editor.set_meta("editing_property", property_name)
 
 func get_mission_data() -> MissionData:
 	"""Get current mission data."""
