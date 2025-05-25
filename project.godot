@@ -34,11 +34,11 @@ SoundManager="*res://scripts/sound_animation/sound_manager.gd"
 MusicManager="*res://scripts/sound_animation/music_manager.gd"
 GameSounds="*res://scripts/globals/game_sounds.gd"
 MusicData="*res://scripts/globals/music_data.gd"
-ObjectManager="*res://scripts/core/object_manager.gd"
-GameStateManager="*res://scripts/core/game_state_manager.gd"
-PhysicsManager="*res://scripts/core/physics_manager.gd"
-InputManager="*res://scripts/core/input_manager.gd"
-AssetManager="*res://scripts/assets/asset_manager.gd"
+ObjectManager="*res://autoload/ObjectManager.gd"
+GameStateManager="*res://autoload/GameStateManager.gd"
+PhysicsManager="*res://autoload/PhysicsManager.gd"
+InputManager="*res://autoload/InputManager.gd"
+AssetManager="*res://autoload/AssetManager.gd"
 
 [display]
 
@@ -54,7 +54,7 @@ enabled=PackedStringArray("res://addons/SignalVisualizer/plugin.cfg", "res://add
 
 debug_toggle={
 "deadzone": 0.5,
-"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":4194332,"key_label":0,"unicode":0,"echo":false,"script":null)
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":4194332,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
 ]
 }
 

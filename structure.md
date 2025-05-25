@@ -54,9 +54,9 @@ scenes/
 │   ├── BriefingRoom.tscn
 │   └── DebriefingRoom.tscn
 └── space/
-    ├── SpaceScene.tscn
-    ├── StarField.tscn
-    └── NebulaField.tscn
+	├── SpaceScene.tscn
+	├── StarField.tscn
+	└── NebulaField.tscn
 ```
 
 ### Scripts Organization
@@ -102,9 +102,9 @@ scripts/
 │   ├── Triggers.gd
 │   └── Scoring.gd
 └── utils/
-    ├── Math3D.gd
-    ├── Debug.gd
-    └── SaveLoad.gd
+	├── Math3D.gd
+	├── Debug.gd
+	└── SaveLoad.gd
 ```
 
 ### Resources Structure
@@ -126,8 +126,8 @@ resources/
 │   ├── campaign1/
 │   └── campaign2/
 └── ui/
-    ├── themes/
-    └── styles/
+	├── themes/
+	└── styles/
 ```
 
 ## Migration Notes
