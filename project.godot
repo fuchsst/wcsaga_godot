@@ -38,6 +38,7 @@ ObjectManager="*res://scripts/core/object_manager.gd"
 GameStateManager="*res://scripts/core/game_state_manager.gd"
 PhysicsManager="*res://scripts/core/physics_manager.gd"
 InputManager="*res://scripts/core/input_manager.gd"
+AssetManager="*res://scripts/assets/asset_manager.gd"
 
 [display]
 
