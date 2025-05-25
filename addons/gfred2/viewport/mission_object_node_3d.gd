@@ -21,8 +21,8 @@ signal transformation_finished()
 @export var selection_outline_width: float = 0.1
 
 # Object state
-var mission_object: MissionObject
-var object_type: MissionObject.Type
+var mission_object: MissionObjectData
+var object_type: MissionObjectData.ObjectType
 var is_selected: bool = false
 var is_hovered: bool = false
 
@@ -54,14 +54,14 @@ func _ready() -> void:
 		collision_area.mouse_exited.connect(_on_mouse_exited)
 
 ## Sets up the object from mission data.
-func setup_from_mission_object(obj_data: MissionObject) -> void:
+func setup_from_mission_object(obj_data: MissionObjectData) -> void:
 	if not obj_data:
 		push_error("Cannot setup MissionObjectNode3D with null mission object")
 		return
 	
 	mission_object = obj_data
-	object_type = obj_data.type
-	name = obj_data.name
+	object_type = obj_data.object_type
+	name = obj_data.object_name
 	
 	# Set transform from mission data
 	position = obj_data.position
@@ -419,8 +419,18 @@ func sync_to_mission_data() -> void:
 	
 	# Update mission object position and rotation
 	mission_object.position = global_position
-	mission_object.rotation = global_rotation
-	mission_object.scale = global_scale
+	mission_object.rotation = rotation
+	mission_object.scale = scale
 	
 	# Emit signal for other systems that need to know about the change
 	transform_changed.emit(self)
+
+## Sync from mission data to current transform
+func sync_from_mission_data() -> void:
+	if not mission_object:
+		return
+	
+	# Update transform from mission object data
+	global_position = mission_object.position
+	rotation = mission_object.rotation
+	scale = mission_object.scale
