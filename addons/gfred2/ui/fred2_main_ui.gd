@@ -23,6 +23,7 @@ var right_panel: VBoxContainer
 var viewport_container: SubViewport
 var property_inspector: ObjectPropertyInspector
 var object_hierarchy: ObjectHierarchy
+var asset_browser: AssetBrowserDock
 var sexp_editor: VisualSexpEditor
 var sexp_editor_panel: Panel
 
@@ -97,6 +98,9 @@ func _setup_right_panel() -> void:
 	# Object hierarchy (top)
 	_setup_object_hierarchy()
 	
+	# Asset browser (second)
+	_setup_asset_browser()
+	
 	# Property editor (middle)
 	_setup_property_editor()
 	
@@ -126,6 +130,26 @@ func _setup_object_hierarchy() -> void:
 	
 	object_hierarchy.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	hierarchy_vbox.add_child(object_hierarchy)
+
+func _setup_asset_browser() -> void:
+	"""Setup the asset browser panel."""
+	var asset_panel: Panel = Panel.new()
+	asset_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	left_vsplit.add_child(asset_panel)
+	
+	var asset_vbox: VBoxContainer = VBoxContainer.new()
+	asset_panel.add_child(asset_vbox)
+	
+	# Header
+	var asset_header: Label = Label.new()
+	asset_header.text = "Asset Browser"
+	asset_header.add_theme_font_size_override("font_size", 14)
+	asset_vbox.add_child(asset_header)
+	
+	# Asset browser component
+	asset_browser = AssetBrowserDock.new()
+	asset_browser.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	asset_vbox.add_child(asset_browser)
 
 func _setup_property_editor() -> void:
 	"""Setup the property editor panel."""
@@ -325,6 +349,10 @@ func _connect_signals() -> void:
 		property_inspector.property_changed.connect(_on_property_changed)
 		property_inspector.validation_error.connect(_on_validation_error)
 		property_inspector.sexp_edit_requested.connect(_on_sexp_edit_requested)
+	
+	# Asset browser signals
+	if asset_browser:
+		asset_browser.asset_selected.connect(_on_asset_selected)
 	
 	# SEXP editor signals
 	if sexp_editor:
