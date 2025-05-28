@@ -126,7 +126,10 @@ static func vec_make(x: float, y: float, z: float) -> Vector3:
 ## Random vector in sphere (uniform distribution)
 static func vec_random_in_sphere(radius: float = 1.0) -> Vector3:
 	var vec: Vector3
-	repeat:
+	var safety = 1000  # Prevent infinite loops
+
+	while safety > 0:
+		safety -= 1
 		vec = Vector3(
 			randf_range(-1.0, 1.0),
 			randf_range(-1.0, 1.0), 
@@ -134,8 +137,9 @@ static func vec_random_in_sphere(radius: float = 1.0) -> Vector3:
 		)
 		if vec.length_squared() <= 1.0:
 			return vec * radius
-		else:
-			goto repeat
+	
+	# Fallback to normalized vector if no valid found
+	return Vector3.UP * radius
 
 ## Random vector on sphere surface
 static func vec_random_on_sphere(radius: float = 1.0) -> Vector3:
@@ -388,7 +392,7 @@ static func calc_coordinated_bank(turn_rate: float, forward_speed: float, gravit
 ## Calculate minimum turning radius
 static func calc_min_turn_radius(max_turn_rate: float, speed: float) -> float:
 	if abs(max_turn_rate) < SMALL_NUM:
-		return FLT_MAX
+		return INF
 	return speed / max_turn_rate
 
 # ========================================

@@ -1,5 +1,5 @@
 class_name ErrorHandler
-extends RefCounted
+extends Node
 
 ## Comprehensive error handling and validation system for WCS-Godot conversion.
 ## Provides graceful degradation, error recovery, and detailed error reporting.
@@ -284,7 +284,7 @@ static func _schedule_application_restart(error_info: ErrorInfo) -> void:
 	await Engine.get_main_loop().create_timer(5.0).timeout
 	
 	DebugManager.log_critical(DebugManager.Category.GENERAL, "Restarting application...")
-	get_tree().quit()  # This would need to be called from a proper context
+	Engine.get_main_loop().quit()   # This would need to be called from a proper context
 
 ## Initiate graceful shutdown
 static func _initiate_graceful_shutdown(error_info: ErrorInfo) -> void:
@@ -294,7 +294,7 @@ static func _initiate_graceful_shutdown(error_info: ErrorInfo) -> void:
 	DebugManager.shutdown()
 	
 	# Quit application
-	get_tree().quit()  # This would need to be called from a proper context
+	Engine.get_main_loop().quit()  # This would need to be called from a proper context
 
 ## Handle critical error threshold exceeded
 static func _handle_critical_error_threshold() -> void:

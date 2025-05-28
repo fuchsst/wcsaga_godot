@@ -18,22 +18,9 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-SceneManager="*res://addons/scene_manager/scene_manager.tscn"
+SceneManager="*res://addons/scene_manager/SceneManager.tscn"
 Scenes="*res://addons/scene_manager/scenes.gd"
 Signal_Debugger="*res://addons/SignalVisualizer/Debugger/SignalDebugger.gd"
-GameState="*res://scripts/globals/game_state.gd"
-GlobalConstants="*res://scripts/globals/global_constants.gd"
-AIConstants="*res://scripts/globals/ai_constants.gd"
-ScriptSystem="*res://scripts/core_systems/script_system.gd"
-SexpOperatorHandler="*res://scripts/scripting/sexp/sexp_operators.gd"
-SexpVariableManager="*res://scripts/scripting/sexp/sexp_variables.gd"
-AutopilotManager="*res://scripts/core_systems/autopilot_manager.gd"
-CameraManager="*res://scripts/core_systems/camera_manager.gd"
-SubtitleManager="*res://scripts/core_systems/subtitle_manager.gd"
-SoundManager="*res://scripts/sound_animation/sound_manager.gd"
-MusicManager="*res://scripts/sound_animation/music_manager.gd"
-GameSounds="*res://scripts/globals/game_sounds.gd"
-MusicData="*res://scripts/globals/music_data.gd"
 ObjectManager="*res://autoload/object_manager.gd"
 GameStateManager="*res://autoload/game_state_manager.gd"
 PhysicsManager="*res://autoload/physics_manager.gd"
@@ -50,7 +37,7 @@ window/stretch/mode="canvas_items"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/SignalVisualizer/plugin.cfg", "res://addons/scene_manager/plugin.cfg")
+enabled=PackedStringArray("res://addons/scene_manager/plugin.cfg")
 
 [input]
 

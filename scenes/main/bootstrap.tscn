@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://dklow7o0omv7n"]
 
 [ext_resource type="Script" uid="uid://bwuw0jjs72jhq" path="res://scenes/main/bootstrap.gd" id="1_lwevj"]
-[ext_resource type="Script" path="res://scripts/debug/manager_debug_overlay.gd" id="2_debug"]
+[ext_resource type="Script" uid="uid://hvtbsvsrybpu" path="res://scripts/debug/manager_debug_overlay.gd" id="2_debug"]
 
 [node name="Bootstrap" type="Node2D"]
 script = ExtResource("1_lwevj")

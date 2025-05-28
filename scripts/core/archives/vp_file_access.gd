@@ -9,7 +9,7 @@ const DebugManager = preload("res://scripts/core/platform/debug_manager.gd")
 const ErrorHandler = preload("res://scripts/core/platform/error_handler.gd")
 
 ## Error constants matching Godot FileAccess behavior
-enum Error {
+enum VPError {
 	OK = 0,
 	ERR_FILE_NOT_FOUND = 7,
 	ERR_FILE_BAD_DRIVE = 8,

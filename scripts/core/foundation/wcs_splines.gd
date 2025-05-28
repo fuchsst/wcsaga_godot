@@ -65,7 +65,7 @@ class BezierSpline:
 		var n: int = num_points - 1  # Degree of curve
 		
 		for i in range(num_points):
-			var blend: float = bezier_blend(i, n, t)
+			var blend: float = WCSSplines.bezier_blend(i, n, t)
 			result += control_points[i] * blend
 		
 		return result
@@ -84,7 +84,7 @@ class BezierSpline:
 		
 		for i in range(num_points - 1):
 			var diff: Vector3 = control_points[i + 1] - control_points[i]
-			var blend: float = bezier_blend(i, n - 1, t)
+			var blend: float = WCSSplines.bezier_blend(i, n - 1, t)
 			result += diff * blend * float(n)
 		
 		return result

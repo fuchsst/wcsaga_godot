@@ -1,6 +1,8 @@
 # Godot 4+ specific ignores
 .godot/
 addons/gdUnit4
+addons/debug_console
+addons/SignalVisualizer
 
 # Python ignores
 __pycache__/

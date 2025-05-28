@@ -101,8 +101,8 @@ func _initialize_physics_world() -> void:
 	
 	# Disable gravity for space simulation
 	if not gravity_enabled:
-		PhysicsServer3D.space_set_param(physics_space_rid, PhysicsServer3D.SPACE_PARAM_GRAVITY, 0.0)
-		PhysicsServer3D.space_set_param(physics_space_rid, PhysicsServer3D.SPACE_PARAM_GRAVITY_VECTOR, Vector3.ZERO)
+		PhysicsServer3D.area_set_param(physics_space_rid, PhysicsServer3D.AREA_PARAM_GRAVITY, 0.0)
+		PhysicsServer3D.area_set_param(physics_space_rid, PhysicsServer3D.AREA_PARAM_GRAVITY_VECTOR, Vector3.ZERO)
 	
 	physics_world_ready.emit()
 	print("PhysicsManager: Physics world initialized")

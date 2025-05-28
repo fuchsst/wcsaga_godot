@@ -63,21 +63,6 @@ func get_thrust_vector() -> Vector3:
 func set_thrust_vector(new_thrust: Vector3) -> void:
 	thrust_vector = new_thrust
 
-func get_position() -> Vector3:
-	return position
-
-func set_position(new_position: Vector3) -> void:
-	position = new_position
-
-func get_rotation() -> Vector3:
-	return rotation
-
-func set_rotation(new_rotation: Vector3) -> void:
-	rotation = new_rotation
-
-func get_transform() -> Transform3D:
-	return transform
-
 # Collision properties
 
 func get_collision_radius() -> float:

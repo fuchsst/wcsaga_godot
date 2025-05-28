@@ -14,7 +14,7 @@ static func add_extension(filename: String, extension: String) -> String:
 	
 	# Ensure extension starts with a dot
 	var ext: String = extension
-	if not ext.starts_with("."):
+	if not ext.begins_with("."):
 		ext = "." + ext
 	
 	# Check if filename already has this extension
@@ -53,7 +53,7 @@ static func has_extension(filename: String, extensions: PackedStringArray) -> bo
 	
 	for ext in extensions:
 		var clean_ext: String = ext
-		if clean_ext.starts_with("."):
+		if clean_ext.begins_with("."):
 			clean_ext = clean_ext.substr(1)
 		
 		if file_ext.to_lower() == clean_ext.to_lower():
@@ -292,11 +292,11 @@ static func read_config_file(file_path: String) -> Dictionary:
 		line = line.strip_edges()
 		
 		# Skip empty lines and comments
-		if line.is_empty() or line.starts_with(";") or line.starts_with("#"):
+		if line.is_empty() or line.begins_with(";") or line.begins_with("#"):
 			continue
 		
 		# Section header
-		if line.starts_with("[") and line.ends_with("]"):
+		if line.begins_with("[") and line.ends_with("]"):
 			current_section = line.substr(1, line.length() - 2)
 			if not config.has(current_section):
 				config[current_section] = {}
@@ -309,7 +309,7 @@ static func read_config_file(file_path: String) -> Dictionary:
 			var value: String = line.substr(equals_pos + 1).strip_edges()
 			
 			# Remove quotes if present
-			if value.starts_with("\"") and value.ends_with("\""):
+			if value.begins_with("\"") and value.ends_with("\""):
 				value = value.substr(1, value.length() - 2)
 			
 			if current_section.is_empty():

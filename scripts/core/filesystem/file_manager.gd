@@ -170,7 +170,7 @@ func open_file(filename: String, mode: AccessMode = AccessMode.READ, path_type: 
 	if mode == AccessMode.READ:
 		var vp_file: VPFileAccess = _try_open_from_vp(filename, path_type)
 		if vp_file != null:
-			return vp_file
+			return FileAccess.open(full_path, FileAccess.READ)
 	
 	# Try to open from filesystem
 	var file_access: FileAccess = null
