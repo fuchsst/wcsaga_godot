@@ -19,8 +19,8 @@ var show_outlines := true
 
 # Gizmo state
 var active_gizmo: Node = null
-var gizmo_mode := preload("res://addons/gfred2/object_gizmo.gd").GizmoMode.TRANSLATE
-var gizmo_space := preload("res://addons/gfred2/object_gizmo.gd").GizmoSpace.WORLD
+var gizmo_mode := preload("res://addons/gfred2/viewport/gizmos/mission_gizmo_plugin.gd").GizmoMode.TRANSLATE
+var gizmo_space := preload("res://addons/gfred2/viewport/gizmos/mission_gizmo_plugin.gd").GizmoSpace.WORLD
 var snap_enabled := false
 var snap_translate := 1.0
 var snap_rotate := 15.0

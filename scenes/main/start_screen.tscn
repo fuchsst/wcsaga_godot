@@ -1,0 +1,70 @@
+[gd_scene load_steps=2 format=3 uid="uid://bfgjt8xhp2yk1"]
+
+[ext_resource type="Script" path="res://scenes/main/start_screen.gd" id="1_w1k2m"]
+
+[node name="StartScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_w1k2m")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0.2, 1)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -150.0
+offset_right = 200.0
+offset_bottom = 150.0
+
+[node name="Title" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Wing Commander Saga"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Subtitle" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Godot Engine Port"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="ButtonContainer" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="MainHallButton" type="Button" parent="VBoxContainer/ButtonContainer"]
+layout_mode = 2
+text = "Enter Main Hall"
+
+[node name="OptionsButton" type="Button" parent="VBoxContainer/ButtonContainer"]
+layout_mode = 2
+text = "Options"
+
+[node name="ExitButton" type="Button" parent="VBoxContainer/ButtonContainer"]
+layout_mode = 2
+text = "Exit"
+
+[node name="StatusLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Foundation Systems: Ready"
+horizontal_alignment = 1
+vertical_alignment = 1
+modulate = Color(0.8, 1, 0.8, 1)
+
+[connection signal="pressed" from="VBoxContainer/ButtonContainer/MainHallButton" to="." method="_on_main_hall_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/ButtonContainer/OptionsButton" to="." method="_on_options_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/ButtonContainer/ExitButton" to="." method="_on_exit_button_pressed"]

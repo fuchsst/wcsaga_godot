@@ -13,21 +13,22 @@ config_version=5
 config/name="Wing Commander Saga"
 run/main_scene="res://scenes/main/bootstrap.tscn"
 config/features=PackedStringArray("4.4", "GL Compatibility")
-boot_splash/image="res://assets/hermes_interface/2_LoadingBG_2.png"
 config/icon="res://icon.svg"
 
 [autoload]
 
-SceneManager="*res://addons/scene_manager/SceneManager.tscn"
 Scenes="*res://addons/scene_manager/scenes.gd"
 Signal_Debugger="*res://addons/SignalVisualizer/Debugger/SignalDebugger.gd"
-ObjectManager="*res://autoload/object_manager.gd"
 GameStateManager="*res://autoload/game_state_manager.gd"
 PhysicsManager="*res://autoload/physics_manager.gd"
 InputManager="*res://autoload/input_manager.gd"
 AssetManager="*res://autoload/AssetManager.gd"
 ConfigurationManager="*res://autoload/ConfigurationManager.gd"
 SaveGameManager="*res://autoload/SaveGameManager.gd"
+ObjectManager="*res://autoload/object_manager.gd"
+SceneManager="*res://addons/scene_manager/SceneManager.tscn"
+VPResourceManager="*res://autoload/vp_resource_manager.gd"
+#AssetManager="*res://autoload/AssetManager.gd"
 
 [display]
 
@@ -37,7 +38,7 @@ window/stretch/mode="canvas_items"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/scene_manager/plugin.cfg")
+enabled=PackedStringArray("res://addons/SignalVisualizer/plugin.cfg", "res://addons/gdUnit4/plugin.cfg", "res://addons/gfred2/plugin.cfg", "res://addons/scene_manager/plugin.cfg")
 
 [input]
 

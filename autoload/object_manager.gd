@@ -135,7 +135,7 @@ func _physics_process(delta: float) -> void:
 func _process_update_groups(delta: float) -> void:
 	# Process different update frequency groups
 	for frequency in update_groups.keys():
-		var objects_in_group: Array[WCSObject] = update_groups[frequency]
+		var objects_in_group: Array = update_groups[frequency]
 		var should_update: bool = _should_update_group(frequency)
 		
 		if should_update:
@@ -203,8 +203,8 @@ func destroy_object(object: WCSObject) -> void:
 	else:
 		object.queue_free()
 
-func get_objects_by_type(object_type: String) -> Array[WCSObject]:
-	var result: Array[WCSObject] = []
+func get_objects_by_type(object_type: String) -> Array:
+	var result: Array = []
 	
 	for obj in active_objects:
 		if is_instance_valid(obj) and obj.get_object_type() == object_type:
@@ -227,7 +227,7 @@ func clear_all_objects() -> void:
 		print("ObjectManager: Clearing all objects (%d active)" % active_objects.size())
 	
 	# Destroy all active objects
-	var objects_to_destroy: Array[WCSObject] = active_objects.duplicate()
+	var objects_to_destroy: Array = active_objects.duplicate()
 	for obj in objects_to_destroy:
 		destroy_object(obj)
 	
@@ -426,7 +426,7 @@ func debug_validate_object_integrity() -> bool:
 			valid = false
 	
 	# Check for objects in multiple update groups
-	var all_grouped_objects: Array[WCSObject] = []
+	var all_grouped_objects: Array = []
 	for frequency in update_groups.keys():
 		var group: Array = update_groups[frequency]
 		for obj in group:
