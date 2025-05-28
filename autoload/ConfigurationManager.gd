@@ -1,4 +1,3 @@
-class_name ConfigurationManager
 extends Node
 
 ## Central configuration management system for WCS-Godot conversion.

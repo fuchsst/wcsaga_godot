@@ -1,4 +1,3 @@
-class_name ObjectManager
 extends Node
 
 ## Core object lifecycle manager replacing C++ object system.

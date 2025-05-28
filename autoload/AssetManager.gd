@@ -1,4 +1,3 @@
-class_name AssetManager
 extends Node
 
 ## Central asset management system for WCS-Godot conversion.

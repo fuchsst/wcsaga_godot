@@ -1,0 +1,23 @@
+[gd_scene load_steps=2 format=3 uid="uid://bx3o4ljwnh8kt"]
+
+[ext_resource type="Script" path="res://scripts/core/wcs_object.gd" id="1_n5gql"]
+
+[node name="WCSObject" type="Node3D"]
+script = ExtResource("1_n5gql")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+
+[node name="PhysicsBody" type="RigidBody3D" parent="."]
+freeze_mode = 1
+
+[node name="PhysicsShape" type="CollisionShape3D" parent="PhysicsBody"]
+
+[node name="Components" type="Node" parent="."]
+
+[node name="InputReceiver" type="Node" parent="Components"]
+
+[node name="AudioManager" type="Node" parent="Components"]
+
+[node name="EffectManager" type="Node" parent="Components"]

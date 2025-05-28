@@ -1,4 +1,3 @@
-class_name SaveGameManager
 extends Node
 
 ## Central save game management system for WCS-Godot conversion.

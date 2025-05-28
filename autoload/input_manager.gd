@@ -1,4 +1,3 @@
-class_name InputManager
 extends Node
 
 ## High-precision input handling for space flight controls.

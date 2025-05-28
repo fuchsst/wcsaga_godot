@@ -1,0 +1,12 @@
+[gd_scene load_steps=2 format=3 uid="uid://cl89jhjsb8c0u"]
+
+[ext_resource type="Script" path="res://scripts/core/input_receiver.gd" id="1_m6hkd"]
+
+[node name="InputReceiver" type="Node"]
+script = ExtResource("1_m6hkd")
+
+[node name="InputMap" type="Node" parent="."]
+
+[node name="DeviceManager" type="Node" parent="."]
+
+[node name="ActionProcessor" type="Node" parent="."]

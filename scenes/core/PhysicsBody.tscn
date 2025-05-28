@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://bwt8f5m2qkjed"]
+
+[ext_resource type="Script" path="res://scripts/core/custom_physics_body.gd" id="1_x7fqg"]
+
+[node name="PhysicsBody" type="RigidBody3D"]
+script = ExtResource("1_x7fqg")
+freeze_mode = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+
+[node name="DebugCollisionDisplay" type="MeshInstance3D" parent="."]
+visible = false

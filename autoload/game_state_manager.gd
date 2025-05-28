@@ -1,4 +1,3 @@
-class_name GameStateManager
 extends Node
 
 ## Central game state controller managing menu/mission/briefing flow.

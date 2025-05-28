@@ -1,4 +1,3 @@
-class_name PhysicsManager
 extends Node
 
 ## Integrates WCS physics simulation with Godot physics engine.
