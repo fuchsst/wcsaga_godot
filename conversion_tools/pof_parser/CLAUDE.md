@@ -1,10 +1,14 @@
-# POF Parser Package - EPIC-003 DM-004 & DM-005 Implementation
+# POF Parser Package - EPIC-003 DM-004, DM-005 & DM-006 Implementation
 
 ## Package Purpose
 
-This package provides comprehensive POF (Parallax Object Format) file analysis, parsing, and mesh conversion for Wing Commander Saga to Godot conversion. It implements the EPIC-003 DM-004 story requirements for POF format analysis, chunk parsing, geometry extraction, and data validation, plus DM-005 requirements for complete POF to Godot GLB mesh conversion.
+This package provides comprehensive POF (Parallax Object Format) file analysis, parsing, mesh conversion, and optimization for Wing Commander Saga to Godot conversion. It implements the complete EPIC-003 conversion pipeline:
 
-The package enables accurate conversion of WCS 3D model files to Godot-compatible GLB format while preserving all visual, structural, and gameplay-relevant details through a complete pipeline from POF → OBJ/MTL → GLB with Godot import files.
+- **DM-004**: POF format analysis, chunk parsing, geometry extraction, and data validation
+- **DM-005**: Complete POF to Godot GLB mesh conversion with materials and import files
+- **DM-006**: Advanced LOD processing, material optimization, collision generation, and performance validation
+
+The package enables accurate conversion of WCS 3D model files to production-ready Godot assets while preserving all visual, structural, and gameplay-relevant details through an optimized pipeline: POF → Analysis → LOD Generation → Material Conversion → Collision Optimization → GLB with comprehensive validation.
 
 ## Original C++ Analysis
 
@@ -89,6 +93,48 @@ Godot .import file generator with WCS-specific optimizations.
 - **Key Methods**: `generate_import_file()`, model type detection
 - **Features**: Ship/station/debris-specific settings, WCS ship class detection
 - **Integration**: Creates import files with physics bodies, LOD settings, material optimization
+
+### POFLODProcessor (DM-006)
+Advanced LOD (Level of Detail) hierarchy processor for performance optimization.
+- **Purpose**: Create multiple detail levels for distance-based rendering optimization
+- **Key Methods**: `create_lod_hierarchy()`, `generate_lod_variants()`, `validate_lod_hierarchy()`
+- **Features**: Progressive vertex/triangle reduction, texture resolution scaling, specular/normal mapping control
+- **C++ Mapping**: Direct implementation of WCS detail level system from modelinterp.cpp (Interp_detail_level)
+
+### GodotMaterialConverter (DM-006)
+WCS to Godot material conversion with StandardMaterial3D optimization.
+- **Purpose**: Convert WCS materials to Godot equivalents with proper shader assignment and rendering properties
+- **Key Methods**: `convert_material()`, `convert_material_batch()`, `generate_material_report()`
+- **Features**: Render mode mapping, texture path conversion, transparency handling, performance optimization
+- **Integration**: Maps WCS glow, transparency, additive, and special render modes to Godot materials
+
+### CollisionMeshGenerator (DM-006)
+Optimized physics collision mesh generator for different gameplay scenarios.
+- **Purpose**: Create efficient collision shapes for physics interaction while preserving gameplay accuracy
+- **Key Methods**: `generate_collision_mesh()`, support for sphere, box, convex hull, and trimesh shapes
+- **Features**: Subsystem collision preservation, shield mesh generation, performance-targeted optimization
+- **Integration**: Works with LOD system to provide distance-appropriate collision complexity
+
+### WCSShaderMapper (DM-006)
+Shader effect mapper for WCS-specific visual effects in Godot.
+- **Purpose**: Map WCS special effects (glow, cloak, thruster flames) to appropriate Godot shader implementations
+- **Key Methods**: `map_wcs_effect_to_shader()`, `generate_custom_shader()`, `generate_shader_report()`
+- **Features**: Custom shader templates, effect parameter customization, performance analysis
+- **Integration**: Generates StandardMaterial3D properties and custom .gdshader files for advanced effects
+
+### MeshOptimizer (DM-006)
+Performance optimization tools for different target platforms.
+- **Purpose**: Optimize meshes for mobile, web, and desktop targets with configurable quality/performance trade-offs
+- **Key Methods**: `optimize_mesh()`, `create_lod_variants()`, support for multiple optimization profiles
+- **Features**: Vertex deduplication, triangle reduction, material merging, UV optimization, compression
+- **Integration**: Platform-specific optimization profiles (Desktop High/Medium, Mobile, WebGL1/2)
+
+### LODMaterialValidator (DM-006)
+Comprehensive validation system for LOD and material processing quality assurance.
+- **Purpose**: Measure performance impact and visual quality retention, ensure conversion accuracy
+- **Key Methods**: `validate_lod_hierarchy()`, `generate_recommendations()`, `save_validation_report()`
+- **Features**: Performance metrics calculation, quality scoring, issue detection, optimization suggestions
+- **Integration**: Validates all DM-006 components and generates actionable improvement recommendations
 
 ## Usage Examples
 
@@ -355,7 +401,7 @@ python -m unittest pof_parser.test_pof_parser.TestPOFFormatAnalyzer
 
 ---
 
-**Implementation Status**: DM-004 and DM-005 completed following EPIC-003 architecture  
+**Implementation Status**: DM-004, DM-005, and DM-006 completed following EPIC-003 architecture  
 **Quality**: Production-ready with comprehensive error handling and validation  
 **Performance**: Optimized for large model collections and batch processing  
-**Integration**: Complete POF → GLB conversion pipeline with seamless Godot workflow integration
+**Integration**: Complete POF → GLB conversion pipeline with LOD, materials, and optimization
