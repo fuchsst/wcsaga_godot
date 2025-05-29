@@ -360,10 +360,10 @@ func convert_from_legacy_ship_data(legacy_data: Resource) -> void:
 	# Copy common properties that exist in both formats
 	# This would be expanded based on the exact legacy format
 	if legacy_data.has_method("get") or "ship_name" in legacy_data:
-		ship_name = legacy_data.get("ship_name", "")
-		alt_name = legacy_data.get("alt_name", "")
-		mass = legacy_data.get("mass", 100.0)
-		max_hull_strength = legacy_data.get("max_hull_strength", 100.0)
+		ship_name = legacy_data.get("ship_name") or ""
+		alt_name = legacy_data.get("alt_name") or ""
+		mass = legacy_data.get("mass") or 100.0
+		max_hull_strength = legacy_data.get("max_hull_strength") or 100.0
 		# ... more conversion logic
 	
 	# Mark as converted and track source

@@ -41,7 +41,7 @@ class AssetValidator:
 	func can_validate(asset_type: AssetTypes.Type) -> bool:
 		return asset_types.is_empty() or asset_types.has(asset_type)
 	
-	func validate(asset: BaseAssetData, result: ValidationResult) -> void:
+	var validate: Callable = func (asset: BaseAssetData, result: ValidationResult) -> void:
 		# Override in subclasses
 		pass
 
@@ -67,7 +67,7 @@ func validate_asset(asset: BaseAssetData) -> ValidationResult:
 		Validation result with errors, warnings, and suggestions"""
 	
 	if asset == null:
-		var result: ValidationResult = ValidationResult.new()
+		var result: ValidationResult = ValidationResult.new(asset.file_path, asset.get_asset_type_name())
 		result.add_error("Asset is null")
 		return result
 	
@@ -79,12 +79,12 @@ func validate_asset(asset: BaseAssetData) -> ValidationResult:
 		print("WCSAssetValidator: Validating asset %s" % asset.file_path)
 	
 	# Create validation result
-	var result: ValidationResult = ValidationResult.new(asset.file_path, asset.get_asset_type())
+	var result: ValidationResult = ValidationResult.new(asset.file_path, asset.get_asset_type_name())
 	
 	# Run global validators first
 	for validator in _global_validators:
 		if validator.can_validate(asset.get_asset_type()):
-			validator.validate(asset, result)
+			validator.validate.call(asset, result)
 			
 			# Check for error limit
 			if result.errors.size() >= max_validation_errors:
@@ -95,7 +95,7 @@ func validate_asset(asset: BaseAssetData) -> ValidationResult:
 	var asset_type: AssetTypes.Type = asset.get_asset_type()
 	if _validators.has(asset_type):
 		var validator: AssetValidator = _validators[asset_type]
-		validator.validate(asset, result)
+		validator.validate.call(asset, result)
 	
 	# Run built-in asset validation
 	var asset_errors: Array[String] = asset.get_validation_errors()
@@ -153,7 +153,7 @@ func validate_by_path(asset_path: String) -> ValidationResult:
 	var asset: BaseAssetData = load(asset_path) as BaseAssetData
 	
 	if asset == null:
-		var result: ValidationResult = ValidationResult.new(asset_path)
+		var result: ValidationResult = ValidationResult.new(asset.file_path, asset.get_asset_type_name())
 		result.add_error("Failed to load asset or asset is not BaseAssetData type")
 		return result
 	

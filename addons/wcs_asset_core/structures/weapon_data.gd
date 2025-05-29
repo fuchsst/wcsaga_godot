@@ -436,12 +436,12 @@ func convert_from_legacy_weapon_data(legacy_data: Resource) -> void:
 	
 	# Copy common properties that exist in both formats
 	if legacy_data.has_method("get") or "weapon_name" in legacy_data:
-		weapon_name = legacy_data.get("weapon_name", "")
-		alt_name = legacy_data.get("alt_name", "")
-		damage = legacy_data.get("damage", 10.0)
-		max_speed = legacy_data.get("max_speed", 100.0)
-		lifetime = legacy_data.get("lifetime", 5.0)
-		fire_wait = legacy_data.get("fire_wait", 0.25)
+		weapon_name = legacy_data.get("weapon_name") or ""
+		alt_name = legacy_data.get("alt_name") or ""
+		damage = legacy_data.get("damage") or 10.0
+		max_speed = legacy_data.get("max_speed") or 100.0
+		lifetime = legacy_data.get("lifetime") or 5.0
+		fire_wait = legacy_data.get("fire_wait") or 0.25
 		# ... more conversion logic
 	
 	# Mark as converted
