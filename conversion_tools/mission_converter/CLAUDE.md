@@ -56,28 +56,28 @@ Creates Godot Resource files (.tres) for mission data.
 ### Basic Mission Conversion
 ```bash
 # Convert single FS2 mission file
-python mission_file_converter.py mission.fs2 --output converted_missions/
+conversion_tools/run_script.sh mission_file_converter mission.fs2 --output converted_missions/
 
 # Convert with validation
-python mission_file_converter.py mission.fs2 --output converted_missions/ --validate
+conversion_tools/run_script.sh mission_file_converter mission.py --output converted_missions/ --validate
 
 # Convert entire mission directory
-python mission_file_converter.py missions/ --output converted_missions/
+conversion_tools/run_script.sh mission_file_converter missions/ --output converted_missions/
 
 # Verbose logging for debugging
-python mission_file_converter.py mission.fs2 --output converted_missions/ --verbose
+conversion_tools/run_script.sh mission_file_converter mission.fs2 --output converted_missions/ --verbose
 ```
 
 ### Testing and Validation
 ```bash
 # Test FS2 parser with sample mission
-python fs2_mission_parser.py --test sample_mission.fs2
+conversion_tools/run_script.sh fs2_mission_parser --test sample_mission.fs2
 
 # Test event conversion
-python mission_event_converter.py --test sample_events.fs2
+conversion_tools/run_script.sh mission_event_converter --test sample_events.fs2
 
 # Validate converted resources
-python mission_file_converter.py --validate-only converted_missions/
+conversion_tools/run_script.sh mission_file_converter --validate-only converted_missions/
 ```
 
 ## Architecture Notes

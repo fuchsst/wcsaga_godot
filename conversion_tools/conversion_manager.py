@@ -345,13 +345,28 @@ class ConversionManager:
             return False
     
     def _execute_table_conversion(self, job: ConversionJob) -> bool:
-        """Execute table file conversion"""
+        """Execute table file conversion using TableDataConverter"""
         try:
-            # Placeholder - would use table converter
-            logger.warning(f"Table conversion not yet implemented: {job.source_path}")
-            return False
+            from .tests.table_data_converter import TableDataConverter
+            
+            # Initialize table converter
+            converter = TableDataConverter(
+                source_dir=self.wcs_source_dir,
+                target_dir=self.godot_target_dir
+            )
+            
+            # Convert the specific table file
+            success = converter.convert_table_file(job.source_path)
+            
+            if success:
+                logger.info(f"Successfully converted table file: {job.source_path}")
+                return True
+            else:
+                logger.error(f"Failed to convert table file: {job.source_path}")
+                return False
+                
         except Exception as e:
-            logger.error(f"Table conversion failed: {e}")
+            logger.error(f"Table conversion failed for {job.source_path}: {e}")
             return False
     
     def execute_conversion_plan(self, jobs: List[ConversionJob], 

@@ -5,7 +5,7 @@ class_name WingInstanceData
 extends Resource
 
 # --- Nested Resource Definitions ---
-const SexpNode = preload("res://scripts/scripting/sexp/sexp_node.gd")
+const SexpNode = preload("res://addons/sexp/sexp_node.gd")
 const AIGoal = preload("res://scripts/resources/ai/ai_goal.gd")
 
 # --- Wing Properties ---

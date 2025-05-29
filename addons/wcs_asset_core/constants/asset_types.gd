@@ -72,7 +72,12 @@ enum Type {
 	SHIP_TABLE = 901,
 	WEAPON_TABLE = 902,
 	ARMOR_TABLE = 903,
-	STRING_TABLE = 904
+	STRING_TABLE = 904,
+	
+	# Faction and species assets
+	SPECIES = 950,
+	FACTION = 951,
+	IFF_DATA = 952
 }
 
 ## Asset category groupings
@@ -152,7 +157,12 @@ static var TYPE_NAMES: Dictionary = {
 	Type.SHIP_TABLE: "Ship Table",
 	Type.WEAPON_TABLE: "Weapon Table",
 	Type.ARMOR_TABLE: "Armor Table",
-	Type.STRING_TABLE: "String Table"
+	Type.STRING_TABLE: "String Table",
+	
+	# Factions and Species
+	Type.SPECIES: "Species",
+	Type.FACTION: "Faction",
+	Type.IFF_DATA: "IFF Data"
 }
 
 ## Category mappings
@@ -220,7 +230,12 @@ static var TYPE_CATEGORIES: Dictionary = {
 	Type.SHIP_TABLE: Category.DATA,
 	Type.WEAPON_TABLE: Category.DATA,
 	Type.ARMOR_TABLE: Category.DATA,
-	Type.STRING_TABLE: Category.DATA
+	Type.STRING_TABLE: Category.DATA,
+	
+	# Factions and Species
+	Type.SPECIES: Category.CORE,
+	Type.FACTION: Category.CORE,
+	Type.IFF_DATA: Category.CORE
 }
 
 ## Utility functions
