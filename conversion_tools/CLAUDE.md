@@ -45,28 +45,34 @@ Lightweight validation system for converted assets.
 ### Basic Conversion
 ```bash
 # Convert all WCS assets to Godot format
-python convert_wcs_assets.py --source /path/to/wcs --target /path/to/godot/project
+run_script.sh convert_wcs_assets --source /path/to/wcs --target /path/to/godot/project
 
 # Dry run to preview conversion plan
-python convert_wcs_assets.py --source /path/to/wcs --target /path/to/godot/project --dry-run
+run_script.sh convert_wcs_assets --source /path/to/wcs --target /path/to/godot/project --dry-run
 
 # Convert with validation
-python convert_wcs_assets.py --source /path/to/wcs --target /path/to/godot/project --validate
+run_script.sh convert_wcs_assets --source /path/to/wcs --target /path/to/godot/project --validate
+
+# Test mesh conversion
+run_script.sh pof_parser.test_mesh_conversion
+
+# Convert POF models to GLB format
+run_script.sh pof_parser.cli convert ship.pof --output ship.glb --textures textures/
 ```
 
 ### Asset Cataloging
 ```bash
 # Catalog existing converted assets
-python convert_wcs_assets.py --target /path/to/godot/project --catalog-only
+run_script.sh convert_wcs_assets --target /path/to/godot/project --catalog-only
 
 # Search assets programmatically
-python asset_catalog.py search --query "fighter" --type "model"
+run_script.sh asset_catalog search --query "fighter" --type "model"
 ```
 
 ### Validation Only
 ```bash
 # Validate converted assets
-python asset_catalog.py validate --directory converted_assets/
+run_script.sh asset_catalog validate --directory converted_assets/
 ```
 
 ## Architecture Notes
@@ -180,7 +186,7 @@ conversion_tools/
 
 ---
 
-**Implementation Status**: DM-001, DM-002, and DM-003 completed following EPIC-003 architecture  
+**Implementation Status**: DM-001, DM-002, DM-003, and DM-005 completed following EPIC-003 architecture  
 **Quality**: Production-ready with comprehensive error handling and validation  
 **Performance**: Designed for efficiency with large WCS asset collections  
 **Integration**: Seamless integration with EPIC-002 asset management and Godot workflow

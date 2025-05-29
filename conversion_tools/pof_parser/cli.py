@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-POF Parser CLI - EPIC-003 DM-004 Implementation
+POF Parser CLI - EPIC-003 DM-004 & DM-005 Implementation
 
-Command-line interface for POF format analysis, parsing, and data extraction.
-Provides comprehensive tools for POF file inspection and conversion preparation.
+Command-line interface for POF format analysis, parsing, data extraction,
+and mesh conversion to Godot GLB format.
 """
 
 import argparse
@@ -16,6 +16,7 @@ from typing import List, Optional
 from .pof_format_analyzer import POFFormatAnalyzer
 from .pof_data_extractor import POFDataExtractor
 from .pof_parser import POFParser
+from .pof_mesh_converter import POFMeshConverter
 
 # Configure logging
 logging.basicConfig(
@@ -212,7 +213,9 @@ def parse_pof_file(file_path: Path, output_file: Optional[Path] = None) -> bool:
         return False
 
 def process_directory(directory: Path, operation: str, output_dir: Optional[Path] = None,
-                     godot_format: bool = False) -> None:
+                     godot_format: bool = False, textures_dir: Optional[Path] = None,
+                     model_type: str = 'ship', blender_path: Optional[Path] = None,
+                     keep_temp: bool = False) -> None:
     """
     Process all POF files in a directory.
     
@@ -250,6 +253,11 @@ def process_directory(directory: Path, operation: str, output_dir: Optional[Path
                 success = extract_pof_data(pof_file, output_file, godot_format)
             elif operation == 'parse':
                 success = parse_pof_file(pof_file, output_file)
+            elif operation == 'convert':
+                if output_dir:
+                    output_file = output_dir / pof_file.with_suffix('.glb').name
+                success = convert_pof_to_glb(pof_file, output_file, textures_dir, 
+                                           model_type, blender_path, keep_temp)
             else:
                 print(f"Unknown operation: {operation}")
                 continue
@@ -270,6 +278,59 @@ def process_directory(directory: Path, operation: str, output_dir: Optional[Path
     print(f"\n=== Summary ===")
     print(f"Processed: {success_count}/{len(pof_files)} files successfully")
 
+def convert_pof_to_glb(file_path: Path, output_file: Optional[Path] = None,
+                      textures_dir: Optional[Path] = None, model_type: str = 'ship',
+                      blender_path: Optional[Path] = None, keep_temp: bool = False) -> bool:
+    """
+    Convert POF file to Godot GLB format.
+    
+    Args:
+        file_path: Path to POF file
+        output_file: Path to output GLB file (auto-generated if None)
+        textures_dir: Directory containing texture files
+        model_type: Type of model for optimization
+        blender_path: Path to Blender executable
+        keep_temp: Keep temporary files after conversion
+        
+    Returns:
+        True if conversion successful, False otherwise
+    """
+    try:
+        print(f"Converting POF to GLB: {file_path}")
+        
+        # Generate output path if not provided
+        if not output_file:
+            output_file = file_path.with_suffix('.glb')
+        
+        # Initialize converter
+        converter = POFMeshConverter(
+            blender_executable=blender_path,
+            cleanup_temp=not keep_temp
+        )
+        
+        # Perform conversion
+        report = converter.convert_pof_to_glb(
+            file_path, output_file, textures_dir, model_type
+        )
+        
+        if report.success:
+            print(f"✓ Conversion successful: {output_file}")
+            print(f"  Time: {report.conversion_time:.2f}s")
+            print(f"  Vertices: {report.obj_vertices:,}")
+            print(f"  Faces: {report.obj_faces:,}")
+            print(f"  Materials: {report.obj_materials}")
+            print(f"  GLB Size: {report.glb_file_size:,} bytes")
+            return True
+        else:
+            print(f"✗ Conversion failed")
+            for error in report.errors:
+                print(f"  Error: {error}")
+            return False
+        
+    except Exception as e:
+        logger.error(f"Failed to convert POF file {file_path}: {e}")
+        return False
+
 def main():
     """Main CLI entry point."""
     parser = argparse.ArgumentParser(
@@ -286,14 +347,20 @@ Examples:
   # Parse POF file and save raw data
   python -m pof_parser.cli parse ship.pof --output ship_parsed.json
   
+  # Convert POF to Godot GLB format
+  python -m pof_parser.cli convert ship.pof --output ship.glb --textures textures/
+  
   # Process all POF files in directory
   python -m pof_parser.cli analyze models/ --output-dir analysis_results/
+  
+  # Batch convert POF models to GLB
+  python -m pof_parser.cli convert models/ --output-dir glb_models/ --textures textures/
         """
     )
     
     parser.add_argument(
         'operation', 
-        choices=['analyze', 'extract', 'parse'],
+        choices=['analyze', 'extract', 'parse', 'convert'],
         help='Operation to perform'
     )
     
@@ -327,6 +394,32 @@ Examples:
         help='Enable verbose logging'
     )
     
+    # Convert-specific arguments
+    parser.add_argument(
+        '--textures', '-t',
+        type=Path,
+        help='Directory containing texture files (for convert operation)'
+    )
+    
+    parser.add_argument(
+        '--model-type', '-m',
+        choices=['ship', 'station', 'debris', 'custom'],
+        default='ship',
+        help='Model type for optimization (for convert operation, default: ship)'
+    )
+    
+    parser.add_argument(
+        '--blender',
+        type=Path,
+        help='Path to Blender executable (for convert operation, auto-detected if not specified)'
+    )
+    
+    parser.add_argument(
+        '--keep-temp',
+        action='store_true',
+        help='Keep temporary OBJ files after conversion (for convert operation)'
+    )
+    
     args = parser.parse_args()
     
     # Configure logging level
@@ -347,15 +440,19 @@ Examples:
                 success = extract_pof_data(args.input, args.output, args.godot_format)
             elif args.operation == 'parse':
                 success = parse_pof_file(args.input, args.output)
+            elif args.operation == 'convert':
+                success = convert_pof_to_glb(args.input, args.output, args.textures,
+                                           args.model_type, args.blender, args.keep_temp)
             else:
                 success = False
-                print(f"Error: operation must one of 'analyze', 'extract', 'parse', but was '{args.input}'")
+                print(f"Error: operation must one of 'analyze', 'extract', 'parse', 'convert', but was '{args.operation}'")
             
             sys.exit(0 if success else 1)
         
         elif args.input.is_dir():
             # Process directory
-            process_directory(args.input, args.operation, args.output_dir, args.godot_format)
+            process_directory(args.input, args.operation, args.output_dir, args.godot_format,
+                            args.textures, args.model_type, args.blender, args.keep_temp)
             sys.exit(0)
         
         else:

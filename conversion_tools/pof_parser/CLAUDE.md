@@ -1,10 +1,10 @@
-# POF Parser Package - EPIC-003 DM-004 Implementation
+# POF Parser Package - EPIC-003 DM-004 & DM-005 Implementation
 
 ## Package Purpose
 
-This package provides comprehensive POF (Parallax Object Format) file analysis and parsing for Wing Commander Saga to Godot conversion. It implements the EPIC-003 DM-004 story requirements for POF format analysis, chunk parsing, geometry extraction, and data validation.
+This package provides comprehensive POF (Parallax Object Format) file analysis, parsing, and mesh conversion for Wing Commander Saga to Godot conversion. It implements the EPIC-003 DM-004 story requirements for POF format analysis, chunk parsing, geometry extraction, and data validation, plus DM-005 requirements for complete POF to Godot GLB mesh conversion.
 
-The package enables accurate conversion of WCS 3D model files to Godot-compatible formats while preserving all visual, structural, and gameplay-relevant details.
+The package enables accurate conversion of WCS 3D model files to Godot-compatible GLB format while preserving all visual, structural, and gameplay-relevant details through a complete pipeline from POF → OBJ/MTL → GLB with Godot import files.
 
 ## Original C++ Analysis
 
@@ -69,6 +69,27 @@ Structured data extraction for conversion workflows.
 - **Output**: POFModelData objects with complete model information
 - **Integration**: Designed specifically for EPIC-003 conversion pipeline
 
+### POFMeshConverter (DM-005)
+Complete POF to Godot GLB conversion pipeline orchestrator.
+- **Purpose**: Manage the complete conversion from POF → OBJ/MTL → GLB with Godot import files
+- **Key Methods**: `convert_pof_to_glb()`, `convert_directory()`
+- **Output**: GLB files with .import files and comprehensive conversion reports
+- **Integration**: Uses POFOBJConverter, BlenderOBJConverter, and GodotImportGenerator
+
+### POFOBJConverter (DM-005)
+POF to OBJ/MTL intermediate format converter.
+- **Purpose**: Convert POF geometry to OBJ format with material files
+- **Key Methods**: `convert_pof_to_obj()`, coordinate/UV conversion functions
+- **Features**: Coordinate system conversion, polygon triangulation, material mapping
+- **C++ Mapping**: Direct implementation of BSP geometry processing from modelinterp.cpp
+
+### GodotImportGenerator (DM-005)
+Godot .import file generator with WCS-specific optimizations.
+- **Purpose**: Generate optimized .import files for seamless Godot editor integration
+- **Key Methods**: `generate_import_file()`, model type detection
+- **Features**: Ship/station/debris-specific settings, WCS ship class detection
+- **Integration**: Creates import files with physics bodies, LOD settings, material optimization
+
 ## Usage Examples
 
 ### Basic POF File Analysis
@@ -125,6 +146,45 @@ objects = parsed_data['objects']
 weapon_points = parsed_data['gun_points']
 ```
 
+### POF to Godot Mesh Conversion (DM-005)
+```python
+from pathlib import Path
+from pof_parser import POFMeshConverter
+
+# Initialize converter (auto-detects Blender if available)
+converter = POFMeshConverter()
+
+# Convert single POF to GLB
+report = converter.convert_pof_to_glb(
+    pof_path=Path('fighter.pof'),
+    glb_path=Path('fighter.glb'),
+    texture_dir=Path('textures/'),
+    model_type='ship'
+)
+
+if report.success:
+    print(f"✓ Conversion successful: {report.conversion_time:.2f}s")
+    print(f"  Vertices: {report.obj_vertices:,}")
+    print(f"  Faces: {report.obj_faces:,}")
+    print(f"  Materials: {report.obj_materials}")
+    print(f"  GLB Size: {report.glb_file_size:,} bytes")
+else:
+    print("✗ Conversion failed:")
+    for error in report.errors:
+        print(f"  {error}")
+
+# Batch convert directory
+reports = converter.convert_directory(
+    input_dir=Path('pof_models/'),
+    output_dir=Path('glb_models/'),
+    texture_dir=Path('textures/')
+)
+
+# Generate validation report
+for report in reports:
+    print(f"{report.source_file}: {'✓' if report.success else '✗'}")
+```
+
 ### Command-Line Interface
 ```bash
 # Analyze POF format
@@ -138,6 +198,15 @@ python -m pof_parser.cli analyze models/ --output-dir analysis_results/
 
 # Parse and save raw data
 python -m pof_parser.cli parse ship.pof --output ship_raw.json
+
+# Convert POF to GLB format (DM-005)
+python -m pof_parser.cli convert ship.pof --output ship.glb --textures textures/
+
+# Batch convert POF models to GLB
+python -m pof_parser.cli convert models/ --output-dir glb_models/ --textures textures/
+
+# Test mesh conversion pipeline
+python -m pof_parser.test_mesh_conversion
 ```
 
 ## Architecture Notes
@@ -286,7 +355,7 @@ python -m unittest pof_parser.test_pof_parser.TestPOFFormatAnalyzer
 
 ---
 
-**Implementation Status**: DM-004 completed following EPIC-003 architecture  
+**Implementation Status**: DM-004 and DM-005 completed following EPIC-003 architecture  
 **Quality**: Production-ready with comprehensive error handling and validation  
 **Performance**: Optimized for large model collections and batch processing  
-**Integration**: Seamless integration with EPIC-003 conversion pipeline and Godot workflow
+**Integration**: Complete POF → GLB conversion pipeline with seamless Godot workflow integration
