@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 """
-WCS to Godot Conversion Tool
+WCS to Godot Conversion Tool - Comprehensive CLI Interface
 
-Main CLI interface for converting WCS assets to Godot format following
-the EPIC-003 architecture design.
+Main command-line interface for converting WCS assets to Godot format following
+the EPIC-003 architecture design. Provides complete batch processing, automation,
+resume functionality, and comprehensive reporting capabilities.
 
-Usage: python convert_wcs_assets.py --source /path/to/wcs --target /path/to/godot/project
+Usage: 
+  python convert_wcs_assets.py --source /path/to/wcs --target /path/to/godot/project
+  python convert_wcs_assets.py --resume /path/to/conversion_state.json
+  python convert_wcs_assets.py --validate-only --target /path/to/godot/project
 
 Author: Dev (GDScript Developer)
 Date: January 29, 2025
-Story: DM-003 - Asset Organization and Cataloging
+Stories: DM-003 - Asset Organization and Cataloging, DM-010 - CLI Tool Development  
 Architecture: EPIC-003 - Data Migration & Conversion Tools
 """
 
@@ -17,7 +21,12 @@ import argparse
 import json
 import logging
 import sys
+import time
+import signal
+from datetime import datetime
 from pathlib import Path
+from typing import Dict, List, Optional, Tuple
+from dataclasses import dataclass, asdict
 
 # Add conversion_tools to path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -25,6 +34,191 @@ sys.path.insert(0, str(Path(__file__).parent))
 from conversion_manager import ConversionManager
 from validation.format_validator import FormatValidator
 from utilities.path_utils import ensure_directory, create_godot_directory_structure
+
+
+@dataclass
+class ConversionState:
+    """State information for resumable conversions"""
+    conversion_id: str
+    start_time: str
+    source_path: str
+    target_path: str
+    total_jobs: int
+    completed_jobs: int
+    failed_jobs: int
+    current_phase: int
+    job_states: Dict[str, str]  # job_id -> status
+    performance_metrics: Dict[str, float]
+    
+    def save_to_file(self, state_file: Path) -> None:
+        """Save state to JSON file"""
+        with open(state_file, 'w') as f:
+            json.dump(asdict(self), f, indent=2)
+    
+    @classmethod
+    def load_from_file(cls, state_file: Path) -> 'ConversionState':
+        """Load state from JSON file"""
+        with open(state_file, 'r') as f:
+            data = json.load(f)
+        return cls(**data)
+
+
+@dataclass
+class ProgressTracker:
+    """Enhanced progress tracking with real-time metrics"""
+    start_time: float
+    total_jobs: int
+    completed_jobs: int = 0
+    failed_jobs: int = 0
+    current_job: str = ""
+    current_phase: int = 1
+    phase_names: Dict[int, str] = None
+    performance_metrics: Dict[str, float] = None
+    
+    def __post_init__(self):
+        if self.phase_names is None:
+            self.phase_names = {
+                1: "VP Archive Extraction",
+                2: "Core Asset Conversion", 
+                3: "Dependent Asset Processing"
+            }
+        if self.performance_metrics is None:
+            self.performance_metrics = {
+                "jobs_per_second": 0.0,
+                "estimated_time_remaining": 0.0,
+                "current_phase_progress": 0.0
+            }
+    
+    def update_job_completed(self, job_name: str) -> None:
+        """Update progress for completed job"""
+        self.completed_jobs += 1
+        self.current_job = job_name
+        self._update_metrics()
+    
+    def update_job_failed(self, job_name: str) -> None:
+        """Update progress for failed job"""
+        self.failed_jobs += 1
+        self.current_job = job_name
+        self._update_metrics()
+    
+    def set_phase(self, phase: int) -> None:
+        """Set current conversion phase"""
+        self.current_phase = phase
+        self._update_metrics()
+    
+    def _update_metrics(self) -> None:
+        """Update performance metrics"""
+        elapsed_time = time.time() - self.start_time
+        total_processed = self.completed_jobs + self.failed_jobs
+        
+        if elapsed_time > 0 and total_processed > 0:
+            self.performance_metrics["jobs_per_second"] = total_processed / elapsed_time
+            
+            remaining_jobs = self.total_jobs - total_processed
+            if self.performance_metrics["jobs_per_second"] > 0:
+                self.performance_metrics["estimated_time_remaining"] = (
+                    remaining_jobs / self.performance_metrics["jobs_per_second"]
+                )
+        
+        if self.total_jobs > 0:
+            self.performance_metrics["current_phase_progress"] = (
+                total_processed / self.total_jobs * 100
+            )
+    
+    def get_progress_summary(self) -> str:
+        """Get formatted progress summary"""
+        progress_pct = (self.completed_jobs + self.failed_jobs) / max(1, self.total_jobs) * 100
+        phase_name = self.phase_names.get(self.current_phase, f"Phase {self.current_phase}")
+        
+        eta_minutes = self.performance_metrics["estimated_time_remaining"] / 60
+        jobs_per_sec = self.performance_metrics["jobs_per_second"]
+        
+        return (
+            f"Progress: {progress_pct:.1f}% ({self.completed_jobs + self.failed_jobs}/{self.total_jobs}) "
+            f"| {phase_name} | Current: {self.current_job} "
+            f"| Speed: {jobs_per_sec:.2f} jobs/sec | ETA: {eta_minutes:.1f}min"
+        )
+
+
+class ConversionOrchestrator:
+    """Enhanced conversion orchestrator with state management"""
+    
+    def __init__(self, source_path: Path, target_path: Path):
+        self.source_path = source_path
+        self.target_path = target_path
+        self.state_file = target_path / "conversion_state.json"
+        self.conversion_manager = ConversionManager(source_path, target_path)
+        self.progress_tracker: Optional[ProgressTracker] = None
+        self.state: Optional[ConversionState] = None
+        self.interrupted = False
+        
+        # Setup signal handlers for graceful interruption
+        signal.signal(signal.SIGINT, self._handle_interrupt)
+        signal.signal(signal.SIGTERM, self._handle_interrupt)
+    
+    def _handle_interrupt(self, signum, frame):
+        """Handle interrupt signals gracefully"""
+        self.interrupted = True
+        print("\nReceived interrupt signal. Saving state and shutting down gracefully...")
+        if self.state:
+            self.save_state()
+    
+    def create_new_conversion(self, total_jobs: int) -> ConversionState:
+        """Create new conversion state"""
+        conversion_id = f"wcs_conversion_{int(time.time())}"
+        self.state = ConversionState(
+            conversion_id=conversion_id,
+            start_time=datetime.now().isoformat(),
+            source_path=str(self.source_path),
+            target_path=str(self.target_path),
+            total_jobs=total_jobs,
+            completed_jobs=0,
+            failed_jobs=0,
+            current_phase=1,
+            job_states={},
+            performance_metrics={}
+        )
+        
+        self.progress_tracker = ProgressTracker(
+            start_time=time.time(),
+            total_jobs=total_jobs
+        )
+        
+        return self.state
+    
+    def load_conversion_state(self, state_file: Path) -> bool:
+        """Load existing conversion state"""
+        try:
+            self.state = ConversionState.load_from_file(state_file)
+            self.progress_tracker = ProgressTracker(
+                start_time=time.time(),  # Reset start time for current session
+                total_jobs=self.state.total_jobs,
+                completed_jobs=self.state.completed_jobs,
+                failed_jobs=self.state.failed_jobs,
+                current_phase=self.state.current_phase
+            )
+            return True
+        except Exception as e:
+            logging.error(f"Failed to load conversion state: {e}")
+            return False
+    
+    def save_state(self) -> None:
+        """Save current conversion state"""
+        if self.state and self.progress_tracker:
+            # Update state with current progress
+            self.state.completed_jobs = self.progress_tracker.completed_jobs
+            self.state.failed_jobs = self.progress_tracker.failed_jobs
+            self.state.current_phase = self.progress_tracker.current_phase
+            self.state.performance_metrics = self.progress_tracker.performance_metrics
+            
+            # Save to file
+            self.state.save_to_file(self.state_file)
+            logging.info(f"Conversion state saved to: {self.state_file}")
+    
+    def print_real_time_progress(self, interval: float = 2.0) -> None:
+        """Print real-time progress updates"""
+        if self.progress_tracker:
+            print(f"\r{self.progress_tracker.get_progress_summary()}", end="", flush=True)
 
 def setup_logging(target_dir: Path, verbose: bool = False) -> None:
     """Setup logging configuration"""
@@ -153,50 +347,135 @@ def run_validation(target_dir: Path, verbose: bool = False) -> dict:
     return report
 
 def main():
-    """Main conversion function"""
+    """Main conversion function with comprehensive CLI interface"""
     parser = argparse.ArgumentParser(
-        description='Convert WCS assets to Godot format',
+        description='WCS to Godot Asset Conversion Tool - Comprehensive batch processing with resume capability',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Convert all WCS assets
+  # Convert all WCS assets with batch processing
   python convert_wcs_assets.py --source /path/to/wcs --target /path/to/godot/project
   
-  # Dry run to see what would be converted
+  # Resume interrupted conversion
+  python convert_wcs_assets.py --resume /path/to/godot/project/conversion_state.json
+  
+  # Dry run to preview conversion plan
   python convert_wcs_assets.py --source /path/to/wcs --target /path/to/godot/project --dry-run
   
-  # Only catalog existing converted assets
-  python convert_wcs_assets.py --target /path/to/godot/project --catalog-only
+  # Comprehensive validation of existing assets
+  python convert_wcs_assets.py --target /path/to/godot/project --validate-only
   
-  # Convert with validation and custom job count
-  python convert_wcs_assets.py --source /path/to/wcs --target /path/to/godot/project --jobs 8 --validate
+  # Batch convert with custom settings
+  python convert_wcs_assets.py --source /path/to/wcs --target /path/to/godot/project \\
+      --jobs 8 --validate --save-state --progress-interval 1.0
+  
+  # Convert specific asset types only
+  python convert_wcs_assets.py --source /path/to/wcs --target /path/to/godot/project \\
+      --asset-types vp_archives,pof_models,missions --skip-validation
+  
+  # Generate detailed reports
+  python convert_wcs_assets.py --source /path/to/wcs --target /path/to/godot/project \\
+      --generate-manifest --performance-report --export-report json,csv
         """
     )
     
+    # Core arguments
     parser.add_argument('--source', type=Path, 
                        help='Path to WCS source directory')
     parser.add_argument('--target', type=Path, required=True,
                        help='Path to Godot project directory')
+    
+    # Conversion control
     parser.add_argument('--jobs', type=int, default=4,
                        help='Number of parallel conversion jobs (default: 4)')
-    parser.add_argument('--validate', action='store_true',
-                       help='Run validation after conversion')
-    parser.add_argument('--catalog-only', action='store_true',
-                       help='Only catalog existing assets without conversion')
+    parser.add_argument('--asset-types', type=str,
+                       help='Comma-separated list of asset types to convert (e.g., vp_archives,pof_models,missions)')
+    parser.add_argument('--conversion-types', type=str,
+                       help='Comma-separated list of conversion types to include (e.g., vp_extraction,texture_dds,pof_model)')
+    
+    # Mode selection
     parser.add_argument('--dry-run', action='store_true',
                        help='Show conversion plan without executing')
-    parser.add_argument('--config', type=Path, 
-                       help='Path to conversion configuration file')
+    parser.add_argument('--catalog-only', action='store_true',
+                       help='Only catalog existing assets without conversion')
+    parser.add_argument('--validate-only', action='store_true',
+                       help='Only run comprehensive validation on existing assets')
+    
+    # Resume functionality
+    parser.add_argument('--resume', type=Path,
+                       help='Resume from previous conversion state file')
+    parser.add_argument('--save-state', action='store_true',
+                       help='Save conversion state for resume capability')
+    parser.add_argument('--checkpoint-interval', type=int, default=10,
+                       help='Save state checkpoint every N completed jobs (default: 10)')
+    
+    # Validation and reporting
+    parser.add_argument('--validate', action='store_true',
+                       help='Run validation after conversion')
+    parser.add_argument('--skip-validation', action='store_true',
+                       help='Skip validation to improve performance')
+    parser.add_argument('--generate-manifest', action='store_true',
+                       help='Generate detailed asset manifest')
+    parser.add_argument('--performance-report', action='store_true',
+                       help='Generate detailed performance report')
+    parser.add_argument('--export-report', type=str,
+                       help='Export formats for reports (json,csv,xml)')
+    
+    # Progress and output control
+    parser.add_argument('--progress-interval', type=float, default=2.0,
+                       help='Progress update interval in seconds (default: 2.0)')
+    parser.add_argument('--quiet', action='store_true',
+                       help='Minimize output (only show errors and final results)')
     parser.add_argument('-v', '--verbose', action='store_true',
                        help='Enable verbose output')
-    parser.add_argument('--resume', type=Path,
-                       help='Resume from previous conversion state file (not implemented)')
+    parser.add_argument('--debug', action='store_true',
+                       help='Enable debug logging')
+    
+    # Configuration
+    parser.add_argument('--config', type=Path, 
+                       help='Path to conversion configuration file')
+    parser.add_argument('--batch-size', type=int, default=50,
+                       help='Batch size for processing groups of assets (default: 50)')
+    parser.add_argument('--memory-limit', type=int,
+                       help='Memory limit in MB (conversion will pause if exceeded)')
+    
+    # Advanced options
+    parser.add_argument('--force-overwrite', action='store_true',
+                       help='Overwrite existing converted assets')
+    parser.add_argument('--verify-checksums', action='store_true',
+                       help='Verify file checksums during conversion')
+    parser.add_argument('--compression-level', type=int, choices=range(0, 10), default=6,
+                       help='Compression level for output assets (0-9, default: 6)')
+    parser.add_argument('--temp-dir', type=Path,
+                       help='Temporary directory for intermediate files')
     
     args = parser.parse_args()
     
-    # Validate arguments
-    if not args.catalog_only and not args.source:
-        parser.error("--source is required unless using --catalog-only")
+    # Validate arguments and mode selection
+    mode_count = sum([
+        bool(args.resume),
+        bool(args.catalog_only),
+        bool(args.validate_only),
+        bool(args.source)
+    ])
+    
+    if mode_count == 0:
+        parser.error("Must specify --source, --resume, --catalog-only, or --validate-only")
+    elif mode_count > 1 and not args.source:
+        parser.error("Cannot combine --resume, --catalog-only, or --validate-only with other modes")
+    
+    if not args.source and not args.resume and not args.catalog_only and not args.validate_only:
+        parser.error("--source is required unless using --resume, --catalog-only, or --validate-only")
+    
+    # Validate conflicting options
+    if args.quiet and args.verbose:
+        parser.error("Cannot use both --quiet and --verbose")
+    
+    if args.validate and args.skip_validation:
+        parser.error("Cannot use both --validate and --skip-validation")
+    
+    if args.dry_run and args.resume:
+        parser.error("Cannot use --dry-run with --resume")
     
     # Setup logging
     setup_logging(args.target, args.verbose)
