@@ -203,3 +203,5 @@ The implementation successfully converts WCS table files to Godot resources with
 - **Complete integration** with EPIC-002 and EPIC-003 systems
 
 The TableDataConverter package is ready for production use and provides a solid foundation for WCS table data conversion in the WCS-Godot project.
+
+use `../run_test.sh` to execute test. You can pass a specific file as parameter to only run a part of the tests, e.g. `../run_test.sh test_cli_tool_comprehensive.py`
