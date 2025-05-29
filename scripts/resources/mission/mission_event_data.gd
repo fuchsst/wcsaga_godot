@@ -18,3 +18,9 @@ const SexpNode = preload("res://scripts/scripting/sexp/sexp_node.gd")
 @export var objective_text: String = "" # Text to display on HUD directives when active
 @export var objective_key_text: String = "" # Key binding text associated with the objective
 @export var team: int = -1 # Team this event applies to (-1 for all)
+
+# --- Event Control Flags (QA REMEDIATION - missing from original C++ mission_event struct) ---
+@export var flags: int = 0 # Event behavior flags (MEF_* flags from missiongoals.h)
+@export var display_count: int = 0 # Object count for directive display
+@export var born_on_date: int = 0 # Timestamp at which event was born
+@export var satisfied_time: int = 0 # Time when event was satisfied

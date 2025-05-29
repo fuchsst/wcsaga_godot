@@ -67,6 +67,10 @@ extends Resource
 @export var special_hitpoints: int = 0 # Overrides ship_data hull if > 0
 @export var special_shield_points: int = -1 # Overrides ship_data shields if >= 0
 
+# --- Object Status System (QA REMEDIATION - missing from original C++ p_object struct) ---
+# Array of ObjectStatusData resources - corresponds to status_type[], status[], target[] arrays
+@export var object_status_entries: Array[Resource] = [] # Array[ObjectStatusData]
+
 # --- Subsystem Status ---
 # Array of SubsystemStatusData resources
 @export var subsystem_status: Array[Resource] = [] # Array[SubsystemStatusData]
@@ -91,3 +95,68 @@ extends Resource
 @export var wing_status_wing_pos: int = -1 # Runtime HUD info
 @export var respawn_count: int = 0 # Runtime multiplayer info
 @export var alternate_iff_colors: Dictionary = {} # Key: team index (int), Value: Color override (Color)
+
+## Validates the ship instance data
+func validate() -> MissionValidationResult:
+	var result := MissionValidationResult.new()
+	
+	# Validate basic ship info
+	if ship_name.is_empty():
+		result.add_error("Ship name cannot be empty")
+	
+	if ship_class_name.is_empty():
+		result.add_error("Ship class name cannot be empty")
+	
+	# Validate percentages
+	if initial_hull_percent < 0 or initial_hull_percent > 100:
+		result.add_warning("Initial hull percentage should be between 0-100")
+	
+	if initial_shields_percent < 0 or initial_shields_percent > 100:
+		result.add_warning("Initial shield percentage should be between 0-100")
+	
+	if initial_velocity_percent < 0 or initial_velocity_percent > 100:
+		result.add_warning("Initial velocity percentage should be between 0-100")
+	
+	# Validate scores
+	if assist_score_pct < 0.0 or assist_score_pct > 1.0:
+		result.add_warning("Assist score percentage should be between 0.0-1.0")
+	
+	# Validate object status entries
+	for i in range(object_status_entries.size()):
+		var status := object_status_entries[i] as ObjectStatusData
+		if not status:
+			result.add_error("Object status entry at index %d is null" % i)
+			continue
+		
+		if status.has_method("validate"):
+			var status_result := status.validate() as MissionValidationResult
+			if status_result:
+				result.merge(status_result)
+	
+	# Validate subsystem status
+	for i in range(subsystem_status.size()):
+		var subsys := subsystem_status[i]
+		if not subsys:
+			result.add_error("Subsystem status entry at index %d is null" % i)
+			continue
+		
+		if subsys.has_method("validate"):
+			var subsys_result := subsys.validate() as MissionValidationResult
+			if subsys_result:
+				result.merge(subsys_result)
+	
+	return result
+
+## Adds an object status entry
+func add_object_status(status_type: int, status_value: int, target_name: String = "") -> void:
+	var status := ObjectStatusData.create_status(status_type, status_value, target_name)
+	object_status_entries.append(status)
+
+## Gets object status entries by type
+func get_object_status_by_type(status_type: int) -> Array[ObjectStatusData]:
+	var matches: Array[ObjectStatusData] = []
+	for entry in object_status_entries:
+		var status := entry as ObjectStatusData
+		if status and status.status_type == status_type:
+			matches.append(status)
+	return matches

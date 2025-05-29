@@ -40,3 +40,8 @@ const AIGoal = preload("res://scripts/resources/ai/ai_goal.gd")
 @export var ship_names: Array[String] = []
 # Array of AIGoal resources applied to all ships in the wing
 @export var ai_goals: Array[AIGoal] = []
+
+# --- Wing Statistics (QA REMEDIATION - missing from original C++ wing struct) ---
+@export var total_destroyed: int = 0 # Ships destroyed count
+@export var total_departed: int = 0 # Ships departed count  
+@export var total_vanished: int = 0 # Ships vanished count

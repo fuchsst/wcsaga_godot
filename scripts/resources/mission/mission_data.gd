@@ -14,6 +14,14 @@ extends Resource
 @export var mission_notes: String = ""
 @export var mission_desc: String = ""
 
+# --- Mission Metadata (QA REMEDIATION - missing from original C++ mission struct) ---
+@export var author: String = ""
+@export var version: float = 0.0
+@export var created_date: String = ""
+@export var modified_date: String = ""
+@export var envmap_name: String = ""
+@export var contrail_threshold: int = 45  # Default from CONTRAIL_THRESHOLD_DEFAULT
+
 # --- Mission Info ---
 @export var game_type: int = 0 # Corresponds to MISSION_TYPE_* flags
 @export var flags: int = 0     # Corresponds to MISSION_FLAG_* flags
@@ -130,13 +138,13 @@ signal data_changed(property: String, old_value: Variant, new_value: Variant)
 signal validation_changed(is_valid: bool, errors: Array[String])
 
 # Internal validation cache
-var _validation_cache: ValidationResult
+var _validation_cache: MissionValidationResult
 var _last_validation_hash: int = -1
 
 ## Validates the complete mission data structure
-## Returns a ValidationResult with detailed information about any issues
-func validate() -> ValidationResult:
-	var result := ValidationResult.new()
+## Returns a MissionValidationResult with detailed information about any issues
+func validate() -> MissionValidationResult:
+	var result := MissionValidationResult.new()
 	
 	# Check if we need to revalidate
 	var current_hash := _calculate_data_hash()
@@ -147,11 +155,24 @@ func validate() -> ValidationResult:
 	if mission_title.is_empty():
 		result.add_error("Mission title cannot be empty")
 	
+	if author.is_empty():
+		result.add_warning("Mission author not specified")
+	
+	if version <= 0.0:
+		result.add_warning("Mission version not specified or invalid")
+	
+	if created_date.is_empty():
+		result.add_info("Mission creation date not specified")
+	
 	if num_players < 1:
 		result.add_error("Mission must have at least one player")
 	
 	if num_players > 12:
 		result.add_warning("Mission has more than 12 players - may cause performance issues")
+	
+	if contrail_threshold < 0:
+		result.add_warning("Contrail threshold cannot be negative, using default value")
+		contrail_threshold = 45
 	
 	# Validate ships
 	var ship_names: Dictionary = {}
@@ -169,7 +190,7 @@ func validate() -> ValidationResult:
 		
 		# Validate ship if it has a validate method
 		if ship.has_method("validate"):
-			var ship_result := ship.validate() as ValidationResult
+			var ship_result := ship.validate() as MissionValidationResult
 			if ship_result:
 				result.merge(ship_result)
 	
@@ -182,7 +203,7 @@ func validate() -> ValidationResult:
 		
 		# Validate wing if it has a validate method
 		if wing.has_method("validate"):
-			var wing_result := wing.validate() as ValidationResult
+			var wing_result := wing.validate() as MissionValidationResult
 			if wing_result:
 				result.merge(wing_result)
 	
@@ -195,7 +216,7 @@ func validate() -> ValidationResult:
 		
 		# Validate event if it has a validate method
 		if event.has_method("validate"):
-			var event_result := event.validate() as ValidationResult
+			var event_result := event.validate() as MissionValidationResult
 			if event_result:
 				result.merge(event_result)
 	
@@ -208,7 +229,7 @@ func validate() -> ValidationResult:
 		
 		# Validate goal if it has a validate method
 		if goal.has_method("validate"):
-			var goal_result := goal.validate() as ValidationResult
+			var goal_result := goal.validate() as MissionValidationResult
 			if goal_result:
 				result.merge(goal_result)
 	
@@ -320,6 +341,12 @@ func _calculate_data_hash() -> int:
 	# Simple hash based on key properties for validation caching
 	var hash_string := ""
 	hash_string += mission_title
+	hash_string += author
+	hash_string += str(version)
+	hash_string += created_date
+	hash_string += modified_date
+	hash_string += envmap_name
+	hash_string += str(contrail_threshold)
 	hash_string += str(ships.size())
 	hash_string += str(wings.size())
 	hash_string += str(events.size())
