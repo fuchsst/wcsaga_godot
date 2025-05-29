@@ -165,6 +165,7 @@ conversion_tools/
 - Test VP extraction with sample archives
 - Validate format converters with known good assets
 - Verify asset catalog accuracy with controlled datasets
+- use `cd /mnt/d/projects/wcsaga_godot_converter/target/migration_tools && bash run_tests.sh && cd ..` to run tests
 
 ### Integration Testing
 - End-to-end conversion pipeline validation

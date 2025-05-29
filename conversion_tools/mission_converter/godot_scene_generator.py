@@ -52,9 +52,9 @@ class GodotNode:
 class GodotScene:
     """Represents a complete Godot scene."""
     format: int = 3  # Godot 4.x format
-    root_node: GodotNode = None
-    nodes: List[GodotNode] = None
-    connections: List[Dict[str, Any]] = None
+    root_node: Optional[GodotNode] = None
+    nodes: List[GodotNode] = []
+    connections: List[Dict[str, Any]] = []
     
     def __post_init__(self):
         if self.nodes is None:

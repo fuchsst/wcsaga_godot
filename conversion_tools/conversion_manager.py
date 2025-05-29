@@ -20,6 +20,7 @@ from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from asset_catalog import AssetCatalog
+from config_migrator import ConfigMigrator
 
 logger = logging.getLogger(__name__)
 
@@ -60,6 +61,9 @@ class ConversionManager:
         # Initialize asset catalog
         catalog_path = self.godot_target_dir / "asset_catalog.json"
         self.asset_catalog = AssetCatalog(str(catalog_path))
+        
+        # Initialize configuration migrator
+        self.config_migrator = ConfigMigrator()
         
         # Initialize converters (will be imported dynamically)
         self.converters = {}
@@ -198,6 +202,16 @@ class ConversionManager:
         logger.debug("Phase 3: Dependent Asset Conversion")
         asset_deps = vp_deps + [f"pof_model:{pof.stem}" for pof in assets.get('pof_models', [])]
         
+        # Configuration migration (early in phase 3, independent)
+        config_job = ConversionJob(
+            source_path=self.wcs_source_dir,
+            target_path=self.godot_target_dir,
+            conversion_type="config_migration",
+            priority=3,
+            dependencies=[]  # Configuration is independent
+        )
+        jobs.append(config_job)
+        
         # Mission files
         for mission_file in assets.get('missions', []):
             job = ConversionJob(
@@ -269,6 +283,8 @@ class ConversionManager:
                 success = self._execute_mission_conversion(job)
             elif job.conversion_type == "table":
                 success = self._execute_table_conversion(job)
+            elif job.conversion_type == "config_migration":
+                success = self._execute_config_migration(job)
             else:
                 logger.warning(f"Unknown conversion type: {job.conversion_type}")
                 success = False
@@ -347,7 +363,7 @@ class ConversionManager:
     def _execute_table_conversion(self, job: ConversionJob) -> bool:
         """Execute table file conversion using TableDataConverter"""
         try:
-            from .tests.table_data_converter import TableDataConverter
+            from table_data_converter import TableDataConverter
             
             # Initialize table converter
             converter = TableDataConverter(
@@ -367,6 +383,28 @@ class ConversionManager:
                 
         except Exception as e:
             logger.error(f"Table conversion failed for {job.source_path}: {e}")
+            return False
+    
+    def _execute_config_migration(self, job: ConversionJob) -> bool:
+        """Execute WCS configuration migration to Godot format"""
+        try:
+            logger.info(f"Starting WCS configuration migration from {job.source_path} to {job.target_path}")
+            
+            # Execute configuration migration
+            success = self.config_migrator.migrate_wcs_configuration(
+                wcs_source_dir=job.source_path,
+                godot_target_dir=job.target_path
+            )
+            
+            if success:
+                logger.info("Configuration migration completed successfully")
+                return True
+            else:
+                logger.error("Configuration migration failed")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Configuration migration failed: {e}")
             return False
     
     def execute_conversion_plan(self, jobs: List[ConversionJob], 
