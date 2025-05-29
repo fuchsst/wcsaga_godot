@@ -68,11 +68,11 @@ enum PilotFlags {
 # --- Initialization ---
 func _init():
 	# Ensure arrays are initialized with correct sizes if needed immediately
-	if medals.size() != GlobalConstants.MAX_MEDALS:
-		medals.resize(GlobalConstants.MAX_MEDALS)
+	if medals.size() != WCSConstants.MAX_MEDALS:
+		medals.resize(WCSConstants.MAX_MEDALS)
 		medals.fill(0)
-	if kills.size() != GlobalConstants.MAX_SHIP_CLASSES: # Assuming MAX_SHIP_CLASSES is defined
-		kills.resize(GlobalConstants.MAX_SHIP_CLASSES)
+	if kills.size() != WCSConstants.MAX_SHIP_CLASSES: # Assuming MAX_SHIP_CLASSES is defined
+		kills.resize(WCSConstants.MAX_SHIP_CLASSES)
 		kills.fill(0)
 	created_time = Time.get_unix_time_from_system()
 
@@ -86,17 +86,21 @@ func get_rank_name() -> String:
 func get_stat(stat_enum) -> int:
 	# Placeholder for potentially accessing stats via enum later
 	match stat_enum:
-		GlobalConstants.StatType.SCORE: return score
-		GlobalConstants.StatType.KILLS_TOTAL: return kill_count_ok
+		# TODO: Define StatType enum in WCSConstants
+		# WCSConstants.StatType.SCORE: return score
+		# WCSConstants.StatType.KILLS_TOTAL: return kill_count_ok
 		# ... other stats ...
+		_: pass
 	return 0
 
 func update_stat(stat_enum, value: int):
 	# Placeholder
 	match stat_enum:
-		GlobalConstants.StatType.SCORE: score = value
-		GlobalConstants.StatType.KILLS_TOTAL: kill_count_ok = value
+		# TODO: Define StatType enum in WCSConstants
+		# WCSConstants.StatType.SCORE: score = value
+		# WCSConstants.StatType.KILLS_TOTAL: kill_count_ok = value
 		# ... other stats ...
+		_: pass
 
 func add_kill(ship_class_index: int):
 	if ship_class_index >= 0 and ship_class_index < kills.size():

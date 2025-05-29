@@ -1,4 +1,3 @@
-class_name ManagerDebugOverlay
 extends CanvasLayer
 
 ## Debug overlay showing core manager status and performance metrics
@@ -238,7 +237,7 @@ func _update_performance_metrics() -> void:
 	_update_metric_label("Frame Time", "%.1fms" % (frame_time * 1000.0), frame_color)
 	
 	# Update Memory Usage
-	var memory_mb: float = OS.get_static_memory_usage_by_type().get("Object", 0) / 1024.0 / 1024.0
+	var memory_mb: float = OS.get_static_memory_usage() / 1024.0 / 1024.0
 	_update_metric_label("Memory Usage", "%.1fMB" % memory_mb)
 
 func _update_metric_label(metric_name: String, value: String, color: Color = Color.WHITE) -> void:
@@ -284,7 +283,7 @@ func debug_print_full_status() -> void:
 	if InputManager:
 		InputManager.debug_print_input_state()
 	
-	print("=================================="
+	print("===================================")
 
 func debug_test_managers() -> void:
 	print("ManagerDebugOverlay: Running manager tests...")

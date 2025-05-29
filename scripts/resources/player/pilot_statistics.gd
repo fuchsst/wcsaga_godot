@@ -47,9 +47,9 @@ extends Resource
 
 func _init() -> void:
 	# Initialize arrays with proper sizes
-	medals.resize(GlobalConstants.MAX_MEDALS)
+	medals.resize(WCSConstants.MAX_MEDALS)
 	medals.fill(0)
-	kills.resize(GlobalConstants.MAX_SHIP_CLASSES)
+	kills.resize(WCSConstants.MAX_SHIP_CLASSES)
 	kills.fill(0)
 	_update_calculated_stats()
 
@@ -132,10 +132,10 @@ func get_mp_kd_ratio() -> float:
 		return float(mp_kills_total) / float(mp_deaths_total)
 	return float(mp_kills_total)
 
-## Get rank name (requires GlobalConstants access)
+## Get rank name (requires WCSConstants access)
 func get_rank_name() -> String:
-	if GlobalConstants and rank >= 0:
-		# Assume rank lookup method exists in GlobalConstants
+	if rank >= 0:
+		# Assume rank lookup method exists in WCSConstants
 		return "Rank " + str(rank)  # Placeholder - implement proper rank lookup
 	return "Unknown"
 

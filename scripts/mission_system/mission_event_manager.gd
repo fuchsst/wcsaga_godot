@@ -5,7 +5,7 @@ extends Node
 
 # --- Dependencies ---
 const MissionEventData = preload("res://scripts/resources/mission/mission_event_data.gd")
-const GlobalConstants = preload("res://scripts/globals/global_constants.gd")
+const WCSConstants = preload("res://scripts/core/foundation/wcs_constants.gd")
 # Access GameManager, ScoringManager, SEXPSystem via singletons
 
 # --- State ---

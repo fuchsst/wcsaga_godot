@@ -17,7 +17,7 @@ const MissionEventData = preload("res://scripts/resources/mission_event_data.gd"
 const MissionLoader = preload("mission_loader.gd")
 const SpawnManager = preload("spawn_manager.gd") # Assuming helper node/script
 const ArrivalDepartureSystem = preload("arrival_departure.gd") # Assuming helper node/script
-const GlobalConstants = preload("res://scripts/globals/global_constants.gd")
+const WCSConstants = preload("res://scripts/core/foundation/wcs_constants.gd")
 
 # --- Signals ---
 signal mission_started(mission_name: String, campaign_name: String) # Emitted when mission logic starts

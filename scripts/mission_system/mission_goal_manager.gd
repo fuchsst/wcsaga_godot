@@ -5,7 +5,7 @@ extends Node
 
 # --- Dependencies ---
 const MissionObjectiveData = preload("res://scripts/resources/mission/mission_objective_data.gd")
-const GlobalConstants = preload("res://scripts/globals/global_constants.gd")
+const WCSConstants = preload("res://scripts/core/foundation/wcs_constants.gd")
 # Access MissionLogManager, ScoringManager, MusicManager, SoundManager, SEXPSystem via singletons
 
 # --- State ---

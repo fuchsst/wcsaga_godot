@@ -74,6 +74,12 @@ run_script.sh asset_catalog search --query "fighter" --type "model"
 # Validate converted assets
 run_script.sh asset_catalog validate --directory converted_assets/
 ```
+'
+### Run Unit Tests
+```bash
+# Validate converted assets
+run_tests.sh
+```
 
 ## Architecture Notes
 

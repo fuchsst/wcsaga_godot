@@ -1,4 +1,4 @@
-extends GutTest
+extends GdUnitTestSuite
 
 ## Unit tests for TableDataConverter functionality
 ## Tests the conversion of WCS table files (.tbl) to Godot resources
@@ -7,11 +7,10 @@ extends GutTest
 ## Date: January 29, 2025
 ## Story: DM-008 - Asset Table Processing
 
-var converter: TableDataConverter = null
 var temp_source_dir: String = ""
 var temp_target_dir: String = ""
 
-func before_each() -> void:
+func before_test() -> void:
 	"""Setup test environment before each test"""
 	# Create temporary directories for testing
 	temp_source_dir = "user://test_source_" + str(Time.get_ticks_msec())
@@ -20,14 +19,10 @@ func before_each() -> void:
 	DirAccess.open("user://").make_dir_recursive(temp_source_dir)
 	DirAccess.open("user://").make_dir_recursive(temp_target_dir)
 	
-	# Initialize converter with test directories
-	var conversion_tools_path: String = "res://conversion_tools/"
-	
-	# Since we can't directly instantiate Python classes in GDScript,
-	# we'll test the integration points and expected outputs
-	pass
+	# Note: Since TableDataConverter is a Python class, we test the integration
+	# points and expected outputs rather than direct instantiation
 
-func after_each() -> void:
+func after_test() -> void:
 	"""Cleanup test environment after each test"""
 	# Clean up temporary directories
 	if DirAccess.open("user://").dir_exists(temp_source_dir):
@@ -63,11 +58,11 @@ func test_ship_resource_structure() -> void:
 	assert_has_property(ship, "armor_type_name", "ShipData should have armor_type_name property")
 	
 	# Test asset type is set correctly
-	assert_eq(ship.asset_type, AssetTypes.Type.SHIP, "ShipData should have SHIP asset type")
+	assert_that(ship.asset_type).is_equal(AssetTypes.Type.SHIP)
 	
 	# Test validation works
 	var errors: Array[String] = ship.get_validation_errors()
-	assert_true(errors.size() > 0, "Empty ship should have validation errors")
+	assert_that(errors.size()).is_greater(0)
 
 func test_weapon_resource_structure() -> void:
 	"""Test that weapon resources have the correct structure"""
@@ -81,11 +76,11 @@ func test_weapon_resource_structure() -> void:
 	assert_has_property(weapon, "damage_type_name", "WeaponData should have damage_type_name property")
 	
 	# Test asset type is set correctly
-	assert_eq(weapon.asset_type, AssetTypes.Type.WEAPON, "WeaponData should have WEAPON asset type")
+	assert_that(weapon.asset_type).is_equal(AssetTypes.Type.WEAPON)
 	
 	# Test validation works
 	var errors: Array[String] = weapon.get_validation_errors()
-	assert_true(errors.size() > 0, "Empty weapon should have validation errors")
+	assert_that(errors.size()).is_greater(0)
 
 func test_armor_resource_structure() -> void:
 	"""Test that armor resources have the correct structure"""
@@ -98,17 +93,17 @@ func test_armor_resource_structure() -> void:
 	assert_has_property(armor, "base_damage_modifier", "ArmorData should have base_damage_modifier property")
 	
 	# Test asset type is set correctly
-	assert_eq(armor.asset_type, AssetTypes.Type.ARMOR, "ArmorData should have ARMOR asset type")
+	assert_that(armor.asset_type).is_equal(AssetTypes.Type.ARMOR)
 	
 	# Test damage calculation functions
 	armor.armor_name = "Test Armor"
 	armor.set_damage_resistance("kinetic", 0.5)
 	
 	var multiplier: float = armor.get_damage_multiplier("kinetic")
-	assert_eq(multiplier, 0.5, "Damage multiplier should be 0.5 for kinetic damage")
+	assert_that(multiplier).is_equal(0.5)
 	
 	var damage_taken: float = armor.calculate_damage_taken(100.0, "kinetic")
-	assert_eq(damage_taken, 50.0, "Should take 50% damage from kinetic attacks")
+	assert_that(damage_taken).is_equal(50.0)
 
 func test_species_resource_structure() -> void:
 	"""Test that species resources have the correct structure"""
@@ -121,16 +116,16 @@ func test_species_resource_structure() -> void:
 	assert_has_property(species, "max_debris_speed", "SpeciesData should have max_debris_speed property")
 	
 	# Test asset type is set correctly
-	assert_eq(species.asset_type, AssetTypes.Type.SPECIES, "SpeciesData should have SPECIES asset type")
+	assert_that(species.asset_type).is_equal(AssetTypes.Type.SPECIES)
 	
 	# Test functionality
 	species.species_name = "Test Species"
 	species.thruster_pri_normal = "thrust_normal.ani"
 	species.thruster_pri_afterburn = "thrust_afterburn.ani"
 	
-	assert_true(species.has_thruster_animations(), "Should detect thruster animations")
-	assert_eq(species.get_primary_thruster_animation(false), "thrust_normal.ani", "Should return normal thruster")
-	assert_eq(species.get_primary_thruster_animation(true), "thrust_afterburn.ani", "Should return afterburn thruster")
+	assert_that(species.has_thruster_animations()).is_true()
+	assert_that(species.get_primary_thruster_animation(false)).is_equal("thrust_normal.ani")
+	assert_that(species.get_primary_thruster_animation(true)).is_equal("thrust_afterburn.ani")
 
 func test_iff_resource_structure() -> void:
 	"""Test that IFF resources have the correct structure"""
@@ -144,36 +139,36 @@ func test_iff_resource_structure() -> void:
 	assert_has_property(iff, "sees_as", "IFFData should have sees_as property")
 	
 	# Test asset type is set correctly
-	assert_eq(iff.asset_type, AssetTypes.Type.FACTION, "IFFData should have FACTION asset type")
+	assert_that(iff.asset_type).is_equal(AssetTypes.Type.FACTION)
 	
 	# Test relationship functions
 	iff.iff_name = "Test Faction"
 	iff.add_enemy_faction("Enemy Faction")
 	
-	assert_true(iff.is_hostile_to("Enemy Faction"), "Should be hostile to enemy faction")
-	assert_false(iff.is_hostile_to("Friendly Faction"), "Should not be hostile to unlisted faction")
+	assert_that(iff.is_hostile_to("Enemy Faction")).is_true()
+	assert_that(iff.is_hostile_to("Friendly Faction")).is_false()
 	
 	# Test reputation system
-	assert_eq(iff.get_relationship_status(60.0), "ally", "High reputation should be ally")
-	assert_eq(iff.get_relationship_status(20.0), "friendly", "Medium reputation should be friendly")
-	assert_eq(iff.get_relationship_status(0.0), "neutral", "Zero reputation should be neutral")
-	assert_eq(iff.get_relationship_status(-50.0), "hostile", "Negative reputation should be hostile")
+	assert_that(iff.get_relationship_status(60.0)).is_equal("ally")
+	assert_that(iff.get_relationship_status(20.0)).is_equal("friendly")
+	assert_that(iff.get_relationship_status(0.0)).is_equal("neutral")
+	assert_that(iff.get_relationship_status(-50.0)).is_equal("hostile")
 
 func test_asset_type_registration() -> void:
 	"""Test that new asset types are properly registered"""
 	# Test that SPECIES type exists and has correct properties
-	assert_true(AssetTypes.Type.has("SPECIES"), "SPECIES type should be defined")
-	assert_eq(AssetTypes.get_type_name(AssetTypes.Type.SPECIES), "Species", "SPECIES should have correct name")
-	assert_eq(AssetTypes.get_type_category(AssetTypes.Type.SPECIES), AssetTypes.Category.CORE, "SPECIES should be in CORE category")
+	assert_that(AssetTypes.Type.has("SPECIES")).is_true()
+	assert_that(AssetTypes.get_type_name(AssetTypes.Type.SPECIES)).is_equal("Species")
+	assert_that(AssetTypes.get_type_category(AssetTypes.Type.SPECIES)).is_equal(AssetTypes.Category.CORE)
 	
 	# Test that FACTION type exists and has correct properties
-	assert_true(AssetTypes.Type.has("FACTION"), "FACTION type should be defined")
-	assert_eq(AssetTypes.get_type_name(AssetTypes.Type.FACTION), "Faction", "FACTION should have correct name")
-	assert_eq(AssetTypes.get_type_category(AssetTypes.Type.FACTION), AssetTypes.Category.CORE, "FACTION should be in CORE category")
+	assert_that(AssetTypes.Type.has("FACTION")).is_true()
+	assert_that(AssetTypes.get_type_name(AssetTypes.Type.FACTION)).is_equal("Faction")
+	assert_that(AssetTypes.get_type_category(AssetTypes.Type.FACTION)).is_equal(AssetTypes.Category.CORE)
 	
 	# Test that IFF_DATA type exists and has correct properties
-	assert_true(AssetTypes.Type.has("IFF_DATA"), "IFF_DATA type should be defined")
-	assert_eq(AssetTypes.get_type_name(AssetTypes.Type.IFF_DATA), "IFF Data", "IFF_DATA should have correct name")
+	assert_that(AssetTypes.Type.has("IFF_DATA")).is_true()
+	assert_that(AssetTypes.get_type_name(AssetTypes.Type.IFF_DATA)).is_equal("IFF Data")
 
 func test_conversion_manager_integration() -> void:
 	"""Test that table conversion integrates with ConversionManager"""
@@ -209,12 +204,12 @@ $Hull: 150
 		file.close()
 	
 	# Verify file was created
-	assert_true(FileAccess.file_exists(source_path), "Test table file should be created")
+	assert_that(FileAccess.file_exists(source_path)).is_true()
 	
 	# Test file content is readable
 	var content: String = FileAccess.get_file_as_string(source_path)
-	assert_true(content.contains("$Name: Test Fighter"), "File should contain ship definition")
-	assert_true(content.contains("#Ship Classes"), "File should have ship classes header")
+	assert_that(content.contains("$Name: Test Fighter")).is_true()
+	assert_that(content.contains("#Ship Classes")).is_true()
 
 func test_data_fidelity_requirements() -> void:
 	"""Test that conversion maintains complete data fidelity"""
@@ -263,4 +258,4 @@ func assert_has_property(object: Object, property_name: String, message: String 
 			has_property = true
 			break
 	
-	assert_true(has_property, message if message else "Object should have property: " + property_name)
+	assert_that(has_property).is_true()
