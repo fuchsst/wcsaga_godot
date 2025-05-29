@@ -8,6 +8,13 @@ var _errors: Array[String] = []
 var _warnings: Array[String] = []
 var _info_messages: Array[String] = []
 
+var file_path: String
+var asset_type_name: String
+
+func _init(file_path: String, asset_type_name: String) -> void:
+	self.file_path = file_path
+	self.asset_type_name = asset_type_name
+
 ## Adds an error message to the validation result
 func add_error(message: String) -> void:
 	_errors.append(message)
@@ -67,7 +74,7 @@ func merge(other: ValidationResult) -> void:
 
 ## Gets a summary string of the validation result
 func get_summary() -> String:
-	var summary := ""
+	var summary := self.asset_type_name + " (" +self.file_path + "): "
 	
 	if _errors.size() > 0:
 		summary += "%d errors" % _errors.size()
@@ -111,7 +118,7 @@ func get_total_count() -> int:
 
 ## Formats all messages for display
 func format_for_display() -> String:
-	var output := ""
+	var output := self.asset_type_name + " (" +self.file_path + "): "
 	
 	if _errors.size() > 0:
 		output += "ERRORS:\n"
@@ -135,17 +142,17 @@ func format_for_display() -> String:
 ## Static factory methods
 
 ## Creates a validation result with a single error
-static func with_error(message: String) -> ValidationResult:
-	var result := ValidationResult.new()
+static func with_error(file_path: String, asset_type_name: String, message: String) -> ValidationResult:
+	var result := ValidationResult.new(file_path, asset_type_name)
 	result.add_error(message)
 	return result
 
 ## Creates a validation result with a single warning
-static func with_warning(message: String) -> ValidationResult:
-	var result := ValidationResult.new()
+static func with_warning(file_path: String, asset_type_name: String, message: String) -> ValidationResult:
+	var result := ValidationResult.new(file_path, asset_type_name)
 	result.add_warning(message)
 	return result
 
 ## Creates a valid (empty) validation result
-static func valid() -> ValidationResult:
-	return ValidationResult.new()
+static func valid(file_path: String, asset_type_name: String, message: String) -> ValidationResult:
+	return ValidationResult.new(file_path, asset_type_name)
