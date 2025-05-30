@@ -4,7 +4,7 @@ class_name MissionEventManager
 extends Node
 
 # --- Dependencies ---
-const MissionEventData = preload("res://scripts/resources/mission/mission_event_data.gd")
+const MissionEventData = preload("res://addons/wcs_asset_core/resources/mission/mission_event_data.gd")
 const WCSConstants = preload("res://scripts/core/foundation/wcs_constants.gd")
 # Access GameManager, ScoringManager, SEXPSystem via singletons
 

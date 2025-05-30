@@ -76,7 +76,7 @@ class MissionResourceGenerator:
             # Create main mission resource
             resource_content = f'''[gd_resource type="MissionData" script_class="MissionData" load_steps=1 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/mission/mission_data.gd" id="1"]
+[ext_resource type="Script" path="res://addons/wcs_asset_core/resources/mission/mission_data.gd" id="1"]
 
 [resource]
 script = ExtResource("1")
@@ -140,7 +140,7 @@ variables = {self._format_resource_array([f"res://resources/missions/{self._sani
                 # Create ship resource
                 resource_content = f'''[gd_resource type="ShipInstanceData" script_class="ShipInstanceData" load_steps=1 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/mission/ship_instance_data.gd" id="1"]
+[ext_resource type="Script" path="res://addons/wcs_asset_core/resources/mission/ship_instance_data.gd" id="1"]
 
 [resource]
 script = ExtResource("1")
@@ -197,7 +197,7 @@ object_status_entries = []
                 
                 resource_content = f'''[gd_resource type="WingInstanceData" script_class="WingInstanceData" load_steps=1 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/mission/wing_instance_data.gd" id="1"]
+[ext_resource type="Script" path="res://addons/wcs_asset_core/resources/mission/wing_instance_data.gd" id="1"]
 
 [resource]
 script = ExtResource("1")
@@ -250,7 +250,7 @@ wave_delay_max = 10000
                 
                 resource_content = f'''[gd_resource type="MissionEventData" script_class="MissionEventData" load_steps=1 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/mission/mission_event_data.gd" id="1"]
+[ext_resource type="Script" path="res://addons/wcs_asset_core/resources/mission/mission_event_data.gd" id="1"]
 
 [resource]
 script = ExtResource("1")
@@ -308,7 +308,7 @@ objective_key_text = ""
                 
                 resource_content = f'''[gd_resource type="WaypointListData" script_class="WaypointListData" load_steps=1 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/mission/waypoint_list_data.gd" id="1"]
+[ext_resource type="Script" path="res://addons/wcs_asset_core/resources/mission/waypoint_list_data.gd" id="1"]
 
 [resource]
 script = ExtResource("1")
@@ -332,17 +332,17 @@ waypoints = [{", ".join(waypoint_positions)}]
     
     def generate_mission_script_resources(self, output_dir: Path) -> List[str]:
         """Generate the GDScript Resource classes for mission data.
-        Note: Using existing mission resource definitions in target/scripts/resources/mission/
+        Note: Using existing mission resource definitions in target/addons/wcs_asset_core/resources/mission/
         This method is kept for backward compatibility but doesn't generate duplicate scripts."""
         script_files = []
         
         # Instead of generating new scripts, reference existing ones
         existing_scripts = [
-            "target/scripts/resources/mission/mission_data.gd",
-            "target/scripts/resources/mission/ship_instance_data.gd", 
-            "target/scripts/resources/mission/wing_instance_data.gd",
-            "target/scripts/resources/mission/mission_event_data.gd",
-            "target/scripts/resources/mission/waypoint_list_data.gd"
+            "target/addons/wcs_asset_core/resources/mission/mission_data.gd",
+            "target/addons/wcs_asset_core/resources/mission/ship_instance_data.gd", 
+            "target/addons/wcs_asset_core/resources/mission/wing_instance_data.gd",
+            "target/addons/wcs_asset_core/resources/mission/mission_event_data.gd",
+            "target/addons/wcs_asset_core/resources/mission/waypoint_list_data.gd"
         ]
         
         # Convert to full paths and add to return list

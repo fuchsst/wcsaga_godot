@@ -3,6 +3,11 @@ extends Node2D
 ## Bootstrap scene for WCS-Godot
 ## Initializes core managers and tests basic functionality
 
+# --- Core Classes ---
+const WCSObject = preload("res://scripts/core/wcs_object.gd")
+const WCSObjectData = preload("res://scripts/core/wcs_object_data.gd")
+const CustomPhysicsBody = preload("res://scripts/core/custom_physics_body.gd")
+
 func _ready() -> void:
 	print("Bootstrap: Starting WCS-Godot initialization...")
 	

@@ -13,6 +13,11 @@ signal auto_save_triggered()
 signal backup_created(save_slot: int, backup_index: int)
 signal corruption_detected(save_slot: int, error_details: String)
 
+# --- Resource Classes ---
+const SaveSlotInfo = preload("res://addons/wcs_asset_core/resources/save_system/save_slot_info.gd")
+const PlayerProfile = preload("res://addons/wcs_asset_core/resources/player/player_profile.gd")
+const CampaignState = preload("res://addons/wcs_asset_core/resources/save_system/campaign_state.gd")
+
 # --- Configuration ---
 @export var max_save_slots: int = 10             ## Maximum regular save slots
 @export var auto_save_enabled: bool = true       ## Enable automatic saving

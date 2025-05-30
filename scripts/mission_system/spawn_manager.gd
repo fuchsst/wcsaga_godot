@@ -7,10 +7,10 @@ extends Node # Using Node allows easy scene instantiation
 # --- Dependencies ---
 # Access ObjectManager via singleton: Engine.get_singleton("ObjectManager")
 # Access GlobalConstants via singleton: Engine.get_singleton("GlobalConstants")
-const ShipInstanceData = preload("res://scripts/resources/mission/ship_instance_data.gd") # Adjusted path
-const WingInstanceData = preload("res://scripts/resources/mission/wing_instance_data.gd") # Adjusted path
+const ShipInstanceData = preload("res://addons/wcs_asset_core/resources/mission/ship_instance_data.gd") # Adjusted path
+const WingInstanceData = preload("res://addons/wcs_asset_core/resources/mission/wing_instance_data.gd") # Adjusted path
 const ShipBase = preload("res://scripts/ship/ship_base.gd") # Assuming ShipBase script exists
-const ShipData = preload("res://scripts/resources/ship_weapon/ship_data.gd") # Adjusted path
+const ShipData = preload("res://addons/wcs_asset_core/resources/ship_weapon/ship_data.gd") # Adjusted path
 
 # --- Scene Cache (Optional but recommended) ---
 var ship_scene_cache: Dictionary = {}

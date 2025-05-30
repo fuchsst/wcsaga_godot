@@ -4,6 +4,7 @@ extends Node
 ## Integrates VP archives with Godot's resource loading system
 
 const VPResourceFormatLoader = preload("res://scripts/core/archives/vp_resource_loader.gd")
+const VPArchive = preload("res://scripts/core/archives/vp_archive.gd")
 
 var vp_loader: VPResourceFormatLoader
 var is_registered: bool = false

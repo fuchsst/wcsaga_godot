@@ -7,6 +7,9 @@ extends CanvasLayer
 @export var auto_hide_timer: float = 10.0  # Auto-hide after 10 seconds
 @export var enable_performance_graphs: bool = false
 
+# --- Core Classes ---
+const ManagerCoordinator = preload("res://scripts/core/manager_coordinator.gd")
+
 # UI components
 var main_panel: Panel
 var manager_labels: Dictionary = {}

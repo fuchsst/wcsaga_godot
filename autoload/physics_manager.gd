@@ -14,6 +14,10 @@ signal manager_initialized()
 signal manager_shutdown()
 signal critical_error(error_message: String)
 
+# --- Core Classes ---
+const WCSObject = preload("res://scripts/core/wcs_object.gd")
+const CustomPhysicsBody = preload("res://scripts/core/custom_physics_body.gd")
+
 # Configuration
 @export var physics_frequency: int = 60  # Fixed timestep Hz
 @export var use_custom_physics: bool = true

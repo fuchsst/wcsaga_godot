@@ -4,7 +4,7 @@ class_name MissionGoalManager
 extends Node
 
 # --- Dependencies ---
-const MissionObjectiveData = preload("res://scripts/resources/mission/mission_objective_data.gd")
+const MissionObjectiveData = preload("res://addons/wcs_asset_core/resources/mission/mission_objective_data.gd")
 const WCSConstants = preload("res://scripts/core/foundation/wcs_constants.gd")
 # Access MissionLogManager, ScoringManager, MusicManager, SoundManager, SEXPSystem via singletons
 

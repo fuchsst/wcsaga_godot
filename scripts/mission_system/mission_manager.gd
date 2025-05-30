@@ -5,11 +5,11 @@ class_name MissionManager
 extends Node
 
 # --- Dependencies ---
-const MissionData = preload("res://scripts/resources/mission_data.gd")
-const ShipInstanceData = preload("res://scripts/resources/ship_instance_data.gd")
-const WingInstanceData = preload("res://scripts/resources/wing_instance_data.gd")
-const MissionObjectiveData = preload("res://scripts/resources/mission_objective_data.gd")
-const MissionEventData = preload("res://scripts/resources/mission_event_data.gd")
+const MissionData = preload("res://addons/wcs_asset_core/resources/mission/mission_data.gd")
+const ShipInstanceData = preload("res://addons/wcs_asset_core/resources/mission/ship_instance_data.gd")
+const WingInstanceData = preload("res://addons/wcs_asset_core/resources/mission/wing_instance_data.gd")
+const MissionObjectiveData = preload("res://addons/wcs_asset_core/resources/mission/mission_objective_data.gd")
+const MissionEventData = preload("res://addons/wcs_asset_core/resources/mission/mission_event_data.gd")
 # Preload other necessary resources/scripts
 # const SEXPSystem = preload("res://scripts/scripting/sexp/sexp_system.gd") # Assuming singleton access via name
 # const ObjectManager = preload("res://scripts/core_systems/object_manager.gd") # Assuming singleton access via name

@@ -4,7 +4,7 @@
 class_name MissionLoader
 extends RefCounted # Use RefCounted for a utility class
 
-const MissionData = preload("res://scripts/resources/mission_data.gd")
+const MissionData = preload("res://addons/wcs_asset_core/resources/mission/mission_data.gd")
 
 # Loads a MissionData resource from the specified path.
 # Returns the loaded MissionData resource or null on failure.

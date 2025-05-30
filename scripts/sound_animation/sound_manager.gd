@@ -45,7 +45,7 @@ var _next_handle: int = 1
 var _game_sounds_data: GameSoundsData = null
 
 # Preload the SoundEntry script to access its enum
-const SoundEntry = preload("res://scripts/resources/game_data/sound_entry.gd")
+const SoundEntry = preload("res://addons/wcs_asset_core/resources/game_data/sound_entry.gd")
 
 func _ready():
 	name = "SoundManager" # Ensure singleton name

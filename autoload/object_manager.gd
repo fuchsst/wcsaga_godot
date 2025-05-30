@@ -14,6 +14,10 @@ signal manager_initialized()
 signal manager_shutdown()
 signal critical_error(error_message: String)
 
+# --- Core Classes ---
+const WCSObject = preload("res://scripts/core/wcs_object.gd")
+const WCSObjectData = preload("res://scripts/core/wcs_object_data.gd")
+
 # Configuration
 @export var max_objects: int = 1000
 @export var update_frequency: int = 60  # Hz

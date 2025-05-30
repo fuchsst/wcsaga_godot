@@ -5,8 +5,8 @@ class_name MessageManager
 extends Node
 
 # --- Dependencies ---
-const MessageData = preload("res://scripts/resources/mission/message_data.gd")
-const PersonaData = preload("res://scripts/resources/mission/persona_data.gd")
+const MessageData = preload("res://addons/wcs_asset_core/resources/mission/message_data.gd")
+const PersonaData = preload("res://addons/wcs_asset_core/resources/mission/persona_data.gd")
 # Access HUDManager, SoundManager, SexpVariableManager via singletons
 
 # --- Constants ---

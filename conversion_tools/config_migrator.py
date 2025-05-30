@@ -1020,7 +1020,7 @@ class ConfigMigrator:
     def _generate_game_settings_resource(self) -> str:
         """Generate GameSettings resource content."""
         content = '[gd_resource type="Resource" script_class="GameSettings" load_steps=2 format=3]\n\n'
-        content += '[ext_resource type="Script" path="res://scripts/resources/configuration/game_settings.gd" id="1"]\n\n'
+        content += '[ext_resource type="Script" path="res://addons/wcs_asset_core/resources/configuration/game_settings.gd" id="1"]\n\n'
         content += '[resource]\n'
         content += 'script = ExtResource("1")\n'
         
@@ -1043,7 +1043,7 @@ class ConfigMigrator:
     def _generate_user_preferences_resource(self) -> str:
         """Generate UserPreferences resource content."""
         content = '[gd_resource type="Resource" script_class="UserPreferences" load_steps=2 format=3]\n\n'
-        content += '[ext_resource type="Script" path="res://scripts/resources/configuration/user_preferences.gd" id="1"]\n\n'
+        content += '[ext_resource type="Script" path="res://addons/wcs_asset_core/resources/configuration/user_preferences.gd" id="1"]\n\n'
         content += '[resource]\n'
         content += 'script = ExtResource("1")\n'
         
@@ -1068,7 +1068,7 @@ class ConfigMigrator:
     def _generate_system_configuration_resource(self) -> str:
         """Generate SystemConfiguration resource content."""
         content = '[gd_resource type="Resource" script_class="SystemConfiguration" load_steps=2 format=3]\n\n'
-        content += '[ext_resource type="Script" path="res://scripts/resources/configuration/system_configuration.gd" id="1"]\n\n'
+        content += '[ext_resource type="Script" path="res://addons/wcs_asset_core/resources/configuration/system_configuration.gd" id="1"]\n\n'
         content += '[resource]\n'
         content += 'script = ExtResource("1")\n'
         

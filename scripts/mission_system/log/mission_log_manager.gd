@@ -5,7 +5,7 @@ class_name MissionLogManager
 extends Node
 
 # --- Dependencies ---
-const MissionLogEntry = preload("res://scripts/resources/mission/mission_log_entry.gd")
+const MissionLogEntry = preload("res://addons/wcs_asset_core/resources/mission/mission_log_entry.gd")
 # Access GameManager via singleton: Engine.get_singleton("GameManager")
 
 # --- Constants ---

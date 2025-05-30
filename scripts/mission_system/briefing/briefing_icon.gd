@@ -5,7 +5,7 @@ class_name BriefingIcon
 extends Node3D # Assuming the icon scene root is Node3D
 
 # --- Dependencies ---
-const BriefingIconData = preload("res://scripts/resources/mission/briefing_icon_data.gd")
+const BriefingIconData = preload("res://addons/wcs_asset_core/resources/mission/briefing_icon_data.gd")
 # Access SpeciesManager via singleton: Engine.get_singleton("SpeciesManager")
 
 # --- Nodes ---

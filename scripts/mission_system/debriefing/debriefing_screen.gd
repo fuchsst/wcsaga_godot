@@ -5,8 +5,8 @@ class_name DebriefingScreen
 extends Control # Assuming the root node is a Control
 
 # --- Dependencies ---
-const DebriefingData = preload("res://scripts/resources/mission/debriefing_data.gd")
-const DebriefingStageData = preload("res://scripts/resources/mission/debriefing_stage_data.gd")
+const DebriefingData = preload("res://addons/wcs_asset_core/resources/mission/debriefing_data.gd")
+const DebriefingStageData = preload("res://addons/wcs_asset_core/resources/mission/debriefing_stage_data.gd")
 # Access GameManager, GameSequenceManager, SoundManager, MusicManager, ScoringManager, CampaignManager via singletons
 # Access SEXPSystem via singleton: Engine.get_singleton("SEXPSystem")
 

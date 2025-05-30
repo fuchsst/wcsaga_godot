@@ -5,8 +5,8 @@ class_name BriefingScreen
 extends Control # Assuming the root node is a Control
 
 # --- Dependencies ---
-const BriefingData = preload("res://scripts/resources/mission/briefing_data.gd")
-const BriefingStageData = preload("res://scripts/resources/mission/briefing_stage_data.gd")
+const BriefingData = preload("res://addons/wcs_asset_core/resources/mission/briefing_data.gd")
+const BriefingStageData = preload("res://addons/wcs_asset_core/resources/mission/briefing_stage_data.gd")
 # Access GameManager, GameSequenceManager, SoundManager, MusicManager via singletons
 
 # --- Nodes ---

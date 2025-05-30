@@ -5,9 +5,9 @@ class_name BriefingMapManager
 extends SubViewportContainer # Or Node3D if the viewport is managed differently
 
 # --- Dependencies ---
-const BriefingStageData = preload("res://scripts/resources/mission/briefing_stage_data.gd")
-const BriefingIconData = preload("res://scripts/resources/mission/briefing_icon_data.gd")
-const BriefingLineData = preload("res://scripts/resources/mission/briefing_line_data.gd")
+const BriefingStageData = preload("res://addons/wcs_asset_core/resources/mission/briefing_stage_data.gd")
+const BriefingIconData = preload("res://addons/wcs_asset_core/resources/mission/briefing_icon_data.gd")
+const BriefingLineData = preload("res://addons/wcs_asset_core/resources/mission/briefing_line_data.gd")
 const BriefingIconScene = preload("res://scenes/missions/briefing/briefing_icon.tscn") # Path to the icon scene
 
 # --- Nodes ---
