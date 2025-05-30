@@ -5,6 +5,8 @@ extends Camera3D
 ## Camera controller for the FRED2 mission editor viewport.
 ## Provides smooth navigation, object focusing, and state persistence
 ## with industry-standard 3D editor controls.
+## 
+## Uses EPIC-001 core foundation utilities for all mathematical operations.
 
 signal camera_moved(camera: MissionCamera3D)
 signal view_changed(is_orthogonal: bool)
@@ -66,7 +68,7 @@ func reset_to_default_position() -> void:
 	position = default_position
 	look_at(default_target, Vector3.UP)
 	orbit_target = default_target
-	orbit_distance = position.distance_to(orbit_target)
+	orbit_distance = WCSVectorMath.vec_dist(position, orbit_target)
 	update_orbit_angles()
 	
 	target_position = position
@@ -198,9 +200,9 @@ func update_orbit(mouse_delta: Vector2) -> void:
 
 ## Updates camera position and rotation from orbit parameters.
 func update_camera_from_orbit() -> void:
-	# Convert spherical coordinates to Cartesian
-	var elevation_rad: float = deg_to_rad(orbit_elevation)
-	var azimuth_rad: float = deg_to_rad(orbit_azimuth)
+	# Convert spherical coordinates to Cartesian using WCS math utilities
+	var elevation_rad: float = WCSVectorMath.degrees_to_radians(orbit_elevation)
+	var azimuth_rad: float = WCSVectorMath.degrees_to_radians(orbit_azimuth)
 	
 	var x: float = orbit_distance * cos(elevation_rad) * cos(azimuth_rad)
 	var y: float = orbit_distance * sin(elevation_rad)

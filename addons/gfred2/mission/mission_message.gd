@@ -38,16 +38,14 @@ func validate() -> Array:
 	if text.is_empty():
 		errors.append("Message '%s' requires text" % name)
 		
-	# Check wave file exists if specified
+	# Check wave file exists if specified using EPIC-001 core utilities
 	if !wave_file.is_empty():
-		var file = FileAccess.open(wave_file, FileAccess.READ)
-		if !file:
+		if not WCSPaths.file_exists(wave_file):
 			errors.append("Message '%s' wave file not found: %s" % [name, wave_file])
 			
-	# Check ani file exists if specified  
+	# Check ani file exists if specified using EPIC-001 core utilities
 	if !ani_file.is_empty():
-		var file = FileAccess.open(ani_file, FileAccess.READ)
-		if !file:
+		if not WCSPaths.file_exists(ani_file):
 			errors.append("Message '%s' ani file not found: %s" % [name, ani_file])
 			
 	# Check persona index is valid

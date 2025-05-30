@@ -14,8 +14,8 @@ enum ObjectType {
 @export var object_type: ObjectType = ObjectType.SHIP
 @export var object_id: String = ""
 @export var object_name: String = ""
-@export var position: Vector3 = Vector3.ZERO
-@export var rotation: Vector3 = Vector3.ZERO
+@export var position: Vector3 = WCSVectorMath.ZERO_VECTOR
+@export var rotation: Vector3 = WCSVectorMath.ZERO_VECTOR
 @export var scale: Vector3 = Vector3.ONE
 @export var properties: Dictionary = {}
 
@@ -23,8 +23,8 @@ func _init() -> void:
 	# Initialize with default values
 	object_id = ""
 	object_name = "Unnamed Object"
-	position = Vector3.ZERO
-	rotation = Vector3.ZERO
+	position = WCSVectorMath.ZERO_VECTOR
+	rotation = WCSVectorMath.ZERO_VECTOR
 	scale = Vector3.ONE
 	properties = {}
 
@@ -46,19 +46,14 @@ func get_display_name() -> String:
 		return object_name
 	return "Unnamed " + ObjectType.keys()[object_type]
 
-func validate() -> Dictionary:
-	"""Validate this object data and return result."""
-	var result: Dictionary = {
-		"is_valid": true,
-		"errors": []
-	}
+func validate() -> ValidationResult:
+	"""Validate this object data using EPIC-001 core validation patterns."""
+	var result: ValidationResult = ValidationResult.new("mission_object", "MissionObjectData")
 	
 	if object_id.is_empty():
-		result.is_valid = false
-		result.errors.append("Object ID cannot be empty")
+		result.add_error("Object ID cannot be empty")
 	
 	if object_name.is_empty():
-		result.is_valid = false
-		result.errors.append("Object name cannot be empty")
+		result.add_error("Object name cannot be empty")
 	
 	return result

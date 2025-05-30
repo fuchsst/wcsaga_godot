@@ -470,29 +470,51 @@ func _update_validation_display() -> void:
 			error_text += "[color=red]• " + error + "[/color]\n"
 		validation_panel.text = error_text
 
-## Get configuration for saving/loading editor state
+## Get configuration for saving/loading editor state using EPIC-001 core configuration
 func get_editor_config() -> Dictionary:
 	var config: Dictionary = {}
 	
 	if sexp_graph:
+		# Store in core UserPreferences system
+		ConfigurationManager.set_user_preference("gfred2_sexp_zoom", sexp_graph.zoom)
+		ConfigurationManager.set_user_preference("gfred2_sexp_scroll_x", sexp_graph.scroll_ofs.x)
+		ConfigurationManager.set_user_preference("gfred2_sexp_scroll_y", sexp_graph.scroll_ofs.y)
+		ConfigurationManager.set_user_preference("gfred2_sexp_minimap", sexp_graph.minimap_enabled)
+		
+		# Legacy dictionary return for backwards compatibility
 		config.zoom = sexp_graph.zoom
 		config.scroll_offset = sexp_graph.scroll_ofs
 		config.minimap_enabled = sexp_graph.minimap_enabled
 	
 	return config
 
-## Apply configuration to restore editor state
+## Apply configuration to restore editor state using EPIC-001 core configuration
 func apply_editor_config(config: Dictionary) -> void:
-	if not sexp_graph or config.is_empty():
+	if not sexp_graph:
 		return
 	
-	if config.has("zoom"):
+	# Restore from core UserPreferences system (preferred)
+	var zoom: float = ConfigurationManager.get_user_preference("gfred2_sexp_zoom")
+	if zoom > 0.0:
+		sexp_graph.zoom = zoom
+	
+	var scroll_x: float = ConfigurationManager.get_user_preference("gfred2_sexp_scroll_x")
+	var scroll_y: float = ConfigurationManager.get_user_preference("gfred2_sexp_scroll_y")
+	if scroll_x != 0.0 or scroll_y != 0.0:
+		sexp_graph.scroll_ofs = Vector2(scroll_x, scroll_y)
+	
+	var minimap_enabled = ConfigurationManager.get_user_preference("gfred2_sexp_minimap")
+	if minimap_enabled is bool:
+		sexp_graph.minimap_enabled = minimap_enabled
+	
+	# Fallback to legacy config if core preferences not available
+	if config.has("zoom") and sexp_graph.zoom == 1.0:
 		sexp_graph.zoom = config.zoom
 	
-	if config.has("scroll_offset"):
+	if config.has("scroll_offset") and sexp_graph.scroll_ofs == Vector2.ZERO:
 		sexp_graph.scroll_ofs = config.scroll_offset
 	
-	if config.has("minimap_enabled"):
+	if config.has("minimap_enabled") and not (minimap_enabled is bool):
 		sexp_graph.minimap_enabled = config.minimap_enabled
 
 ## COMPATIBILITY API

@@ -3,6 +3,7 @@ extends Node
 
 ## Validator for mission object properties in the FRED2 editor plugin.
 ## Provides real-time validation and error reporting.
+## Uses EPIC-001 core foundation validation patterns for consistency.
 
 signal validation_error(object_data: MissionObjectData, property: String, error: String)
 signal validation_passed(object_data: MissionObjectData, property: String)
@@ -12,17 +13,12 @@ var object_manager: MissionObjectManager
 func _ready() -> void:
 	name = "ObjectValidator"
 
-func validate_object(object_data: MissionObjectData) -> Dictionary:
-	"""Validate an entire object and return result."""
-	var result: Dictionary = {
-		"is_valid": true,
-		"errors": [],
-		"warnings": []
-	}
+func validate_object(object_data: MissionObjectData) -> ValidationResult:
+	"""Validate an entire object and return result using core validation patterns."""
+	var result: ValidationResult = ValidationResult.new("mission_object", "MissionObjectData")
 	
 	if not object_data:
-		result.is_valid = false
-		result.errors.append("Object data is null")
+		result.add_error("Object data is null")
 		return result
 	
 	# Validate basic properties
@@ -45,48 +41,44 @@ func validate_object(object_data: MissionObjectData) -> Dictionary:
 	
 	return result
 
-func validate_object_property(object_data: MissionObjectData, property: String) -> Dictionary:
-	"""Validate a specific property of an object."""
-	var result: Dictionary = {
-		"is_valid": true,
-		"error_message": ""
-	}
+func validate_object_property(object_data: MissionObjectData, property: String) -> ValidationResult:
+	"""Validate a specific property of an object using core validation patterns."""
+	var result: ValidationResult = ValidationResult.new("mission_object_property", property)
 	
 	if not object_data:
-		result.is_valid = false
-		result.error_message = "Object data is null"
+		result.add_error("Object data is null")
 		return result
 	
 	match property:
 		"object_id":
 			if not _is_valid_object_id(object_data.object_id):
-				result.is_valid = false
-				result.error_message = "Invalid object ID format"
+				result.add_error("Invalid object ID format")
 		"object_name":
 			if not _is_valid_object_name(object_data.object_name):
-				result.is_valid = false
-				result.error_message = "Object name cannot be empty"
+				result.add_error("Object name cannot be empty")
 		"position":
 			if not _is_valid_position(object_data.position):
-				result.is_valid = false
-				result.error_message = "Invalid position values"
+				result.add_error("Invalid position values")
 		"rotation":
 			if not _is_valid_rotation(object_data.rotation):
-				result.is_valid = false
-				result.error_message = "Invalid rotation values"
+				result.add_error("Invalid rotation values")
 		"scale":
 			if not _is_valid_scale(object_data.scale):
-				result.is_valid = false
-				result.error_message = "Scale values must be positive"
+				result.add_error("Scale values must be positive")
 		_:
 			# Custom property validation
-			result = _validate_custom_property(object_data, property)
+			var custom_result = _validate_custom_property(object_data, property)
+			if not custom_result.is_valid():
+				for error in custom_result.get_errors():
+					result.add_error(error)
 	
 	# Emit signals
-	if result.is_valid:
+	if result.is_valid():
 		validation_passed.emit(object_data, property)
 	else:
-		validation_error.emit(object_data, property, result.error_message)
+		var errors: Array[String] = result.get_errors()
+		if not errors.is_empty():
+			validation_error.emit(object_data, property, errors[0])
 	
 	return result
 
