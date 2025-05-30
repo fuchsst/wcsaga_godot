@@ -1,6 +1,15 @@
 @tool
 extends Control
 
+# Theme manager
+var theme_manager: GFRED2ThemeManager
+
+# Dock manager
+var dock_manager: GFRED2DockManager
+
+# Shortcut manager
+var shortcut_manager: GFRED2ShortcutManager
+
 # Input manager
 var input_manager: Node
 
@@ -45,7 +54,35 @@ var open_dialog: Window
 # Grid manager
 var grid_manager: Node
 
+func set_theme_manager(manager: GFRED2ThemeManager) -> void:
+	"""Set the theme manager and apply theming to the entire editor."""
+	theme_manager = manager
+	if theme_manager:
+		theme_manager.theme_changed.connect(_on_theme_changed)
+		theme_manager.high_contrast_changed.connect(_on_high_contrast_changed)
+		# Apply theme immediately if already ready
+		if is_inside_tree():
+			_apply_theming()
+
+func set_dock_manager(manager: GFRED2DockManager) -> void:
+	"""Set the dock manager for handling dockable panels."""
+	dock_manager = manager
+	if dock_manager:
+		dock_manager.dock_added.connect(_on_dock_added)
+		dock_manager.dock_removed.connect(_on_dock_removed)
+		dock_manager.layout_changed.connect(_on_layout_changed)
+
+func set_shortcut_manager(manager: GFRED2ShortcutManager) -> void:
+	"""Set the shortcut manager for handling keyboard shortcuts."""
+	shortcut_manager = manager
+	if shortcut_manager:
+		shortcut_manager.shortcut_triggered.connect(_on_shortcut_triggered)
+
 func _ready():
+	# Apply theming if theme manager is already set
+	if theme_manager:
+		_apply_theming()
+	
 	# Setup input manager
 	input_manager = preload("res://addons/gfred2/input_manager.gd").new()
 	add_child(input_manager)
@@ -213,20 +250,21 @@ func _on_editors_menu_item_selected(id: int):
 		1: # Asteroid Field
 			asteroid_field_editor.show_dialog()
 
-func _on_shortcut_triggered(shortcut_name: String):
-	match shortcut_name:
+func _on_shortcut_triggered(action_name: String, event: InputEvent) -> void:
+	"""Handle shortcut activation from the shortcut manager."""
+	match action_name:
 		# View toggles
-		"view_show_grid":
+		"view_toggle_grid":
 			show_grid = !show_grid
 			grid_manager.set_enabled(show_grid)
-		"view_show_models":
+		"view_toggle_models":
 			show_ships = !show_ships
-		"view_show_outlines":
+		"view_toggle_outlines":
 			show_outlines = !show_outlines
-		"view_show_coordinates":
+		"view_toggle_coordinates":
 			show_coordinates = !show_coordinates
 			_update_grid()
-		"view_show_distances":
+		"view_toggle_distances":
 			show_distances = !show_distances
 			
 		# Camera modes
@@ -334,6 +372,10 @@ func _on_shortcut_triggered(shortcut_name: String):
 		"speed_rotation_50": rotation_speed = 50.0
 
 func _input(event):
+	# Handle keyboard shortcuts first
+	if shortcut_manager and shortcut_manager.handle_input_event(event):
+		return
+	
 	if event is InputEventMouseMotion:
 		if event.button_mask & MOUSE_BUTTON_MASK_MIDDLE:
 			# Pan camera
@@ -542,9 +584,7 @@ func _on_file_menu_item_selected(id: int):
 	match id:
 		0: # New Mission
 			if modified:
-				var dialog = ConfirmationDialog.new()
-				dialog.dialog_text = "There are unsaved changes. Do you want to continue?"
-				dialog.confirmed.connect(func(): _new_mission())
+				var dialog = create_themed_confirmation_dialog("There are unsaved changes. Do you want to continue?", func(): _new_mission())
 				add_child(dialog)
 				dialog.popup_centered()
 			else:
@@ -552,9 +592,7 @@ func _on_file_menu_item_selected(id: int):
 			
 		1: # Open Mission
 			if modified:
-				var dialog = ConfirmationDialog.new()
-				dialog.dialog_text = "There are unsaved changes. Do you want to continue?"
-				dialog.confirmed.connect(func(): open_dialog.show_dialog())
+				var dialog = create_themed_confirmation_dialog("There are unsaved changes. Do you want to continue?", func(): open_dialog.show_dialog())
 				add_child(dialog)
 				dialog.popup_centered()
 			else:
@@ -571,9 +609,7 @@ func _on_file_menu_item_selected(id: int):
 			
 		6: # Exit
 			if modified:
-				var dialog = ConfirmationDialog.new()
-				dialog.dialog_text = "There are unsaved changes. Do you want to exit?"
-				dialog.confirmed.connect(func(): get_tree().quit())
+				var dialog = create_themed_confirmation_dialog("There are unsaved changes. Do you want to exit?", func(): get_tree().quit())
 				add_child(dialog)
 				dialog.popup_centered()
 			else:
@@ -619,8 +655,7 @@ func _open_mission(path: String):
 		# Reset selection
 		selection_manager.clear_selection()
 	else:
-		var dialog = AcceptDialog.new()
-		dialog.dialog_text = "Failed to open mission file: " + path
+		var dialog = create_themed_accept_dialog("Failed to open mission file: " + path)
 		add_child(dialog)
 		dialog.popup_centered()
 
@@ -630,8 +665,7 @@ func _save_mission(path: String):
 		current_filename = path
 		modified = false
 	else:
-		var dialog = AcceptDialog.new()
-		dialog.dialog_text = "Failed to save mission file: " + path
+		var dialog = create_themed_accept_dialog("Failed to save mission file: " + path)
 		add_child(dialog)
 		dialog.popup_centered()
 
@@ -695,3 +729,121 @@ func _on_open_dialog_confirmed():
 	var path = open_dialog.get_selected_file()
 	if path:
 		_open_mission(path)
+
+func _apply_theming() -> void:
+	"""Apply theme manager styling to all UI components."""
+	if not theme_manager:
+		return
+	
+	# Apply theme to main control
+	theme_manager.apply_theme_to_control(self)
+	
+	# Apply theme to specific components
+	_apply_menu_theming()
+	_apply_dialog_theming()
+	_apply_viewport_theming()
+
+func _apply_menu_theming() -> void:
+	"""Apply theming to menu components."""
+	if not theme_manager:
+		return
+	
+	var menu_bar = get_node_or_null("HSplitContainer/MainArea/TopBar/MenuBar")
+	if menu_bar:
+		theme_manager.apply_theme_to_control(menu_bar)
+
+func _apply_dialog_theming() -> void:
+	"""Apply theming to dialog components."""
+	if not theme_manager:
+		return
+	
+	# Apply to existing dialogs
+	if mission_specs_editor:
+		theme_manager.apply_theme_to_control(mission_specs_editor)
+	if asteroid_field_editor:
+		theme_manager.apply_theme_to_control(asteroid_field_editor)
+	if save_dialog:
+		theme_manager.apply_theme_to_control(save_dialog)
+	if open_dialog:
+		theme_manager.apply_theme_to_control(open_dialog)
+
+func _apply_viewport_theming() -> void:
+	"""Apply theming to viewport and 3D components."""
+	if not theme_manager:
+		return
+	
+	# Apply to viewport container and overlays
+	var viewport_container = get_node_or_null("HSplitContainer/MainArea/ViewportContainer")
+	if viewport_container:
+		theme_manager.apply_theme_to_control(viewport_container)
+
+func _on_theme_changed(new_theme: Theme) -> void:
+	"""Handle theme change events."""
+	_apply_theming()
+	
+	# Update any custom styled components
+	_update_custom_styles()
+
+func _on_high_contrast_changed(enabled: bool) -> void:
+	"""Handle high contrast mode toggle."""
+	_apply_theming()
+	
+	# Update viewport rendering for high contrast
+	if viewport and enabled:
+		# Enable high contrast rendering settings
+		viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+
+func _update_custom_styles() -> void:
+	"""Update custom styling for GFRED2 specific components."""
+	if not theme_manager:
+		return
+	
+	# Update grid appearance for current theme
+	if grid_manager and grid_manager.has_method("update_theme"):
+		grid_manager.update_theme(theme_manager.get_current_theme())
+	
+	# Update gizmo appearance
+	if active_gizmo and active_gizmo.has_method("update_theme"):
+		active_gizmo.update_theme(theme_manager.get_current_theme())
+
+func create_themed_confirmation_dialog(message: String, on_confirmed: Callable) -> ConfirmationDialog:
+	"""Create a confirmation dialog with proper theming."""
+	var dialog: ConfirmationDialog
+	
+	if theme_manager:
+		dialog = ConfirmationDialog.new()
+		theme_manager.apply_theme_to_control(dialog)
+	else:
+		dialog = ConfirmationDialog.new()
+	
+	dialog.dialog_text = message
+	dialog.confirmed.connect(on_confirmed)
+	
+	return dialog
+
+func create_themed_accept_dialog(message: String) -> AcceptDialog:
+	"""Create an accept dialog with proper theming."""
+	var dialog: AcceptDialog
+	
+	if theme_manager:
+		dialog = AcceptDialog.new()
+		theme_manager.apply_theme_to_control(dialog)
+	else:
+		dialog = AcceptDialog.new()
+	
+	dialog.dialog_text = message
+	
+	return dialog
+
+func _on_dock_added(dock_name: String, dock_control: Control) -> void:
+	"""Handle dock addition events."""
+	print("Dock added: ", dock_name)
+
+func _on_dock_removed(dock_name: String) -> void:
+	"""Handle dock removal events."""
+	print("Dock removed: ", dock_name)
+
+func _on_layout_changed() -> void:
+	"""Handle dock layout changes."""
+	# Could trigger UI updates or save layout state
+	pass
