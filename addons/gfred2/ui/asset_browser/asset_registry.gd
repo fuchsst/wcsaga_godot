@@ -1,29 +1,21 @@
-class_name AssetRegistry
+class_name AssetRegistryWrapper
 extends RefCounted
 
-## Central registry for managing WCS asset data.
-## Provides registration, lookup, and management functions for all asset types
-## including ships, weapons, and other mission-critical assets.
+## Wrapper for EPIC-002 asset registry system.
+## Provides GFRED2-specific convenience methods while using the core asset system.
 
-signal asset_registered(asset_data: AssetData)
-signal asset_updated(asset_data: AssetData)
+signal asset_registered(asset_data: BaseAssetData)
+signal asset_updated(asset_data: BaseAssetData)
 signal asset_removed(asset_id: String)
 signal registry_loaded()
 
-# Asset storage
-var ship_classes: Dictionary = {}  # String -> ShipClassData
-var weapon_classes: Dictionary = {}  # String -> WeaponClassData
-var asset_lookup: Dictionary = {}  # String -> AssetData (unified lookup)
+# Reference to EPIC-002 core registry
+var core_registry: RegistryManager = null
 
-# Organization caches
-var ships_by_faction: Dictionary = {}
-var ships_by_type: Dictionary = {}
-var weapons_by_type: Dictionary = {}
-var weapons_by_damage_type: Dictionary = {}
-
-# Registry state
-var is_initialized: bool = false
-var last_update_time: int = 0
+# Cache for quick lookups
+var _ship_cache: Array[ShipData] = []
+var _weapon_cache: Array[WeaponData] = []
+var _cache_dirty: bool = true
 
 func _init() -> void:
 	_initialize_registry()
