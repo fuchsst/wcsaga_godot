@@ -5,7 +5,7 @@ extends VBoxContainer
 ## Shows 3D model previews, technical specifications, and asset metadata
 ## with efficient rendering and responsive updates.
 
-signal asset_selection_confirmed(asset_data: AssetData)
+signal asset_selection_confirmed(asset_data: BaseAssetData)
 signal preview_settings_changed(settings: Dictionary)
 
 # UI Components
@@ -21,9 +21,10 @@ var select_button: Button
 var details_button: Button
 
 # Asset data
-var current_asset: AssetData
+var current_asset: BaseAssetData
 var preview_mesh: MeshInstance3D
 var is_preview_active: bool = false
+var asset_registry: AssetRegistryWrapper  # For compatibility helpers
 
 # Performance tracking
 var last_update_time: int = 0
@@ -135,7 +136,11 @@ func _connect_signals() -> void:
 	select_button.pressed.connect(_on_select_button_pressed)
 	details_button.pressed.connect(_on_details_button_pressed)
 
-func display_asset(asset_data: AssetData) -> void:
+## Set the asset registry for compatibility helpers
+func set_asset_registry(registry: AssetRegistryWrapper) -> void:
+	asset_registry = registry
+
+func display_asset(asset_data: BaseAssetData) -> void:
 	"""Display detailed information for the specified asset."""
 	if asset_data == null:
 		_show_no_selection_state()
@@ -185,10 +190,10 @@ func _update_3d_preview(asset_data: AssetData) -> void:
 	# Force viewport update
 	model_preview.render_target_update_mode = SubViewport.UPDATE_ONCE
 
-func _create_placeholder_mesh(asset_data: AssetData) -> Mesh:
+func _create_placeholder_mesh(asset_data: BaseAssetData) -> Mesh:
 	"""Create a placeholder mesh based on asset type."""
-	if asset_data is ShipClassData:
-		var ship_data: ShipClassData = asset_data as ShipClassData
+	if asset_data is ShipData:
+		var ship_data: ShipData = asset_data as ShipData
 		match ship_data.ship_type:
 			"Fighter":
 				return _create_fighter_mesh()
@@ -198,7 +203,7 @@ func _create_placeholder_mesh(asset_data: AssetData) -> Mesh:
 				return _create_cruiser_mesh()
 			_:
 				return _create_generic_ship_mesh()
-	elif asset_data is WeaponClassData:
+	elif asset_data is WeaponData:
 		return _create_weapon_mesh()
 	else:
 		return BoxMesh.new()
@@ -239,8 +244,8 @@ func _create_asset_material(asset_data: AssetData) -> StandardMaterial3D:
 	"""Create a material based on asset properties."""
 	var material: StandardMaterial3D = StandardMaterial3D.new()
 	
-	if asset_data is ShipClassData:
-		var ship_data: ShipClassData = asset_data as ShipClassData
+	if asset_data is ShipData:
+		var ship_data: ShipData = asset_data as ShipData
 		match ship_data.faction:
 			"Terran":
 				material.albedo_color = Color(0.3, 0.5, 0.8)
@@ -250,8 +255,8 @@ func _create_asset_material(asset_data: AssetData) -> StandardMaterial3D:
 				material.albedo_color = Color(0.6, 0.3, 0.8)
 			_:
 				material.albedo_color = Color(0.5, 0.5, 0.5)
-	elif asset_data is WeaponClassData:
-		var weapon_data: WeaponClassData = asset_data as WeaponClassData
+	elif asset_data is WeaponData:
+		var weapon_data: WeaponData = asset_data as WeaponData
 		match weapon_data.damage_type:
 			"Energy":
 				material.albedo_color = Color(0.8, 0.8, 0.3)
@@ -281,26 +286,36 @@ func _update_specifications(asset_data: AssetData) -> void:
 	for child in specs_table.get_children():
 		child.queue_free()
 	
-	if asset_data is ShipClassData:
-		_add_ship_specifications(asset_data as ShipClassData)
-	elif asset_data is WeaponClassData:
-		_add_weapon_specifications(asset_data as WeaponClassData)
+	if asset_data is ShipData:
+		_add_ship_specifications(asset_data as ShipData)
+	elif asset_data is WeaponData:
+		_add_weapon_specifications(asset_data as WeaponData)
 
-func _add_ship_specifications(ship_data: ShipClassData) -> void:
+func _add_ship_specifications(ship_data: ShipData) -> void:
 	"""Add ship-specific specifications to the table."""
-	_add_spec_row("Type:", ship_data.ship_type)
-	_add_spec_row("Faction:", ship_data.faction)
-	_add_spec_row("Max Speed:", "%.1f m/s" % ship_data.max_velocity)
+	if asset_registry:
+		_add_spec_row("Type:", asset_registry.get_ship_type_for_display(ship_data))
+		_add_spec_row("Faction:", asset_registry.get_ship_faction_for_display(ship_data))
+	else:
+		_add_spec_row("Type:", "Unknown")
+		_add_spec_row("Faction:", "Unknown")
+	
+	_add_spec_row("Max Speed:", "%.1f m/s" % ship_data.get_max_speed())
 	_add_spec_row("Hull Strength:", "%.0f" % ship_data.max_hull_strength)
 	_add_spec_row("Shield Strength:", "%.0f" % ship_data.max_shield_strength)
 
-func _add_weapon_specifications(weapon_data: WeaponClassData) -> void:
+func _add_weapon_specifications(weapon_data: WeaponData) -> void:
 	"""Add weapon-specific specifications to the table."""
-	_add_spec_row("Type:", weapon_data.weapon_type)
-	_add_spec_row("Damage Type:", weapon_data.damage_type)
-	_add_spec_row("Damage/Shot:", "%.1f" % weapon_data.damage_per_shot)
-	_add_spec_row("Fire Rate:", "%.1f/sec" % weapon_data.firing_rate)
-	_add_spec_row("Energy Cost:", "%.1f" % weapon_data.energy_consumed)
+	if asset_registry:
+		_add_spec_row("Type:", asset_registry.get_weapon_type_for_display(weapon_data))
+		_add_spec_row("Damage Type:", asset_registry.get_weapon_damage_type_for_display(weapon_data))
+	else:
+		_add_spec_row("Type:", "Unknown")
+		_add_spec_row("Damage Type:", "Unknown")
+	
+	_add_spec_row("Damage/Shot:", "%.1f" % weapon_data.damage_per_second)
+	_add_spec_row("Range:", "%.0f m" % weapon_data.weapon_range)
+	_add_spec_row("Lifetime:", "%.1f s" % weapon_data.lifetime)
 
 func _add_spec_row(label: String, value: String) -> void:
 	"""Add a specification row to the table."""
@@ -329,9 +344,9 @@ func _update_action_buttons(asset_data: AssetData) -> void:
 	details_button.disabled = false
 	
 	# Update button text based on asset type
-	if asset_data is ShipClassData:
+	if asset_data is ShipData:
 		select_button.text = "Select Ship"
-	elif asset_data is WeaponClassData:
+	elif asset_data is WeaponData:
 		select_button.text = "Select Weapon"
 	else:
 		select_button.text = "Select Asset"

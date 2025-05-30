@@ -1,328 +1,325 @@
 class_name AssetRegistryWrapper
 extends RefCounted
 
-## Wrapper for EPIC-002 asset registry system.
-## Provides GFRED2-specific convenience methods while using the core asset system.
+## GFRED2 wrapper for EPIC-002 WCS Asset Core registry system.
+## Provides convenient access to centralized asset management while maintaining
+## GFRED2-specific convenience methods and caching for mission editor performance.
 
-signal asset_registered(asset_data: BaseAssetData)
-signal asset_updated(asset_data: BaseAssetData)
-signal asset_removed(asset_id: String)
-signal registry_loaded()
+signal asset_loaded(asset_path: String, asset_data: BaseAssetData)
+signal registry_updated(asset_type: AssetTypes.Type)
+signal search_completed(query: String, results: Array[String])
 
-# Reference to EPIC-002 core registry
-var core_registry: RegistryManager = null
-
-# Cache for quick lookups
+# Performance optimization for asset browser
 var _ship_cache: Array[ShipData] = []
 var _weapon_cache: Array[WeaponData] = []
-var _cache_dirty: bool = true
+var _armor_cache: Array[ArmorData] = []
+var _cache_last_updated: int = 0
+var _cache_ttl_ms: int = 5000  # 5 second cache TTL
 
 func _init() -> void:
-	_initialize_registry()
+	# Connect to core registry signals for cache invalidation
+	if WCSAssetRegistry.asset_registered.is_connected(_on_asset_registered):
+		WCSAssetRegistry.asset_registered.disconnect(_on_asset_registered)
+	WCSAssetRegistry.asset_registered.connect(_on_asset_registered)
 
-func _initialize_registry() -> void:
-	"""Initialize the asset registry with empty collections."""
-	ship_classes.clear()
-	weapon_classes.clear()
-	asset_lookup.clear()
-	ships_by_faction.clear()
-	ships_by_type.clear()
-	weapons_by_type.clear()
-	weapons_by_damage_type.clear()
-	
-	is_initialized = true
-	last_update_time = Time.get_ticks_msec()
+## Check if assets are available and registry is initialized
+func is_ready() -> bool:
+	return WCSAssetRegistry.is_initialized()
 
-# Ship class management
-func register_ship_class(ship_data: ShipClassData) -> bool:
-	"""Register a ship class in the registry."""
-	if ship_data == null:
-		push_error("Cannot register null ship class data")
-		return false
+## Get all ship assets with caching
+func get_ships() -> Array[ShipData]:
+	if _is_cache_valid() and not _ship_cache.is_empty():
+		return _ship_cache
 	
-	var validation: Dictionary = ship_data.validate()
-	if not validation.is_valid:
-		push_error("Invalid ship class data: %s" % str(validation.errors))
-		return false
+	_ship_cache.clear()
+	var ship_paths: Array[String] = WCSAssetRegistry.get_asset_paths_by_type(AssetTypes.Type.SHIP)
 	
-	var ship_id: String = ship_data.class_name
-	ship_classes[ship_id] = ship_data
-	asset_lookup[ship_id] = ship_data
+	for path in ship_paths:
+		var ship_data: ShipData = WCSAssetLoader.load_asset(path) as ShipData
+		if ship_data and ship_data.is_valid():
+			_ship_cache.append(ship_data)
 	
-	# Update organization caches
-	_update_ship_caches(ship_data)
-	
-	asset_registered.emit(ship_data)
-	last_update_time = Time.get_ticks_msec()
-	return true
+	_update_cache_timestamp()
+	return _ship_cache
 
-func get_ship_class(class_name: String) -> ShipClassData:
-	"""Get a ship class by name."""
-	return ship_classes.get(class_name, null)
-
-func get_ship_classes() -> Array[ShipClassData]:
-	"""Get all registered ship classes."""
-	var classes: Array[ShipClassData] = []
-	for ship_data in ship_classes.values():
-		classes.append(ship_data)
-	return classes
-
-func get_ships_by_faction(faction: String) -> Array[ShipClassData]:
-	"""Get all ship classes for a specific faction."""
-	return ships_by_faction.get(faction, [])
-
-func get_ships_by_type(ship_type: String) -> Array[ShipClassData]:
-	"""Get all ship classes of a specific type."""
-	return ships_by_type.get(ship_type, [])
-
-func get_ship_factions() -> Array[String]:
-	"""Get all available ship factions."""
-	return ships_by_faction.keys()
-
-func get_ship_types() -> Array[String]:
-	"""Get all available ship types."""
-	return ships_by_type.keys()
-
-func _update_ship_caches(ship_data: ShipClassData) -> void:
-	"""Update ship organization caches."""
-	var faction: String = ship_data.get_faction()
-	var ship_type: String = ship_data.get_ship_type()
+## Get all weapon assets with caching
+func get_weapons() -> Array[WeaponData]:
+	if _is_cache_valid() and not _weapon_cache.is_empty():
+		return _weapon_cache
 	
-	# Update faction cache
-	if not ships_by_faction.has(faction):
-		ships_by_faction[faction] = []
-	var faction_ships: Array = ships_by_faction[faction]
-	if not ship_data in faction_ships:
-		faction_ships.append(ship_data)
+	_weapon_cache.clear()
+	var weapon_paths: Array[String] = WCSAssetRegistry.get_asset_paths_by_type(AssetTypes.Type.PRIMARY_WEAPON)
+	weapon_paths.append_array(WCSAssetRegistry.get_asset_paths_by_type(AssetTypes.Type.SECONDARY_WEAPON))
 	
-	# Update type cache
-	if not ships_by_type.has(ship_type):
-		ships_by_type[ship_type] = []
-	var type_ships: Array = ships_by_type[ship_type]
-	if not ship_data in type_ships:
-		type_ships.append(ship_data)
+	for path in weapon_paths:
+		var weapon_data: WeaponData = WCSAssetLoader.load_asset(path) as WeaponData
+		if weapon_data and weapon_data.is_valid():
+			_weapon_cache.append(weapon_data)
+	
+	_update_cache_timestamp()
+	return _weapon_cache
 
-# Weapon class management
-func register_weapon_class(weapon_data: WeaponClassData) -> bool:
-	"""Register a weapon class in the registry."""
-	if weapon_data == null:
-		push_error("Cannot register null weapon class data")
-		return false
+## Get all armor assets with caching
+func get_armor_types() -> Array[ArmorData]:
+	if _is_cache_valid() and not _armor_cache.is_empty():
+		return _armor_cache
 	
-	var validation: Dictionary = weapon_data.validate()
-	if not validation.is_valid:
-		push_error("Invalid weapon class data: %s" % str(validation.errors))
-		return false
+	_armor_cache.clear()
+	var armor_paths: Array[String] = WCSAssetRegistry.get_asset_paths_by_type(AssetTypes.Type.ARMOR)
 	
-	var weapon_id: String = weapon_data.weapon_name
-	weapon_classes[weapon_id] = weapon_data
-	asset_lookup[weapon_id] = weapon_data
+	for path in armor_paths:
+		var armor_data: ArmorData = WCSAssetLoader.load_asset(path) as ArmorData
+		if armor_data and armor_data.is_valid():
+			_armor_cache.append(armor_data)
 	
-	# Update organization caches
-	_update_weapon_caches(weapon_data)
-	
-	asset_registered.emit(weapon_data)
-	last_update_time = Time.get_ticks_msec()
-	return true
+	_update_cache_timestamp()
+	return _armor_cache
 
-func get_weapon_class(weapon_name: String) -> WeaponClassData:
-	"""Get a weapon class by name."""
-	return weapon_classes.get(weapon_name, null)
-
-func get_weapon_classes() -> Array[WeaponClassData]:
-	"""Get all registered weapon classes."""
-	var classes: Array[WeaponClassData] = []
-	for weapon_data in weapon_classes.values():
-		classes.append(weapon_data)
-	return classes
-
-func get_weapons_by_type(weapon_type: String) -> Array[WeaponClassData]:
-	"""Get all weapon classes of a specific type."""
-	return weapons_by_type.get(weapon_type, [])
-
-func get_weapons_by_damage_type(damage_type: String) -> Array[WeaponClassData]:
-	"""Get all weapon classes with a specific damage type."""
-	return weapons_by_damage_type.get(damage_type, [])
-
-func get_weapon_types() -> Array[String]:
-	"""Get all available weapon types."""
-	return weapons_by_type.keys()
-
-func get_damage_types() -> Array[String]:
-	"""Get all available damage types."""
-	return weapons_by_damage_type.keys()
-
-func _update_weapon_caches(weapon_data: WeaponClassData) -> void:
-	"""Update weapon organization caches."""
-	var weapon_type: String = weapon_data.get_weapon_type()
-	var damage_type: String = weapon_data.get_damage_type()
-	
-	# Update weapon type cache
-	if not weapons_by_type.has(weapon_type):
-		weapons_by_type[weapon_type] = []
-	var type_weapons: Array = weapons_by_type[weapon_type]
-	if not weapon_data in type_weapons:
-		type_weapons.append(weapon_data)
-	
-	# Update damage type cache
-	if not weapons_by_damage_type.has(damage_type):
-		weapons_by_damage_type[damage_type] = []
-	var damage_weapons: Array = weapons_by_damage_type[damage_type]
-	if not weapon_data in damage_weapons:
-		damage_weapons.append(weapon_data)
-
-# General asset management
-func get_asset(asset_id: String) -> AssetData:
-	"""Get any asset by ID (unified lookup)."""
-	return asset_lookup.get(asset_id, null)
-
-func get_all_assets() -> Array[AssetData]:
-	"""Get all registered assets of any type."""
-	var all_assets: Array[AssetData] = []
-	for asset_data in asset_lookup.values():
-		all_assets.append(asset_data)
-	return all_assets
-
-func remove_asset(asset_id: String) -> bool:
-	"""Remove an asset from the registry."""
-	if not asset_lookup.has(asset_id):
-		return false
-	
-	var asset_data: AssetData = asset_lookup[asset_id]
-	
-	# Remove from specific collections
-	if asset_data is ShipClassData:
-		ship_classes.erase(asset_id)
-		_remove_from_ship_caches(asset_data as ShipClassData)
-	elif asset_data is WeaponClassData:
-		weapon_classes.erase(asset_id)
-		_remove_from_weapon_caches(asset_data as WeaponClassData)
-	
-	# Remove from unified lookup
-	asset_lookup.erase(asset_id)
-	
-	asset_removed.emit(asset_id)
-	last_update_time = Time.get_ticks_msec()
-	return true
-
-func _remove_from_ship_caches(ship_data: ShipClassData) -> void:
-	"""Remove ship from organization caches."""
-	var faction: String = ship_data.get_faction()
-	var ship_type: String = ship_data.get_ship_type()
-	
-	if ships_by_faction.has(faction):
-		var faction_ships: Array = ships_by_faction[faction]
-		faction_ships.erase(ship_data)
-		if faction_ships.is_empty():
-			ships_by_faction.erase(faction)
-	
-	if ships_by_type.has(ship_type):
-		var type_ships: Array = ships_by_type[ship_type]
-		type_ships.erase(ship_data)
-		if type_ships.is_empty():
-			ships_by_type.erase(ship_type)
-
-func _remove_from_weapon_caches(weapon_data: WeaponClassData) -> void:
-	"""Remove weapon from organization caches."""
-	var weapon_type: String = weapon_data.get_weapon_type()
-	var damage_type: String = weapon_data.get_damage_type()
-	
-	if weapons_by_type.has(weapon_type):
-		var type_weapons: Array = weapons_by_type[weapon_type]
-		type_weapons.erase(weapon_data)
-		if type_weapons.is_empty():
-			weapons_by_type.erase(weapon_type)
-	
-	if weapons_by_damage_type.has(damage_type):
-		var damage_weapons: Array = weapons_by_damage_type[damage_type]
-		damage_weapons.erase(weapon_data)
-		if damage_weapons.is_empty():
-			weapons_by_damage_type.erase(damage_type)
-
-# Search and filtering
-func search_assets(search_text: String, asset_type: String = "") -> Array[AssetData]:
-	"""Search for assets by text, optionally filtered by type."""
-	var results: Array[AssetData] = []
-	var search_lower: String = search_text.to_lower()
-	
-	for asset_data in asset_lookup.values():
-		# Type filter
-		if not asset_type.is_empty() and asset_data.get_asset_type() != asset_type:
-			continue
-		
-		# Text search
-		var display_name: String = asset_data.get_display_name().to_lower()
-		var description: String = asset_data.get_description().to_lower()
-		
-		if display_name.contains(search_lower) or description.contains(search_lower):
-			results.append(asset_data)
-	
+## Search assets across all types
+func search_assets(query: String, asset_type: AssetTypes.Type = AssetTypes.Type.ALL) -> Array[String]:
+	var results: Array[String] = WCSAssetRegistry.search_assets(query, asset_type)
+	search_completed.emit(query, results)
 	return results
 
-func get_compatible_weapons(ship_data: ShipClassData) -> Array[WeaponClassData]:
-	"""Get weapons compatible with a specific ship class."""
-	var compatible: Array[WeaponClassData] = []
+## Get asset by path with validation
+func get_asset(asset_path: String) -> BaseAssetData:
+	if not WCSAssetRegistry.has_asset(asset_path):
+		push_warning("Asset not found in registry: %s" % asset_path)
+		return null
 	
-	for weapon_data in weapon_classes.values():
-		if _is_weapon_compatible_with_ship(weapon_data, ship_data):
-			compatible.append(weapon_data)
+	var asset: BaseAssetData = WCSAssetLoader.load_asset(asset_path)
+	if asset:
+		asset_loaded.emit(asset_path, asset)
+	return asset
+
+## Get ships by faction for GFRED2 filtering
+func get_ships_by_faction(faction: String) -> Array[ShipData]:
+	var filters: Dictionary = {"faction": faction}
+	var paths: Array[String] = WCSAssetRegistry.filter_assets(filters, AssetTypes.Type.SHIP)
+	var ships: Array[ShipData] = []
+	
+	for path in paths:
+		var ship: ShipData = WCSAssetLoader.load_asset(path) as ShipData
+		if ship:
+			ships.append(ship)
+	
+	return ships
+
+## Get weapons by category for GFRED2 filtering
+func get_weapons_by_category(category: String) -> Array[WeaponData]:
+	var filters: Dictionary = {"category": category}
+	var primary_paths: Array[String] = WCSAssetRegistry.filter_assets(filters, AssetTypes.Type.PRIMARY_WEAPON)
+	var secondary_paths: Array[String] = WCSAssetRegistry.filter_assets(filters, AssetTypes.Type.SECONDARY_WEAPON)
+	var weapons: Array[WeaponData] = []
+	
+	for path in primary_paths + secondary_paths:
+		var weapon: WeaponData = WCSAssetLoader.load_asset(path) as WeaponData
+		if weapon:
+			weapons.append(weapon)
+	
+	return weapons
+
+## Validate asset by path
+func validate_asset(asset_path: String) -> ValidationResult:
+	return WCSAssetValidator.validate_by_path(asset_path)
+
+## Get asset info for GFRED2 UI
+func get_asset_info(asset_path: String) -> Dictionary:
+	return WCSAssetRegistry.get_asset_info(asset_path)
+
+## Performance: Check if cache is still valid
+func _is_cache_valid() -> bool:
+	return (Time.get_ticks_msec() - _cache_last_updated) < _cache_ttl_ms
+
+## Update cache timestamp
+func _update_cache_timestamp() -> void:
+	_cache_last_updated = Time.get_ticks_msec()
+
+## Invalidate caches when assets change
+func _on_asset_registered(asset_path: String, asset_type: AssetTypes.Type) -> void:
+	match asset_type:
+		AssetTypes.Type.SHIP:
+			_ship_cache.clear()
+		AssetTypes.Type.PRIMARY_WEAPON, AssetTypes.Type.SECONDARY_WEAPON:
+			_weapon_cache.clear()
+		AssetTypes.Type.ARMOR:
+			_armor_cache.clear()
+	
+	registry_updated.emit(asset_type)
+
+## Force cache refresh
+func refresh_cache() -> void:
+	_ship_cache.clear()
+	_weapon_cache.clear()
+	_armor_cache.clear()
+	_cache_last_updated = 0
+
+## Get available ship factions for filtering UI
+func get_ship_factions() -> Array[String]:
+	var factions: Array[String] = []
+	var ships: Array[ShipData] = get_ships()
+	
+	for ship in ships:
+		var faction: String = ship.get_faction()
+		if not faction.is_empty() and faction not in factions:
+			factions.append(faction)
+	
+	factions.sort()
+	return factions
+
+## Get available ship types for filtering UI
+func get_ship_types() -> Array[String]:
+	var types: Array[String] = []
+	var ships: Array[ShipData] = get_ships()
+	
+	for ship in ships:
+		var ship_type: String = ship.get_ship_type()
+		if not ship_type.is_empty() and ship_type not in types:
+			types.append(ship_type)
+	
+	types.sort()
+	return types
+
+## Get available weapon categories for filtering UI
+func get_weapon_categories() -> Array[String]:
+	var categories: Array[String] = []
+	var weapons: Array[WeaponData] = get_weapons()
+	
+	for weapon in weapons:
+		var category: String = weapon.get_weapon_category()
+		if not category.is_empty() and category not in categories:
+			categories.append(category)
+	
+	categories.sort()
+	return categories
+
+## Get compatible weapons for a ship (for loadout editor)
+func get_compatible_weapons(ship_data: ShipData, slot_type: String) -> Array[WeaponData]:
+	var compatible: Array[WeaponData] = []
+	var weapons: Array[WeaponData] = get_weapons()
+	
+	for weapon in weapons:
+		if _is_weapon_compatible_with_ship(weapon, ship_data, slot_type):
+			compatible.append(weapon)
 	
 	return compatible
 
-func _is_weapon_compatible_with_ship(weapon_data: WeaponClassData, ship_data: ShipClassData) -> bool:
-	"""Check if a weapon is compatible with a ship."""
-	# Check ship type compatibility
-	if not weapon_data.is_compatible_with_ship(ship_data.get_ship_type()):
+## Check weapon-ship compatibility for loadout validation
+func _is_weapon_compatible_with_ship(weapon: WeaponData, ship: ShipData, slot_type: String) -> bool:
+	# Check if weapon type matches slot type
+	var weapon_type: String = weapon.get_weapon_type()
+	if slot_type == "primary" and weapon_type != "Primary":
 		return false
+	if slot_type == "secondary" and weapon_type != "Secondary":
+		return false
+	
+	# Check ship class restrictions
+	var ship_restrictions: Array = weapon.get_ship_class_restrictions()
+	if not ship_restrictions.is_empty():
+		var ship_class: String = ship.get_ship_class()
+		if ship_class not in ship_restrictions:
+			return false
 	
 	# Check faction restrictions
-	if not weapon_data.is_allowed_for_faction(ship_data.get_faction()):
-		return false
-	
-	# Check minimum ship class requirements
-	if not weapon_data.minimum_ship_class.is_empty():
-		# TODO: Implement ship class hierarchy checking
-		pass
+	var faction_restrictions: Array = weapon.get_faction_restrictions()
+	if not faction_restrictions.is_empty():
+		var ship_faction: String = ship.get_faction()
+		if ship_faction not in faction_restrictions:
+			return false
 	
 	return true
 
-# Registry statistics
+## Registry statistics for debugging and UI
 func get_registry_stats() -> Dictionary:
-	"""Get statistics about the registry contents."""
 	return {
-		"total_assets": asset_lookup.size(),
-		"ship_classes": ship_classes.size(),
-		"weapon_classes": weapon_classes.size(),
-		"ship_factions": ships_by_faction.size(),
-		"ship_types": ships_by_type.size(),
-		"weapon_types": weapons_by_type.size(),
-		"damage_types": weapons_by_damage_type.size(),
-		"last_update": last_update_time,
-		"is_initialized": is_initialized
+		"ships_count": get_ships().size(),
+		"weapons_count": get_weapons().size(),
+		"armor_count": get_armor_types().size(),
+		"cache_valid": _is_cache_valid(),
+		"cache_age_ms": Time.get_ticks_msec() - _cache_last_updated,
+		"total_assets": WCSAssetRegistry.get_total_asset_count()
 	}
 
-# Data persistence (for future implementation)
-func save_registry_to_file(file_path: String) -> bool:
-	"""Save registry data to file. TODO: Implement when needed."""
-	push_warning("Registry save functionality not yet implemented")
-	return false
-
-func load_registry_from_file(file_path: String) -> bool:
-	"""Load registry data from file. TODO: Implement when needed."""
-	push_warning("Registry load functionality not yet implemented")
-	return false
-
-# Bulk operations
-func clear_registry() -> void:
-	"""Clear all assets from the registry."""
-	_initialize_registry()
-	print("Asset registry cleared")
-
+## Get human-readable registry summary
 func get_registry_summary() -> String:
-	"""Get a human-readable summary of registry contents."""
 	var stats: Dictionary = get_registry_stats()
-	return "Asset Registry: %d ships, %d weapons (%d total assets)" % [
-		stats.ship_classes,
-		stats.weapon_classes, 
+	return "Asset Registry: %d ships, %d weapons, %d armor (%d total assets)" % [
+		stats.ships_count,
+		stats.weapons_count,
+		stats.armor_count,
 		stats.total_assets
 	]
+
+## ASSET COMPATIBILITY HELPERS
+## Helper methods to bridge differences between old and new asset systems
+
+## Get ship type string for ShipData compatibility  
+func get_ship_type_for_display(ship_data: ShipData) -> String:
+	# Map class_type index to string - simplified for now
+	match ship_data.class_type:
+		0: return "Fighter"
+		1: return "Bomber" 
+		2: return "Transport"
+		3: return "Freighter"
+		4: return "Cruiser"
+		5: return "Destroyer"
+		6: return "Carrier"
+		_: return "Unknown"
+
+## Get faction name for ShipData compatibility
+func get_ship_faction_for_display(ship_data: ShipData) -> String:
+	# Map species index to faction name - simplified for now
+	match ship_data.species:
+		0: return "Terran"
+		1: return "Kilrathi"
+		2: return "Shivan"
+		_: return "Unknown"
+
+## Get weapon type for WeaponData compatibility
+func get_weapon_type_for_display(weapon_data: WeaponData) -> String:
+	# Check subtype to determine if primary/secondary
+	if weapon_data.subtype < 10:  # Simplified mapping
+		return "Primary"
+	else:
+		return "Secondary"
+
+## Get damage type for WeaponData compatibility
+func get_weapon_damage_type_for_display(weapon_data: WeaponData) -> String:
+	# Simplified damage type mapping
+	if weapon_data.weapon_name.to_lower().contains("laser") or weapon_data.weapon_name.to_lower().contains("plasma"):
+		return "Energy"
+	elif weapon_data.weapon_name.to_lower().contains("missile") or weapon_data.weapon_name.to_lower().contains("torpedo"):
+		return "Missile"
+	else:
+		return "Kinetic"
+
+## DEPRECATED COMPATIBILITY METHODS
+## These exist for gradual migration from old GFRED2 code
+
+## Legacy ship class access
+func get_ship_classes() -> Array[ShipData]:
+	push_warning("get_ship_classes() is deprecated, use get_ships() instead")
+	return get_ships()
+
+## Legacy weapon class access
+func get_weapon_classes() -> Array[WeaponData]:
+	push_warning("get_weapon_classes() is deprecated, use get_weapons() instead")
+	return get_weapons()
+
+## Legacy asset lookup by name
+func get_ship_class(class_name: String) -> ShipData:
+	push_warning("get_ship_class() is deprecated, use search and get_asset() instead")
+	var results: Array[String] = search_assets(class_name, AssetTypes.Type.SHIP)
+	if not results.is_empty():
+		return get_asset(results[0]) as ShipData
+	return null
+
+## Legacy weapon lookup by name
+func get_weapon_class(weapon_name: String) -> WeaponData:
+	push_warning("get_weapon_class() is deprecated, use search and get_asset() instead")
+	var primary_results: Array[String] = search_assets(weapon_name, AssetTypes.Type.PRIMARY_WEAPON)
+	var secondary_results: Array[String] = search_assets(weapon_name, AssetTypes.Type.SECONDARY_WEAPON)
+	var all_results: Array[String] = primary_results + secondary_results
+	if not all_results.is_empty():
+		return get_asset(all_results[0]) as WeaponData
+	return null
