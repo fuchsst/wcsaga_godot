@@ -15,6 +15,7 @@ signal variable_changed(scope: VariableScope, name: String, old_value: SexpResul
 signal variable_added(scope: VariableScope, name: String, value: SexpResult)
 signal variable_removed(scope: VariableScope, name: String)
 signal scope_cleared(scope: VariableScope)
+signal cache_invalidation_required(dependency: String)
 
 enum VariableScope {
 	LOCAL = 0,    ## Mission-specific variables (cleared on mission end)
@@ -98,6 +99,9 @@ func set_variable(scope: VariableScope, name: String, value: SexpResult) -> bool
 	else:
 		variable_added.emit(scope, name, value)
 	
+	# Emit cache invalidation signal for SEXP expressions that depend on this variable
+	cache_invalidation_required.emit("var:" + name)
+	
 	# Auto-save if enabled
 	if _auto_save_enabled and scope != VariableScope.LOCAL:
 		_auto_save_scope(scope)
@@ -174,6 +178,9 @@ func remove_variable(scope: VariableScope, name: String) -> bool:
 	# Emit signal
 	variable_removed.emit(scope, name)
 	
+	# Emit cache invalidation signal for SEXP expressions that depend on this variable
+	cache_invalidation_required.emit("var:" + name)
+	
 	# Auto-save if enabled
 	if _auto_save_enabled and scope != VariableScope.LOCAL:
 		_auto_save_scope(scope)
@@ -194,6 +201,10 @@ func clear_scope(scope: VariableScope) -> void:
 			_variable_cache.erase(cache_key)
 	
 	scope_cleared.emit(scope)
+	
+	# Emit cache invalidation signals for all variables that were cleared
+	for name in variable_names:
+		cache_invalidation_required.emit("var:" + name)
 	
 	# Auto-save if enabled
 	if _auto_save_enabled and scope != VariableScope.LOCAL:

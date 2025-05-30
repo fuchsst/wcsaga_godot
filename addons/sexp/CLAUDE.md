@@ -157,6 +157,7 @@ print("Else clause: ", expr.arguments[2].literal_value)  # "dead"
 - **Parsing**: Expression tree building, nested structures, validation, error handling
 - **Integration**: Manager functionality, signal emission, system initialization
 - **Compatibility**: WCS SEXP syntax patterns, typical mission script formats
+- **Test Framework**: Implement unit test using gdUnit4 `GdUnitTestSuite`
 - **Run tests**: Use `addons\gdUnit4\runtest.sh` to run gdUnit4 tests
 
 ### Performance Test Requirements
