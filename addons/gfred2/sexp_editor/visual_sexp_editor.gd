@@ -1,12 +1,17 @@
 class_name VisualSexpEditor
 extends Control
 
-## Main visual SEXP editor interface for the FRED2 mission editor.
-## Provides a node-based interface for creating and editing SEXP expressions.
+## Visual SEXP editor for FRED2 mission editor using EPIC-004 SEXP system.
+## Provides node-based visual editing with validation, debugging, and function discovery.
 
 signal expression_changed(sexp_code: String)
 signal expression_validated(is_valid: bool, errors: Array[String])
 signal editor_ready()
+
+# EPIC-004 core system integration
+var sexp_manager: SexpManager
+var function_registry: SexpFunctionRegistry
+var validator: SexpValidator
 
 @export var show_toolbar: bool = true
 @export var show_minimap: bool = true
@@ -32,9 +37,38 @@ var validation_errors: Array[String] = []
 
 func _ready() -> void:
 	name = "VisualSexpEditor"
+	
+	print("VisualSexpEditor: Initializing with EPIC-004 SEXP system...")
+	
+	# Initialize EPIC-004 core systems
+	_initialize_sexp_systems()
+	
+	# Setup UI
 	_setup_ui()
+	
+	# Connect signals
 	_connect_signals()
+	
+	print("VisualSexpEditor: Ready with EPIC-004 integration")
 	editor_ready.emit()
+
+## Initialize EPIC-004 SEXP system components
+func _initialize_sexp_systems() -> void:
+	"""Initialize connections to EPIC-004 SEXP system"""
+	# Get core SEXP systems
+	sexp_manager = SexpManager
+	function_registry = SexpFunctionRegistry.new()
+	validator = SexpValidator.new()
+	
+	# Configure validator for mission editor use
+	validator.validation_level = SexpValidator.ValidationLevel.COMPREHENSIVE
+	validator.enable_fix_suggestions = true
+	
+	# Wait for system to be ready
+	if not sexp_manager.is_ready():
+		await sexp_manager.sexp_system_ready
+	
+	print("VisualSexpEditor: EPIC-004 systems initialized")
 
 func _setup_ui() -> void:
 	"""Setup the main UI layout."""
@@ -150,14 +184,49 @@ func _setup_sidebar() -> void:
 	sidebar.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	editor_container.add_child(sidebar)
 	
-	# Operator palette
-	_setup_operator_palette()
+	# Enhanced sidebar with EPIC-004 integration
+	_setup_enhanced_sidebar()
+
+func _setup_enhanced_sidebar() -> void:
+	"""Setup enhanced sidebar with integrated EPIC-004 tools"""
+	# Add tabbed interface for advanced tools
+	var sidebar_tabs: TabContainer = TabContainer.new()
+	sidebar_tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	sidebar.add_child(sidebar_tabs)
 	
-	# Validation panel
-	_setup_validation_panel()
+	# Function Palette tab
+	var function_palette_script = preload("res://addons/gfred2/ui/sexp_tools/function_palette.gd")
+	var function_palette = function_palette_script.new()
+	function_palette.name = "Functions"
+	sidebar_tabs.add_child(function_palette)
 	
-	# Expression output
-	_setup_expression_output()
+	# Debug Panel tab
+	var debug_panel_script = preload("res://addons/gfred2/ui/sexp_tools/sexp_debug_panel.gd")
+	var debug_panel = debug_panel_script.new()
+	debug_panel.name = "Debug"
+	sidebar_tabs.add_child(debug_panel)
+	
+	# Variable Manager tab
+	var variable_manager_script = preload("res://addons/gfred2/ui/sexp_tools/variable_manager.gd")
+	var variable_manager = variable_manager_script.new()
+	variable_manager.name = "Variables"
+	sidebar_tabs.add_child(variable_manager)
+	
+	# Connect function palette to graph
+	function_palette.function_inserted.connect(_on_function_inserted)
+	function_palette.function_selected.connect(_on_function_selected)
+	
+	# Connect debug panel
+	debug_panel.validation_completed.connect(_on_debug_validation_completed)
+	debug_panel.fix_suggestion_applied.connect(_on_fix_suggestion_applied)
+	
+	# Connect variable manager
+	variable_manager.variable_selected.connect(_on_variable_selected)
+	
+	# Store references for later use
+	set_meta("function_palette", function_palette)
+	set_meta("debug_panel", debug_panel)
+	set_meta("variable_manager", variable_manager)
 
 func _setup_operator_palette() -> void:
 	"""Setup the operator palette for easy node creation."""
@@ -182,36 +251,42 @@ func _setup_operator_palette() -> void:
 	var operators_container: VBoxContainer = VBoxContainer.new()
 	scroll_container.add_child(operators_container)
 	
-	# Arithmetic section
-	_add_operator_section(operators_container, "Arithmetic", [
-		{"name": "Add (+)", "type": "add"},
-		{"name": "Subtract (-)", "type": "subtract"},
-		{"name": "Multiply (*)", "type": "multiply"},
-		{"name": "Divide (/)", "type": "divide"},
-		{"name": "Modulo (mod)", "type": "modulo"}
-	])
+	# Populate from EPIC-004 function registry
+	_populate_functions_from_registry(operators_container)
+
+## Populate functions from EPIC-004 function registry
+func _populate_functions_from_registry(container: VBoxContainer) -> void:
+	"""Populate function palette using EPIC-004 function registry"""
+	if not function_registry:
+		return
 	
-	# Logic section
-	_add_operator_section(operators_container, "Logic", [
-		{"name": "And", "type": "and"},
-		{"name": "Or", "type": "or"},
-		{"name": "Not", "type": "not"}
-	])
+	# Get all function categories from EPIC-004
+	var categories: Dictionary = function_registry.function_categories
 	
-	# Comparison section
-	_add_operator_section(operators_container, "Comparison", [
-		{"name": "Equals (=)", "type": "equals"},
-		{"name": "Less Than (<)", "type": "less_than"},
-		{"name": "Greater Than (>)", "type": "greater_than"}
-	])
+	for category in categories.keys():
+		var functions: Array = categories[category]
+		var operators: Array[Dictionary] = []
+		
+		for function_name in functions.slice(0, 10):  # Limit to first 10 per category for UI
+			operators.append({"name": function_name, "type": function_name})
+		
+		if operators.size() > 0:
+			_add_operator_section(container, category.capitalize(), operators)
+
+## Validate expression with EPIC-004 system
+func _validate_with_epic004(expression: String) -> void:
+	"""Validate expression using EPIC-004 validator"""
+	var is_valid: bool = sexp_manager.validate_syntax(expression)
+	var errors: Array[String] = []
 	
-	# Constants section
-	_add_operator_section(operators_container, "Constants", [
-		{"name": "True", "type": "true"},
-		{"name": "False", "type": "false"},
-		{"name": "Number", "type": "number"},
-		{"name": "String", "type": "string"}
-	])
+	if not is_valid:
+		errors = sexp_manager.get_validation_errors(expression)
+	
+	is_valid_expression = is_valid
+	validation_errors = errors
+	
+	_update_validation_display()
+	expression_validated.emit(is_valid, errors)
 
 func _add_operator_section(container: VBoxContainer, section_name: String, operators: Array[Dictionary]) -> void:
 	"""Add a section of operators to the palette."""
@@ -302,9 +377,13 @@ func _connect_signals() -> void:
 
 func set_expression(sexp_code: String) -> void:
 	"""Set the editor to display a specific SEXP expression."""
-	# TODO: Parse SEXP code and create visual representation
 	current_expression = sexp_code
-	expression_output.text = sexp_code
+	if expression_output:
+		expression_output.text = sexp_code
+	
+	# Validate with EPIC-004 system
+	if not sexp_code.is_empty():
+		_validate_with_epic004(sexp_code)
 
 func get_expression() -> String:
 	"""Get the current SEXP expression as code."""
@@ -316,11 +395,17 @@ func clear_expression() -> void:
 		sexp_graph.clear_graph()
 
 func validate_expression() -> Dictionary:
-	"""Validate the current expression."""
-	if sexp_graph:
-		return sexp_graph.validate_expression()
-	else:
+	"""Validate the current expression using EPIC-004 validator."""
+	if current_expression.is_empty():
 		return {"is_valid": true, "errors": []}
+	
+	var is_valid: bool = sexp_manager.validate_syntax(current_expression)
+	var errors: Array[String] = []
+	
+	if not is_valid:
+		errors = sexp_manager.get_validation_errors(current_expression)
+	
+	return {"is_valid": is_valid, "errors": errors}
 
 # UI Event Handlers
 func _on_clear_button_pressed() -> void:
@@ -409,3 +494,141 @@ func apply_editor_config(config: Dictionary) -> void:
 	
 	if config.has("minimap_enabled"):
 		sexp_graph.minimap_enabled = config.minimap_enabled
+
+## COMPATIBILITY API
+## These methods provide compatibility for existing GFRED2 code
+
+## Set SEXP expression (compatibility method)
+func set_sexp_expression(expression: String) -> void:
+	"""Set SEXP expression using EPIC-004 system"""
+	set_expression(expression)
+
+## Get current SEXP expression (compatibility method)  
+func get_sexp_expression() -> String:
+	"""Get current SEXP expression"""
+	return get_expression()
+
+## Validate current expression (compatibility method)
+func validate_current_expression() -> bool:
+	"""Validate current expression using EPIC-004 validator"""
+	var validation: Dictionary = validate_expression()
+	return validation.is_valid
+
+## Clear editor content (compatibility method)
+func clear_editor() -> void:
+	"""Clear editor content"""
+	clear_expression()
+	current_expression = ""
+
+## Get editor status for debugging
+func get_editor_status() -> Dictionary:
+	"""Get comprehensive editor status"""
+	var status: Dictionary = {
+		"epic004_integration": "required",
+		"current_expression": current_expression,
+		"is_valid_expression": is_valid_expression,
+		"validation_errors_count": validation_errors.size(),
+		"show_toolbar": show_toolbar,
+		"show_minimap": show_minimap,
+		"show_validation_panel": show_validation_panel,
+		"sexp_manager_ready": sexp_manager != null and sexp_manager.is_ready(),
+		"function_registry_ready": function_registry != null,
+		"validator_ready": validator != null
+	}
+	
+	return status
+
+## Check if editor is using SEXP addon system
+func is_using_sexp_addon() -> bool:
+	"""Check if editor is using SEXP addon system"""
+	return sexp_manager != null and function_registry != null and validator != null
+
+# Enhanced SEXP addon integration signal handlers
+func _on_function_inserted(function_name: String, insert_position: Vector2) -> void:
+	"""Handle function insertion from function palette"""
+	if sexp_graph:
+		sexp_graph.add_operator_node(function_name, insert_position)
+		print("VisualSexpEditor: Inserted function '%s' at %s" % [function_name, insert_position])
+
+func _on_function_selected(function_name: String, function_metadata: Dictionary) -> void:
+	"""Handle function selection from function palette"""
+	print("VisualSexpEditor: Function selected: %s" % function_name)
+	# Could show function help or highlight related nodes
+
+func _on_debug_validation_completed(is_valid: bool, errors: Array[String]) -> void:
+	"""Handle validation completion from debug panel"""
+	is_valid_expression = is_valid
+	validation_errors = errors
+	_update_validation_display()
+	expression_validated.emit(is_valid, errors)
+
+func _on_fix_suggestion_applied(original_expression: String, fixed_expression: String) -> void:
+	"""Handle fix suggestion application from debug panel"""
+	set_expression(fixed_expression)
+	print("VisualSexpEditor: Applied fix suggestion: %s → %s" % [original_expression, fixed_expression])
+
+func _on_variable_selected(var_name: String, var_data: Dictionary) -> void:
+	"""Handle variable selection from variable manager"""
+	print("VisualSexpEditor: Variable selected: %s (%s)" % [var_name, var_data.get("type", "unknown")])
+	# Could insert variable reference node or show variable info
+
+## Enhanced expression validation with SEXP addon debug integration
+func validate_expression_comprehensive() -> Dictionary:
+	"""Comprehensive validation using SEXP addon debug framework"""
+	if current_expression.is_empty():
+		return {"is_valid": true, "errors": [], "warnings": [], "suggestions": []}
+	
+	var debug_panel = get_meta("debug_panel", null)
+	if debug_panel and debug_panel.has_method("set_expression"):
+		debug_panel.set_expression(current_expression)
+		
+		# Get comprehensive validation result
+		var validation_result: Dictionary = validate_expression()
+		
+		# Add debug information if available
+		if debug_panel.has_method("get_debug_status"):
+			var debug_status: Dictionary = debug_panel.get_debug_status()
+			validation_result["debug_info"] = debug_status
+		
+		return validation_result
+	
+	# Fallback to basic validation
+	return validate_expression()
+
+## Get comprehensive editor statistics including SEXP addon integration
+func get_comprehensive_editor_status() -> Dictionary:
+	"""Get detailed editor status including all integrated components"""
+	var status: Dictionary = get_editor_status()
+	
+	# Add SEXP addon integration status
+	status["sexp_addon_integration"] = is_using_sexp_addon()
+	
+	# Add function palette statistics
+	var function_palette = get_meta("function_palette", null)
+	if function_palette and function_palette.has_method("get_palette_statistics"):
+		status["function_palette"] = function_palette.get_palette_statistics()
+	
+	# Add debug panel statistics
+	var debug_panel = get_meta("debug_panel", null)
+	if debug_panel and debug_panel.has_method("get_debug_status"):
+		status["debug_panel"] = debug_panel.get_debug_status()
+	
+	# Add variable manager statistics
+	var variable_manager = get_meta("variable_manager", null)
+	if variable_manager and variable_manager.has_method("get_manager_statistics"):
+		status["variable_manager"] = variable_manager.get_manager_statistics()
+	
+	return status
+
+## Public API for accessing integrated components
+func get_function_palette():
+	"""Get the integrated function palette component"""
+	return get_meta("function_palette", null)
+
+func get_debug_panel():
+	"""Get the integrated debug panel component"""
+	return get_meta("debug_panel", null)
+
+func get_variable_manager():
+	"""Get the integrated variable manager component"""
+	return get_meta("variable_manager", null)
