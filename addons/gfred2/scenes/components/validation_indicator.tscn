@@ -1,0 +1,17 @@
+[gd_scene load_steps=2 format=3 uid="uid://bxl78mn4uvbaj"]
+
+[ext_resource type="Script" path="res://addons/gfred2/validation/validation_indicator.gd" id="1_h2rkf"]
+
+[node name="ValidationIndicator" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 16.0
+offset_bottom = 16.0
+focus_mode = 2
+script = ExtResource("1_h2rkf")
+indicator_size = Vector2(16, 16)
+show_text_label = false
+show_tooltip = true
+animate_transitions = true
+high_contrast_mode = false
+screen_reader_enabled = true

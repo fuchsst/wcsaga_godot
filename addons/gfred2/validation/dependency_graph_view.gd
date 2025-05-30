@@ -1,14 +1,24 @@
 @tool
 class_name DependencyGraphView
-extends GraphEdit
+extends Control
 
 ## Dependency graph visualization for GFRED2 mission editor
+## Scene: addons/gfred2/scenes/components/dependency_graph_view.tscn
 ## Displays mission object dependencies and asset relationships with interactive graph
 ## Integrates with MissionValidationController for real-time dependency tracking
 
 signal node_selected(node_id: String, dependency_info: MissionValidationController.DependencyInfo)
 signal dependency_highlighted(from_id: String, to_id: String)
 signal graph_layout_changed()
+
+## Scene node references (from scene)
+@onready var refresh_button: Button = $VBoxContainer/ToolbarPanel/RefreshButton
+@onready var layout_button: OptionButton = $VBoxContainer/ToolbarPanel/LayoutButton
+@onready var filter_edit: LineEdit = $VBoxContainer/ToolbarPanel/FilterContainer/FilterLineEdit
+@onready var errors_only_check: CheckBox = $VBoxContainer/ToolbarPanel/ShowErrorsOnly
+@onready var graph_canvas: Control = $VBoxContainer/GraphContainer/GraphViewport/GraphCanvas
+@onready var status_label: Label = $VBoxContainer/StatusBar/StatusLabel
+@onready var count_label: Label = $VBoxContainer/StatusBar/DependencyCount
 
 ## Graph configuration
 @export var auto_layout: bool = true
@@ -149,11 +159,6 @@ class GraphLayoutAlgorithm:
 func _ready() -> void:
 	name = "DependencyGraphView"
 	
-	# Configure GraphEdit
-	right_disconnects = false
-	connection_lines_antialiased = true
-	connection_lines_thickness = 2.0
-	
 	# Initialize layout algorithm
 	layout_algorithm = GraphLayoutAlgorithm.new(self)
 	
@@ -162,10 +167,19 @@ func _ready() -> void:
 		layout_tween = Tween.new()
 		add_child(layout_tween)
 	
-	# Connect signals
-	connection_request.connect(_on_connection_request)
-	disconnection_request.connect(_on_disconnection_request)
-	node_selected.connect(_on_graph_node_selected)
+	# Connect UI signals
+	refresh_button.pressed.connect(_on_refresh_pressed)
+	layout_button.item_selected.connect(_on_layout_changed)
+	filter_edit.text_changed.connect(_on_filter_changed)
+	errors_only_check.toggled.connect(_on_errors_only_toggled)
+	
+	# Setup layout options
+	layout_button.add_item("Tree Layout")
+	layout_button.add_item("Force-Directed")
+	layout_button.add_item("Circular")
+	
+	# Initialize status
+	_update_status_display()
 
 func set_dependency_graph(graph: MissionValidationController.DependencyGraph, mission: MissionData) -> void:
 	"""Set dependency graph data and rebuild visualization.
@@ -691,3 +705,41 @@ func get_connection_count() -> int:
 		Number of connections in the graph"""
 	
 	return connection_registry.size()
+
+func _update_status_display() -> void:
+	"""Update status bar display."""
+	
+	if not dependency_graph:
+		status_label.text = "No dependencies"
+		count_label.text = "0 items"
+		return
+	
+	var node_count: int = dependency_graph.nodes.size()
+	var edge_count: int = 0
+	for edges in dependency_graph.edges.values():
+		edge_count += edges.size()
+	
+	status_label.text = "Dependency graph loaded"
+	count_label.text = "%d nodes, %d connections" % [node_count, edge_count]
+
+## Signal handlers
+
+func _on_refresh_pressed() -> void:
+	"""Handle refresh button press."""
+	refresh_graph()
+
+func _on_layout_changed(index: int) -> void:
+	"""Handle layout algorithm selection change."""
+	if auto_layout:
+		_apply_automatic_layout()
+	graph_layout_changed.emit()
+
+func _on_filter_changed(text: String) -> void:
+	"""Handle filter text change."""
+	# TODO: Implement filtering
+	refresh_graph()
+
+func _on_errors_only_toggled(pressed: bool) -> void:
+	"""Handle errors-only filter toggle."""
+	# TODO: Implement error filtering
+	refresh_graph()

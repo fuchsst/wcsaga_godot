@@ -1,0 +1,123 @@
+[gd_scene load_steps=3 format=3 uid="uid://bwy2g1n2mw72f"]
+
+[ext_resource type="PackedScene" uid="uid://bxl78mn4uvbaj" path="res://addons/gfred2/scenes/components/validation_indicator.tscn" id="1_4q5e7"]
+[ext_resource type="Script" path="res://addons/gfred2/validation/real_time_validation_integration.gd" id="2_x7k3p"]
+
+[node name="RealTimeValidationPanel" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("2_x7k3p")
+
+[node name="ValidationStatusHeader" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="StatusLabel" type="Label" parent="ValidationStatusHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Mission Validation Status"
+add_theme_font_size_override("font_size", 14)
+
+[node name="MissionValidationIndicator" parent="ValidationStatusHeader" instance=ExtResource("1_4q5e7")]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="RefreshButton" type="Button" parent="ValidationStatusHeader"]
+layout_mode = 2
+text = "Validate Now"
+
+[node name="HSeparator" type="HSeparator" parent="."]
+layout_mode = 2
+
+[node name="StatisticsContainer" type="GridContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 0
+columns = 2
+
+[node name="ErrorCountLabel" type="Label" parent="StatisticsContainer"]
+layout_mode = 2
+text = "Errors:"
+
+[node name="ErrorCountValue" type="Label" parent="StatisticsContainer"]
+layout_mode = 2
+text = "0"
+add_theme_color_override("font_color", Color(0.9, 0.2, 0.2, 1))
+
+[node name="WarningCountLabel" type="Label" parent="StatisticsContainer"]
+layout_mode = 2
+text = "Warnings:"
+
+[node name="WarningCountValue" type="Label" parent="StatisticsContainer"]
+layout_mode = 2
+text = "0"
+add_theme_color_override("font_color", Color(1, 0.8, 0, 1))
+
+[node name="ValidationTimeLabel" type="Label" parent="StatisticsContainer"]
+layout_mode = 2
+text = "Validation Time:"
+
+[node name="ValidationTimeValue" type="Label" parent="StatisticsContainer"]
+layout_mode = 2
+text = "0ms"
+
+[node name="DependencyCountLabel" type="Label" parent="StatisticsContainer"]
+layout_mode = 2
+text = "Dependencies:"
+
+[node name="DependencyCountValue" type="Label" parent="StatisticsContainer"]
+layout_mode = 2
+text = "0"
+
+[node name="HSeparator2" type="HSeparator" parent="."]
+layout_mode = 2
+
+[node name="PerformanceContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="PerformanceLabel" type="Label" parent="PerformanceContainer"]
+layout_mode = 2
+text = "Performance Monitoring"
+add_theme_font_size_override("font_size", 12)
+
+[node name="PerformanceGrid" type="GridContainer" parent="PerformanceContainer"]
+layout_mode = 2
+columns = 2
+
+[node name="PerformanceStatusLabel" type="Label" parent="PerformanceContainer/PerformanceGrid"]
+layout_mode = 2
+text = "Status:"
+
+[node name="PerformanceStatusValue" type="Label" parent="PerformanceContainer/PerformanceGrid"]
+layout_mode = 2
+text = "Good"
+add_theme_color_override("font_color", Color(0.2, 0.8, 0.2, 1))
+
+[node name="ThresholdLabel" type="Label" parent="PerformanceContainer/PerformanceGrid"]
+layout_mode = 2
+text = "Threshold:"
+
+[node name="ThresholdValue" type="Label" parent="PerformanceContainer/PerformanceGrid"]
+layout_mode = 2
+text = "100ms"
+
+[node name="HSeparator3" type="HSeparator" parent="."]
+layout_mode = 2
+
+[node name="ControlsContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="EnableRealTimeCheck" type="CheckBox" parent="ControlsContainer"]
+layout_mode = 2
+button_pressed = true
+text = "Real-time Validation"
+
+[node name="ShowDependenciesButton" type="Button" parent="ControlsContainer"]
+layout_mode = 2
+text = "Show Dependencies"
+
+[node name="ExportReportButton" type="Button" parent="ControlsContainer"]
+layout_mode = 2
+text = "Export Report"
