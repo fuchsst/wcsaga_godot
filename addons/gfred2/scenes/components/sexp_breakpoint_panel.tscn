@@ -1,0 +1,86 @@
+[gd_scene load_steps=2 format=3 uid="uid://dgvh3k8qxm5ij"]
+
+[ext_resource type="Script" path="res://addons/gfred2/debug/sexp_breakpoint_manager.gd" id="1_h5rkf"]
+
+[node name="SexpBreakpointPanel" type="VBoxContainer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_h5rkf")
+
+[node name="BreakpointHeader" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="BreakpointLabel" type="Label" parent="BreakpointHeader"]
+layout_mode = 2
+text = "SEXP Breakpoints"
+theme_type_variation = &"HeaderLarge"
+
+[node name="VSeparator" type="VSeparator" parent="BreakpointHeader"]
+layout_mode = 2
+
+[node name="AddBreakpointButton" type="Button" parent="BreakpointHeader"]
+layout_mode = 2
+text = "Add"
+tooltip_text = "Add new breakpoint"
+
+[node name="RemoveBreakpointButton" type="Button" parent="BreakpointHeader"]
+layout_mode = 2
+text = "Remove"
+tooltip_text = "Remove selected breakpoint"
+
+[node name="ClearAllButton" type="Button" parent="BreakpointHeader"]
+layout_mode = 2
+text = "Clear All"
+tooltip_text = "Clear all breakpoints"
+
+[node name="BreakpointList" type="ItemList" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+auto_height = true
+same_column_width = true
+
+[node name="BreakpointDetails" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="DetailsHeader" type="Label" parent="BreakpointDetails"]
+layout_mode = 2
+text = "Breakpoint Details"
+theme_type_variation = &"HeaderMedium"
+
+[node name="DetailsContainer" type="GridContainer" parent="BreakpointDetails"]
+layout_mode = 2
+columns = 2
+
+[node name="ExpressionLabel" type="Label" parent="BreakpointDetails/DetailsContainer"]
+layout_mode = 2
+text = "Expression:"
+
+[node name="ExpressionValue" type="Label" parent="BreakpointDetails/DetailsContainer"]
+layout_mode = 2
+text = "None selected"
+autowrap_mode = 3
+
+[node name="TypeLabel" type="Label" parent="BreakpointDetails/DetailsContainer"]
+layout_mode = 2
+text = "Type:"
+
+[node name="TypeValue" type="Label" parent="BreakpointDetails/DetailsContainer"]
+layout_mode = 2
+text = "-"
+
+[node name="HitCountLabel" type="Label" parent="BreakpointDetails/DetailsContainer"]
+layout_mode = 2
+text = "Hit Count:"
+
+[node name="HitCountValue" type="Label" parent="BreakpointDetails/DetailsContainer"]
+layout_mode = 2
+text = "0"
+
+[node name="EnabledLabel" type="Label" parent="BreakpointDetails/DetailsContainer"]
+layout_mode = 2
+text = "Enabled:"
+
+[node name="EnabledCheckBox" type="CheckBox" parent="BreakpointDetails/DetailsContainer"]
+layout_mode = 2

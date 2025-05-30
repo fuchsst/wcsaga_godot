@@ -1,0 +1,181 @@
+[gd_scene load_steps=7 format=3 uid="uid://dy9k7nx4qr6mj"]
+
+[ext_resource type="Script" path="res://addons/gfred2/debug/sexp_advanced_debug_integration.gd" id="1_q0rkf"]
+[ext_resource type="PackedScene" uid="uid://dgvh3k8qxm5ij" path="res://addons/gfred2/scenes/components/sexp_breakpoint_panel.tscn" id="2_breakpoint"]
+[ext_resource type="PackedScene" uid="uid://c8kf5m7nxqr2d" path="res://addons/gfred2/scenes/components/sexp_variable_watch_panel.tscn" id="3_watch"]
+[ext_resource type="PackedScene" uid="uid://byk4h7nx5q8md" path="res://addons/gfred2/scenes/components/sexp_debug_controls_panel.tscn" id="4_controls"]
+[ext_resource type="PackedScene" uid="uid://ba7k4nx9qr5mj" path="res://addons/gfred2/scenes/components/sexp_expression_preview_panel.tscn" id="5_preview"]
+[ext_resource type="PackedScene" uid="uid://cz8k5nx7qr9md" path="res://addons/gfred2/scenes/components/sexp_debug_console_panel.tscn" id="6_console"]
+
+[node name="SexpDebugIntegrationPanel" type="VBoxContainer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_q0rkf")
+
+[node name="DebugHeader" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="IntegrationLabel" type="Label" parent="DebugHeader"]
+layout_mode = 2
+text = "Advanced SEXP Debugging"
+theme_type_variation = &"HeaderLarge"
+
+[node name="VSeparator" type="VSeparator" parent="DebugHeader"]
+layout_mode = 2
+
+[node name="SessionLabel" type="Label" parent="DebugHeader"]
+layout_mode = 2
+text = "Session: None"
+theme_type_variation = &"HeaderMedium"
+
+[node name="VSeparator2" type="VSeparator" parent="DebugHeader"]
+layout_mode = 2
+
+[node name="SaveConfigButton" type="Button" parent="DebugHeader"]
+layout_mode = 2
+text = "Save Config"
+tooltip_text = "Save debug configuration"
+
+[node name="LoadConfigButton" type="Button" parent="DebugHeader"]
+layout_mode = 2
+text = "Load Config"
+tooltip_text = "Load debug configuration"
+
+[node name="NewSessionButton" type="Button" parent="DebugHeader"]
+layout_mode = 2
+text = "New Session"
+tooltip_text = "Start new debug session"
+
+[node name="DebugTabs" type="TabContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Debug Controls" type="Control" parent="DebugTabs"]
+layout_mode = 2
+
+[node name="DebugControlsContainer" parent="DebugTabs/Debug Controls" instance=ExtResource("4_controls")]
+layout_mode = 1
+
+[node name="Breakpoints" type="Control" parent="DebugTabs"]
+layout_mode = 2
+
+[node name="BreakpointsContainer" parent="DebugTabs/Breakpoints" instance=ExtResource("2_breakpoint")]
+layout_mode = 1
+
+[node name="Variable Watch" type="Control" parent="DebugTabs"]
+layout_mode = 2
+
+[node name="VariableWatchContainer" parent="DebugTabs/Variable Watch" instance=ExtResource("3_watch")]
+layout_mode = 1
+
+[node name="Expression Preview" type="Control" parent="DebugTabs"]
+layout_mode = 2
+
+[node name="ExpressionPreviewContainer" parent="DebugTabs/Expression Preview" instance=ExtResource("5_preview")]
+layout_mode = 1
+
+[node name="Debug Console" type="Control" parent="DebugTabs"]
+layout_mode = 2
+
+[node name="DebugConsoleContainer" parent="DebugTabs/Debug Console" instance=ExtResource("6_console")]
+layout_mode = 1
+
+[node name="Performance Profiler" type="Control" parent="DebugTabs"]
+layout_mode = 2
+
+[node name="PerformanceProfilerContainer" type="VBoxContainer" parent="DebugTabs/Performance Profiler"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="ProfilerHeader" type="HBoxContainer" parent="DebugTabs/Performance Profiler/PerformanceProfilerContainer"]
+layout_mode = 2
+
+[node name="ProfilerLabel" type="Label" parent="DebugTabs/Performance Profiler/PerformanceProfilerContainer/ProfilerHeader"]
+layout_mode = 2
+text = "SEXP Performance Profiler"
+theme_type_variation = &"HeaderLarge"
+
+[node name="VSeparator" type="VSeparator" parent="DebugTabs/Performance Profiler/PerformanceProfilerContainer/ProfilerHeader"]
+layout_mode = 2
+
+[node name="StartProfilingButton" type="Button" parent="DebugTabs/Performance Profiler/PerformanceProfilerContainer/ProfilerHeader"]
+layout_mode = 2
+text = "Start Profiling"
+tooltip_text = "Start performance profiling"
+
+[node name="StopProfilingButton" type="Button" parent="DebugTabs/Performance Profiler/PerformanceProfilerContainer/ProfilerHeader"]
+layout_mode = 2
+text = "Stop Profiling"
+tooltip_text = "Stop performance profiling"
+disabled = true
+
+[node name="ClearProfileButton" type="Button" parent="DebugTabs/Performance Profiler/PerformanceProfilerContainer/ProfilerHeader"]
+layout_mode = 2
+text = "Clear"
+tooltip_text = "Clear profiling data"
+
+[node name="ProfilerData" type="HSplitContainer" parent="DebugTabs/Performance Profiler/PerformanceProfilerContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ProfileTree" type="Tree" parent="DebugTabs/Performance Profiler/PerformanceProfilerContainer/ProfilerData"]
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 4
+column_titles_visible = true
+hide_root = true
+
+[node name="ProfileDetails" type="VBoxContainer" parent="DebugTabs/Performance Profiler/PerformanceProfilerContainer/ProfilerData"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DetailsHeader" type="Label" parent="DebugTabs/Performance Profiler/PerformanceProfilerContainer/ProfilerData/ProfileDetails"]
+layout_mode = 2
+text = "Performance Details"
+theme_type_variation = &"HeaderMedium"
+
+[node name="DetailsText" type="TextEdit" parent="DebugTabs/Performance Profiler/PerformanceProfilerContainer/ProfilerData/ProfileDetails"]
+layout_mode = 2
+size_flags_vertical = 3
+placeholder_text = "Select an expression to see performance details..."
+editable = false
+wrap_mode = 1
+
+[node name="OptimizationHints" type="VBoxContainer" parent="DebugTabs/Performance Profiler/PerformanceProfilerContainer/ProfilerData/ProfileDetails"]
+layout_mode = 2
+
+[node name="HintsHeader" type="Label" parent="DebugTabs/Performance Profiler/PerformanceProfilerContainer/ProfilerData/ProfileDetails/OptimizationHints"]
+layout_mode = 2
+text = "Optimization Hints"
+theme_type_variation = &"HeaderMedium"
+
+[node name="HintsList" type="ItemList" parent="DebugTabs/Performance Profiler/PerformanceProfilerContainer/ProfilerData/ProfileDetails/OptimizationHints"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="DebugFooter" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="StatusLabel" type="Label" parent="DebugFooter"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Ready for debugging"
+
+[node name="VSeparator3" type="VSeparator" parent="DebugFooter"]
+layout_mode = 2
+
+[node name="PerformanceLabel" type="Label" parent="DebugFooter"]
+layout_mode = 2
+text = "Performance: Good"
+
+[node name="VSeparator4" type="VSeparator" parent="DebugFooter"]
+layout_mode = 2
+
+[node name="MissionTestButton" type="Button" parent="DebugFooter"]
+layout_mode = 2
+text = "Mission Test"
+tooltip_text = "Start mission testing with live debugging"

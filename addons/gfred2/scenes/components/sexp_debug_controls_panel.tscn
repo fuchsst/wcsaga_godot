@@ -1,0 +1,171 @@
+[gd_scene load_steps=2 format=3 uid="uid://byk4h7nx5q8md"]
+
+[ext_resource type="Script" path="res://addons/gfred2/debug/sexp_debug_controller.gd" id="1_m7rkf"]
+
+[node name="SexpDebugControlsPanel" type="VBoxContainer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_m7rkf")
+
+[node name="DebugHeader" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="DebugLabel" type="Label" parent="DebugHeader"]
+layout_mode = 2
+text = "SEXP Debug Controls"
+theme_type_variation = &"HeaderLarge"
+
+[node name="VSeparator" type="VSeparator" parent="DebugHeader"]
+layout_mode = 2
+
+[node name="DebugStatus" type="Label" parent="DebugHeader"]
+layout_mode = 2
+text = "Ready"
+theme_type_variation = &"HeaderMedium"
+
+[node name="DebugControls" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="StartDebugButton" type="Button" parent="DebugControls"]
+layout_mode = 2
+text = "Start Debug"
+tooltip_text = "Start debug session"
+
+[node name="StopDebugButton" type="Button" parent="DebugControls"]
+layout_mode = 2
+text = "Stop Debug"
+tooltip_text = "Stop debug session"
+disabled = true
+
+[node name="VSeparator" type="VSeparator" parent="DebugControls"]
+layout_mode = 2
+
+[node name="StepIntoButton" type="Button" parent="DebugControls"]
+layout_mode = 2
+text = "Step Into"
+tooltip_text = "Step into function calls"
+disabled = true
+
+[node name="StepOverButton" type="Button" parent="DebugControls"]
+layout_mode = 2
+text = "Step Over"
+tooltip_text = "Step over function calls"
+disabled = true
+
+[node name="StepOutButton" type="Button" parent="DebugControls"]
+layout_mode = 2
+text = "Step Out"
+tooltip_text = "Step out of current function"
+disabled = true
+
+[node name="ContinueButton" type="Button" parent="DebugControls"]
+layout_mode = 2
+text = "Continue"
+tooltip_text = "Continue execution"
+disabled = true
+
+[node name="VSeparator2" type="VSeparator" parent="DebugControls"]
+layout_mode = 2
+
+[node name="PauseButton" type="Button" parent="DebugControls"]
+layout_mode = 2
+text = "Pause"
+tooltip_text = "Pause execution"
+disabled = true
+
+[node name="ExecutionFlow" type="HSplitContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CallStack" type="VBoxContainer" parent="ExecutionFlow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CallStackHeader" type="Label" parent="ExecutionFlow/CallStack"]
+layout_mode = 2
+text = "Call Stack"
+theme_type_variation = &"HeaderMedium"
+
+[node name="CallStackList" type="ItemList" parent="ExecutionFlow/CallStack"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ExecutionState" type="VBoxContainer" parent="ExecutionFlow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ExecutionHeader" type="Label" parent="ExecutionFlow/ExecutionState"]
+layout_mode = 2
+text = "Current Expression"
+theme_type_variation = &"HeaderMedium"
+
+[node name="CurrentExpressionText" type="TextEdit" parent="ExecutionFlow/ExecutionState"]
+layout_mode = 2
+size_flags_vertical = 3
+placeholder_text = "Current SEXP expression will appear here..."
+editable = false
+wrap_mode = 1
+
+[node name="ExecutionInfo" type="GridContainer" parent="ExecutionFlow/ExecutionState"]
+layout_mode = 2
+columns = 2
+
+[node name="StepLabel" type="Label" parent="ExecutionFlow/ExecutionState/ExecutionInfo"]
+layout_mode = 2
+text = "Step:"
+
+[node name="StepValue" type="Label" parent="ExecutionFlow/ExecutionState/ExecutionInfo"]
+layout_mode = 2
+text = "0"
+
+[node name="DepthLabel" type="Label" parent="ExecutionFlow/ExecutionState/ExecutionInfo"]
+layout_mode = 2
+text = "Depth:"
+
+[node name="DepthValue" type="Label" parent="ExecutionFlow/ExecutionState/ExecutionInfo"]
+layout_mode = 2
+text = "0"
+
+[node name="ModeLabel" type="Label" parent="ExecutionFlow/ExecutionState/ExecutionInfo"]
+layout_mode = 2
+text = "Mode:"
+
+[node name="ModeValue" type="Label" parent="ExecutionFlow/ExecutionState/ExecutionInfo"]
+layout_mode = 2
+text = "Disabled"
+
+[node name="DebugSettings" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="AutoStepCheck" type="CheckBox" parent="DebugSettings"]
+layout_mode = 2
+text = "Auto-step"
+tooltip_text = "Automatically step through expressions"
+
+[node name="StepDelayLabel" type="Label" parent="DebugSettings"]
+layout_mode = 2
+text = "Step Delay:"
+
+[node name="StepDelaySpinBox" type="SpinBox" parent="DebugSettings"]
+layout_mode = 2
+min_value = 0.1
+max_value = 5.0
+step = 0.1
+value = 1.0
+suffix = "s"
+tooltip_text = "Delay between auto-steps"
+
+[node name="VSeparator3" type="VSeparator" parent="DebugSettings"]
+layout_mode = 2
+
+[node name="ShowInternalCheck" type="CheckBox" parent="DebugSettings"]
+layout_mode = 2
+text = "Show Internal"
+tooltip_text = "Show internal function calls"
+
+[node name="VerboseCheck" type="CheckBox" parent="DebugSettings"]
+layout_mode = 2
+text = "Verbose"
+tooltip_text = "Show detailed execution information"

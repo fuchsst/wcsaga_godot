@@ -1,0 +1,122 @@
+[gd_scene load_steps=2 format=3 uid="uid://c8kf5m7nxqr2d"]
+
+[ext_resource type="Script" path="res://addons/gfred2/debug/sexp_variable_watch_manager.gd" id="1_k6rkf"]
+
+[node name="SexpVariableWatchPanel" type="VBoxContainer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_k6rkf")
+
+[node name="WatchHeader" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="WatchLabel" type="Label" parent="WatchHeader"]
+layout_mode = 2
+text = "Variable Watch"
+theme_type_variation = &"HeaderLarge"
+
+[node name="VSeparator" type="VSeparator" parent="WatchHeader"]
+layout_mode = 2
+
+[node name="AddWatchButton" type="Button" parent="WatchHeader"]
+layout_mode = 2
+text = "Add"
+tooltip_text = "Add variable to watch list"
+
+[node name="RemoveWatchButton" type="Button" parent="WatchHeader"]
+layout_mode = 2
+text = "Remove"
+tooltip_text = "Remove selected variable from watch"
+
+[node name="RefreshButton" type="Button" parent="WatchHeader"]
+layout_mode = 2
+text = "Refresh"
+tooltip_text = "Refresh all variable values"
+
+[node name="WatchSplitter" type="HSplitContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="WatchList" type="Tree" parent="WatchSplitter"]
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 3
+column_titles_visible = true
+hide_root = true
+
+[node name="WatchDetails" type="VBoxContainer" parent="WatchSplitter"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DetailsHeader" type="Label" parent="WatchSplitter/WatchDetails"]
+layout_mode = 2
+text = "Variable Details"
+theme_type_variation = &"HeaderMedium"
+
+[node name="DetailsGrid" type="GridContainer" parent="WatchSplitter/WatchDetails"]
+layout_mode = 2
+columns = 2
+
+[node name="NameLabel" type="Label" parent="WatchSplitter/WatchDetails/DetailsGrid"]
+layout_mode = 2
+text = "Name:"
+
+[node name="NameValue" type="Label" parent="WatchSplitter/WatchDetails/DetailsGrid"]
+layout_mode = 2
+text = "None selected"
+autowrap_mode = 3
+
+[node name="TypeLabel" type="Label" parent="WatchSplitter/WatchDetails/DetailsGrid"]
+layout_mode = 2
+text = "Type:"
+
+[node name="TypeValue" type="Label" parent="WatchSplitter/WatchDetails/DetailsGrid"]
+layout_mode = 2
+text = "-"
+
+[node name="ValueLabel" type="Label" parent="WatchSplitter/WatchDetails/DetailsGrid"]
+layout_mode = 2
+text = "Value:"
+
+[node name="ValueText" type="TextEdit" parent="WatchSplitter/WatchDetails/DetailsGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+placeholder_text = "Variable value will appear here..."
+editable = false
+wrap_mode = 1
+
+[node name="LastUpdatedLabel" type="Label" parent="WatchSplitter/WatchDetails/DetailsGrid"]
+layout_mode = 2
+text = "Last Updated:"
+
+[node name="LastUpdatedValue" type="Label" parent="WatchSplitter/WatchDetails/DetailsGrid"]
+layout_mode = 2
+text = "-"
+
+[node name="WatchControls" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="RealTimeCheck" type="CheckBox" parent="WatchControls"]
+layout_mode = 2
+button_pressed = true
+text = "Real-time Updates"
+tooltip_text = "Automatically update variable values during debugging"
+
+[node name="VSeparator2" type="VSeparator" parent="WatchControls"]
+layout_mode = 2
+
+[node name="UpdateIntervalLabel" type="Label" parent="WatchControls"]
+layout_mode = 2
+text = "Update Interval:"
+
+[node name="UpdateIntervalSpinBox" type="SpinBox" parent="WatchControls"]
+layout_mode = 2
+min_value = 0.1
+max_value = 5.0
+step = 0.1
+value = 0.5
+suffix = "s"
+tooltip_text = "How often to update variable values"

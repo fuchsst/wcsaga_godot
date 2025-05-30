@@ -141,7 +141,7 @@ signal validation_status_changed(is_valid: bool, errors: Array[String])
 
 ### Direct System Access
 - Use core systems directly (no wrapper layers)
-- Leverage existing EPIC-001 utilities, EPIC-002 assets, EPIC-004 SEXP
+- Leverage existing `addons/wcs_converter` legacy file utilities, `addons/wcs_assets_core` constants, assets and data structures, `addons/sexp` S-Expression framework
 - Follow Godot scene composition patterns
 - Maintain performance requirements throughout
 

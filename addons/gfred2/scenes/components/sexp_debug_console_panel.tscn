@@ -1,0 +1,134 @@
+[gd_scene load_steps=2 format=3 uid="uid://cz8k5nx7qr9md"]
+
+[ext_resource type="Script" path="res://addons/gfred2/debug/sexp_debug_console.gd" id="1_p9rkf"]
+
+[node name="SexpDebugConsolePanel" type="VBoxContainer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_p9rkf")
+
+[node name="ConsoleHeader" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="ConsoleLabel" type="Label" parent="ConsoleHeader"]
+layout_mode = 2
+text = "SEXP Debug Console"
+theme_type_variation = &"HeaderLarge"
+
+[node name="VSeparator" type="VSeparator" parent="ConsoleHeader"]
+layout_mode = 2
+
+[node name="ClearButton" type="Button" parent="ConsoleHeader"]
+layout_mode = 2
+text = "Clear"
+tooltip_text = "Clear console output"
+
+[node name="SaveLogButton" type="Button" parent="ConsoleHeader"]
+layout_mode = 2
+text = "Save Log"
+tooltip_text = "Save console log to file"
+
+[node name="ConsoleOutput" type="TextEdit" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+placeholder_text = "Console output will appear here..."
+editable = false
+wrap_mode = 1
+
+[node name="InputSection" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="InputHeader" type="HBoxContainer" parent="InputSection"]
+layout_mode = 2
+
+[node name="InputLabel" type="Label" parent="InputSection/InputHeader"]
+layout_mode = 2
+text = "Command Input:"
+
+[node name="VSeparator2" type="VSeparator" parent="InputSection/InputHeader"]
+layout_mode = 2
+
+[node name="HistoryButton" type="Button" parent="InputSection/InputHeader"]
+layout_mode = 2
+text = "History"
+tooltip_text = "Show command history"
+
+[node name="HelpButton" type="Button" parent="InputSection/InputHeader"]
+layout_mode = 2
+text = "Help"
+tooltip_text = "Show available commands"
+
+[node name="CommandInput" type="LineEdit" parent="InputSection"]
+layout_mode = 2
+placeholder_text = "Enter SEXP expression or console command..."
+
+[node name="CommandButtons" type="HBoxContainer" parent="InputSection"]
+layout_mode = 2
+
+[node name="ExecuteButton" type="Button" parent="InputSection/CommandButtons"]
+layout_mode = 2
+text = "Execute"
+tooltip_text = "Execute current command"
+
+[node name="VSeparator3" type="VSeparator" parent="InputSection/CommandButtons"]
+layout_mode = 2
+
+[node name="QuickCommands" type="HBoxContainer" parent="InputSection/CommandButtons"]
+layout_mode = 2
+
+[node name="EvalButton" type="Button" parent="InputSection/CommandButtons/QuickCommands"]
+layout_mode = 2
+text = "eval"
+tooltip_text = "Evaluate expression"
+
+[node name="VarsButton" type="Button" parent="InputSection/CommandButtons/QuickCommands"]
+layout_mode = 2
+text = "vars"
+tooltip_text = "List variables"
+
+[node name="FuncsButton" type="Button" parent="InputSection/CommandButtons/QuickCommands"]
+layout_mode = 2
+text = "funcs"
+tooltip_text = "List functions"
+
+[node name="TestButton" type="Button" parent="InputSection/CommandButtons/QuickCommands"]
+layout_mode = 2
+text = "test"
+tooltip_text = "Run test expression"
+
+[node name="ConsoleSettings" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="AutoScrollCheck" type="CheckBox" parent="ConsoleSettings"]
+layout_mode = 2
+button_pressed = true
+text = "Auto-scroll"
+tooltip_text = "Automatically scroll to latest output"
+
+[node name="TimestampCheck" type="CheckBox" parent="ConsoleSettings"]
+layout_mode = 2
+button_pressed = true
+text = "Timestamps"
+tooltip_text = "Show timestamps in output"
+
+[node name="VerboseCheck" type="CheckBox" parent="ConsoleSettings"]
+layout_mode = 2
+text = "Verbose"
+tooltip_text = "Show detailed output"
+
+[node name="VSeparator4" type="VSeparator" parent="ConsoleSettings"]
+layout_mode = 2
+
+[node name="MaxLinesLabel" type="Label" parent="ConsoleSettings"]
+layout_mode = 2
+text = "Max Lines:"
+
+[node name="MaxLinesSpinBox" type="SpinBox" parent="ConsoleSettings"]
+layout_mode = 2
+min_value = 100.0
+max_value = 10000.0
+step = 100.0
+value = 1000.0
+tooltip_text = "Maximum number of lines to keep in console"

@@ -1,0 +1,157 @@
+[gd_scene load_steps=2 format=3 uid="uid://ba7k4nx9qr5mj"]
+
+[ext_resource type="Script" path="res://addons/gfred2/debug/sexp_expression_evaluator.gd" id="1_n8rkf"]
+
+[node name="SexpExpressionPreviewPanel" type="VBoxContainer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_n8rkf")
+
+[node name="PreviewHeader" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="PreviewLabel" type="Label" parent="PreviewHeader"]
+layout_mode = 2
+text = "Expression Preview"
+theme_type_variation = &"HeaderLarge"
+
+[node name="VSeparator" type="VSeparator" parent="PreviewHeader"]
+layout_mode = 2
+
+[node name="EvaluateButton" type="Button" parent="PreviewHeader"]
+layout_mode = 2
+text = "Evaluate"
+tooltip_text = "Evaluate current expression"
+
+[node name="ClearButton" type="Button" parent="PreviewHeader"]
+layout_mode = 2
+text = "Clear"
+tooltip_text = "Clear expression and results"
+
+[node name="ExpressionInput" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="InputLabel" type="Label" parent="ExpressionInput"]
+layout_mode = 2
+text = "SEXP Expression:"
+theme_type_variation = &"HeaderMedium"
+
+[node name="ExpressionText" type="TextEdit" parent="ExpressionInput"]
+layout_mode = 2
+size_flags_vertical = 3
+placeholder_text = "Enter SEXP expression to preview..."
+wrap_mode = 1
+
+[node name="ValidationPanel" type="HBoxContainer" parent="ExpressionInput"]
+layout_mode = 2
+
+[node name="ValidationIcon" type="Label" parent="ExpressionInput/ValidationPanel"]
+layout_mode = 2
+text = "⚬"
+theme_type_variation = &"HeaderMedium"
+
+[node name="ValidationLabel" type="Label" parent="ExpressionInput/ValidationPanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Ready for input"
+autowrap_mode = 3
+
+[node name="ResultsContainer" type="HSplitContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="EvaluationResult" type="VBoxContainer" parent="ResultsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ResultHeader" type="Label" parent="ResultsContainer/EvaluationResult"]
+layout_mode = 2
+text = "Evaluation Result"
+theme_type_variation = &"HeaderMedium"
+
+[node name="ResultText" type="TextEdit" parent="ResultsContainer/EvaluationResult"]
+layout_mode = 2
+size_flags_vertical = 3
+placeholder_text = "Evaluation result will appear here..."
+editable = false
+wrap_mode = 1
+
+[node name="ResultInfo" type="GridContainer" parent="ResultsContainer/EvaluationResult"]
+layout_mode = 2
+columns = 2
+
+[node name="TypeLabel" type="Label" parent="ResultsContainer/EvaluationResult/ResultInfo"]
+layout_mode = 2
+text = "Result Type:"
+
+[node name="TypeValue" type="Label" parent="ResultsContainer/EvaluationResult/ResultInfo"]
+layout_mode = 2
+text = "-"
+
+[node name="EvalTimeLabel" type="Label" parent="ResultsContainer/EvaluationResult/ResultInfo"]
+layout_mode = 2
+text = "Eval Time:"
+
+[node name="EvalTimeValue" type="Label" parent="ResultsContainer/EvaluationResult/ResultInfo"]
+layout_mode = 2
+text = "-"
+
+[node name="IsValidLabel" type="Label" parent="ResultsContainer/EvaluationResult/ResultInfo"]
+layout_mode = 2
+text = "Is Valid:"
+
+[node name="IsValidValue" type="Label" parent="ResultsContainer/EvaluationResult/ResultInfo"]
+layout_mode = 2
+text = "-"
+
+[node name="ExpressionDetails" type="VBoxContainer" parent="ResultsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DetailsHeader" type="Label" parent="ResultsContainer/ExpressionDetails"]
+layout_mode = 2
+text = "Expression Analysis"
+theme_type_variation = &"HeaderMedium"
+
+[node name="AnalysisTree" type="Tree" parent="ResultsContainer/ExpressionDetails"]
+layout_mode = 2
+size_flags_vertical = 3
+columns = 2
+column_titles_visible = true
+hide_root = true
+
+[node name="PreviewSettings" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="AutoEvalCheck" type="CheckBox" parent="PreviewSettings"]
+layout_mode = 2
+text = "Auto-evaluate"
+tooltip_text = "Automatically evaluate expressions as you type"
+
+[node name="ShowAnalysisCheck" type="CheckBox" parent="PreviewSettings"]
+layout_mode = 2
+button_pressed = true
+text = "Show Analysis"
+tooltip_text = "Show detailed expression analysis"
+
+[node name="VSeparator2" type="VSeparator" parent="PreviewSettings"]
+layout_mode = 2
+
+[node name="EvalModeLabel" type="Label" parent="PreviewSettings"]
+layout_mode = 2
+text = "Mode:"
+
+[node name="EvalModeOption" type="OptionButton" parent="PreviewSettings"]
+layout_mode = 2
+tooltip_text = "Evaluation mode for preview"
+
+[node name="VSeparator3" type="VSeparator" parent="PreviewSettings"]
+layout_mode = 2
+
+[node name="MockDataCheck" type="CheckBox" parent="PreviewSettings"]
+layout_mode = 2
+button_pressed = true
+text = "Use Mock Data"
+tooltip_text = "Use mock mission data for evaluation"
