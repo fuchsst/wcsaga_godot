@@ -5,7 +5,7 @@ class_name WingInstanceData
 extends Resource
 
 # --- Nested Resource Definitions ---
-const SexpNode = preload("res://addons/sexp/sexp_node.gd")
+const SexpExpression = preload("res://addons/sexp/core/sexp_expression.gd")
 const AIGoal = preload("res://addons/wcs_asset_core/resources/ai/ai_goal.gd")
 
 # --- Wing Properties ---
@@ -22,13 +22,13 @@ const AIGoal = preload("res://addons/wcs_asset_core/resources/ai/ai_goal.gd")
 @export var arrival_distance: int = 0
 @export var arrival_anchor_name: String = "" # Name of anchor object/waypoint
 @export var arrival_path_name: String = "" # Name of the path restriction (if any)
-@export var arrival_cue_sexp: SexpNode = null # SexpNode resource
+@export var arrival_cue_sexp: SexpExpression = null # SexpExpression resource
 @export var arrival_delay_ms: int = 0 # Delay in milliseconds after cue is true
 
 @export var departure_location: int = 0 # Corresponds to DEPARTURE_* enum
 @export var departure_anchor_name: String = "" # Name of anchor object/waypoint
 @export var departure_path_name: String = "" # Name of the path restriction (if any)
-@export var departure_cue_sexp: SexpNode = null # SexpNode resource
+@export var departure_cue_sexp: SexpExpression = null # SexpExpression resource
 @export var departure_delay_ms: int = 0 # Delay in milliseconds after cue is true
 
 # --- Wave Timing ---

@@ -7,7 +7,7 @@ extends Resource
 # Ensure these paths are correct relative to this script's location
 const BriefingIconData = preload("briefing_icon_data.gd")
 const BriefingLineData = preload("briefing_line_data.gd")
-const SexpNode = preload("res://scripts/scripting/sexp/sexp_node.gd") # Assuming SexpNode exists
+const SexpExpression = preload("res://addons/sexp/core/sexp_expression.gd") # Assuming SexpExpression exists
 
 # --- Stage Properties ---
 @export var text: String = "" # Multi-line text for this stage
@@ -16,7 +16,7 @@ const SexpNode = preload("res://scripts/scripting/sexp/sexp_node.gd") # Assuming
 @export var camera_orient: Basis = Basis.IDENTITY
 @export var camera_time_ms: int = 0 # Time in milliseconds for camera transition
 @export var flags: int = 0 # Bitmask for stage flags (e.g., BS_FORWARD_CUT)
-@export var formula_sexp: SexpNode = null # SEXP condition for this stage to be active/visible
+@export var formula_sexp: SexpExpression = null # SEXP condition for this stage to be active/visible
 
 @export var icons: Array[BriefingIconData] = [] # Icons displayed in this stage
 @export var lines: Array[BriefingLineData] = [] # Lines connecting icons in this stage

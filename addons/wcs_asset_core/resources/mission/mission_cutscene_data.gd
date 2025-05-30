@@ -4,7 +4,7 @@ class_name MissionCutsceneData
 extends Resource
 
 # --- Dependencies ---
-const SexpNode = preload("res://scripts/scripting/sexp/sexp_node.gd")
+const SexpExpression = preload("res://addons/sexp/core/sexp_expression.gd")
 
 # --- Cutscene Types (Mirroring MOVIE_*) ---
 enum CutsceneType {
@@ -19,4 +19,4 @@ enum CutsceneType {
 @export var type: CutsceneType = CutsceneType.PRE_GAME
 @export var cutscene_filename: String = "" # Path to the video file (e.g., .ogv, .webm)
 @export var is_campaign_only: bool = false
-@export var formula_sexp: SexpNode = null # SEXP node to determine if cutscene plays
+@export var formula_sexp: SexpExpression = null # SEXP node to determine if cutscene plays

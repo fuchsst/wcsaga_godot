@@ -26,7 +26,7 @@ enum ExpressionType {
 @export var arguments: Array[SexpExpression] = []
 
 ## Literal value (for LITERAL_* types)
-@export var literal_value: Variant
+@export var literal_value: Variant = null
 
 ## Variable name (for VARIABLE_REFERENCE type)
 @export var variable_name: String = ""

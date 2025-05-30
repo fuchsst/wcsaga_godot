@@ -1,218 +1,156 @@
-# GFRED2 Mission Editor Package Documentation
+# GFRED2 Mission Editor - Agent Guidance
 
 ## Package Purpose
+Modern FRED2-style mission editor as Godot plugin integrating WCS asset management (EPIC-002) and SEXP systems (EPIC-004). Provides visual mission creation with scene-based UI architecture.
 
-GFRED2 provides a complete FRED2-style mission editor for Godot, directly integrated with EPIC-004 SEXP Expression System and EPIC-002 WCS Asset Core. This package eliminates code duplication by using centralized systems while maintaining the familiar visual editing interface for WCS mission development.
+## Architecture Reference
+- **Main Architecture**: `.ai/docs/epic-005-gfred2-mission-editor/architecture.md`
+- **Dependencies**: `.ai/docs/epic-005-gfred2-mission-editor/godot-dependencies.md`
+- **File Structure**: `.ai/docs/epic-005-gfred2-mission-editor/godot-files.md`
 
-## Original C++ Analysis
+## Core Integration Points
 
-### FRED2 Analysis
-**Source Files Analyzed**: `source/code/fred2/sexp_tree.cpp`, `source/code/fred2/eventeditor.cpp`, `source/code/fred2/shipclasseditordlg.cpp`, `source/code/fred2/weaponeditordlg.cpp`
+### EPIC-002 Asset Integration
+```gdscript
+# Direct asset access - no wrappers
+var ship_data: ShipData = WCSAssetLoader.load_asset(ship_path)
+var assets: Array[String] = WCSAssetRegistry.get_asset_paths_by_type(AssetTypes.Type.SHIP)
+```
 
-**Key Findings from WCS C++ Code**:
-- **Visual SEXP Editor**: FRED2 used MFC Tree controls for visual SEXP editing with node expansion/collapse
-- **Asset Management**: Custom asset classes separate from main game with duplicate management code
-- **Expression Generation**: Real-time SEXP code generation from visual tree structure
-- **Basic Validation**: Simple syntax validation with limited error reporting
-- **Performance Focus**: Optimized for missions with 100+ SEXP expressions and 1000+ assets
+### EPIC-004 SEXP Integration  
+```gdscript
+# Direct SEXP system access
+var is_valid: bool = SexpManager.validate_syntax(expression)
+var errors: Array[String] = SexpManager.get_validation_errors(expression)
+```
 
-### GFRED2 Architecture Improvements
-- **Direct Integration**: Uses EPIC-004 SEXP system directly without wrapper layers
-- **Centralized Assets**: Leverages EPIC-002 WCS Asset Core for all asset management
-- **Enhanced Validation**: Real-time validation with comprehensive error reporting
-- **Modern UI**: Node-based GraphEdit interface with advanced debugging capabilities
+## Critical Architecture Rules (NON-NEGOTIABLE)
+
+### Scene-Based UI Only
+- **ALL UI components MUST be scenes (.tscn files)**
+- **NO programmatic UI construction allowed**
+- **Scripts attach to scene root nodes as controllers**
+- See Architecture Section 3 for mandatory patterns
+
+### Folder Organization (Post-GFRED2-011)
+```
+addons/gfred2/
+├── scenes/           # ALL UI scenes centralized here
+│   ├── docks/        # Editor dock scenes  
+│   ├── dialogs/      # Modal dialog scenes
+│   ├── components/   # Reusable UI components
+│   └── overlays/     # Viewport overlays
+├── scripts/          # Logic-only scripts (no UI construction)
+├── core/            # Mission data management
+├── integration/     # System integration points  
+└── tests/           # gdUnit4 test suites
+```
+
+### Performance Requirements
+- Scene instantiation: < 16ms per component
+- UI updates: Batched at 60 FPS
+- Real-time validation: < 5ms for standard expressions
+- Mission handling: 100+ SEXP expressions at >60 FPS
+
+## Integration Architecture
+
+### Mission Data Flow
+```gdscript
+# Mission loading with EPIC-004 validation
+func load_mission_data(mission_data: MissionData):
+    for event in mission_data.events:
+        if event.condition_sexp:
+            var is_valid: bool = SexpManager.validate_syntax(event.condition_sexp)
+            if not is_valid:
+                _report_validation_errors(SexpManager.get_validation_errors(event.condition_sexp))
+```
+
+### Asset Browser Integration
+```gdscript
+# Direct EPIC-002 asset browsing
+func populate_asset_browser():
+    var ship_paths: Array[String] = WCSAssetRegistry.get_asset_paths_by_type(AssetTypes.Type.SHIP)
+    for ship_path in ship_paths:
+        var ship_data: ShipData = WCSAssetLoader.load_asset(ship_path)
+        asset_browser.add_asset_item(ship_data.ship_name, ship_path)
+```
 
 ## Key Components
 
 ### VisualSexpEditor
-**Purpose**: Node-based visual SEXP editor with direct EPIC-004 integration.
+**Purpose**: Scene-based SEXP editor with EPIC-004 integration  
+**Scene**: `scenes/components/sexp_tree_panel.tscn`  
+**Performance**: Real-time validation <5ms, 400+ function support
 
-**Core Features**:
-- **Direct EPIC-004 Access**: Uses `SexpManager`, `SexpFunctionRegistry`, and `SexpValidator` directly
-- **Function Palette**: Dynamically populated from EPIC-004 function registry (400+ WCS operators)
-- **Real-time Validation**: Instant syntax and semantic validation using EPIC-004 validator
-- **Backward Compatibility**: Maintains legacy API for existing GFRED2 code
+### MissionEditorDock  
+**Purpose**: Main editing interface scene  
+**Scene**: `scenes/docks/main_editor_dock.tscn`  
+**Features**: 3D viewport, object hierarchy, property editing
 
-**Integration Points**:
-```gdscript
-# Direct EPIC-004 system integration
-var sexp_manager: SexpManager = SexpManager
-var function_registry: SexpFunctionRegistry = SexpFunctionRegistry.new()
-var validator: SexpValidator = SexpValidator.new()
-
-# Real-time validation
-func _validate_with_epic004(expression: String) -> void:
-    var is_valid: bool = sexp_manager.validate_syntax(expression)
-    if not is_valid:
-        var errors: Array[String] = sexp_manager.get_validation_errors(expression)
-        _update_validation_display()
-```
-
-### Asset Browser Integration
-**Purpose**: Mission editor asset browser using EPIC-002 centralized asset system.
-
-**Direct Integration**:
-- Uses `WCSAssetRegistry` autoload for all asset operations
-- Loads `ShipData`, `WeaponData`, `ArmorData` directly from core system
-- No duplicate asset classes or management code
-- Consistent asset data between editor and game
-
-## Architecture Philosophy
-
-### No Wrapper Layers
-The implementation philosophy is to use core systems directly:
-
-**BEFORE (Wrapper Approach)**:
-```
-GFRED2 → EnhancedSexpEditor → SexpMigrationAdapter → EPIC-004
-GFRED2 → AssetRegistryWrapper → WCSAssetRegistry
-```
-
-**AFTER (Direct Approach)**:
-```
-GFRED2 → EPIC-004 SEXP System (directly)
-GFRED2 → EPIC-002 Asset Core (directly)
-```
-
-### Benefits of Direct Integration
-1. **Reduced Complexity**: No intermediate wrapper layers to maintain
-2. **Better Performance**: Direct system access without abstraction overhead
-3. **Easier Maintenance**: Changes in core systems automatically available
-4. **Consistency**: Same behavior as other parts of the project using core systems
-
-## Integration Points
-
-### Mission Editor with EPIC-004 SEXP
-```gdscript
-# Mission loading with direct EPIC-004 validation
-func load_mission_sexp_expressions(mission_data: MissionData):
-    for event in mission_data.events:
-        if event.condition_sexp:
-            # Direct validation with EPIC-004
-            var is_valid: bool = SexpManager.validate_syntax(event.condition_sexp)
-            if not is_valid:
-                var errors: Array[String] = SexpManager.get_validation_errors(event.condition_sexp)
-                push_warning("Invalid SEXP in event %s: %s" % [event.name, str(errors)])
-```
-
-### Asset Management with EPIC-002
-```gdscript
-# Direct asset loading from core system
-func create_ship_object(ship_path: String) -> MissionObject:
-    var ship_data: ShipData = WCSAssetLoader.load_asset(ship_path)
-    if ship_data and ship_data.is_valid():
-        var mission_obj: MissionObject = MissionObject.new()
-        mission_obj.name = ship_data.ship_name
-        mission_obj.ship_class_path = ship_path
-        return mission_obj
-    return null
-```
-
-### Property Editing Integration
-```gdscript
-# SEXP property editing with direct validation
-func _on_sexp_property_changed(new_expression: String):
-    var is_valid: bool = SexpManager.validate_syntax(new_expression)
-    if is_valid:
-        property_value = new_expression
-        _emit_property_changed()
-    else:
-        var errors: Array[String] = SexpManager.get_validation_errors(new_expression)
-        _show_validation_errors(errors)
-```
-
-## Performance Characteristics
-
-### EPIC-004 SEXP Integration
-- **Expression Parsing**: Leverages EPIC-004 optimized parsing (5-15ms typical)
-- **Validation Speed**: Real-time validation in <5ms for standard expressions
-- **Function Discovery**: <1ms search through 400+ function library
-- **Large Missions**: Maintains >60 FPS with 100+ SEXP expressions
-
-### EPIC-002 Asset Integration
-- **Asset Loading**: <2s for 1000+ assets using core caching
-- **Search Performance**: <100ms for asset search and filtering
-- **Memory Efficiency**: Automatic Resource cleanup via core system
-- **UI Responsiveness**: Lazy loading prevents blocking operations
+### AssetBrowserDock
+**Purpose**: Asset browsing scene using EPIC-002 system  
+**Scene**: `scenes/docks/asset_browser_dock.tscn`  
+**Integration**: Direct WCSAssetRegistry access
 
 ## Testing Strategy
 
-### Direct Integration Testing
-- **EPIC-004 Access**: Verify direct access to `SexpManager`, `SexpFunctionRegistry`, `SexpValidator`
-- **EPIC-002 Access**: Verify direct access to `WCSAssetRegistry`, `WCSAssetLoader`
-- **Performance**: Validate core system performance requirements are met
-- **Compatibility**: Ensure legacy API continues to work
-
-### Test Coverage
+### Direct Integration Tests
 ```gdscript
-func test_direct_epic004_access():
-    # Verify direct access without wrappers
-    assert_not_null(visual_editor.sexp_manager)
-    assert_not_null(visual_editor.function_registry)
-    assert_not_null(visual_editor.validator)
-    
-    # Test direct calls to core systems
-    var is_valid = visual_editor.sexp_manager.validate_syntax("(+ 1 2)")
+func test_epic004_integration():
+    # Verify direct SEXP system access
+    assert_not_null(sexp_editor.sexp_manager)
+    var is_valid = SexpManager.validate_syntax("(+ 1 2)")
     assert_true(is_valid)
+
+func test_epic002_integration():
+    # Verify direct asset system access
+    var assets = WCSAssetRegistry.get_asset_paths_by_type(AssetTypes.Type.SHIP)
+    assert_true(assets.size() > 0)
 ```
 
-## Migration from Wrapper Approach
+### Run Tests
+```bash
+# From target directory
+bash addons/gdUnit4/runtest.sh -a addons/gfred2/tests/
+```
 
-### What Was Removed
-- `EnhancedSexpEditor` - Unnecessary wrapper around core SEXP system
-- `SexpMigrationAdapter` - Direct integration eliminates need for migration layer
-- `AssetRegistryWrapper` - Direct use of `WCSAssetRegistry` instead
+## Common Patterns
 
-### What Was Simplified
-- **VisualSexpEditor**: Now directly uses EPIC-004 systems in `_ready()`
-- **Asset Browsing**: Directly queries `WCSAssetRegistry` for asset lists
-- **Validation**: Direct calls to `SexpManager.validate_syntax()`
-
-### Backward Compatibility Maintained
+### Scene Controller Pattern
 ```gdscript
-# Legacy API preserved - now calls core systems directly
-func set_sexp_expression(expression: String) -> void:
-    set_expression(expression)  # Calls core EPIC-004 validation
+# scene_controller.gd (attached to scene root)
+class_name SceneController
+extends Control
 
-func get_sexp_expression() -> String:
-    return get_expression()  # Returns current expression
+@onready var child_component: ChildType = $ChildPath
+signal component_action(data: Dictionary)
 
-func validate_current_expression() -> bool:
-    var validation: Dictionary = validate_expression()  # Uses EPIC-004 validator
-    return validation.is_valid
+func _ready() -> void:
+    _setup_ui_connections()
+    _initialize_component_state()
 ```
 
-## Usage Examples
-
-### Direct SEXP Editing
+### Signal-Based Communication
 ```gdscript
-# Create visual editor - automatically uses EPIC-004
-var sexp_editor = VisualSexpEditor.new()
-add_child(sexp_editor)
-
-# Set expression - automatically validated with EPIC-004
-sexp_editor.set_expression("(when (> (ship-health \"Alpha 1\") 50) (send-message \"Continue\"))")
-
-# Check validation status
-if sexp_editor.validate_current_expression():
-    print("Expression is valid")
+# Loose coupling between components
+signal mission_object_selected(object: MissionObject)
+signal validation_status_changed(is_valid: bool, errors: Array[String])
 ```
 
-### Direct Asset Integration
-```gdscript
-# Load assets directly from EPIC-002 core system
-var ship_paths: Array[String] = WCSAssetRegistry.get_asset_paths_by_type(AssetTypes.Type.SHIP)
-for ship_path in ship_paths:
-    var ship_data: ShipData = WCSAssetLoader.load_asset(ship_path)
-    asset_browser.add_asset_item(ship_data.ship_name, ship_path)
-```
+## Implementation Notes
 
-## Future Extensibility
+### Direct System Access
+- Use core systems directly (no wrapper layers)
+- Leverage existing EPIC-001 utilities, EPIC-002 assets, EPIC-004 SEXP
+- Follow Godot scene composition patterns
+- Maintain performance requirements throughout
 
-### Core System Benefits
-- **Automatic Updates**: New EPIC-004 functions automatically available in GFRED2
-- **Shared Improvements**: Performance improvements in core systems benefit GFRED2
-- **Consistent Behavior**: Same validation/asset behavior across entire project
-- **Community Extensions**: EPIC-004 plugins automatically extend GFRED2 capabilities
+### Scene Migration (GFRED2-011)
+When refactoring existing programmatic UI:
+1. Create scene file first
+2. Attach script to scene root as controller
+3. Use scene composition for complex components
+4. Delete programmatic UI construction code
+5. Test functionality preservation
 
-This approach ensures GFRED2 remains a thin, efficient UI layer over the robust core systems, providing maximum functionality with minimal maintenance overhead.
+**Critical**: Follow Architecture Section 3 for scene-based patterns and performance requirements.

@@ -5,11 +5,11 @@ class_name MissionEventData
 extends Resource
 
 # --- Nested Resource Definition ---
-const SexpNode = preload("res://scripts/scripting/sexp/sexp_node.gd")
+const SexpExpression = preload("res://addons/sexp/core/sexp_expression.gd")
 
 # --- Event Definition ---
 @export var event_name: String = "" # Optional name for the event
-@export var formula: SexpNode = null # SEXP node for the trigger condition
+@export var formula: SexpExpression = null # SEXP expression for the trigger condition
 @export var repeat_count: int = 1 # How many times to trigger (-1 for infinite until formula false?)
 @export var trigger_count: int = 1 # Alternative trigger count (FS2 feature)
 @export var interval_ms: int = -1 # Delay between repeats in milliseconds (-1 means no interval)

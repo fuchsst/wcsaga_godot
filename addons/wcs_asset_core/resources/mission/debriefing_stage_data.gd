@@ -4,10 +4,10 @@ class_name DebriefingStageData
 extends Resource
 
 # --- Nested Resource Definitions ---
-const SexpNode = preload("res://scripts/scripting/sexp/sexp_node.gd") # Assuming SexpNode exists
+const SexpExpression = preload("res://addons/sexp/core/sexp_expression.gd") # Assuming SexpExpression exists
 
 # --- Stage Properties ---
-@export var formula_sexp: SexpNode = null # SEXP condition for this stage to be shown
+@export var formula_sexp: SexpExpression = null # SEXP condition for this stage to be shown
 @export var text: String = "" # Multi-line text for this stage
 @export var voice_path: String = "" # Path to the voice audio file
 @export var recommendation_text: String = "" # Recommendation text shown in this stage
