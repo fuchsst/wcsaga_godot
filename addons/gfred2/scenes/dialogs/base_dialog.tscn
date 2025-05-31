@@ -1,0 +1,71 @@
+[gd_scene load_steps=2 format=3 uid="uid://b4xqo8kg5a1f8"]
+
+[ext_resource type="Script" path="res://addons/gfred2/scripts/controllers/base_dialog_controller.gd" id="1_2k4m5"]
+
+[node name="BaseDialog" type="AcceptDialog"]
+title = "GFRED2 Dialog"
+initial_position = 1
+size = Vector2i(600, 400)
+unresizable = false
+script = ExtResource("1_2k4m5")
+
+[node name="MainContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -49.0
+
+[node name="DialogHeader" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="MainContainer/DialogHeader"]
+layout_mode = 2
+text = "Dialog Title"
+theme_type_variation = &"HeaderLarge"
+
+[node name="Spacer" type="Control" parent="MainContainer/DialogHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HelpButton" type="Button" parent="MainContainer/DialogHeader"]
+layout_mode = 2
+text = "?"
+custom_minimum_size = Vector2(30, 30)
+
+[node name="HeaderSeparator" type="HSeparator" parent="MainContainer"]
+layout_mode = 2
+
+[node name="ContentContainer" type="VBoxContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="FooterSeparator" type="HSeparator" parent="MainContainer"]
+layout_mode = 2
+
+[node name="FooterContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="ValidationLabel" type="Label" parent="MainContainer/FooterContainer"]
+layout_mode = 2
+text = ""
+modulate = Color(1, 0.5, 0.5, 1)
+
+[node name="FooterSpacer" type="Control" parent="MainContainer/FooterContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ApplyButton" type="Button" parent="MainContainer/FooterContainer"]
+layout_mode = 2
+text = "Apply"
+
+[node name="CancelButton" type="Button" parent="MainContainer/FooterContainer"]
+layout_mode = 2
+text = "Cancel"
+
+[node name="OKButton" type="Button" parent="MainContainer/FooterContainer"]
+layout_mode = 2
+text = "OK"

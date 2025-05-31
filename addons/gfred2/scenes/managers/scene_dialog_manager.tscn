@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://bcnx3ydoahjcp"]
+
+[ext_resource type="Script" path="res://addons/gfred2/scripts/controllers/scene_dialog_manager_controller.gd" id="1_7n3k8"]
+
+[node name="SceneDialogManager" type="Node"]
+script = ExtResource("1_7n3k8")
+
+[node name="DialogContainer" type="CanvasLayer" parent="."]

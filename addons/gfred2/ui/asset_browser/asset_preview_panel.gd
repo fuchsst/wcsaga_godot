@@ -24,7 +24,7 @@ var details_button: Button
 var current_asset: BaseAssetData
 var preview_mesh: MeshInstance3D
 var is_preview_active: bool = false
-var asset_registry: AssetRegistryWrapper  # For compatibility helpers
+# Removed AssetRegistryWrapper - using WCS Asset Core directly
 
 # Performance tracking
 var last_update_time: int = 0
@@ -136,9 +136,9 @@ func _connect_signals() -> void:
 	select_button.pressed.connect(_on_select_button_pressed)
 	details_button.pressed.connect(_on_details_button_pressed)
 
-## Set the asset registry for compatibility helpers
-func set_asset_registry(registry: AssetRegistryWrapper) -> void:
-	asset_registry = registry
+## Legacy method - no longer needed with direct WCS Asset Core access
+func set_asset_registry(registry) -> void:
+	push_warning("AssetPreviewPanel.set_asset_registry() is deprecated - using WCS Asset Core directly")
 
 func display_asset(asset_data: BaseAssetData) -> void:
 	"""Display detailed information for the specified asset."""
@@ -164,7 +164,7 @@ func display_asset(asset_data: BaseAssetData) -> void:
 	var update_time: int = Time.get_ticks_msec() - last_update_time
 	print("Asset preview updated in %d ms" % update_time)
 
-func _update_3d_preview(asset_data: AssetData) -> void:
+func _update_3d_preview(asset_data: BaseAssetData) -> void:
 	"""Update the 3D model preview for the asset."""
 	# Clear existing preview
 	if preview_mesh != null:
@@ -240,7 +240,7 @@ func _create_weapon_mesh() -> Mesh:
 	mesh.bottom_radius = 0.1
 	return mesh
 
-func _create_asset_material(asset_data: AssetData) -> StandardMaterial3D:
+func _create_asset_material(asset_data: BaseAssetData) -> StandardMaterial3D:
 	"""Create a material based on asset properties."""
 	var material: StandardMaterial3D = StandardMaterial3D.new()
 	
@@ -280,7 +280,7 @@ func _start_preview_animation() -> void:
 	tween.set_loops()
 	tween.tween_property(preview_mesh, "rotation_degrees", Vector3(0, 360, 0), 8.0)
 
-func _update_specifications(asset_data: AssetData) -> void:
+func _update_specifications(asset_data: BaseAssetData) -> void:
 	"""Update the specifications table with asset data."""
 	# Clear existing specifications
 	for child in specs_table.get_children():
@@ -293,12 +293,9 @@ func _update_specifications(asset_data: AssetData) -> void:
 
 func _add_ship_specifications(ship_data: ShipData) -> void:
 	"""Add ship-specific specifications to the table."""
-	if asset_registry:
-		_add_spec_row("Type:", asset_registry.get_ship_type_for_display(ship_data))
-		_add_spec_row("Faction:", asset_registry.get_ship_faction_for_display(ship_data))
-	else:
-		_add_spec_row("Type:", "Unknown")
-		_add_spec_row("Faction:", "Unknown")
+	# Use WCS Asset Core data directly
+	_add_spec_row("Type:", _get_ship_type_for_display(ship_data))
+	_add_spec_row("Faction:", _get_ship_faction_for_display(ship_data))
 	
 	_add_spec_row("Max Speed:", "%.1f m/s" % ship_data.get_max_speed())
 	_add_spec_row("Hull Strength:", "%.0f" % ship_data.max_hull_strength)
@@ -306,12 +303,9 @@ func _add_ship_specifications(ship_data: ShipData) -> void:
 
 func _add_weapon_specifications(weapon_data: WeaponData) -> void:
 	"""Add weapon-specific specifications to the table."""
-	if asset_registry:
-		_add_spec_row("Type:", asset_registry.get_weapon_type_for_display(weapon_data))
-		_add_spec_row("Damage Type:", asset_registry.get_weapon_damage_type_for_display(weapon_data))
-	else:
-		_add_spec_row("Type:", "Unknown")
-		_add_spec_row("Damage Type:", "Unknown")
+	# Use WCS Asset Core data directly
+	_add_spec_row("Type:", _get_weapon_type_for_display(weapon_data))
+	_add_spec_row("Damage Type:", _get_weapon_damage_type_for_display(weapon_data))
 	
 	_add_spec_row("Damage/Shot:", "%.1f" % weapon_data.damage_per_second)
 	_add_spec_row("Range:", "%.0f m" % weapon_data.weapon_range)
@@ -329,7 +323,7 @@ func _add_spec_row(label: String, value: String) -> void:
 	value_widget.add_theme_font_size_override("font_size", 10)
 	specs_table.add_child(value_widget)
 
-func _update_description(asset_data: AssetData) -> void:
+func _update_description(asset_data: BaseAssetData) -> void:
 	"""Update the description text."""
 	var description: String = asset_data.get_description()
 	if description.is_empty():
@@ -338,7 +332,7 @@ func _update_description(asset_data: AssetData) -> void:
 	description_label.clear()
 	description_label.append_text(description)
 
-func _update_action_buttons(asset_data: AssetData) -> void:
+func _update_action_buttons(asset_data: BaseAssetData) -> void:
 	"""Update action button states based on asset."""
 	select_button.disabled = false
 	details_button.disabled = false
@@ -391,6 +385,48 @@ func clear_preview() -> void:
 	"""Clear the current preview."""
 	_show_no_selection_state()
 
-func get_current_asset() -> AssetData:
+func get_current_asset() -> BaseAssetData:
 	"""Get the currently previewed asset."""
 	return current_asset
+
+## Helper methods for display using WCS Asset Core data directly
+
+func _get_ship_type_for_display(ship_data: ShipData) -> String:
+	"""Get ship type string for display using WCS Asset Core data."""
+	# Map class_type index to string - simplified for now
+	match ship_data.class_type:
+		0: return "Fighter"
+		1: return "Bomber" 
+		2: return "Transport"
+		3: return "Freighter"
+		4: return "Cruiser"
+		5: return "Destroyer"
+		6: return "Carrier"
+		_: return "Unknown"
+
+func _get_ship_faction_for_display(ship_data: ShipData) -> String:
+	"""Get faction name for display using WCS Asset Core data."""
+	# Map species index to faction name - simplified for now
+	match ship_data.species:
+		0: return "Terran"
+		1: return "Kilrathi"
+		2: return "Shivan"
+		_: return "Unknown"
+
+func _get_weapon_type_for_display(weapon_data: WeaponData) -> String:
+	"""Get weapon type for display using WCS Asset Core data."""
+	# Check subtype to determine if primary/secondary
+	if weapon_data.subtype < 10:  # Simplified mapping
+		return "Primary"
+	else:
+		return "Secondary"
+
+func _get_weapon_damage_type_for_display(weapon_data: WeaponData) -> String:
+	"""Get damage type for display using WCS Asset Core data."""
+	# Simplified damage type mapping
+	if weapon_data.weapon_name.to_lower().contains("laser") or weapon_data.weapon_name.to_lower().contains("plasma"):
+		return "Energy"
+	elif weapon_data.weapon_name.to_lower().contains("missile") or weapon_data.weapon_name.to_lower().contains("torpedo"):
+		return "Missile"
+	else:
+		return "Kinetic"

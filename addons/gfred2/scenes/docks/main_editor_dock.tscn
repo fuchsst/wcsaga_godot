@@ -1,0 +1,76 @@
+[gd_scene load_steps=2 format=3 uid="uid://bqk7yf3nh2kv3"]
+
+[ext_resource type="Script" path="res://addons/gfred2/scripts/controllers/main_editor_dock_controller.gd" id="1_8v7q2"]
+
+[node name="MainEditorDock" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_8v7q2")
+
+[node name="MainContainer" type="HSplitContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+split_offset = 800
+
+[node name="ViewportContainer" type="VBoxContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ToolbarContainer" type="HBoxContainer" parent="MainContainer/ViewportContainer"]
+layout_mode = 2
+
+[node name="ViewModeOptions" type="OptionButton" parent="MainContainer/ViewportContainer/ToolbarContainer"]
+layout_mode = 2
+tooltip_text = "View Mode"
+
+[node name="GridToggle" type="CheckBox" parent="MainContainer/ViewportContainer/ToolbarContainer"]
+layout_mode = 2
+text = "Grid"
+
+[node name="SnapToggle" type="CheckBox" parent="MainContainer/ViewportContainer/ToolbarContainer"]
+layout_mode = 2
+text = "Snap"
+
+[node name="ViewportWrapper" type="SubViewportContainer" parent="MainContainer/ViewportContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MissionViewport" type="SubViewport" parent="MainContainer/ViewportContainer/ViewportWrapper"]
+handle_input_locally = false
+render_target_update_mode = 4
+
+[node name="RightPanel" type="VBoxContainer" parent="MainContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(350, 0)
+
+[node name="ObjectHierarchy" type="VBoxContainer" parent="MainContainer/RightPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HierarchyLabel" type="Label" parent="MainContainer/RightPanel/ObjectHierarchy"]
+layout_mode = 2
+text = "Object Hierarchy"
+
+[node name="HierarchyTree" type="Tree" parent="MainContainer/RightPanel/ObjectHierarchy"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PropertyInspector" type="VBoxContainer" parent="MainContainer/RightPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="InspectorLabel" type="Label" parent="MainContainer/RightPanel/PropertyInspector"]
+layout_mode = 2
+text = "Property Inspector"
+
+[node name="PropertyScroll" type="ScrollContainer" parent="MainContainer/RightPanel/PropertyInspector"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PropertiesContainer" type="VBoxContainer" parent="MainContainer/RightPanel/PropertyInspector/PropertyScroll"]
+layout_mode = 2
+size_flags_horizontal = 3

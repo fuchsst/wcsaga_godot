@@ -1,0 +1,88 @@
+[gd_scene load_steps=2 format=3 uid="uid://bv7xjmdk3gg0k"]
+
+[ext_resource type="Script" path="res://addons/gfred2/scripts/controllers/mission_validation_panel_controller.gd" id="1_9m2k4"]
+
+[node name="MissionValidationPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_9m2k4")
+
+[node name="MainContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Header" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="MainContainer/Header"]
+layout_mode = 2
+text = "Mission Validation"
+
+[node name="Spacer" type="Control" parent="MainContainer/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ValidationStatus" type="Label" parent="MainContainer/Header"]
+layout_mode = 2
+text = "Valid"
+modulate = Color(0.5, 1, 0.5, 1)
+
+[node name="RefreshButton" type="Button" parent="MainContainer/Header"]
+layout_mode = 2
+text = "Refresh"
+
+[node name="FilterContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="FilterLabel" type="Label" parent="MainContainer/FilterContainer"]
+layout_mode = 2
+text = "Show:"
+
+[node name="ShowErrors" type="CheckBox" parent="MainContainer/FilterContainer"]
+layout_mode = 2
+button_pressed = true
+text = "Errors"
+
+[node name="ShowWarnings" type="CheckBox" parent="MainContainer/FilterContainer"]
+layout_mode = 2
+button_pressed = true
+text = "Warnings"
+
+[node name="ShowInfo" type="CheckBox" parent="MainContainer/FilterContainer"]
+layout_mode = 2
+text = "Info"
+
+[node name="Separator" type="HSeparator" parent="MainContainer"]
+layout_mode = 2
+
+[node name="ValidationList" type="Tree" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+hide_root = true
+columns = 4
+column_titles_visible = true
+
+[node name="Actions" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="FixButton" type="Button" parent="MainContainer/Actions"]
+layout_mode = 2
+text = "Auto-Fix"
+disabled = true
+
+[node name="GotoButton" type="Button" parent="MainContainer/Actions"]
+layout_mode = 2
+text = "Go To"
+disabled = true
+
+[node name="Spacer2" type="Control" parent="MainContainer/Actions"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ExportButton" type="Button" parent="MainContainer/Actions"]
+layout_mode = 2
+text = "Export Report"

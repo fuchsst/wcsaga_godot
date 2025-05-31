@@ -1,0 +1,146 @@
+[gd_scene load_steps=2 format=3 uid="uid://bwxf7mh5kq1dx"]
+
+[ext_resource type="Script" path="res://addons/gfred2/scripts/controllers/sexp_editor_dock_controller.gd" id="1_9k3j4"]
+
+[node name="SexpEditorDock" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_9k3j4")
+
+[node name="MainContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Header" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="MainContainer/Header"]
+layout_mode = 2
+text = "SEXP Editor"
+
+[node name="Spacer" type="Control" parent="MainContainer/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ValidateButton" type="Button" parent="MainContainer/Header"]
+layout_mode = 2
+text = "Validate"
+
+[node name="DebugButton" type="Button" parent="MainContainer/Header"]
+layout_mode = 2
+text = "Debug"
+
+[node name="ToolbarContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="NewExpressionButton" type="Button" parent="MainContainer/ToolbarContainer"]
+layout_mode = 2
+text = "New"
+
+[node name="LoadExpressionButton" type="Button" parent="MainContainer/ToolbarContainer"]
+layout_mode = 2
+text = "Load"
+
+[node name="SaveExpressionButton" type="Button" parent="MainContainer/ToolbarContainer"]
+layout_mode = 2
+text = "Save"
+
+[node name="Separator" type="VSeparator" parent="MainContainer/ToolbarContainer"]
+layout_mode = 2
+
+[node name="UndoButton" type="Button" parent="MainContainer/ToolbarContainer"]
+layout_mode = 2
+text = "Undo"
+
+[node name="RedoButton" type="Button" parent="MainContainer/ToolbarContainer"]
+layout_mode = 2
+text = "Redo"
+
+[node name="ContentSplitter" type="HSplitContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+split_offset = 200
+
+[node name="FunctionPalette" type="VBoxContainer" parent="MainContainer/ContentSplitter"]
+layout_mode = 2
+
+[node name="PaletteLabel" type="Label" parent="MainContainer/ContentSplitter/FunctionPalette"]
+layout_mode = 2
+text = "Function Palette"
+
+[node name="PaletteSearch" type="LineEdit" parent="MainContainer/ContentSplitter/FunctionPalette"]
+layout_mode = 2
+placeholder_text = "Search functions..."
+
+[node name="CategoryTabs" type="TabContainer" parent="MainContainer/ContentSplitter/FunctionPalette"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Operators" type="VBoxContainer" parent="MainContainer/ContentSplitter/FunctionPalette/CategoryTabs"]
+layout_mode = 2
+
+[node name="OperatorsList" type="ItemList" parent="MainContainer/ContentSplitter/FunctionPalette/CategoryTabs/Operators"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Actions" type="VBoxContainer" parent="MainContainer/ContentSplitter/FunctionPalette/CategoryTabs"]
+layout_mode = 2
+
+[node name="ActionsList" type="ItemList" parent="MainContainer/ContentSplitter/FunctionPalette/CategoryTabs/Actions"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Conditionals" type="VBoxContainer" parent="MainContainer/ContentSplitter/FunctionPalette/CategoryTabs"]
+layout_mode = 2
+
+[node name="ConditionalsList" type="ItemList" parent="MainContainer/ContentSplitter/FunctionPalette/CategoryTabs/Conditionals"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="EditorArea" type="VBoxContainer" parent="MainContainer/ContentSplitter"]
+layout_mode = 2
+
+[node name="EditorTabs" type="TabContainer" parent="MainContainer/ContentSplitter/EditorArea"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VisualEditor" type="Control" parent="MainContainer/ContentSplitter/EditorArea/EditorTabs"]
+layout_mode = 2
+
+[node name="GraphContainer" type="ScrollContainer" parent="MainContainer/ContentSplitter/EditorArea/EditorTabs/VisualEditor"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="SexpGraph" type="Control" parent="MainContainer/ContentSplitter/EditorArea/EditorTabs/VisualEditor/GraphContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="TextEditor" type="VBoxContainer" parent="MainContainer/ContentSplitter/EditorArea/EditorTabs"]
+layout_mode = 2
+
+[node name="CodeEdit" type="CodeEdit" parent="MainContainer/ContentSplitter/EditorArea/EditorTabs/TextEditor"]
+layout_mode = 2
+size_flags_vertical = 3
+placeholder_text = "Enter SEXP code here..."
+
+[node name="StatusBar" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="ValidationStatus" type="Label" parent="MainContainer/StatusBar"]
+layout_mode = 2
+text = "Valid"
+
+[node name="Spacer2" type="Control" parent="MainContainer/StatusBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CursorPosition" type="Label" parent="MainContainer/StatusBar"]
+layout_mode = 2
+text = "Ln 1, Col 1"

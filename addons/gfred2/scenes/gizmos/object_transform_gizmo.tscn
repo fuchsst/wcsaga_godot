@@ -1,0 +1,66 @@
+[gd_scene load_steps=2 format=3 uid="uid://dmk6c0e8mfbdr"]
+
+[ext_resource type="Script" path="res://addons/gfred2/scripts/controllers/object_transform_gizmo_controller.gd" id="1_3v8r4"]
+
+[node name="ObjectTransformGizmo" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("1_3v8r4")
+
+[node name="GizmoContainer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="XAxisArrow" type="Control" parent="GizmoContainer"]
+layout_mode = 1
+mouse_filter = 0
+
+[node name="YAxisArrow" type="Control" parent="GizmoContainer"]
+layout_mode = 1
+mouse_filter = 0
+
+[node name="ZAxisArrow" type="Control" parent="GizmoContainer"]
+layout_mode = 1
+mouse_filter = 0
+
+[node name="CenterHandle" type="Control" parent="GizmoContainer"]
+layout_mode = 1
+mouse_filter = 0
+
+[node name="ScaleHandles" type="Control" parent="GizmoContainer"]
+layout_mode = 1
+mouse_filter = 2
+
+[node name="XScaleHandle" type="Control" parent="GizmoContainer/ScaleHandles"]
+layout_mode = 1
+mouse_filter = 0
+
+[node name="YScaleHandle" type="Control" parent="GizmoContainer/ScaleHandles"]
+layout_mode = 1
+mouse_filter = 0
+
+[node name="ZScaleHandle" type="Control" parent="GizmoContainer/ScaleHandles"]
+layout_mode = 1
+mouse_filter = 0
+
+[node name="RotationRings" type="Control" parent="GizmoContainer"]
+layout_mode = 1
+mouse_filter = 2
+
+[node name="XRotationRing" type="Control" parent="GizmoContainer/RotationRings"]
+layout_mode = 1
+mouse_filter = 0
+
+[node name="YRotationRing" type="Control" parent="GizmoContainer/RotationRings"]
+layout_mode = 1
+mouse_filter = 0
+
+[node name="ZRotationRing" type="Control" parent="GizmoContainer/RotationRings"]
+layout_mode = 1
+mouse_filter = 0

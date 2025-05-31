@@ -1,21 +1,81 @@
 @tool
 extends EditorPlugin
 
+## GFRED2 Mission Editor Plugin for Godot Engine.
+## Provides scene-based mission editing with WCS Asset Core integration.
+
+# Scene-based resource loading
 const MainPanel = preload("res://addons/gfred2/editor_main.tscn")
+const MainEditorDock = preload("res://addons/gfred2/scenes/docks/main_editor_dock.tscn")
+const AssetBrowserDock = preload("res://addons/gfred2/scenes/docks/asset_browser_dock.tscn")
+const SexpEditorDock = preload("res://addons/gfred2/scenes/docks/sexp_editor_dock.tscn")
+const ObjectInspectorDock = preload("res://addons/gfred2/scenes/docks/object_inspector_dock.tscn")
+const ValidationDock = preload("res://addons/gfred2/scenes/docks/validation_dock.tscn")
+const SceneDialogManager = preload("res://addons/gfred2/scenes/managers/scene_dialog_manager.tscn")
+
+# Manager script loading
 const ThemeManager = preload("res://addons/gfred2/ui/theme_manager.gd")
-const DockManager = preload("res://addons/gfred2/ui/dock_manager.gd")
 const ShortcutManager = preload("res://addons/gfred2/ui/shortcut_manager.gd")
 const ValidationIntegration = preload("res://addons/gfred2/validation/validation_integration.gd")
 
-var main_panel_instance
+# Plugin instances
+var main_panel_instance: Control
+var scene_dialog_manager: SceneDialogManagerController
 var theme_manager: GFRED2ThemeManager
-var dock_manager: GFRED2DockManager
 var shortcut_manager: GFRED2ShortcutManager
 var validation_integration: ValidationIntegration
 
+# Dock instances
+var dock_instances: Dictionary = {}
+
 func _enter_tree():
-	# Initialize theme manager first
-	theme_manager = ThemeManager.new(get_editor_interface())
+	print("GFRED2: Initializing mission editor plugin...")
+	
+	# Initialize core managers
+	_initialize_managers()
+	
+	# Initialize dialog manager
+	_initialize_dialog_manager()
+	
+	# Initialize main panel
+	_initialize_main_panel()
+	
+	# Register docks
+	_register_docks()
+	
+	# Hide panel initially
+	_make_visible(false)
+	
+	print("GFRED2: Mission editor plugin initialization completed")
+
+func _exit_tree():
+	print("GFRED2: Cleaning up mission editor plugin...")
+	
+	# Save manager settings
+	if shortcut_manager:
+		shortcut_manager.save_shortcuts()
+	if theme_manager:
+		theme_manager.save_theme_preferences()
+	
+	# Clean up dock instances
+	_cleanup_dock_instances()
+	
+	# Clean up main panel
+	if main_panel_instance:
+		main_panel_instance.queue_free()
+		main_panel_instance = null
+	
+	# Clean up dialog manager
+	if scene_dialog_manager:
+		scene_dialog_manager.close_all_dialogs()
+		scene_dialog_manager.queue_free()
+		scene_dialog_manager = null
+
+func _initialize_managers() -> void:
+	# Initialize theme manager
+	theme_manager = ThemeManager.new()
+	if theme_manager.has_method("initialize_with_editor_interface"):
+		theme_manager.initialize_with_editor_interface(get_editor_interface())
 	theme_manager.load_theme_preferences()
 	
 	# Initialize shortcut manager
@@ -24,65 +84,185 @@ func _enter_tree():
 	# Initialize validation integration
 	validation_integration = ValidationIntegration.new()
 	add_child(validation_integration)
-	
-	# Initialize dock manager
-	dock_manager = DockManager.new(get_editor_interface(), theme_manager)
-	_register_docks()
-	dock_manager.load_layout()
-	
-	# Initialize plugin
+
+func _initialize_dialog_manager() -> void:
+	# Instantiate dialog manager
+	scene_dialog_manager = SceneDialogManager.instantiate() as SceneDialogManagerController
+	if scene_dialog_manager:
+		add_child(scene_dialog_manager)
+		print("GFRED2: Dialog manager initialized")
+	else:
+		push_error("GFRED2: Failed to instantiate dialog manager")
+
+func _initialize_main_panel() -> void:
+	# Instantiate main panel scene
 	main_panel_instance = MainPanel.instantiate()
 	
-	# Apply managers to main panel
+	if not main_panel_instance:
+		push_error("GFRED2: Failed to instantiate main panel scene")
+		return
+	
+	# Connect managers to main panel
 	if main_panel_instance.has_method("set_theme_manager"):
 		main_panel_instance.set_theme_manager(theme_manager)
-	if main_panel_instance.has_method("set_dock_manager"):
-		main_panel_instance.set_dock_manager(dock_manager)
+	
 	if main_panel_instance.has_method("set_shortcut_manager"):
 		main_panel_instance.set_shortcut_manager(shortcut_manager)
+	
 	if main_panel_instance.has_method("set_validation_integration"):
 		main_panel_instance.set_validation_integration(validation_integration)
 	
-	# Add the main editor UI to the editor viewport
-	get_editor_interface().get_editor_main_screen().add_child(main_panel_instance)
+	if main_panel_instance.has_method("set_dialog_manager"):
+		main_panel_instance.set_dialog_manager(scene_dialog_manager)
 	
-	# Hide the panel when plugin starts
-	_make_visible(false)
-
-func _exit_tree():
-	if shortcut_manager:
-		shortcut_manager.save_shortcuts()
-	if dock_manager:
-		dock_manager.save_layout()
-	if theme_manager:
-		theme_manager.save_theme_preferences()
-	if main_panel_instance:
-		main_panel_instance.queue_free()
+	# Add to editor
+	get_editor_interface().get_editor_main_screen().add_child(main_panel_instance)
+	print("GFRED2: Main panel scene initialized and added to editor")
 
 func _register_docks() -> void:
-	"""Register all available docks with the dock manager."""
-	# Note: Using placeholder scene paths - these would need to be created as .tscn files
-	dock_manager.register_dock("object_inspector", "res://addons/gfred2/ui/docks/object_inspector_dock.gd", "Object Inspector", GFRED2DockManager.DockSlot.RIGHT_UL)
-	dock_manager.register_dock("asset_browser", "res://addons/gfred2/ui/docks/asset_browser_dock.gd", "Asset Browser", GFRED2DockManager.DockSlot.LEFT_UL)
-	dock_manager.register_dock("sexp_editor", "res://addons/gfred2/ui/docks/sexp_editor_dock.gd", "SEXP Editor", GFRED2DockManager.DockSlot.LEFT_BL)
-	dock_manager.register_dock("validation_panel", "res://addons/gfred2/ui/docks/validation_dock.gd", "Validation", GFRED2DockManager.DockSlot.RIGHT_BL)
+	"""Register all docks with the Godot editor."""
+	print("GFRED2: Registering docks...")
 	
-	# Integrate validation dock with validation system
-	if validation_integration and validation_integration.is_validation_system_ready():
-		var validation_dock: ValidationDock = validation_integration.get_validation_dock()
-		if validation_dock:
-			dock_manager.add_dock_instance("validation_panel", validation_dock)
+	# Create and register main editor dock
+	var main_editor_dock: MainEditorDockController = MainEditorDock.instantiate() as MainEditorDockController
+	if main_editor_dock:
+		dock_instances["main_editor"] = main_editor_dock
+		add_control_to_dock(DOCK_SLOT_LEFT_UL, main_editor_dock)
+		print("GFRED2: Main editor dock registered")
+	
+	# Create and register asset browser dock
+	var asset_browser_dock: AssetBrowserDockController = AssetBrowserDock.instantiate() as AssetBrowserDockController
+	if asset_browser_dock:
+		dock_instances["asset_browser"] = asset_browser_dock
+		add_control_to_dock(DOCK_SLOT_LEFT_UR, asset_browser_dock)
+		print("GFRED2: Asset browser dock registered")
+	
+	# Create and register SEXP editor dock
+	var sexp_editor_dock: SexpEditorDockController = SexpEditorDock.instantiate() as SexpEditorDockController
+	if sexp_editor_dock:
+		dock_instances["sexp_editor"] = sexp_editor_dock
+		add_control_to_dock(DOCK_SLOT_LEFT_BL, sexp_editor_dock)
+		print("GFRED2: SEXP editor dock registered")
+	
+	# Create and register object inspector dock
+	var object_inspector_dock: ObjectInspectorDockController = ObjectInspectorDock.instantiate() as ObjectInspectorDockController
+	if object_inspector_dock:
+		dock_instances["object_inspector"] = object_inspector_dock
+		add_control_to_dock(DOCK_SLOT_RIGHT_UL, object_inspector_dock)
+		print("GFRED2: Object inspector dock registered")
+	
+	# Create and register validation dock (if available)
+	if ValidationDock:
+		var validation_dock_instance = ValidationDock.instantiate()
+		if validation_dock_instance:
+			dock_instances["validation"] = validation_dock_instance
+			add_control_to_dock(DOCK_SLOT_RIGHT_BL, validation_dock_instance)
+			print("GFRED2: Validation dock registered")
+	
+	# Connect dock signals for inter-dock communication
+	_connect_dock_signals()
 
-func _has_main_screen():
+func _connect_dock_signals() -> void:
+	"""Connect signals between docks for coordinated functionality."""
+	var main_dock: MainEditorDockController = dock_instances.get("main_editor") as MainEditorDockController
+	var asset_dock: AssetBrowserDockController = dock_instances.get("asset_browser") as AssetBrowserDockController
+	var sexp_dock: SexpEditorDockController = dock_instances.get("sexp_editor") as SexpEditorDockController
+	var inspector_dock: ObjectInspectorDockController = dock_instances.get("object_inspector") as ObjectInspectorDockController
+	
+	if main_dock and inspector_dock:
+		# Connect object selection between main editor and inspector
+		main_dock.object_selected.connect(inspector_dock.inspect_object)
+		inspector_dock.property_changed.connect(_on_object_property_changed)
+		print("GFRED2: Connected main editor and object inspector")
+	
+	if asset_dock and main_dock:
+		# Connect asset selection for adding to mission
+		asset_dock.asset_double_clicked.connect(_on_asset_add_to_mission)
+		print("GFRED2: Connected asset browser to main editor")
+	
+	if sexp_dock and main_dock:
+		# Connect SEXP editor for mission event editing
+		sexp_dock.expression_changed.connect(_on_sexp_expression_changed)
+		print("GFRED2: Connected SEXP editor to main editor")
+
+func _cleanup_dock_instances() -> void:
+	"""Clean up all dock instances."""
+	for dock_name in dock_instances:
+		var dock_instance: Control = dock_instances[dock_name]
+		if dock_instance:
+			remove_control_from_docks(dock_instance)
+			dock_instance.queue_free()
+	
+	dock_instances.clear()
+	print("GFRED2: All dock instances cleaned up")
+
+## Signal handlers for inter-dock communication
+
+func _on_object_property_changed(object_data: MissionObjectData, property_name: String, new_value: Variant) -> void:
+	# Handle property changes from object inspector
+	print("GFRED2: Object property changed: %s.%s = %s" % [object_data.name if object_data else "null", property_name, new_value])
+
+func _on_asset_add_to_mission(asset_path: String, asset_data: Resource) -> void:
+	# Handle adding assets to mission from asset browser
+	var main_dock: MainEditorDockController = dock_instances.get("main_editor") as MainEditorDockController
+	if main_dock and main_dock.has_method("add_asset_to_mission"):
+		main_dock.add_asset_to_mission(asset_path, asset_data)
+	
+	print("GFRED2: Adding asset to mission: %s" % asset_path)
+
+func _on_sexp_expression_changed(sexp_code: String) -> void:
+	# Handle SEXP expression changes
+	print("GFRED2: SEXP expression changed: %s" % sexp_code)
+
+## Plugin interface implementation
+
+func _has_main_screen() -> bool:
 	return true
 
-func _make_visible(visible):
+func _make_visible(visible: bool) -> void:
 	if main_panel_instance:
 		main_panel_instance.visible = visible
 
-func _get_plugin_name():
-	return "Mission Editor"
+func _get_plugin_name() -> String:
+	return "GFRED2 Mission Editor"
 
-func _get_plugin_icon():
-	# Return editor icon from Godot's built-in icons
+func _get_plugin_icon() -> Texture2D:
+	# Return mission editor icon
 	return get_editor_interface().get_base_control().get_theme_icon("Node3D", "EditorIcons")
+
+## Public API for accessing scene-based components
+
+func get_scene_dialog_manager() -> SceneDialogManagerController:
+	return scene_dialog_manager
+
+func get_dock_instance(dock_name: String) -> Control:
+	return dock_instances.get(dock_name)
+
+func get_main_editor_dock() -> MainEditorDockController:
+	return dock_instances.get("main_editor") as MainEditorDockController
+
+func get_asset_browser_dock() -> AssetBrowserDockController:
+	return dock_instances.get("asset_browser") as AssetBrowserDockController
+
+func get_sexp_editor_dock() -> SexpEditorDockController:
+	return dock_instances.get("sexp_editor") as SexpEditorDockController
+
+func get_object_inspector_dock() -> ObjectInspectorDockController:
+	return dock_instances.get("object_inspector") as ObjectInspectorDockController
+
+## Mission management integration
+
+func load_mission(mission_path: String) -> void:
+	# Load mission into all relevant docks
+	print("GFRED2: Loading mission: %s" % mission_path)
+	
+	# TODO: Implement mission loading logic
+	# This would use WCS Asset Core to load mission data
+	# and distribute it to relevant dock instances
+
+func save_mission(mission_path: String) -> void:
+	# Save mission from all relevant docks
+	print("GFRED2: Saving mission: %s" % mission_path)
+	
+	# TODO: Implement mission saving logic
+	# This would collect data from all docks and save using WCS Asset Core
