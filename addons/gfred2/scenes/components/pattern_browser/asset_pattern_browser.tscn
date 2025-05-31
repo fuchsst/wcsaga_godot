@@ -1,0 +1,160 @@
+[gd_scene load_steps=3 format=3 uid="uid://bj4n7m5p8ckq9"]
+
+[ext_resource type="Script" path="res://addons/gfred2/scenes/components/pattern_browser/asset_pattern_browser.gd" id="1_9n4kx"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1_v4q3x"]
+bg_color = Color(0.2, 0.2, 0.25, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4, 0.4, 0.45, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="AssetPatternBrowser" type="VBoxContainer"]
+custom_minimum_size = Vector2(700, 500)
+script = ExtResource("1_9n4kx")
+
+[node name="HeaderPanel" type="PanelContainer" parent="."]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1_v4q3x")
+
+[node name="HeaderContent" type="HBoxContainer" parent="HeaderPanel"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="HeaderPanel/HeaderContent"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Asset Pattern Library"
+theme_override_font_sizes/font_size = 16
+
+[node name="TypeFilter" type="OptionButton" parent="HeaderPanel/HeaderContent"]
+layout_mode = 2
+tooltip_text = "Filter by pattern type"
+
+[node name="RoleFilter" type="OptionButton" parent="HeaderPanel/HeaderContent"]
+layout_mode = 2
+tooltip_text = "Filter by tactical role"
+
+[node name="FactionFilter" type="OptionButton" parent="HeaderPanel/HeaderContent"]
+layout_mode = 2
+tooltip_text = "Filter by faction"
+
+[node name="RefreshButton" type="Button" parent="HeaderPanel/HeaderContent"]
+layout_mode = 2
+text = "Refresh"
+
+[node name="MainSplitter" type="HSplitContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+split_offset = 350
+
+[node name="LeftPanel" type="VBoxContainer" parent="MainSplitter"]
+layout_mode = 2
+custom_minimum_size = Vector2(350, 0)
+
+[node name="SearchPanel" type="VBoxContainer" parent="MainSplitter/LeftPanel"]
+layout_mode = 2
+
+[node name="SearchLabel" type="Label" parent="MainSplitter/LeftPanel/SearchPanel"]
+layout_mode = 2
+text = "Search Patterns"
+
+[node name="SearchBox" type="LineEdit" parent="MainSplitter/LeftPanel/SearchPanel"]
+layout_mode = 2
+placeholder_text = "Search by name, ship class, or weapon..."
+
+[node name="PatternList" type="ScrollContainer" parent="MainSplitter/LeftPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PatternContainer" type="VBoxContainer" parent="MainSplitter/LeftPanel/PatternList"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RightPanel" type="VBoxContainer" parent="MainSplitter"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PreviewPanel" type="VBoxContainer" parent="MainSplitter/RightPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PreviewHeader" type="Label" parent="MainSplitter/RightPanel/PreviewPanel"]
+layout_mode = 2
+text = "Pattern Preview"
+theme_override_font_sizes/font_size = 14
+
+[node name="PatternDetails" type="VBoxContainer" parent="MainSplitter/RightPanel/PreviewPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PatternName" type="Label" parent="MainSplitter/RightPanel/PreviewPanel/PatternDetails"]
+layout_mode = 2
+text = "Select a pattern to preview"
+theme_override_font_sizes/font_size = 12
+
+[node name="PatternInfo" type="RichTextLabel" parent="MainSplitter/RightPanel/PreviewPanel/PatternDetails"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[i]Pattern details will appear here[/i]"
+fit_content = true
+
+[node name="LoadoutPanel" type="VBoxContainer" parent="MainSplitter/RightPanel/PreviewPanel"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 120)
+
+[node name="LoadoutLabel" type="Label" parent="MainSplitter/RightPanel/PreviewPanel/LoadoutPanel"]
+layout_mode = 2
+text = "Weapon Loadout"
+theme_override_font_sizes/font_size = 12
+
+[node name="LoadoutDetails" type="RichTextLabel" parent="MainSplitter/RightPanel/PreviewPanel/LoadoutPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[i]Loadout details will appear here[/i]"
+fit_content = true
+
+[node name="ParameterPanel" type="VBoxContainer" parent="MainSplitter/RightPanel"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 150)
+
+[node name="ParameterHeader" type="Label" parent="MainSplitter/RightPanel/ParameterPanel"]
+layout_mode = 2
+text = "Placement Parameters"
+theme_override_font_sizes/font_size = 14
+
+[node name="ParameterScroll" type="ScrollContainer" parent="MainSplitter/RightPanel/ParameterPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ParameterContainer" type="VBoxContainer" parent="MainSplitter/RightPanel/ParameterPanel/ParameterScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ActionPanel" type="HBoxContainer" parent="MainSplitter/RightPanel"]
+layout_mode = 2
+
+[node name="ValidateButton" type="Button" parent="MainSplitter/RightPanel/ActionPanel"]
+layout_mode = 2
+text = "Validate"
+disabled = true
+
+[node name="InsertButton" type="Button" parent="MainSplitter/RightPanel/ActionPanel"]
+layout_mode = 2
+text = "Insert Pattern"
+disabled = true
+
+[node name="PreviewButton" type="Button" parent="MainSplitter/RightPanel/ActionPanel"]
+layout_mode = 2
+text = "Preview Objects"
+disabled = true
+
+[node name="Spacer" type="Control" parent="MainSplitter/RightPanel/ActionPanel"]
+layout_mode = 2
+size_flags_horizontal = 3

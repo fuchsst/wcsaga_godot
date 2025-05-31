@@ -1,6 +1,22 @@
-[gd_scene load_steps=2 format=3 uid="uid://bxl78mn4uvbaj"]
+[gd_scene load_steps=3 format=3 uid="uid://bxl78mn4uvbaj"]
 
-[ext_resource type="Script" path="res://addons/gfred2/validation/validation_indicator.gd" id="1_h2rkf"]
+[ext_resource type="Script" path="res://addons/gfred2/scenes/components/validation_indicator.gd" id="1_validation_indicator_script"]
+
+[sub_resource type="Animation" id="Animation_spin"]
+resource_name = "spin"
+length = 1.0
+loop_mode = 1
+tracks/0/type = "rotation"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("HBoxContainer/StatusIcon")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"values": [0.0, 6.28319]
+}
 
 [node name="ValidationIndicator" type="Control"]
 layout_mode = 3
@@ -8,10 +24,34 @@ anchors_preset = 0
 offset_right = 16.0
 offset_bottom = 16.0
 focus_mode = 2
-script = ExtResource("1_h2rkf")
+script = ExtResource("1_validation_indicator_script")
 indicator_size = Vector2(16, 16)
-show_text_label = false
 show_tooltip = true
-animate_transitions = true
-high_contrast_mode = false
-screen_reader_enabled = true
+show_error_count = false
+animation_enabled = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="StatusIcon" type="TextureRect" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ErrorLabel" type="Label" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 1
+text = "0"
+label_settings = null
+vertical_alignment = 1
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": null
+}

@@ -1,0 +1,95 @@
+[gd_scene load_steps=3 format=3 uid="uid://cqyj8t1l2m4rk"]
+
+[ext_resource type="Script" path="res://addons/gfred2/scenes/dialogs/template_library/template_customization_dialog.gd" id="1_2m8kx"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1_v4q3x"]
+bg_color = Color(0.2, 0.2, 0.25, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4, 0.4, 0.45, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="TemplateCustomizationDialog" type="AcceptDialog"]
+title = "Customize Template"
+initial_position = 2
+size = Vector2i(700, 500)
+script = ExtResource("1_2m8kx")
+
+[node name="MainContainer" type="VBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -48.0
+
+[node name="HeaderPanel" type="PanelContainer" parent="MainContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1_v4q3x")
+
+[node name="HeaderContent" type="VBoxContainer" parent="MainContainer/HeaderPanel"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="MainContainer/HeaderPanel/HeaderContent"]
+layout_mode = 2
+text = "Template Customization"
+theme_override_font_sizes/font_size = 16
+
+[node name="TemplateInfo" type="Label" parent="MainContainer/HeaderPanel/HeaderContent"]
+layout_mode = 2
+text = "Customize parameters for: [Template Name]"
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.7, 0.7, 0.8, 1)
+
+[node name="ParametersPanel" type="ScrollContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ParameterContainer" type="VBoxContainer" parent="MainContainer/ParametersPanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PreviewPanel" type="VBoxContainer" parent="MainContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 120)
+
+[node name="PreviewLabel" type="Label" parent="MainContainer/PreviewPanel"]
+layout_mode = 2
+text = "Mission Preview"
+theme_override_font_sizes/font_size = 14
+
+[node name="PreviewContent" type="RichTextLabel" parent="MainContainer/PreviewPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[i]Mission preview will appear here[/i]"
+fit_content = true
+
+[node name="ButtonPanel" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="ResetButton" type="Button" parent="MainContainer/ButtonPanel"]
+layout_mode = 2
+text = "Reset to Defaults"
+
+[node name="ValidateButton" type="Button" parent="MainContainer/ButtonPanel"]
+layout_mode = 2
+text = "Validate"
+
+[node name="Spacer" type="Control" parent="MainContainer/ButtonPanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CancelButton" type="Button" parent="MainContainer/ButtonPanel"]
+layout_mode = 2
+text = "Cancel"
+
+[node name="CreateButton" type="Button" parent="MainContainer/ButtonPanel"]
+layout_mode = 2
+text = "Create Mission"

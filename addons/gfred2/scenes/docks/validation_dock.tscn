@@ -1,0 +1,51 @@
+[gd_scene load_steps=3 format=3 uid="uid://bskyb1g7uxfic"]
+
+[ext_resource type="Script" path="res://addons/gfred2/scenes/docks/validation_dock.gd" id="1_validation_dock_script"]
+[ext_resource type="PackedScene" uid="uid://bxl78mn4uvbaj" path="res://addons/gfred2/scenes/components/validation_indicator.tscn" id="2_validation_indicator"]
+
+[node name="ValidationDock" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_validation_dock_script")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="ValidationTree" type="Tree" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+columns = 3
+column_titles_visible = true
+hide_root = false
+allow_reselect = true
+allow_rmb_select = true
+select_mode = 1
+
+[node name="StatusBar" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="ValidationIndicator" parent="VBoxContainer/StatusBar" instance=ExtResource("2_validation_indicator")]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="StatusLabel" type="Label" parent="VBoxContainer/StatusBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "No validation performed"
+vertical_alignment = 1
+
+[node name="RefreshButton" type="Button" parent="VBoxContainer/StatusBar"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Refresh"
+
+[node name="SettingsButton" type="Button" parent="VBoxContainer/StatusBar"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Settings"

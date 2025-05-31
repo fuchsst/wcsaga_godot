@@ -3,7 +3,7 @@ extends Node
 
 ## Validator for mission object properties in the FRED2 editor plugin.
 ## Provides real-time validation and error reporting.
-## Uses EPIC-001 core foundation validation patterns for consistency.
+## Uses addons/wcs_core_asstes core foundation validation patterns for consistency.
 
 signal validation_error(object_data: MissionObjectData, property: String, error: String)
 signal validation_passed(object_data: MissionObjectData, property: String)

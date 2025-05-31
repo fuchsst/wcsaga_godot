@@ -1,0 +1,155 @@
+[gd_scene load_steps=3 format=3 uid="uid://bqjx8n4p5ckl2"]
+
+[ext_resource type="Script" path="res://addons/gfred2/scenes/components/pattern_browser/sexp_pattern_browser.gd" id="1_8m2kx"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1_v4q3x"]
+bg_color = Color(0.2, 0.2, 0.25, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4, 0.4, 0.45, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="SexpPatternBrowser" type="VBoxContainer"]
+custom_minimum_size = Vector2(600, 400)
+script = ExtResource("1_8m2kx")
+
+[node name="HeaderPanel" type="PanelContainer" parent="."]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1_v4q3x")
+
+[node name="HeaderContent" type="HBoxContainer" parent="HeaderPanel"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="HeaderPanel/HeaderContent"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "SEXP Pattern Library"
+theme_override_font_sizes/font_size = 16
+
+[node name="CategoryFilter" type="OptionButton" parent="HeaderPanel/HeaderContent"]
+layout_mode = 2
+tooltip_text = "Filter by pattern category"
+
+[node name="ComplexityFilter" type="OptionButton" parent="HeaderPanel/HeaderContent"]
+layout_mode = 2
+tooltip_text = "Filter by complexity level"
+
+[node name="RefreshButton" type="Button" parent="HeaderPanel/HeaderContent"]
+layout_mode = 2
+text = "Refresh"
+
+[node name="MainSplitter" type="HSplitContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+split_offset = 300
+
+[node name="LeftPanel" type="VBoxContainer" parent="MainSplitter"]
+layout_mode = 2
+custom_minimum_size = Vector2(300, 0)
+
+[node name="SearchPanel" type="VBoxContainer" parent="MainSplitter/LeftPanel"]
+layout_mode = 2
+
+[node name="SearchLabel" type="Label" parent="MainSplitter/LeftPanel/SearchPanel"]
+layout_mode = 2
+text = "Search Patterns"
+
+[node name="SearchBox" type="LineEdit" parent="MainSplitter/LeftPanel/SearchPanel"]
+layout_mode = 2
+placeholder_text = "Search by name, function, or tag..."
+
+[node name="PatternList" type="ScrollContainer" parent="MainSplitter/LeftPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PatternContainer" type="VBoxContainer" parent="MainSplitter/LeftPanel/PatternList"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RightPanel" type="VBoxContainer" parent="MainSplitter"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PreviewPanel" type="VBoxContainer" parent="MainSplitter/RightPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PreviewHeader" type="Label" parent="MainSplitter/RightPanel/PreviewPanel"]
+layout_mode = 2
+text = "Pattern Preview"
+theme_override_font_sizes/font_size = 14
+
+[node name="PatternDetails" type="VBoxContainer" parent="MainSplitter/RightPanel/PreviewPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PatternName" type="Label" parent="MainSplitter/RightPanel/PreviewPanel/PatternDetails"]
+layout_mode = 2
+text = "Select a pattern to preview"
+theme_override_font_sizes/font_size = 12
+
+[node name="PatternInfo" type="RichTextLabel" parent="MainSplitter/RightPanel/PreviewPanel/PatternDetails"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[i]Pattern details will appear here[/i]"
+fit_content = true
+
+[node name="ExpressionPanel" type="VBoxContainer" parent="MainSplitter/RightPanel/PreviewPanel"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 120)
+
+[node name="ExpressionLabel" type="Label" parent="MainSplitter/RightPanel/PreviewPanel/ExpressionPanel"]
+layout_mode = 2
+text = "SEXP Expression"
+theme_override_font_sizes/font_size = 12
+
+[node name="ExpressionEditor" type="TextEdit" parent="MainSplitter/RightPanel/PreviewPanel/ExpressionPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+placeholder_text = "Pattern expression will appear here"
+editable = false
+
+[node name="ParameterPanel" type="VBoxContainer" parent="MainSplitter/RightPanel"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 150)
+
+[node name="ParameterHeader" type="Label" parent="MainSplitter/RightPanel/ParameterPanel"]
+layout_mode = 2
+text = "Parameters"
+theme_override_font_sizes/font_size = 14
+
+[node name="ParameterScroll" type="ScrollContainer" parent="MainSplitter/RightPanel/ParameterPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ParameterContainer" type="VBoxContainer" parent="MainSplitter/RightPanel/ParameterPanel/ParameterScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ActionPanel" type="HBoxContainer" parent="MainSplitter/RightPanel"]
+layout_mode = 2
+
+[node name="ValidateButton" type="Button" parent="MainSplitter/RightPanel/ActionPanel"]
+layout_mode = 2
+text = "Validate"
+disabled = true
+
+[node name="InsertButton" type="Button" parent="MainSplitter/RightPanel/ActionPanel"]
+layout_mode = 2
+text = "Insert Pattern"
+disabled = true
+
+[node name="CopyButton" type="Button" parent="MainSplitter/RightPanel/ActionPanel"]
+layout_mode = 2
+text = "Copy Expression"
+disabled = true
+
+[node name="Spacer" type="Control" parent="MainSplitter/RightPanel/ActionPanel"]
+layout_mode = 2
+size_flags_horizontal = 3

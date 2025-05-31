@@ -1,0 +1,213 @@
+[gd_scene load_steps=3 format=3 uid="uid://bvkfkqd1ckni5"]
+
+[ext_resource type="Script" path="res://addons/gfred2/scenes/dialogs/template_library/mission_template_browser.gd" id="1_jx8k7"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1_v4q3x"]
+bg_color = Color(0.2, 0.2, 0.25, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4, 0.4, 0.45, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="MissionTemplateBrowser" type="VBoxContainer"]
+custom_minimum_size = Vector2(800, 600)
+script = ExtResource("1_jx8k7")
+
+[node name="HeaderPanel" type="PanelContainer" parent="."]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1_v4q3x")
+
+[node name="HeaderContent" type="HBoxContainer" parent="HeaderPanel"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="HeaderPanel/HeaderContent"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Mission Template Library"
+theme_override_font_sizes/font_size = 16
+
+[node name="RefreshButton" type="Button" parent="HeaderPanel/HeaderContent"]
+layout_mode = 2
+text = "Refresh"
+
+[node name="ImportButton" type="Button" parent="HeaderPanel/HeaderContent"]
+layout_mode = 2
+text = "Import"
+
+[node name="CreateButton" type="Button" parent="HeaderPanel/HeaderContent"]
+layout_mode = 2
+text = "Create New"
+
+[node name="MainSplitter" type="HSplitContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+split_offset = 250
+
+[node name="LeftPanel" type="VBoxContainer" parent="MainSplitter"]
+layout_mode = 2
+custom_minimum_size = Vector2(250, 0)
+
+[node name="FilterPanel" type="VBoxContainer" parent="MainSplitter/LeftPanel"]
+layout_mode = 2
+
+[node name="FilterLabel" type="Label" parent="MainSplitter/LeftPanel/FilterPanel"]
+layout_mode = 2
+text = "Filters"
+theme_override_font_sizes/font_size = 14
+
+[node name="CategoryFilter" type="VBoxContainer" parent="MainSplitter/LeftPanel/FilterPanel"]
+layout_mode = 2
+
+[node name="CategoryLabel" type="Label" parent="MainSplitter/LeftPanel/FilterPanel/CategoryFilter"]
+layout_mode = 2
+text = "Category:"
+
+[node name="CategoryOption" type="OptionButton" parent="MainSplitter/LeftPanel/FilterPanel/CategoryFilter"]
+layout_mode = 2
+
+[node name="TypeFilter" type="VBoxContainer" parent="MainSplitter/LeftPanel/FilterPanel"]
+layout_mode = 2
+
+[node name="TypeLabel" type="Label" parent="MainSplitter/LeftPanel/FilterPanel/TypeFilter"]
+layout_mode = 2
+text = "Type:"
+
+[node name="TypeOption" type="OptionButton" parent="MainSplitter/LeftPanel/FilterPanel/TypeFilter"]
+layout_mode = 2
+
+[node name="DifficultyFilter" type="VBoxContainer" parent="MainSplitter/LeftPanel/FilterPanel"]
+layout_mode = 2
+
+[node name="DifficultyLabel" type="Label" parent="MainSplitter/LeftPanel/FilterPanel/DifficultyFilter"]
+layout_mode = 2
+text = "Difficulty:"
+
+[node name="DifficultyOption" type="OptionButton" parent="MainSplitter/LeftPanel/FilterPanel/DifficultyFilter"]
+layout_mode = 2
+
+[node name="SearchPanel" type="VBoxContainer" parent="MainSplitter/LeftPanel"]
+layout_mode = 2
+
+[node name="SearchLabel" type="Label" parent="MainSplitter/LeftPanel/SearchPanel"]
+layout_mode = 2
+text = "Search"
+theme_override_font_sizes/font_size = 14
+
+[node name="SearchBox" type="LineEdit" parent="MainSplitter/LeftPanel/SearchPanel"]
+layout_mode = 2
+placeholder_text = "Search templates..."
+
+[node name="TagsPanel" type="VBoxContainer" parent="MainSplitter/LeftPanel"]
+layout_mode = 2
+
+[node name="TagsLabel" type="Label" parent="MainSplitter/LeftPanel/TagsPanel"]
+layout_mode = 2
+text = "Popular Tags"
+theme_override_font_sizes/font_size = 14
+
+[node name="TagContainer" type="FlowContainer" parent="MainSplitter/LeftPanel/TagsPanel"]
+layout_mode = 2
+
+[node name="RightPanel" type="VBoxContainer" parent="MainSplitter"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TemplateListPanel" type="VBoxContainer" parent="MainSplitter/RightPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ListHeader" type="HBoxContainer" parent="MainSplitter/RightPanel/TemplateListPanel"]
+layout_mode = 2
+
+[node name="ResultsLabel" type="Label" parent="MainSplitter/RightPanel/TemplateListPanel/ListHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Templates (0)"
+
+[node name="SortLabel" type="Label" parent="MainSplitter/RightPanel/TemplateListPanel/ListHeader"]
+layout_mode = 2
+text = "Sort by:"
+
+[node name="SortOption" type="OptionButton" parent="MainSplitter/RightPanel/TemplateListPanel/ListHeader"]
+layout_mode = 2
+
+[node name="TemplateList" type="ScrollContainer" parent="MainSplitter/RightPanel/TemplateListPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TemplateContainer" type="VBoxContainer" parent="MainSplitter/RightPanel/TemplateListPanel/TemplateList"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PreviewPanel" type="VBoxContainer" parent="MainSplitter/RightPanel"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 200)
+
+[node name="PreviewHeader" type="Label" parent="MainSplitter/RightPanel/PreviewPanel"]
+layout_mode = 2
+text = "Template Preview"
+theme_override_font_sizes/font_size = 14
+
+[node name="PreviewContent" type="HSplitContainer" parent="MainSplitter/RightPanel/PreviewPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PreviewDetails" type="VBoxContainer" parent="MainSplitter/RightPanel/PreviewPanel/PreviewContent"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TemplateName" type="Label" parent="MainSplitter/RightPanel/PreviewPanel/PreviewContent/PreviewDetails"]
+layout_mode = 2
+text = "Select a template to preview"
+theme_override_font_sizes/font_size = 12
+
+[node name="TemplateDescription" type="RichTextLabel" parent="MainSplitter/RightPanel/PreviewPanel/PreviewContent/PreviewDetails"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[i]Template details will appear here[/i]"
+fit_content = true
+
+[node name="PreviewActions" type="VBoxContainer" parent="MainSplitter/RightPanel/PreviewPanel/PreviewContent"]
+layout_mode = 2
+custom_minimum_size = Vector2(150, 0)
+
+[node name="UseTemplateButton" type="Button" parent="MainSplitter/RightPanel/PreviewPanel/PreviewContent/PreviewActions"]
+layout_mode = 2
+text = "Use Template"
+disabled = true
+
+[node name="CustomizeButton" type="Button" parent="MainSplitter/RightPanel/PreviewPanel/PreviewContent/PreviewActions"]
+layout_mode = 2
+text = "Customize"
+disabled = true
+
+[node name="ExportButton" type="Button" parent="MainSplitter/RightPanel/PreviewPanel/PreviewContent/PreviewActions"]
+layout_mode = 2
+text = "Export"
+disabled = true
+
+[node name="EditButton" type="Button" parent="MainSplitter/RightPanel/PreviewPanel/PreviewContent/PreviewActions"]
+layout_mode = 2
+text = "Edit"
+disabled = true
+
+[node name="DeleteButton" type="Button" parent="MainSplitter/RightPanel/PreviewPanel/PreviewContent/PreviewActions"]
+layout_mode = 2
+text = "Delete"
+disabled = true
+
+[node name="ImportFileDialog" type="FileDialog" parent="."]
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.json ; Template Files")
+
+[node name="ExportFileDialog" type="FileDialog" parent="."]
+file_mode = 4
+access = 2
+filters = PackedStringArray("*.json ; Template Files")

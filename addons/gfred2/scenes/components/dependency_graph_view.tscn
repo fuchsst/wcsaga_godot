@@ -1,13 +1,17 @@
 [gd_scene load_steps=2 format=3 uid="uid://bd1rm7xjfn5hv"]
 
-[ext_resource type="Script" path="res://addons/gfred2/validation/dependency_graph_view.gd" id="1_y9k2m"]
+[ext_resource type="Script" path="res://addons/gfred2/scenes/components/dependency_graph_view.gd" id="1_dependency_graph_script"]
 
 [node name="DependencyGraphView" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = ExtResource("1_y9k2m")
+script = ExtResource("1_dependency_graph_script")
+auto_layout = true
+show_validation_status = true
+animate_layout = true
+max_nodes_displayed = 100
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -15,60 +19,52 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 
-[node name="ToolbarPanel" type="HBoxContainer" parent="VBoxContainer"]
+[node name="Toolbar" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 0
 
-[node name="RefreshButton" type="Button" parent="VBoxContainer/ToolbarPanel"]
+[node name="LayoutButton" type="Button" parent="VBoxContainer/Toolbar"]
 layout_mode = 2
-text = "Refresh"
+text = "Auto Layout"
 
-[node name="LayoutButton" type="OptionButton" parent="VBoxContainer/ToolbarPanel"]
+[node name="VSeparator" type="VSeparator" parent="VBoxContainer/Toolbar"]
 layout_mode = 2
-text = "Tree Layout"
 
-[node name="FilterContainer" type="HBoxContainer" parent="VBoxContainer/ToolbarPanel"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="FilterLabel" type="Label" parent="VBoxContainer/ToolbarPanel/FilterContainer"]
+[node name="FilterLabel" type="Label" parent="VBoxContainer/Toolbar"]
 layout_mode = 2
 text = "Filter:"
 
-[node name="FilterLineEdit" type="LineEdit" parent="VBoxContainer/ToolbarPanel/FilterContainer"]
+[node name="FilterOption" type="OptionButton" parent="VBoxContainer/Toolbar"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="VSeparator2" type="VSeparator" parent="VBoxContainer/Toolbar"]
+layout_mode = 2
+
+[node name="SearchBox" type="LineEdit" parent="VBoxContainer/Toolbar"]
 layout_mode = 2
 size_flags_horizontal = 3
-placeholder_text = "Search dependencies..."
+placeholder_text = "Search nodes..."
 
-[node name="ShowErrorsOnly" type="CheckBox" parent="VBoxContainer/ToolbarPanel"]
-layout_mode = 2
-text = "Errors Only"
-
-[node name="GraphContainer" type="SubViewportContainer" parent="VBoxContainer"]
+[node name="GraphEdit" type="GraphEdit" parent="VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
-stretch = true
+right_disconnects = true
+zoom_min = 0.1
+zoom_max = 3.0
 
-[node name="GraphViewport" type="SubViewport" parent="VBoxContainer/GraphContainer"]
-handle_input_locally = false
-size = Vector2i(1152, 648)
-render_target_update_mode = 4
-
-[node name="GraphCanvas" type="Control" parent="VBoxContainer/GraphContainer/GraphViewport"]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-
-[node name="StatusBar" type="HBoxContainer" parent="VBoxContainer"]
+[node name="InfoPanel" type="Panel" parent="VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 0
 
-[node name="StatusLabel" type="Label" parent="VBoxContainer/StatusBar"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "No dependencies"
-
-[node name="DependencyCount" type="Label" parent="VBoxContainer/StatusBar"]
-layout_mode = 2
-text = "0 items"
+[node name="InfoLabel" type="RichTextLabel" parent="VBoxContainer/InfoPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
+bbcode_enabled = true
+text = "Graph information will appear here"
