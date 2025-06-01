@@ -50,7 +50,9 @@ func _ensure_directories_exist() -> void:
 	
 	for dir_path in directories:
 		if not DirAccess.dir_exists_absolute(dir_path):
-			DirAccess.make_dir_recursive_absolute(dir_path)
+			var error: Error = DirAccess.open("user://").make_dir_recursive(dir_path.replace("user://", ""))
+			if error != OK:
+				push_error("Failed to create directory: %s (Error: %d)" % [dir_path, error])
 
 ## Initializes default template and pattern libraries
 func _initialize_default_libraries() -> void:

@@ -1,5 +1,4 @@
-class_name WCSConstants
-extends Resource
+extends Node
 
 ## Core constants and global definitions from WCS C++ implementation.
 ## Contains all global constants from globals.h and pstypes.h with identical values.

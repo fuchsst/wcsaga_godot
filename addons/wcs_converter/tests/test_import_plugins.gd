@@ -16,10 +16,14 @@ var test_assets_dir: String
 func before_test() -> void:
 	# Create temporary directory for tests
 	temp_dir = "user://test_wcs_import_" + str(Time.get_ticks_msec())
-	DirAccess.make_dir_recursive_absolute(temp_dir)
+	var error: Error = DirAccess.open("user://").make_dir_recursive(temp_dir.replace("user://", ""))
+	if error != OK:
+		push_error("Failed to create temp directory: %s (Error: %d)" % [temp_dir, error])
 	
 	test_assets_dir = temp_dir + "/test_assets"
-	DirAccess.make_dir_recursive_absolute(test_assets_dir)
+	var error2: Error = DirAccess.open("user://").make_dir_recursive(test_assets_dir.replace("user://", ""))
+	if error2 != OK:
+		push_error("Failed to create test assets directory: %s (Error: %d)" % [test_assets_dir, error2])
 	
 	_create_test_assets()
 

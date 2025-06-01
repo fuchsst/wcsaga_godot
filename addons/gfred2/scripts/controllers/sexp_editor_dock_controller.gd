@@ -212,19 +212,49 @@ func _on_validate_pressed() -> void:
 	_validate_current_expression()
 
 func _on_debug_pressed() -> void:
-	# TODO: Implement SEXP debugging functionality
-	print("SexpEditorDockController: Debug functionality not yet implemented")
+	# Implement SEXP debugging functionality using EPIC-004 SEXP system
+	if SexpManager and SexpManager.has_method("debug_expression"):
+		var debug_result: Dictionary = SexpManager.debug_expression(current_expression)
+		if debug_result.has("success") and debug_result.success:
+			print("SexpEditorDockController: Debug - Expression evaluation: %s" % debug_result.get("result", "unknown"))
+			if debug_result.has("steps"):
+				print("SexpEditorDockController: Debug - Evaluation steps: %s" % debug_result.steps)
+		else:
+			print("SexpEditorDockController: Debug - Error: %s" % debug_result.get("error", "Unknown debug error"))
+	else:
+		# Fallback debug information
+		print("SexpEditorDockController: Debug - Expression: '%s'" % current_expression)
+		print("SexpEditorDockController: Debug - Valid: %s" % is_valid_expression)
+		if not validation_errors.is_empty():
+			print("SexpEditorDockController: Debug - Errors: %s" % ", ".join(validation_errors))
 
 func _on_new_expression_pressed() -> void:
 	set_expression("")
 
 func _on_load_expression_pressed() -> void:
-	# TODO: Implement expression loading
-	print("SexpEditorDockController: Load expression functionality not yet implemented")
+	# Implement expression loading from mission data or templates
+	# TODO: Connect to mission data Resource system for loading expressions
+	var file_dialog: FileDialog = FileDialog.new()
+	file_dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILE
+	file_dialog.add_filter("*.sexp", "SEXP Expression Files")
+	file_dialog.file_selected.connect(_on_expression_file_selected)
+	get_viewport().add_child(file_dialog)
+	file_dialog.popup_centered(Vector2i(800, 600))
+	print("SexpEditorDockController: Load expression dialog opened")
 
 func _on_save_expression_pressed() -> void:
-	# TODO: Implement expression saving
-	print("SexpEditorDockController: Save expression functionality not yet implemented")
+	# Implement expression saving to file or mission data
+	if current_expression.is_empty():
+		print("SexpEditorDockController: No expression to save")
+		return
+	
+	var file_dialog: FileDialog = FileDialog.new()
+	file_dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
+	file_dialog.add_filter("*.sexp", "SEXP Expression Files")
+	file_dialog.file_selected.connect(_on_save_expression_file_selected)
+	get_viewport().add_child(file_dialog)
+	file_dialog.popup_centered(Vector2i(800, 600))
+	print("SexpEditorDockController: Save expression dialog opened")
 
 func _on_undo_pressed() -> void:
 	if code_edit:
@@ -235,8 +265,28 @@ func _on_redo_pressed() -> void:
 		code_edit.redo()
 
 func _on_palette_search_changed(search_text: String) -> void:
-	# TODO: Implement function palette filtering
-	print("SexpEditorDockController: Filtering functions by: %s" % search_text)
+	# Implement function palette filtering
+	_filter_function_lists(search_text)
+
+func _filter_function_lists(search_text: String) -> void:
+	if not operators_list or not actions_list or not conditionals_list:
+		return
+	
+	# Clear current lists
+	operators_list.clear()
+	actions_list.clear()
+	conditionals_list.clear()
+	
+	# Filter and repopulate lists
+	for func_data in sexp_functions:
+		if search_text.is_empty() or func_data.name.to_lower().contains(search_text.to_lower()) or func_data.description.to_lower().contains(search_text.to_lower()):
+			match func_data.category:
+				"operators":
+					_add_function_to_list(operators_list, func_data)
+				"actions":
+					_add_function_to_list(actions_list, func_data)
+				"conditionals":
+					_add_function_to_list(conditionals_list, func_data)
 
 func _on_function_selected(category: String, index: int) -> void:
 	var list: ItemList = null
@@ -317,3 +367,24 @@ func insert_function(function_name: String) -> void:
 		if func_data.name == function_name:
 			_insert_function_template(func_data)
 			break
+
+## File operation handlers
+
+func _on_expression_file_selected(file_path: String) -> void:
+	var file: FileAccess = FileAccess.open(file_path, FileAccess.READ)
+	if file:
+		var expression_content: String = file.get_as_text()
+		file.close()
+		set_expression(expression_content)
+		print("SexpEditorDockController: Loaded expression from: %s" % file_path)
+	else:
+		print("SexpEditorDockController: Failed to load expression from: %s" % file_path)
+
+func _on_save_expression_file_selected(file_path: String) -> void:
+	var file: FileAccess = FileAccess.open(file_path, FileAccess.WRITE)
+	if file:
+		file.store_string(current_expression)
+		file.close()
+		print("SexpEditorDockController: Saved expression to: %s" % file_path)
+	else:
+		print("SexpEditorDockController: Failed to save expression to: %s" % file_path)

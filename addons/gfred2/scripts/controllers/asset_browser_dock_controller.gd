@@ -142,9 +142,64 @@ func _update_asset_preview(asset_path: String) -> void:
 		asset_selected.emit(asset_path, asset_data)
 
 func _display_asset_preview(asset_data: Resource) -> void:
-	# TODO: Implement asset-specific preview rendering
-	# This would create appropriate preview visuals based on asset type
+	if not preview_panel:
+		return
+	
+	# Clear previous preview content
+	for child in preview_panel.get_children():
+		child.queue_free()
+	
+	# Create appropriate preview based on asset type
+	if asset_data is ShipData:
+		_create_ship_preview(asset_data as ShipData)
+	elif asset_data is WeaponData:
+		_create_weapon_preview(asset_data as WeaponData)
+	elif asset_data is Texture2D:
+		_create_texture_preview(asset_data as Texture2D)
+	else:
+		# Generic preview
+		_create_generic_preview(asset_data)
+	
 	print("AssetBrowserDockController: Displaying preview for asset: %s" % asset_data.get_class())
+
+func _create_ship_preview(ship_data: ShipData) -> void:
+	# Create 3D preview for ship
+	var preview_viewport: SubViewport = SubViewport.new()
+	preview_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	preview_viewport.size = Vector2i(200, 150)
+	
+	var camera: Camera3D = Camera3D.new()
+	camera.projection = Camera3D.PROJECTION_PERSPECTIVE
+	camera.position = Vector3(0, 0, 10)
+	
+	# TODO: Load and display ship model when model loading is available
+	var label: Label = Label.new()
+	label.text = "Ship Preview\n%s\nClass: %s" % [ship_data.ship_name, ship_data.ship_class_name]
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	
+	preview_panel.add_child(label)
+
+func _create_weapon_preview(weapon_data: WeaponData) -> void:
+	var label: Label = Label.new()
+	label.text = "Weapon Preview\n%s\nDamage: %.1f" % [weapon_data.weapon_name, weapon_data.damage]
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	preview_panel.add_child(label)
+
+func _create_texture_preview(texture: Texture2D) -> void:
+	var texture_rect: TextureRect = TextureRect.new()
+	texture_rect.texture = texture
+	texture_rect.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	texture_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	preview_panel.add_child(texture_rect)
+
+func _create_generic_preview(asset_data: Resource) -> void:
+	var label: Label = Label.new()
+	label.text = "Asset Preview\n%s\nType: %s" % [asset_data.resource_path.get_file(), asset_data.get_class()]
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	preview_panel.add_child(label)
 
 ## Signal handlers
 

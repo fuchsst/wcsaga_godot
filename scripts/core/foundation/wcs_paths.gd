@@ -1,5 +1,4 @@
-class_name WCSPaths
-extends Resource
+extends Node
 
 ## Standard game directory paths with cross-platform compatibility.
 ## Defines all standard WCS directory structures using Godot's resource system.

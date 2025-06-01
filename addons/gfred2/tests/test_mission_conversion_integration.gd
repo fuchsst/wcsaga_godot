@@ -228,7 +228,9 @@ func test_batch_file_discovery() -> void:
 	
 	# Create temporary directory with test files
 	var temp_dir: String = "res://temp_batch_test/"
-	DirAccess.make_dir_recursive_absolute(temp_dir)
+	var error: Error = DirAccess.open("res://").make_dir_recursive("temp_batch_test/")
+	if error != OK:
+		push_error("Failed to create test directory: %s (Error: %d)" % [temp_dir, error])
 	
 	# Create test mission files
 	var test_files: Array[String] = ["mission1.fs2", "mission2.fc2", "not_mission.txt"]

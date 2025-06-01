@@ -201,8 +201,8 @@ func update_orbit(mouse_delta: Vector2) -> void:
 ## Updates camera position and rotation from orbit parameters.
 func update_camera_from_orbit() -> void:
 	# Convert spherical coordinates to Cartesian using WCS math utilities
-	var elevation_rad: float = WCSVectorMath.degrees_to_radians(orbit_elevation)
-	var azimuth_rad: float = WCSVectorMath.degrees_to_radians(orbit_azimuth)
+	var elevation_rad: float = WCSVectorMath.deg_to_rad(orbit_elevation)
+	var azimuth_rad: float = WCSVectorMath.deg_to_rad(orbit_azimuth)
 	
 	var x: float = orbit_distance * cos(elevation_rad) * cos(azimuth_rad)
 	var y: float = orbit_distance * sin(elevation_rad)
@@ -214,11 +214,11 @@ func update_camera_from_orbit() -> void:
 ## Updates orbit angles from current camera position.
 func update_orbit_angles() -> void:
 	var offset: Vector3 = position - orbit_target
-	orbit_distance = offset.length()
+	orbit_distance = WCSVectorMath.vec_mag(offset)
 	
-	if orbit_distance > 0.01:
-		orbit_elevation = rad_to_deg(asin(offset.y / orbit_distance))
-		orbit_azimuth = rad_to_deg(atan2(offset.z, offset.x))
+	if orbit_distance > WCSVectorMath.SMALL_NUM:
+		orbit_elevation = WCSVectorMath.rad_to_deg(asin(offset.y / orbit_distance))
+		orbit_azimuth = WCSVectorMath.rad_to_deg(atan2(offset.z, offset.x))
 
 ## Zooms the camera in or out.
 func zoom_camera(delta: float) -> void:
@@ -230,12 +230,12 @@ func zoom_camera(delta: float) -> void:
 
 ## Focuses the camera on the specified bounds.
 func focus_on_bounds(bounds: AABB) -> void:
-	if bounds.size.length() < 0.01:
+	if WCSVectorMath.vec_mag(bounds.size) < WCSVectorMath.SMALL_NUM:
 		return
 	
-	# Calculate appropriate distance to fit bounds
-	var bounds_size: float = bounds.size.length()
-	var fov_rad: float = deg_to_rad(fov)
+	# Calculate appropriate distance to fit bounds using WCS math utilities
+	var bounds_size: float = WCSVectorMath.vec_mag(bounds.size)
+	var fov_rad: float = WCSVectorMath.deg_to_rad(fov)
 	var required_distance: float = bounds_size / (2.0 * tan(fov_rad * 0.5))
 	
 	# Set new orbit target and distance

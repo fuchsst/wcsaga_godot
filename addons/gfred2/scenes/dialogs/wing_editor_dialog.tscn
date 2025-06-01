@@ -1,0 +1,375 @@
+[gd_scene load_steps=3 format=3 uid="uid://b52wmnq6f8vvv"]
+
+[ext_resource type="Script" path="res://addons/gfred2/scripts/controllers/wing_editor_dialog_controller.gd" id="1_3m1yh"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_1"]
+font_size = 14
+font_color = Color(0.8, 0.8, 0.8, 1)
+
+[node name="WingEditorDialog" type="AcceptDialog"]
+title = "Wing Editor"
+initial_position = 1
+size = Vector2i(800, 600)
+min_size = Vector2i(600, 500)
+script = ExtResource("1_3m1yh")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -49.0
+
+[node name="BasicInfoGroup" type="GroupContainer" parent="VBoxContainer"]
+layout_mode = 2
+text = "Basic Wing Information"
+
+[node name="BasicInfoContainer" type="GridContainer" parent="VBoxContainer/BasicInfoGroup"]
+layout_mode = 2
+columns = 2
+
+[node name="WingNameLabel" type="Label" parent="VBoxContainer/BasicInfoGroup/BasicInfoContainer"]
+layout_mode = 2
+text = "Wing Name:"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="WingNameEdit" type="LineEdit" parent="VBoxContainer/BasicInfoGroup/BasicInfoContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Enter wing name..."
+
+[node name="SpecialShipLabel" type="Label" parent="VBoxContainer/BasicInfoGroup/BasicInfoContainer"]
+layout_mode = 2
+text = "Special Ship:"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="SpecialShipOption" type="OptionButton" parent="VBoxContainer/BasicInfoGroup/BasicInfoContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HotkeyLabel" type="Label" parent="VBoxContainer/BasicInfoGroup/BasicInfoContainer"]
+layout_mode = 2
+text = "Hotkey:"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="HotkeyOption" type="OptionButton" parent="VBoxContainer/BasicInfoGroup/BasicInfoContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SquadLogoLabel" type="Label" parent="VBoxContainer/BasicInfoGroup/BasicInfoContainer"]
+layout_mode = 2
+text = "Squad Logo:"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="SquadLogoContainer" type="HBoxContainer" parent="VBoxContainer/BasicInfoGroup/BasicInfoContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SquadLogoEdit" type="LineEdit" parent="VBoxContainer/BasicInfoGroup/BasicInfoContainer/SquadLogoContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Squad logo filename"
+
+[node name="SquadLogoBrowse" type="Button" parent="VBoxContainer/BasicInfoGroup/BasicInfoContainer/SquadLogoContainer"]
+layout_mode = 2
+text = "Browse..."
+
+[node name="WaveManagementGroup" type="GroupContainer" parent="VBoxContainer"]
+layout_mode = 2
+text = "Wave Management"
+
+[node name="WaveContainer" type="GridContainer" parent="VBoxContainer/WaveManagementGroup"]
+layout_mode = 2
+columns = 4
+
+[node name="WavesLabel" type="Label" parent="VBoxContainer/WaveManagementGroup/WaveContainer"]
+layout_mode = 2
+text = "Waves:"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="WavesSpin" type="SpinBox" parent="VBoxContainer/WaveManagementGroup/WaveContainer"]
+layout_mode = 2
+min_value = 1.0
+max_value = 99.0
+value = 1.0
+
+[node name="ThresholdLabel" type="Label" parent="VBoxContainer/WaveManagementGroup/WaveContainer"]
+layout_mode = 2
+text = "Threshold:"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="ThresholdSpin" type="SpinBox" parent="VBoxContainer/WaveManagementGroup/WaveContainer"]
+layout_mode = 2
+max_value = 99.0
+
+[node name="ArrivalDepartureGroup" type="GroupContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Arrival & Departure"
+
+[node name="ArrivalDepartureTab" type="TabContainer" parent="VBoxContainer/ArrivalDepartureGroup"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Arrival" type="Control" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab"]
+layout_mode = 2
+
+[node name="ArrivalVBox" type="VBoxContainer" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Arrival"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="ArrivalSettingsContainer" type="GridContainer" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Arrival/ArrivalVBox"]
+layout_mode = 2
+columns = 4
+
+[node name="ArrivalLocationLabel" type="Label" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Arrival/ArrivalVBox/ArrivalSettingsContainer"]
+layout_mode = 2
+text = "Location:"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="ArrivalLocationOption" type="OptionButton" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Arrival/ArrivalVBox/ArrivalSettingsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ArrivalTargetLabel" type="Label" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Arrival/ArrivalVBox/ArrivalSettingsContainer"]
+layout_mode = 2
+text = "Target:"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="ArrivalTargetOption" type="OptionButton" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Arrival/ArrivalVBox/ArrivalSettingsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ArrivalDelayLabel" type="Label" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Arrival/ArrivalVBox/ArrivalSettingsContainer"]
+layout_mode = 2
+text = "Delay:"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="ArrivalDelaySpin" type="SpinBox" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Arrival/ArrivalVBox/ArrivalSettingsContainer"]
+layout_mode = 2
+max_value = 999.0
+suffix = "s"
+
+[node name="ArrivalDistanceLabel" type="Label" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Arrival/ArrivalVBox/ArrivalSettingsContainer"]
+layout_mode = 2
+text = "Distance:"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="ArrivalDistanceSpin" type="SpinBox" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Arrival/ArrivalVBox/ArrivalSettingsContainer"]
+layout_mode = 2
+max_value = 99999.0
+
+[node name="ArrivalDelayRangeLabel" type="Label" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Arrival/ArrivalVBox/ArrivalSettingsContainer"]
+layout_mode = 2
+text = "Delay Range:"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="ArrivalDelayRangeContainer" type="HBoxContainer" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Arrival/ArrivalVBox/ArrivalSettingsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ArrivalDelayMinSpin" type="SpinBox" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Arrival/ArrivalVBox/ArrivalSettingsContainer/ArrivalDelayRangeContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 999.0
+suffix = "s"
+
+[node name="ToLabel" type="Label" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Arrival/ArrivalVBox/ArrivalSettingsContainer/ArrivalDelayRangeContainer"]
+layout_mode = 2
+text = " to "
+
+[node name="ArrivalDelayMaxSpin" type="SpinBox" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Arrival/ArrivalVBox/ArrivalSettingsContainer/ArrivalDelayRangeContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 999.0
+suffix = "s"
+
+[node name="ArrivalFlagsLabel" type="Label" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Arrival/ArrivalVBox"]
+layout_mode = 2
+text = "Arrival Options:"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="ArrivalFlagsContainer" type="VBoxContainer" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Arrival/ArrivalVBox"]
+layout_mode = 2
+
+[node name="NoArrivalMusicCheck" type="CheckBox" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Arrival/ArrivalVBox/ArrivalFlagsContainer"]
+layout_mode = 2
+text = "No arrival music"
+
+[node name="NoArrivalMessageCheck" type="CheckBox" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Arrival/ArrivalVBox/ArrivalFlagsContainer"]
+layout_mode = 2
+text = "No arrival message"
+
+[node name="NoArrivalWarpCheck" type="CheckBox" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Arrival/ArrivalVBox/ArrivalFlagsContainer"]
+layout_mode = 2
+text = "No arrival warp effect"
+
+[node name="NoArrivalLogCheck" type="CheckBox" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Arrival/ArrivalVBox/ArrivalFlagsContainer"]
+layout_mode = 2
+text = "No arrival log entry"
+
+[node name="ArrivalConditionLabel" type="Label" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Arrival/ArrivalVBox"]
+layout_mode = 2
+text = "Arrival Condition (SEXP):"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="ArrivalConditionContainer" type="VBoxContainer" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Arrival/ArrivalVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ArrivalSexpTree" type="Tree" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Arrival/ArrivalVBox/ArrivalConditionContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+columns = 2
+column_titles_visible = true
+hide_root = true
+allow_reselect = true
+
+[node name="ArrivalSexpButtons" type="HBoxContainer" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Arrival/ArrivalVBox/ArrivalConditionContainer"]
+layout_mode = 2
+
+[node name="ArrivalEditSexp" type="Button" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Arrival/ArrivalVBox/ArrivalConditionContainer/ArrivalSexpButtons"]
+layout_mode = 2
+text = "Edit SEXP..."
+
+[node name="ArrivalClearSexp" type="Button" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Arrival/ArrivalVBox/ArrivalConditionContainer/ArrivalSexpButtons"]
+layout_mode = 2
+text = "Clear"
+
+[node name="Departure" type="Control" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab"]
+layout_mode = 2
+
+[node name="DepartureVBox" type="VBoxContainer" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Departure"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="DepartureSettingsContainer" type="GridContainer" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Departure/DepartureVBox"]
+layout_mode = 2
+columns = 4
+
+[node name="DepartureLocationLabel" type="Label" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Departure/DepartureVBox/DepartureSettingsContainer"]
+layout_mode = 2
+text = "Location:"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="DepartureLocationOption" type="OptionButton" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Departure/DepartureVBox/DepartureSettingsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DepartureTargetLabel" type="Label" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Departure/DepartureVBox/DepartureSettingsContainer"]
+layout_mode = 2
+text = "Target:"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="DepartureTargetOption" type="OptionButton" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Departure/DepartureVBox/DepartureSettingsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DepartureDelayLabel" type="Label" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Departure/DepartureVBox/DepartureSettingsContainer"]
+layout_mode = 2
+text = "Delay:"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="DepartureDelaySpin" type="SpinBox" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Departure/DepartureVBox/DepartureSettingsContainer"]
+layout_mode = 2
+max_value = 999.0
+suffix = "s"
+
+[node name="DepartureFlagsLabel" type="Label" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Departure/DepartureVBox"]
+layout_mode = 2
+text = "Departure Options:"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="DepartureFlagsContainer" type="VBoxContainer" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Departure/DepartureVBox"]
+layout_mode = 2
+
+[node name="NoDepartureWarpCheck" type="CheckBox" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Departure/DepartureVBox/DepartureFlagsContainer"]
+layout_mode = 2
+text = "No departure warp effect"
+
+[node name="NoDepartureLogCheck" type="CheckBox" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Departure/DepartureVBox/DepartureFlagsContainer"]
+layout_mode = 2
+text = "No departure log entry"
+
+[node name="DepartureConditionLabel" type="Label" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Departure/DepartureVBox"]
+layout_mode = 2
+text = "Departure Condition (SEXP):"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="DepartureConditionContainer" type="VBoxContainer" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Departure/DepartureVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="DepartureSexpTree" type="Tree" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Departure/DepartureVBox/DepartureConditionContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+columns = 2
+column_titles_visible = true
+hide_root = true
+allow_reselect = true
+
+[node name="DepartureSexpButtons" type="HBoxContainer" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Departure/DepartureVBox/DepartureConditionContainer"]
+layout_mode = 2
+
+[node name="DepartureEditSexp" type="Button" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Departure/DepartureVBox/DepartureConditionContainer/DepartureSexpButtons"]
+layout_mode = 2
+text = "Edit SEXP..."
+
+[node name="DepartureClearSexp" type="Button" parent="VBoxContainer/ArrivalDepartureGroup/ArrivalDepartureTab/Departure/DepartureVBox/DepartureConditionContainer/DepartureSexpButtons"]
+layout_mode = 2
+text = "Clear"
+
+[node name="AdditionalOptionsGroup" type="GroupContainer" parent="VBoxContainer"]
+layout_mode = 2
+text = "Additional Options"
+
+[node name="AdditionalOptionsContainer" type="VBoxContainer" parent="VBoxContainer/AdditionalOptionsGroup"]
+layout_mode = 2
+
+[node name="ReinforcementCheck" type="CheckBox" parent="VBoxContainer/AdditionalOptionsGroup/AdditionalOptionsContainer"]
+layout_mode = 2
+text = "Reinforcement"
+
+[node name="IgnoreCountCheck" type="CheckBox" parent="VBoxContainer/AdditionalOptionsGroup/AdditionalOptionsContainer"]
+layout_mode = 2
+text = "Ignore wave count for goals"
+
+[node name="NoDynamicCheck" type="CheckBox" parent="VBoxContainer/AdditionalOptionsGroup/AdditionalOptionsContainer"]
+layout_mode = 2
+text = "No dynamic goals"
+
+[node name="DialogButtons" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="PrevWingButton" type="Button" parent="VBoxContainer/DialogButtons"]
+layout_mode = 2
+text = "< Previous Wing"
+
+[node name="NextWingButton" type="Button" parent="VBoxContainer/DialogButtons"]
+layout_mode = 2
+text = "Next Wing >"
+
+[node name="Spacer" type="Control" parent="VBoxContainer/DialogButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DeleteWingButton" type="Button" parent="VBoxContainer/DialogButtons"]
+layout_mode = 2
+text = "Delete Wing"
+
+[node name="DisbandWingButton" type="Button" parent="VBoxContainer/DialogButtons"]
+layout_mode = 2
+text = "Disband Wing"
+
+[node name="SquadLogoFileDialog" type="FileDialog" parent="."]
+title = "Select Squad Logo File"
+initial_position = 1
+size = Vector2i(800, 600)
+ok_button_text = "Select"
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.png ; PNG Images", "*.pcx ; PCX Images", "*.dds ; DDS Images")

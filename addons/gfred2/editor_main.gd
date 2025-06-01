@@ -47,6 +47,7 @@ var current_filename := ""
 
 # Editor dialogs
 var mission_specs_editor: Window
+var wing_editor: WingEditorDialogController
 var asteroid_field_editor: Window
 var save_dialog: Window
 var open_dialog: Window
@@ -193,18 +194,19 @@ func _setup_editor_ui():
 	editors_menu.set_popup(editors_popup)
 	
 	editors_popup.add_item("Mission Specs", 0)
-	editors_popup.add_item("Asteroid Field", 1)
-	editors_popup.add_item("Background", 2)
-	editors_popup.add_item("Briefing", 3)
-	editors_popup.add_item("Command Briefing", 4)
-	editors_popup.add_item("Debriefing", 5)
-	editors_popup.add_item("Fiction Viewer", 6)
-	editors_popup.add_item("Ship Selection", 7)
-	editors_popup.add_item("Mission Goals", 8)
-	editors_popup.add_item("Mission Events", 9)
-	editors_popup.add_item("Mission Messages", 10)
-	editors_popup.add_item("Mission Notes", 11)
-	editors_popup.add_item("Mission Reinforcements", 12)
+	editors_popup.add_item("Wing Editor", 1)
+	editors_popup.add_item("Asteroid Field", 2)
+	editors_popup.add_item("Background", 3)
+	editors_popup.add_item("Briefing", 4)
+	editors_popup.add_item("Command Briefing", 5)
+	editors_popup.add_item("Debriefing", 6)
+	editors_popup.add_item("Fiction Viewer", 7)
+	editors_popup.add_item("Ship Selection", 8)
+	editors_popup.add_item("Mission Goals", 9)
+	editors_popup.add_item("Mission Events", 10)
+	editors_popup.add_item("Mission Messages", 11)
+	editors_popup.add_item("Mission Notes", 12)
+	editors_popup.add_item("Mission Reinforcements", 13)
 	
 	editors_popup.id_pressed.connect(_on_editors_menu_item_selected)
 
@@ -212,6 +214,14 @@ func _setup_dialogs():
 	# Create dialog instances
 	mission_specs_editor = preload("res://addons/gfred2/dialogs/mission_specs_editor.gd").new()
 	add_child(mission_specs_editor)
+	
+	# Create wing editor
+	var wing_editor_scene = preload("res://addons/gfred2/scenes/dialogs/wing_editor_dialog.tscn")
+	wing_editor = wing_editor_scene.instantiate()
+	add_child(wing_editor)
+	wing_editor.wing_modified.connect(_on_wing_modified)
+	wing_editor.wing_deleted.connect(_on_wing_deleted)
+	wing_editor.wing_disbanded.connect(_on_wing_disbanded)
 	
 	asteroid_field_editor = preload("res://addons/gfred2/dialogs/asteroid_field_editor.gd").new()
 	add_child(asteroid_field_editor)
@@ -247,7 +257,9 @@ func _on_editors_menu_item_selected(id: int):
 	match id:
 		0: # Mission Specs
 			mission_specs_editor.show_dialog()
-		1: # Asteroid Field
+		1: # Wing Editor
+			_show_wing_editor()
+		2: # Asteroid Field
 			asteroid_field_editor.show_dialog()
 
 func _on_shortcut_triggered(action_name: String, event: InputEvent) -> void:
@@ -580,6 +592,72 @@ func _restore_camera_position():
 		camera.position = saved_camera_pos
 		camera.rotation = saved_camera_rot
 
+## Shows the wing editor for the first available wing
+func _show_wing_editor() -> void:
+	if not mission or mission.wings.is_empty():
+		var dialog = create_themed_accept_dialog("No wings available. Create a wing first.")
+		add_child(dialog)
+		dialog.popup_centered()
+		return
+	
+	# Show the first wing
+	var first_wing := mission.wings[0] as WingInstanceData
+	wing_editor.show_wing_editor(first_wing, 0, mission)
+
+## Handles wing modification events
+func _on_wing_modified(wing: WingInstanceData) -> void:
+	modified = true
+	print("Wing modified: ", wing.wing_name)
+
+## Handles wing deletion events  
+func _on_wing_deleted(wing_index: int) -> void:
+	if wing_index >= 0 and wing_index < mission.wings.size():
+		var wing_name := (mission.wings[wing_index] as WingInstanceData).wing_name
+		mission.wings.remove_at(wing_index)
+		modified = true
+		print("Wing deleted: ", wing_name)
+		
+		# Remove wing objects from viewport
+		_refresh_viewport_objects()
+
+## Handles wing disbanding events
+func _on_wing_disbanded(wing_index: int) -> void:
+	if wing_index >= 0 and wing_index < mission.wings.size():
+		var wing := mission.wings[wing_index] as WingInstanceData
+		var wing_name := wing.wing_name
+		
+		# Convert wing ships to individual ships
+		for ship_name in wing.ship_names:
+			# Create individual ship instances from wing ships
+			# This is a placeholder - full implementation would create proper ship instances
+			print("Converting wing ship to individual ship: ", ship_name)
+		
+		# Remove the wing
+		mission.wings.remove_at(wing_index)
+		modified = true
+		print("Wing disbanded: ", wing_name)
+		
+		# Refresh viewport
+		_refresh_viewport_objects()
+
+## Refreshes all objects in the viewport
+func _refresh_viewport_objects() -> void:
+	# Clear existing objects
+	for child in viewport.get_children():
+		if child != camera and child != grid_manager:
+			child.queue_free()
+	
+	# Recreate objects from current mission data
+	for ship_resource in mission.ships:
+		var ship_instance := ship_resource as ShipInstanceData
+		if ship_instance:
+			_create_mission_object_from_ship(ship_instance)
+	
+	for wing_resource in mission.wings:
+		var wing_instance := wing_resource as WingInstanceData  
+		if wing_instance:
+			_create_mission_object_from_wing(wing_instance)
+
 func _on_file_menu_item_selected(id: int):
 	match id:
 		0: # New Mission
@@ -634,8 +712,10 @@ func _new_mission():
 	selection_manager.clear_selection()
 
 func _open_mission(path: String):
-	var result = mission.load_fs2(path)
-	if result == OK:
+	# Use the new Mission File I/O System
+	var loaded_mission := MissionFileIO.load_mission(path)
+	if loaded_mission:
+		mission = loaded_mission
 		current_filename = path
 		modified = false
 		
@@ -644,9 +724,16 @@ func _open_mission(path: String):
 			if child != camera and child != grid_manager:
 				child.queue_free()
 		
-		# Create mission objects
-		for object in mission.root_objects:
-			_create_mission_object(object)
+		# Create mission objects from ships and wings
+		for ship_resource in mission.ships:
+			var ship_instance := ship_resource as ShipInstanceData
+			if ship_instance:
+				_create_mission_object_from_ship(ship_instance)
+		
+		for wing_resource in mission.wings:
+			var wing_instance := wing_resource as WingInstanceData  
+			if wing_instance:
+				_create_mission_object_from_wing(wing_instance)
 		
 		# Reset camera
 		camera.position = Vector3(0, 10, 10)
@@ -660,7 +747,8 @@ func _open_mission(path: String):
 		dialog.popup_centered()
 
 func _save_mission(path: String):
-	var result = mission.save_fs2(path)
+	# Use the new Mission File I/O System
+	var result := MissionFileIO.save_mission(mission, path)
 	if result == OK:
 		current_filename = path
 		modified = false
@@ -711,6 +799,70 @@ func _create_mission_object(object: MissionObject) -> Node3D:
 			child_node.rotation = child.rotation
 	
 	return node
+
+## Create mission object from ship instance data
+func _create_mission_object_from_ship(ship_instance: ShipInstanceData) -> Node3D:
+	# Create a simple ship representation for now
+	var ship_node := MeshInstance3D.new()
+	ship_node.name = ship_instance.ship_name
+	
+	# Create basic ship mesh (placeholder)
+	var mesh := BoxMesh.new()
+	mesh.size = Vector3(2, 0.5, 4)  # Basic ship-like proportions
+	ship_node.mesh = mesh
+	
+	# Create material
+	var material := StandardMaterial3D.new()
+	material.albedo_color = Color.CYAN
+	ship_node.material_override = material
+	
+	# Set position from ship instance
+	if ship_instance.has_method("get_position"):
+		ship_node.position = ship_instance.get_position()
+	
+	# Set rotation from ship instance  
+	if ship_instance.has_method("get_rotation"):
+		ship_node.rotation = ship_instance.get_rotation()
+	
+	# Add to viewport
+	viewport.add_child(ship_node)
+	ship_node.owner = viewport
+	
+	return ship_node
+
+## Create mission object from wing instance data
+func _create_mission_object_from_wing(wing_instance: WingInstanceData) -> Node3D:
+	# Create a wing group node
+	var wing_node := Node3D.new()
+	wing_node.name = wing_instance.wing_name
+	
+	# Add to viewport
+	viewport.add_child(wing_node)
+	wing_node.owner = viewport
+	
+	# Create ships in wing (placeholder)
+	for i in range(4):  # Typical wing size
+		var ship_node := MeshInstance3D.new()
+		ship_node.name = "%s_%d" % [wing_instance.wing_name, i + 1]
+		
+		# Create basic ship mesh
+		var mesh := BoxMesh.new()
+		mesh.size = Vector3(1.5, 0.4, 3)
+		ship_node.mesh = mesh
+		
+		# Create material
+		var material := StandardMaterial3D.new()
+		material.albedo_color = Color.GREEN
+		ship_node.material_override = material
+		
+		# Formation positioning
+		ship_node.position = Vector3(i * 5, 0, 0)
+		
+		# Add to wing
+		wing_node.add_child(ship_node)
+		ship_node.owner = viewport
+	
+	return wing_node
 
 func _on_save_dialog_confirmed():
 	if current_filename.is_empty():
