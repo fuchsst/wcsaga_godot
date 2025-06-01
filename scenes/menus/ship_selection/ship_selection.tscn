@@ -1,0 +1,260 @@
+[gd_scene load_steps=2 format=3 uid="uid://c3qme7y3ngl8j"]
+
+[ext_resource type="Script" path="res://scenes/menus/ship_selection/ship_selection_controller.gd" id="1_3xhfv"]
+
+[node name="ShipSelection" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_3xhfv")
+
+[node name="MainContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="HeaderContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[sub_resource type="LabelSettings" id="LabelSettings_1"]
+font_size = 24
+
+[sub_resource type="LabelSettings" id="LabelSettings_2"]
+font_size = 16
+
+[node name="SelectionTitleLabel" type="Label" parent="MainContainer/HeaderContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Ship Selection"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="PilotInfoLabel" type="Label" parent="MainContainer/HeaderContainer"]
+layout_mode = 2
+text = "Pilot: [Pilot Name]"
+label_settings = SubResource("LabelSettings_2")
+horizontal_alignment = 2
+
+[node name="ContentContainer" type="HSplitContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LeftPanel" type="VBoxContainer" parent="MainContainer/ContentContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(350, 0)
+
+[node name="ShipListGroup" type="VBoxContainer" parent="MainContainer/ContentContainer/LeftPanel"]
+layout_mode = 2
+
+[sub_resource type="LabelSettings" id="LabelSettings_3"]
+font_size = 18
+
+[node name="ShipListHeader" type="Label" parent="MainContainer/ContentContainer/LeftPanel/ShipListGroup"]
+layout_mode = 2
+text = "Available Ships"
+label_settings = SubResource("LabelSettings_3")
+
+[node name="ShipListContainer" type="VBoxContainer" parent="MainContainer/ContentContainer/LeftPanel/ShipListGroup"]
+layout_mode = 2
+
+[node name="ShipSearchBox" type="LineEdit" parent="MainContainer/ContentContainer/LeftPanel/ShipListGroup/ShipListContainer"]
+layout_mode = 2
+placeholder_text = "Search ships..."
+
+[node name="ShipListScroll" type="ScrollContainer" parent="MainContainer/ContentContainer/LeftPanel/ShipListGroup/ShipListContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 300)
+size_flags_vertical = 3
+
+[node name="ShipList" type="VBoxContainer" parent="MainContainer/ContentContainer/LeftPanel/ShipListGroup/ShipListContainer/ShipListScroll"]
+layout_mode = 2
+
+[node name="RecommendationsGroup" type="VBoxContainer" parent="MainContainer/ContentContainer/LeftPanel"]
+layout_mode = 2
+
+[sub_resource type="LabelSettings" id="LabelSettings_4"]
+font_size = 18
+
+[node name="RecommendationsHeader" type="Label" parent="MainContainer/ContentContainer/LeftPanel/RecommendationsGroup"]
+layout_mode = 2
+text = "Recommendations"
+label_settings = SubResource("LabelSettings_4")
+
+[node name="RecommendationsScroll" type="ScrollContainer" parent="MainContainer/ContentContainer/LeftPanel/RecommendationsGroup"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 150)
+size_flags_vertical = 3
+
+[node name="RecommendationsList" type="VBoxContainer" parent="MainContainer/ContentContainer/LeftPanel/RecommendationsGroup/RecommendationsScroll"]
+layout_mode = 2
+
+[node name="MiddlePanel" type="VBoxContainer" parent="MainContainer/ContentContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(400, 0)
+
+[node name="ShipPreviewGroup" type="VBoxContainer" parent="MainContainer/ContentContainer/MiddlePanel"]
+layout_mode = 2
+
+[sub_resource type="LabelSettings" id="LabelSettings_5"]
+font_size = 18
+
+[node name="PreviewHeader" type="Label" parent="MainContainer/ContentContainer/MiddlePanel/ShipPreviewGroup"]
+layout_mode = 2
+text = "Ship Preview"
+label_settings = SubResource("LabelSettings_5")
+
+[node name="PreviewContainer" type="Control" parent="MainContainer/ContentContainer/MiddlePanel/ShipPreviewGroup"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 300)
+size_flags_vertical = 3
+
+[node name="PreviewBackground" type="Panel" parent="MainContainer/ContentContainer/MiddlePanel/ShipPreviewGroup/PreviewContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="ShipViewport" type="SubViewport" parent="MainContainer/ContentContainer/MiddlePanel/ShipPreviewGroup/PreviewContainer"]
+size = Vector2i(400, 300)
+render_target_update_mode = 4
+
+[node name="ShipScene" type="Node3D" parent="MainContainer/ContentContainer/MiddlePanel/ShipPreviewGroup/PreviewContainer/ShipViewport"]
+
+[node name="ShipCamera" type="Camera3D" parent="MainContainer/ContentContainer/MiddlePanel/ShipPreviewGroup/PreviewContainer/ShipViewport/ShipScene"]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 50, 100)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="MainContainer/ContentContainer/MiddlePanel/ShipPreviewGroup/PreviewContainer/ShipViewport/ShipScene"]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 100, 0)
+
+[node name="PreviewControls" type="HBoxContainer" parent="MainContainer/ContentContainer/MiddlePanel/ShipPreviewGroup"]
+layout_mode = 2
+
+[node name="RotateLeftButton" type="Button" parent="MainContainer/ContentContainer/MiddlePanel/ShipPreviewGroup/PreviewControls"]
+layout_mode = 2
+text = "⟲"
+
+[node name="RotateRightButton" type="Button" parent="MainContainer/ContentContainer/MiddlePanel/ShipPreviewGroup/PreviewControls"]
+layout_mode = 2
+text = "⟳"
+
+[node name="ZoomSlider" type="HSlider" parent="MainContainer/ContentContainer/MiddlePanel/ShipPreviewGroup/PreviewControls"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.5
+max_value = 3.0
+step = 0.1
+value = 1.0
+
+[node name="ResetViewButton" type="Button" parent="MainContainer/ContentContainer/MiddlePanel/ShipPreviewGroup/PreviewControls"]
+layout_mode = 2
+text = "Reset View"
+
+[node name="ShipDetailsGroup" type="VBoxContainer" parent="MainContainer/ContentContainer/MiddlePanel"]
+layout_mode = 2
+
+[sub_resource type="LabelSettings" id="LabelSettings_6"]
+font_size = 18
+
+[node name="DetailsHeader" type="Label" parent="MainContainer/ContentContainer/MiddlePanel/ShipDetailsGroup"]
+layout_mode = 2
+text = "Ship Details"
+label_settings = SubResource("LabelSettings_6")
+
+[node name="DetailsScroll" type="ScrollContainer" parent="MainContainer/ContentContainer/MiddlePanel/ShipDetailsGroup"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 200)
+size_flags_vertical = 3
+
+[node name="ShipDetailsPanel" type="VBoxContainer" parent="MainContainer/ContentContainer/MiddlePanel/ShipDetailsGroup/DetailsScroll"]
+layout_mode = 2
+
+[node name="RightPanel" type="VBoxContainer" parent="MainContainer/ContentContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(350, 0)
+
+[node name="LoadoutGroup" type="VBoxContainer" parent="MainContainer/ContentContainer/RightPanel"]
+layout_mode = 2
+
+[sub_resource type="LabelSettings" id="LabelSettings_7"]
+font_size = 18
+
+[node name="LoadoutHeader" type="Label" parent="MainContainer/ContentContainer/RightPanel/LoadoutGroup"]
+layout_mode = 2
+text = "Weapon Loadout"
+label_settings = SubResource("LabelSettings_7")
+
+[node name="LoadoutContainer" type="VBoxContainer" parent="MainContainer/ContentContainer/RightPanel/LoadoutGroup"]
+layout_mode = 2
+
+[node name="PrimaryWeaponsGroup" type="VBoxContainer" parent="MainContainer/ContentContainer/RightPanel/LoadoutGroup/LoadoutContainer"]
+layout_mode = 2
+
+[sub_resource type="LabelSettings" id="LabelSettings_8"]
+font_size = 16
+
+[node name="PrimaryWeaponsLabel" type="Label" parent="MainContainer/ContentContainer/RightPanel/LoadoutGroup/LoadoutContainer/PrimaryWeaponsGroup"]
+layout_mode = 2
+text = "Primary Weapons"
+label_settings = SubResource("LabelSettings_8")
+
+[node name="PrimaryWeaponsPanel" type="VBoxContainer" parent="MainContainer/ContentContainer/RightPanel/LoadoutGroup/LoadoutContainer/PrimaryWeaponsGroup"]
+layout_mode = 2
+
+[node name="SecondaryWeaponsGroup" type="VBoxContainer" parent="MainContainer/ContentContainer/RightPanel/LoadoutGroup/LoadoutContainer"]
+layout_mode = 2
+
+[sub_resource type="LabelSettings" id="LabelSettings_9"]
+font_size = 16
+
+[node name="SecondaryWeaponsLabel" type="Label" parent="MainContainer/ContentContainer/RightPanel/LoadoutGroup/LoadoutContainer/SecondaryWeaponsGroup"]
+layout_mode = 2
+text = "Secondary Weapons"
+label_settings = SubResource("LabelSettings_9")
+
+[node name="SecondaryWeaponsPanel" type="VBoxContainer" parent="MainContainer/ContentContainer/RightPanel/LoadoutGroup/LoadoutContainer/SecondaryWeaponsGroup"]
+layout_mode = 2
+
+[node name="LoadoutValidationGroup" type="VBoxContainer" parent="MainContainer/ContentContainer/RightPanel"]
+layout_mode = 2
+
+[sub_resource type="LabelSettings" id="LabelSettings_10"]
+font_size = 16
+
+[node name="ValidationHeader" type="Label" parent="MainContainer/ContentContainer/RightPanel/LoadoutValidationGroup"]
+layout_mode = 2
+text = "Loadout Status"
+label_settings = SubResource("LabelSettings_10")
+
+[node name="ValidationScroll" type="ScrollContainer" parent="MainContainer/ContentContainer/RightPanel/LoadoutValidationGroup"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 100)
+size_flags_vertical = 3
+
+[node name="ValidationPanel" type="VBoxContainer" parent="MainContainer/ContentContainer/RightPanel/LoadoutValidationGroup/ValidationScroll"]
+layout_mode = 2
+
+[node name="ActionContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="ResetLoadoutButton" type="Button" parent="MainContainer/ActionContainer"]
+layout_mode = 2
+text = "Reset Loadout"
+
+[node name="Spacer" type="Control" parent="MainContainer/ActionContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ActionButtons" type="HBoxContainer" parent="MainContainer/ActionContainer"]
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="MainContainer/ActionContainer/ActionButtons"]
+layout_mode = 2
+text = "Back"
+
+[node name="ConfirmSelectionButton" type="Button" parent="MainContainer/ActionContainer/ActionButtons"]
+layout_mode = 2
+text = "Confirm Selection"
+modulate = Color(0, 1, 0, 1)

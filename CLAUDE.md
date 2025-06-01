@@ -20,4 +20,4 @@ Godot Coding Guidelines:
 * Use gd scripts to define logic in the scripts folder
 * make sure to define tests in the tests folder (with the same subdirectory structure)
 * Define data structures in addons/wcs_asst_core
-* use .tres resources to store game data
+* use .tres resources to store game data in the resources folder (organised in subdirectories)
