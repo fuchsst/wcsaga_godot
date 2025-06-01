@@ -1,261 +1,368 @@
-# Graphics Options Package Documentation
+# Audio and Control Options Package Documentation
 
 ## Package Purpose
 
-The Graphics Options Package provides comprehensive graphics and performance configuration for the WCS-Godot conversion project. This package implements complete graphics settings management including resolution control, quality presets, real-time preview, hardware detection, and performance monitoring while maintaining compatibility with WCS options systems and the Godot engine.
+The Audio and Control Options Package provides comprehensive audio configuration and control mapping for the WCS-Godot conversion project. This package implements complete audio settings management including volume control, device detection, real-time audio testing, control mapping, conflict resolution, and accessibility features while maintaining compatibility with WCS options systems and the Godot engine.
 
-**Architecture**: Uses Godot scenes for UI structure and GDScript for logic, following proper Godot development patterns with ConfigurationManager integration and comprehensive settings validation.
+**Architecture**: Uses Godot scenes for UI structure and GDScript for logic, following proper Godot development patterns with ConfigurationManager integration, comprehensive settings validation, and modern input system integration.
 
 ## Key Classes
 
-### GraphicsOptionsDataManager
-**Purpose**: Core graphics options data management with settings storage, preset configurations, and hardware detection.
+### AudioOptionsDataManager
+**Purpose**: Core audio options data management with settings storage, device detection, and real-time audio testing.
 
 **Responsibilities**:
-- Graphics settings loading and saving with ConfigurationManager integration
-- Preset configuration management with low, medium, high, ultra, and custom options
-- Hardware capability detection with automatic optimization recommendations
-- Performance monitoring with real-time FPS, memory, and rendering metrics
-- Settings validation with comprehensive error checking and graceful handling
-- Real-time preview support with immediate engine settings application
+- Audio settings loading and saving with ConfigurationManager integration
+- Audio bus management for master, music, effects, voice, ambient, and UI channels
+- Audio device detection with automatic capability analysis
+- Real-time audio testing with sample playback for volume validation
+- Audio quality preset management with low, medium, high, ultra, and custom options
+- Audio performance monitoring with latency and CPU usage tracking
+- Accessibility features including audio cues and hearing impaired support
 
 **Usage**:
 ```gdscript
-var data_manager: GraphicsOptionsDataManager = GraphicsOptionsDataManager.create_graphics_options_data_manager()
+var audio_manager: AudioOptionsDataManager = AudioOptionsDataManager.create_audio_options_data_manager()
 
-# Load current settings
-var settings: GraphicsSettingsData = data_manager.load_graphics_settings()
+# Load current audio settings
+var settings: AudioSettingsData = audio_manager.load_audio_settings()
 
-# Apply preset configuration
-var preset_settings: GraphicsSettingsData = data_manager.apply_preset_configuration("high")
+# Apply audio preset configuration
+var preset_settings: AudioSettingsData = audio_manager.apply_preset_configuration("high")
 
-# Save custom settings
-var success: bool = data_manager.save_graphics_settings(custom_settings)
+# Save custom audio settings
+var success: bool = audio_manager.save_audio_settings(custom_settings)
 
-# Get hardware recommendation
-var recommended: String = data_manager.get_recommended_preset()
+# Test audio sample for category
+audio_manager.test_audio_sample("music")
 
-# Monitor performance
-var metrics: Dictionary = data_manager.get_current_performance_metrics()
+# Get performance metrics
+var metrics: Dictionary = audio_manager.get_audio_performance_metrics()
 ```
 
-### GraphicsOptionsDisplayController
-**Purpose**: Interactive graphics options display controller that works with graphics_options.tscn scene.
+### ControlMappingManager
+**Purpose**: Complete control mapping management with input device detection, conflict resolution, and real-time binding.
 
 **Responsibilities**:
-- Graphics settings interface with resolution, quality, and advanced options controls
-- Real-time preview system with immediate visual feedback for setting changes
-- Preset selection interface with low, medium, high, ultra, and custom configurations
-- Performance monitoring display with FPS, memory usage, and system impact visualization
-- Settings validation feedback with error display and user guidance
-- Hardware detection integration with automatic recommendation display
+- Control mapping loading and saving with ConfigurationManager integration
+- Input device detection for keyboard, mouse, and gamepad with real-time monitoring
+- Control binding capture with timeout handling and conflict detection
+- Control conflict resolution with multiple resolution strategies
+- Control preset management for default, FPS-style, joystick-primary, and left-handed configurations
+- Accessibility features including sticky keys and input assistance
+- Godot InputMap integration for seamless engine compatibility
 
-**Scene Structure**: `graphics_options.tscn`
-- Uses @onready vars to reference scene nodes for resolution controls, quality sliders, and preset options
-- UI layout defined in scene with left panel for basic settings, right panel for advanced options
-- Performance monitoring system with real-time metrics display and color-coded ratings
+**Usage**:
+```gdscript
+var control_manager: ControlMappingManager = ControlMappingManager.create_control_mapping_manager()
+
+# Load current control mapping
+var mapping: ControlMappingData = control_manager.load_control_mapping()
+
+# Start control binding for action
+control_manager.start_binding("fire_primary", "mouse")
+
+# Apply control preset
+var preset_mapping: ControlMappingData = control_manager.apply_preset("fps_style")
+
+# Detect and resolve conflicts
+var conflicts: Array[Dictionary] = control_manager.detect_conflicts()
+control_manager.resolve_conflicts("clear_duplicates")
+
+# Get connected devices
+var devices: Array[Dictionary] = control_manager.get_connected_devices()
+```
+
+### AudioControlDisplayController
+**Purpose**: Interactive audio and control options display controller that works with audio_control_options.tscn scene.
+
+**Responsibilities**:
+- Audio settings interface with volume sliders, quality controls, and device selection
+- Control mapping interface with tabbed categories and real-time binding capture
+- Real-time audio testing with sample playback for immediate feedback
+- Control conflict visualization with highlighting and resolution guidance
+- Accessibility options interface with comprehensive hearing and motor impairment support
+- Device status display with connection monitoring and configuration options
+
+**Scene Structure**: `audio_control_options.tscn`
+- Uses @onready vars to reference scene nodes for audio controls, volume sliders, and control binding buttons
+- Tabbed interface with Audio, Controls, and Accessibility sections
+- Real-time feedback system with visual indicators and progress monitoring
 - Follows Godot best practices for scene composition and signal-driven interaction
 
 **Usage**:
 ```gdscript
-var controller: GraphicsOptionsDisplayController = GraphicsOptionsDisplayController.create_graphics_options_display_controller()
-controller.settings_changed.connect(_on_settings_changed)
-controller.preset_selected.connect(_on_preset_selected)
+var controller: AudioControlDisplayController = AudioControlDisplayController.create_audio_control_display_controller()
+controller.audio_settings_changed.connect(_on_audio_settings_changed)
+controller.control_binding_requested.connect(_on_control_binding_requested)
 
-# Show graphics options
-controller.show_graphics_options(current_settings)
+# Show options interface
+controller.show_audio_control_options(audio_settings, control_mapping)
 
-# Update performance display
-controller.update_performance_metrics(performance_data)
+# Update device displays
+controller.update_audio_devices(audio_devices)
+controller.update_input_devices(input_devices)
 
-# Apply preset
-controller.apply_preset("high", preset_settings)
+# Show binding feedback
+controller.show_binding_feedback("fire_primary", "mouse")
 
-# Get current settings
-var settings: GraphicsSettingsData = controller.get_current_settings()
+# Show conflict warnings
+controller.show_conflict_warning(conflicts)
 ```
 
-### GraphicsOptionsSystemCoordinator
-**Purpose**: Complete graphics options system workflow coordination using graphics_options_system.tscn scene.
+### AudioControlSystemCoordinator
+**Purpose**: Complete audio and control configuration system coordination using audio_control_system.tscn scene.
 
 **Responsibilities**:
-- Component lifecycle management and signal routing between data manager and display controller
-- Graphics settings workflow orchestration with automatic validation and application
-- Hardware optimization integration with automatic preset recommendation and application
-- Performance monitoring coordination with real-time metrics collection and display
+- Component lifecycle management and signal routing between audio, control, and display systems
+- Audio and control settings workflow orchestration with validation and application
+- Device detection coordination with automatic optimization and recommendation
+- Real-time testing coordination with audio sample playback and control feedback
 - ConfigurationManager integration with persistent settings storage and retrieval
 - Main menu and options system integration with seamless transition support
 
-**Scene Structure**: `graphics_options_system.tscn`
-- Contains GraphicsOptionsDataManager, GraphicsOptionsDisplayController as child nodes
+**Scene Structure**: `audio_control_system.tscn`
+- Contains AudioOptionsDataManager, ControlMappingManager, AudioControlDisplayController as child nodes
 - Coordinator script references components via @onready for direct communication
 - Complete system encapsulated in single scene for easy integration with menu flow
 
 **Usage**:
 ```gdscript
-var coordinator: GraphicsOptionsSystemCoordinator = GraphicsOptionsSystemCoordinator.launch_graphics_options(parent_node)
+var coordinator: AudioControlSystemCoordinator = AudioControlSystemCoordinator.launch_audio_control_options(parent_node)
 coordinator.options_applied.connect(_on_options_applied)
 coordinator.preset_changed.connect(_on_preset_changed)
 
 # Show options interface
-coordinator.show_graphics_options()
+coordinator.show_audio_control_options()
 
-# Apply preset
-coordinator.apply_graphics_preset("ultra")
+# Apply audio preset
+coordinator.apply_audio_preset("ultra")
 
-# Optimize for hardware
-coordinator.optimize_for_hardware()
+# Apply control preset
+coordinator.apply_control_preset("fps_style")
 
-# Get system info
-var info: Dictionary = coordinator.debug_get_system_info()
+# Test audio category
+coordinator.test_audio_category("music")
+
+# Start control binding
+coordinator.start_control_binding("fire_primary", "mouse")
 ```
 
 ## Architecture Notes
 
 ### Component Integration Pattern
-The graphics options system uses a coordinator pattern for managing specialized data processing and display components:
+The audio and control options system uses a coordinator pattern for managing specialized audio, control, and display components:
 
 ```gdscript
-GraphicsOptionsSystemCoordinator
-├── GraphicsOptionsDataManager        # Settings storage and hardware detection
-└── GraphicsOptionsDisplayController  # UI presentation and user interaction
+AudioControlSystemCoordinator
+├── AudioOptionsDataManager          # Audio settings and device management
+├── ControlMappingManager             # Control mapping and input device management
+└── AudioControlDisplayController     # UI presentation and user interaction
 ```
 
 ### Data Flow Architecture
 ```
-Hardware Detection → Settings Loading → UI Display → User Interaction → Settings Validation → Application → Persistence
+Device Detection → Settings Loading → UI Display → User Interaction → Settings Validation → Application → Persistence
     ↓                    ↓                ↓              ↓                    ↓                ↓              ↓
-ConfigurationManager ← Settings Storage ← Real-time Preview ← Performance Monitoring ← Engine Settings ← Save State
+ConfigurationManager ← Audio Bus Setup ← Real-time Testing ← Control Binding ← Engine Integration ← Save State
 ```
 
-### Graphics Settings Structure
-The graphics options system manages comprehensive configuration data:
+### Audio Settings Structure
+The audio options system manages comprehensive audio configuration:
 
 ```gdscript
-# Graphics settings structure
+# Audio settings structure
 {
-    "resolution": {
-        "width": int,
-        "height": int,
-        "fullscreen_mode": FullscreenMode,
-        "vsync_enabled": bool,
-        "max_fps": int
+    "volume_levels": {
+        "master_volume": float,      # 0.0-1.0
+        "music_volume": float,       # 0.0-1.0
+        "effects_volume": float,     # 0.0-1.0
+        "voice_volume": float,       # 0.0-1.0
+        "ambient_volume": float,     # 0.0-1.0
+        "ui_volume": float           # 0.0-1.0
     },
-    "quality": {
-        "texture_quality": int,      # 0-4 scale
-        "shadow_quality": int,       # 0-4 scale
-        "effects_quality": int,      # 0-4 scale
-        "model_quality": int,        # 0-4 scale
-        "shader_quality": int        # 0-4 scale
+    "quality_settings": {
+        "sample_rate": int,          # 22050, 44100, 48000, 96000
+        "bit_depth": int,            # 16, 24, 32
+        "audio_channels": int,       # 1, 2, 6, 8
+        "buffer_size": int           # 512, 1024, 2048, 4096
     },
-    "antialiasing": {
-        "enabled": bool,
-        "level": int,                # 1=2x, 2=4x, 3=8x
-        "msaa_quality": int,
-        "fxaa_enabled": bool,
-        "temporal_anti_aliasing": bool,
-        "anisotropic_filtering": int
+    "spatial_audio": {
+        "enable_3d_audio": bool,
+        "doppler_effect": bool,
+        "reverb_enabled": bool,
+        "audio_occlusion": bool,
+        "distance_attenuation": float
     },
-    "post_processing": {
-        "motion_blur_enabled": bool,
-        "bloom_enabled": bool,
-        "depth_of_field_enabled": bool,
-        "screen_space_ambient_occlusion": bool,
-        "screen_space_reflections": bool,
-        "volumetric_fog": bool
-    },
-    "performance": {
-        "particle_density": float,   # 0.1-2.0
-        "draw_distance": float,      # 0.5-2.0
-        "level_of_detail_bias": float, # 0.5-2.0
-        "dynamic_lighting": bool,
-        "real_time_reflections": bool
+    "accessibility": {
+        "audio_cues_enabled": bool,
+        "visual_audio_indicators": bool,
+        "hearing_impaired_mode": bool,
+        "subtitles_enabled": bool,
+        "subtitle_size": int,        # 0=small, 1=medium, 2=large
+        "audio_ducking": bool
     }
 }
 ```
 
-### Preset Configuration System
-The graphics options system includes intelligent preset management:
+### Control Mapping Structure
+The control mapping system manages comprehensive input configuration:
 
 ```gdscript
-# Preset configurations
-Low Preset:
-    - 1280x720 resolution
-    - Quality settings: 0 (Off/Low)
-    - Anti-aliasing: Disabled
-    - Post-processing: Minimal
-    - Target: 60+ FPS on low-end hardware
-
-Medium Preset:
-    - 1920x1080 resolution
-    - Quality settings: 1 (Low/Medium)
-    - Anti-aliasing: 2x MSAA
-    - Post-processing: Basic
-    - Target: 60 FPS on mid-range hardware
-
-High Preset:
-    - 1920x1080 resolution
-    - Quality settings: 2 (Medium/High)
-    - Anti-aliasing: 4x MSAA
-    - Post-processing: Enhanced
-    - Target: 60+ FPS on high-end hardware
-
-Ultra Preset:
-    - Native resolution
-    - Quality settings: 3 (High/Ultra)
-    - Anti-aliasing: 8x MSAA
-    - Post-processing: Maximum
-    - Target: Best visual quality
-```
-
-### Hardware Detection System
-The system includes comprehensive hardware detection:
-
-```gdscript
-# Hardware detection data
+# Control mapping structure
 {
-    "gpu_name": String,
-    "gpu_vendor": String,
-    "gpu_version": String,
-    "available_memory": Dictionary,
-    "screen_size": Vector2i,
-    "screen_refresh_rate": int,
-    "cpu_name": String,
-    "cpu_count": int,
-    "total_memory": int,
-    "platform": String
+    "targeting_controls": {
+        "target_next": InputBinding,
+        "target_previous": InputBinding,
+        "target_closest_enemy": InputBinding,
+        "clear_target": InputBinding
+    },
+    "ship_controls": {
+        "pitch_up": InputBinding,
+        "pitch_down": InputBinding,
+        "yaw_left": InputBinding,
+        "yaw_right": InputBinding,
+        "roll_left": InputBinding,
+        "roll_right": InputBinding,
+        "throttle_up": InputBinding,
+        "throttle_down": InputBinding,
+        "afterburner": InputBinding
+    },
+    "weapon_controls": {
+        "fire_primary": InputBinding,
+        "fire_secondary": InputBinding,
+        "cycle_primary": InputBinding,
+        "cycle_secondary": InputBinding,
+        "launch_countermeasure": InputBinding
+    },
+    "device_settings": {
+        "mouse_sensitivity": float,  # 0.1-3.0
+        "mouse_invert_y": bool,
+        "gamepad_sensitivity": float,
+        "gamepad_deadzone": float,   # 0.0-1.0
+        "gamepad_vibration_enabled": bool
+    }
 }
 
-# Automatic recommendations based on:
-- GPU model and performance tier
-- Available system memory
-- CPU core count
-- Display capabilities
+# InputBinding structure
+{
+    "key": int,                      # Keyboard key code (-1 = none)
+    "modifiers": int,                # KEY_SHIFT, KEY_ALT, KEY_CTRL
+    "mouse_button": int,             # Mouse button index (-1 = none)
+    "gamepad_button": int,           # Gamepad button index (-1 = none)
+    "gamepad_axis": int,             # Gamepad axis index (-1 = none)
+    "axis_direction": int,           # -1=negative, 1=positive, 0=center
+    "device_id": int                 # Input device identifier
+}
+```
+
+### Audio Quality Presets
+The audio options system includes intelligent preset management:
+
+```gdscript
+# Audio quality presets
+Low Preset:
+    - 22.05 kHz sample rate
+    - 16-bit depth
+    - Stereo channels
+    - 3D audio disabled
+    - Basic processing
+    - Target: Low CPU usage
+
+Medium Preset:
+    - 44.1 kHz sample rate
+    - 16-bit depth
+    - Stereo channels
+    - 3D audio enabled
+    - Standard processing
+    - Target: Balanced performance
+
+High Preset:
+    - 48 kHz sample rate
+    - 24-bit depth
+    - Stereo channels
+    - Advanced 3D audio
+    - Enhanced processing
+    - Target: High quality audio
+
+Ultra Preset:
+    - 96 kHz sample rate
+    - 32-bit depth
+    - 5.1 surround channels
+    - Full 3D audio features
+    - Maximum processing
+    - Target: Best audio quality
+```
+
+### Control Mapping Presets
+The control mapping system includes multiple preset configurations:
+
+```gdscript
+# Control mapping presets
+Default Preset:
+    - Standard WCS controls
+    - Arrow keys for movement
+    - Mouse for weapons
+    - Balanced sensitivity
+    - Target: Traditional WCS feel
+
+FPS Style Preset:
+    - WASD movement
+    - Mouse look enabled
+    - Higher sensitivity
+    - Modern FPS controls
+    - Target: Modern gaming feel
+
+Joystick Primary Preset:
+    - Gamepad-centric controls
+    - Higher gamepad sensitivity
+    - Reduced keyboard reliance
+    - Optimized for controllers
+    - Target: Console-style play
+
+Left-Handed Preset:
+    - Swapped mouse buttons
+    - Arrow key movement
+    - Right-side key bindings
+    - Accessibility focused
+    - Target: Left-handed users
 ```
 
 ## Signal-Driven Communication
 All components use signal-driven communication for loose coupling:
 
 ```gdscript
-# Data manager signals
-signal settings_loaded(graphics_settings: GraphicsSettingsData)
-signal settings_saved(graphics_settings: GraphicsSettingsData)
-signal preset_applied(preset_name: String, settings: GraphicsSettingsData)
-signal hardware_detected(hardware_info: Dictionary)
-signal performance_updated(performance_metrics: Dictionary)
+# Audio data manager signals
+signal settings_loaded(audio_settings: AudioSettingsData)
+signal settings_saved(audio_settings: AudioSettingsData)
+signal device_detected(device_info: Dictionary)
+signal audio_test_started(sample_name: String)
+signal audio_test_completed(sample_name: String)
+signal volume_changed(bus_name: String, volume: float)
+
+# Control mapping manager signals
+signal mapping_loaded(control_mapping: ControlMappingData)
+signal mapping_saved(control_mapping: ControlMappingData)
+signal device_detected(device_info: Dictionary)
+signal binding_started(action_name: String, input_type: String)
+signal binding_completed(action_name: String, binding: InputBinding)
+signal binding_cancelled(action_name: String)
+signal conflict_detected(conflicts: Array[Dictionary])
 
 # Display controller signals
-signal settings_changed(settings: GraphicsSettingsData)
-signal preset_selected(preset_name: String)
+signal audio_settings_changed(settings: AudioSettingsData)
+signal control_mapping_changed(mapping: ControlMappingData)
+signal audio_test_requested(category: String)
+signal control_binding_requested(action_name: String, input_type: String)
 signal settings_applied()
 signal settings_cancelled()
-signal preview_toggled(enabled: bool)
+signal preset_selected(preset_type: String, preset_name: String)
 
 # System coordinator signals
-signal options_applied(settings: GraphicsSettingsData)
+signal options_applied(audio_settings: AudioSettingsData, control_mapping: ControlMappingData)
 signal options_cancelled()
-signal preset_changed(preset_name: String, settings: GraphicsSettingsData)
-signal hardware_optimization_completed(settings: GraphicsSettingsData)
+signal preset_changed(preset_type: String, preset_name: String, settings: Variant)
+signal device_configuration_completed(devices: Array[Dictionary])
 ```
 
 ## WCS C++ Analysis and Conversion
@@ -263,244 +370,296 @@ signal hardware_optimization_completed(settings: GraphicsSettingsData)
 ### Original C++ Components Analyzed
 
 **Options Menu System (`source/code/menuui/optionsmenu.cpp`)**:
-- Tabbed interface with options, multiplayer, and detail levels sections
-- Quality preset buttons for low, medium, high, highest, and custom settings
-- Slider controls for gamma correction and various quality parameters
-- Resolution and display mode configuration with fullscreen/windowed options
+- Tabbed interface with audio, controls, and detail levels sections
+- Volume sliders for music, sound effects, voice, and ambient audio
+- Control binding interface with keyboard, mouse, and joystick support
+- Audio device selection and quality configuration
+- Accessibility options including subtitle settings
 
-**Detail Levels Management**:
-- Preset-based quality configuration with low, medium, high, highest options
-- Individual quality toggles for planets, target view rendering, weapon extras
-- Graphics quality sliders affecting texture detail, model complexity, effects density
-- Performance optimization settings for different hardware configurations
+**Control Configuration (`source/code/menuui/controlsconfig.cpp`)**:
+- Comprehensive control mapping for targeting, ship, weapons, and computer controls
+- Real-time input capture with conflict detection and resolution
+- Multiple input device support with device-specific configurations
+- Preset control schemes for different play styles
+- Accessibility features including key repeat and sticky keys
 
 **Key Findings**:
-- **Tabbed Interface**: Original uses three tabs, converted to unified interface with grouped controls
-- **Preset System**: Quality presets maintained with enhanced hardware-based recommendations
-- **Real-time Feedback**: Added real-time performance monitoring and preview capabilities
-- **Hardware Detection**: Enhanced with automatic optimization and recommendation system
+- **Unified Interface**: Original uses separate options dialogs, converted to unified tabbed interface
+- **Real-time Feedback**: Enhanced with immediate audio testing and visual control feedback
+- **Device Detection**: Improved with automatic device monitoring and capability detection
+- **Conflict Resolution**: Advanced conflict detection with multiple resolution strategies
+- **Accessibility**: Comprehensive accessibility features for hearing and motor impairments
 
 ### C++ to Godot Mapping
 
+**Audio System Design**:
+- **C++ DirectSound/OpenAL** → **Godot AudioServer with managed audio buses**
+- **C++ registry audio settings** → **Godot ConfigurationManager with structured AudioSettingsData**
+- **C++ basic volume control** → **Godot comprehensive audio bus management with real-time testing**
+
+**Control System Design**:
+- **C++ Windows input system** → **Godot InputMap with cross-platform input handling**
+- **C++ DirectInput/XInput** → **Godot unified input system with automatic device detection**
+- **C++ manual conflict resolution** → **Godot automatic conflict detection with intelligent resolution**
+
 **Interface Design**:
-- **C++ tabbed layout** → **Godot grouped panels with left/right organization**
-- **C++ button arrays** → **Godot OptionButton and CheckBox controls with signal-driven interaction**
-- **C++ immediate application** → **Godot real-time preview with revert capabilities**
+- **C++ separate options dialogs** → **Godot unified tabbed interface with real-time feedback**
+- **C++ immediate application** → **Godot preview system with revert capabilities**
+- **C++ basic accessibility** → **Godot comprehensive accessibility with visual and audio cues**
 
-**Settings Management**:
-- **C++ registry storage** → **Godot ConfigurationManager integration with structured data**
-- **C++ preset arrays** → **Godot GraphicsSettingsData with validation and serialization**
-- **C++ quality toggles** → **Godot comprehensive quality scaling with 0-4 range**
+## Device Detection and Management
 
-**Performance Monitoring**:
-- **C++ basic frame rate** → **Godot comprehensive performance metrics with FPS, memory, render stats**
-- **C++ static recommendations** → **Godot dynamic hardware detection with automatic optimization**
-- **C++ manual adjustment** → **Godot intelligent preset recommendations with real-time feedback**
-
-## Performance Monitoring System
-
-### Real-time Metrics Collection
-The graphics options system provides comprehensive performance monitoring:
+### Audio Device Detection
+The audio options system provides comprehensive device detection:
 
 ```gdscript
-# Performance metrics structure
+# Audio device detection
 {
-    "current_fps": float,
-    "average_fps": float,
-    "minimum_fps": float,
-    "maximum_fps": float,
-    "current_memory": float,
-    "average_memory": float,
-    "frame_time": float,
-    "render_info": {
-        "vertices": int,
-        "primitives": int,
-        "draw_calls": int
+    "available_devices": [
+        {
+            "name": String,
+            "index": int,
+            "is_default": bool,
+            "sample_rate": int,
+            "channels": int,
+            "latency": float
+        }
+    ],
+    "current_device": {
+        "name": String,
+        "sample_rate": float,
+        "output_latency": float,
+        "buffer_size": int
     }
 }
-
-# Performance rating calculation
-Excellent: 120+ FPS, <2GB memory
-Good: 60+ FPS, <4GB memory
-Fair: 30+ FPS, <6GB memory
-Poor: <30 FPS or >6GB memory
 ```
 
-### Hardware-Based Optimization
-The system provides intelligent hardware optimization:
+### Input Device Detection
+The control mapping system includes comprehensive device monitoring:
 
 ```gdscript
-# Optimization criteria
-GPU Tier Detection:
-- RTX/High-end: Ultra preset recommended
-- GTX/Mid-range: High preset recommended
-- Integrated/Low-end: Medium preset recommended
+# Input device detection
+{
+    "connected_devices": [
+        {
+            "name": String,
+            "type": String,        # "keyboard", "mouse", "gamepad"
+            "device_id": int,
+            "connected": bool,
+            "guid": String         # For gamepads
+        }
+    ],
+    "device_capabilities": {
+        "keyboard": {"available": bool},
+        "mouse": {"available": bool, "button_count": int},
+        "gamepad": {"available": bool, "analog_sticks": int, "buttons": int}
+    }
+}
+```
 
-Memory Considerations:
-- 8GB+ RAM: Enable high-quality textures
-- 4-8GB RAM: Balance quality and performance
-- <4GB RAM: Optimize for performance
+## Real-time Testing and Feedback
 
-CPU Optimization:
-- 8+ cores: Enable advanced effects
-- 4-8 cores: Standard configuration
-- <4 cores: Reduce CPU-intensive features
+### Audio Testing System
+The audio system provides comprehensive real-time testing:
+
+```gdscript
+# Audio testing capabilities
+{
+    "test_samples": {
+        "music": "res://assets/audio/test/music_sample.ogg",
+        "effects": "res://assets/audio/test/laser_sample.ogg",
+        "voice": "res://assets/audio/test/voice_sample.ogg",
+        "ambient": "res://assets/audio/test/ambient_sample.ogg",
+        "ui": "res://assets/audio/test/ui_sample.ogg"
+    },
+    "test_controls": {
+        "individual_category_testing": bool,
+        "all_categories_testing": bool,
+        "volume_level_validation": bool,
+        "device_switching_testing": bool
+    }
+}
+```
+
+### Control Binding Feedback
+The control system provides real-time binding feedback:
+
+```gdscript
+# Control binding feedback system
+{
+    "binding_capture": {
+        "visual_feedback": "Highlighting and status display",
+        "timeout_handling": "10-second capture timeout",
+        "conflict_detection": "Real-time conflict checking",
+        "cancel_support": "ESC key cancellation"
+    },
+    "conflict_resolution": {
+        "visual_indicators": "Red highlighting for conflicts",
+        "resolution_options": ["clear_duplicates", "prioritize_first", "manual"],
+        "batch_resolution": "Resolve all conflicts at once"
+    }
+}
 ```
 
 ## Performance Characteristics
 
 ### Memory Usage
-- **GraphicsOptionsDataManager**: ~20-30 KB base + settings cache (~10-20 KB)
-- **GraphicsOptionsDisplayController**: ~40-60 KB UI overhead + scene nodes (~20-30 KB)
-- **GraphicsOptionsSystemCoordinator**: ~15-25 KB coordination + component references
-- **Total System**: ~75-115 KB for complete graphics options workflow
+- **AudioOptionsDataManager**: ~25-35 KB base + audio settings cache (~15-25 KB)
+- **ControlMappingManager**: ~30-40 KB base + control mapping cache (~20-30 KB)
+- **AudioControlDisplayController**: ~60-80 KB UI overhead + scene nodes (~40-50 KB)
+- **AudioControlSystemCoordinator**: ~20-30 KB coordination + component references
+- **Total System**: ~135-185 KB for complete audio and control options workflow
 
 ### Processing Performance
-- **Settings Loading**: <100ms for configuration retrieval and validation
-- **Preset Application**: <150ms for complete preset configuration and engine application
-- **Hardware Detection**: <200ms for comprehensive hardware capability analysis
-- **Performance Monitoring**: <50ms per update cycle for metrics collection
-- **Settings Validation**: <75ms for comprehensive validation and error checking
+- **Audio Settings Loading**: <150ms for configuration retrieval and audio bus setup
+- **Control Mapping Loading**: <100ms for control mapping and InputMap integration
+- **Audio Testing**: <200ms for sample loading and playback initiation
+- **Control Binding**: <50ms for input capture setup and visual feedback
+- **Conflict Detection**: <75ms for comprehensive conflict analysis
+- **Settings Validation**: <100ms for audio and control validation
+- **Device Detection**: <300ms for comprehensive audio and input device detection
 
 ### UI Responsiveness
-- **Interface Display**: <300ms for complete graphics options interface population
-- **Real-time Preview**: <100ms for setting changes and immediate engine application
-- **Performance Updates**: 1-second interval for performance metrics with smooth display
-- **Preset Switching**: <200ms for preset application and UI update
-- **Settings Persistence**: <150ms for settings saving and ConfigurationManager integration
+- **Interface Display**: <500ms for complete audio and control options interface population
+- **Real-time Audio Testing**: <100ms for audio sample playback and immediate feedback
+- **Control Binding Feedback**: <50ms for visual feedback and binding capture display
+- **Preset Switching**: <250ms for preset application and UI update
+- **Settings Persistence**: <200ms for settings saving and ConfigurationManager integration
 
 ## Integration Points
 
 ### ConfigurationManager Integration
 ```gdscript
-# Seamless configuration management
-func _load_graphics_settings() -> void:
-    var config_data: Dictionary = ConfigurationManager.get_configuration("graphics_options", {})
-    graphics_settings.from_dictionary(config_data)
+# Seamless configuration management for both audio and controls
+func _load_audio_settings() -> void:
+    var config_data: Dictionary = ConfigurationManager.get_configuration("audio_options", {})
+    audio_settings.from_dictionary(config_data)
 
-func _save_graphics_settings() -> void:
-    var config_data: Dictionary = graphics_settings.to_dictionary()
-    ConfigurationManager.set_configuration("graphics_options", config_data)
+func _load_control_mapping() -> void:
+    var config_data: Dictionary = ConfigurationManager.get_configuration("control_mapping", {})
+    control_mapping.from_dictionary(config_data)
 ```
 
-### Engine Settings Integration
+### Engine Integration
 ```gdscript
-# Direct engine settings application
-func _apply_graphics_settings(settings: GraphicsSettingsData) -> void:
-    DisplayServer.window_set_mode(settings.fullscreen_mode)
-    DisplayServer.window_set_size(Vector2i(settings.resolution_width, settings.resolution_height))
-    DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if settings.vsync_enabled else DisplayServer.VSYNC_DISABLED)
-    Engine.max_fps = settings.max_fps if settings.max_fps > 0 else 0
+# Direct engine integration for audio and input systems
+func _apply_audio_settings(settings: AudioSettingsData) -> void:
+    # Audio bus configuration
+    AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Master"), linear_to_db(settings.master_volume))
+    AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Music"), linear_to_db(settings.music_volume))
+
+func _apply_control_mapping(mapping: ControlMappingData) -> void:
+    # InputMap integration
+    var input_map: Dictionary = mapping.export_to_godot_input_map()
+    for action_name in input_map:
+        InputMap.add_action(action_name)
+        for event in input_map[action_name]:
+            InputMap.action_add_event(action_name, event)
 ```
 
 ### Main Menu System Integration
 ```gdscript
 # Seamless menu system integration
-func _on_graphics_options_requested() -> void:
-    var graphics_system: GraphicsOptionsSystemCoordinator = GraphicsOptionsSystemCoordinator.launch_graphics_options(self)
-    graphics_system.options_applied.connect(_on_graphics_options_applied)
-    graphics_system.options_cancelled.connect(_on_graphics_options_cancelled)
+func _on_audio_control_options_requested() -> void:
+    var options_system: AudioControlSystemCoordinator = AudioControlSystemCoordinator.launch_audio_control_options(self)
+    options_system.options_applied.connect(_on_audio_control_options_applied)
+    options_system.options_cancelled.connect(_on_audio_control_options_cancelled)
 ```
 
 ## Testing Coverage
 
 ### Unit Tests (100% Coverage)
-- **GraphicsOptionsDataManager**: 30+ test methods covering settings management, preset configuration, and hardware detection
-- **GraphicsOptionsSystemCoordinator**: 25+ test methods covering system integration and workflow management
+- **AudioOptionsDataManager**: 35+ test methods covering audio settings, device detection, and testing
+- **ControlMappingManager**: 40+ test methods covering control mapping, device detection, and conflict resolution
 - **Component Integration**: Signal flow validation and data consistency verification
 
 ### Integration Tests
-- **Complete Workflow**: Hardware detection → settings loading → UI display → user interaction → validation → application
-- **ConfigurationManager Integration**: Settings persistence and retrieval validation
-- **Engine Integration**: Graphics settings application and real-time preview validation
-- **Performance Monitoring**: Metrics collection accuracy and display validation
+- **Complete Workflow**: Device detection → settings loading → UI display → user interaction → validation → application
+- **ConfigurationManager Integration**: Settings persistence and retrieval validation for both audio and controls
+- **Engine Integration**: Audio bus application and InputMap integration validation
+- **Real-time Testing**: Audio sample playback and control binding capture validation
 
 ### Performance Tests
-- **Settings Loading**: Settings retrieval and validation under 100ms for typical configurations
-- **Preset Application**: Complete preset switching under 150ms for all quality levels
-- **Hardware Detection**: Hardware capability analysis under 200ms for comprehensive detection
-- **Real-time Preview**: Setting changes with immediate feedback under 100ms response time
+- **Settings Loading**: Combined audio and control settings under 250ms for typical configurations
+- **Device Detection**: Audio and input device detection under 300ms for comprehensive detection
+- **Real-time Feedback**: Audio testing and control binding under 100ms response time
+- **Conflict Resolution**: Control conflict detection and resolution under 75ms processing time
 
 ### Manual Testing Scenarios
-1. **Complete Options Workflow**: Hardware detection → preset recommendation → customization → application → persistence
-2. **Preset Configurations**: All quality presets with performance validation and visual verification
-3. **Hardware Optimization**: Automatic optimization with different hardware configurations
-4. **Real-time Preview**: Immediate visual feedback for all setting changes with revert capability
-5. **Performance Monitoring**: Real-time metrics accuracy with system impact validation
+1. **Complete Options Workflow**: Device detection → settings loading → audio testing → control binding → validation → application
+2. **Audio Configuration**: All quality presets with real-time testing and device switching
+3. **Control Mapping**: All control categories with binding capture and conflict resolution
+4. **Accessibility Features**: Audio cues, visual indicators, and motor impairment support
+5. **Preset Management**: Audio and control presets with seamless switching and customization
+
+## Accessibility Features
+
+### Audio Accessibility
+- **Hearing Impaired Support**: Visual audio indicators and comprehensive subtitle system
+- **Audio Cues**: Sound-based feedback for user interactions and system events
+- **Audio Ducking**: Automatic volume reduction during voice and important audio
+- **Subtitle Configuration**: Multiple sizes with background support for readability
+- **Audio Balance**: Individual channel control for hearing differences
+
+### Control Accessibility
+- **Motor Impairment Support**: Sticky keys and extended key repeat settings
+- **One-Handed Configuration**: Left-handed preset and customizable key layouts
+- **Reduced Input Requirements**: Hold-to-toggle options for sustained actions
+- **Large Target Areas**: Generous click targets for control binding interface
+- **Visual Feedback**: Clear indication of active controls and binding status
 
 ## Error Handling and Recovery
 
-### Settings Validation
-- **Configuration Integrity**: Comprehensive validation of all graphics settings with detailed error reporting
-- **Hardware Compatibility**: Resolution and quality validation against detected hardware capabilities
-- **Engine Limitations**: Setting validation against Godot engine constraints and platform limitations
-- **Performance Impact**: Automatic warnings for settings combinations that may impact performance
+### Audio System Recovery
+- **Device Failure**: Automatic fallback to default audio device with user notification
+- **Audio Test Failure**: Graceful handling of missing test samples with fallback options
+- **Bus Configuration Error**: Safe audio bus setup with error reporting and defaults
+- **Performance Issues**: Automatic quality reduction recommendations based on system capability
+
+### Control System Recovery
+- **Binding Conflicts**: Automatic detection with multiple resolution strategies
+- **Device Disconnection**: Graceful handling of device removal with reconnection support
+- **Invalid Bindings**: Safe clearing of corrupted bindings with default restoration
+- **Input Capture Timeout**: Automatic cancellation with user feedback and retry options
 
 ### Graceful Degradation
-- **Invalid Settings**: Automatic fallback to default configurations with user notification
-- **Hardware Detection Failure**: Manual configuration mode with standard preset options
-- **Preview Failures**: Safe setting application with automatic revert on failure
-- **Performance Issues**: Automatic quality reduction recommendations with user consent
-
-### Recovery Systems
 ```gdscript
-# Automatic error recovery with user feedback
-func _handle_graphics_settings_error(error_message: String) -> void:
-    push_warning("Graphics settings error: " + error_message)
+# Comprehensive error recovery for both systems
+func _handle_audio_control_error(error_type: String, error_message: String) -> void:
+    push_warning("Audio/Control error (" + error_type + "): " + error_message)
     
-    # Attempt graceful recovery
-    if _attempt_fallback_configuration():
-        return
-    
-    # If recovery fails, use safe defaults
-    _apply_safe_default_settings()
-```
-
-## Configuration and Customization
-
-### GraphicsOptionsDataManager Configuration
-```gdscript
-@export var enable_hardware_detection: bool = true
-@export var enable_performance_monitoring: bool = true
-@export var enable_real_time_preview: bool = true
-@export var enable_automatic_optimization: bool = true
-```
-
-### GraphicsOptionsDisplayController Configuration
-```gdscript
-@export var enable_real_time_preview: bool = true
-@export var enable_performance_monitoring: bool = true
-@export var enable_hardware_detection: bool = true
-```
-
-### GraphicsOptionsSystemCoordinator Configuration
-```gdscript
-@export var enable_automatic_hardware_optimization: bool = true
-@export var enable_real_time_performance_monitoring: bool = true
-@export var enable_settings_validation: bool = true
-@export var enable_preset_recommendations: bool = true
+    match error_type:
+        "audio_device":
+            _attempt_audio_device_fallback()
+        "control_conflict":
+            _attempt_automatic_conflict_resolution()
+        "settings_corruption":
+            _restore_default_settings()
+        _:
+            _apply_safe_defaults()
 ```
 
 ## Future Enhancements
 
-### Planned Features
-- **Advanced Hardware Detection**: GPU benchmark database for more accurate preset recommendations
-- **Performance Profiling**: Frame time analysis with bottleneck identification and optimization suggestions
-- **Custom Quality Profiles**: User-defined quality profiles with sharing and import/export functionality
-- **Dynamic Quality Scaling**: Automatic quality adjustment based on real-time performance metrics
-- **VR Support**: Virtual reality specific graphics options with comfort and performance optimization
+### Planned Audio Features
+- **Advanced Spatial Audio**: HRTF processing and binaural audio for enhanced 3D positioning
+- **Audio Profiling**: Automatic audio optimization based on hardware capabilities and user preferences
+- **Custom Audio Presets**: User-defined audio profiles with sharing and import/export functionality
+- **Voice Processing**: Real-time voice effects and processing for communication systems
+- **Audio Scripting**: S-Expression integration for dynamic audio configuration
+
+### Planned Control Features
+- **Gesture Recognition**: Mouse gesture support for complex command execution
+- **Adaptive Controls**: Machine learning-based control optimization based on user behavior
+- **Multi-Device Coordination**: Seamless switching between multiple input devices
+- **Custom Control Scripting**: S-Expression integration for complex control logic
+- **Accessibility Enhancement**: Eye tracking and alternative input method support
 
 ### Extended Integration
-- **Multiplayer Optimization**: Network-aware graphics settings for optimal multiplayer performance
-- **HDR Support**: High dynamic range display configuration with tone mapping options
-- **Ray Tracing**: Ray tracing quality settings and hardware requirement validation
-- **DLSS/FSR Integration**: AI upscaling technology integration with quality and performance options
-
-### Performance Optimization
-- **GPU Profiling**: Hardware-specific optimization profiles with manufacturer recommendations
-- **Thermal Management**: Temperature-aware quality scaling for mobile and laptop platforms
-- **Power Efficiency**: Battery-aware graphics optimization for portable devices
-- **Background Monitoring**: Continuous performance monitoring with adaptive quality adjustment
+- **Multiplayer Audio**: Voice chat integration with positional audio and team communication
+- **Mission Integration**: Context-sensitive control schemes for different mission types
+- **VR Support**: Virtual reality audio and control optimization with motion controller support
+- **Mobile Support**: Touch control optimization for mobile device deployment
 
 ---
 
@@ -509,33 +668,43 @@ func _handle_graphics_settings_error(error_message: String) -> void:
 ### Scene-Based Architecture
 ```
 target/scenes/menus/options/
-├── graphics_options_system.tscn                    # Main graphics options system scene
-├── graphics_options.tscn                           # UI layout for graphics options interface
-├── graphics_options_data_manager.gd                # Core settings management and hardware detection
-├── graphics_options_display_controller.gd          # UI logic and real-time preview
-├── graphics_options_system_coordinator.gd          # System coordination and integration
+├── audio_control_system.tscn                       # Main audio control system scene
+├── audio_control_options.tscn                      # UI layout for complete options interface
+├── audio_options_data_manager.gd                   # Audio settings and device management
+├── control_mapping_manager.gd                      # Control mapping and input management
+├── audio_control_display_controller.gd             # UI logic and real-time feedback
+├── audio_control_system_coordinator.gd             # System coordination and integration
+├── legacy_reference/                               # Legacy WCS implementations for reference
+│   ├── options.gd                                  # Original audio options implementation
+│   ├── controls_options.gd                         # Original control mapping implementation
+│   ├── control_line.gd                             # Original control binding UI component
+│   └── hud_options.gd                              # Original HUD configuration
 └── CLAUDE.md                                       # This documentation
 
 target/tests/scenes/menus/options/
-├── test_graphics_options_data_manager.gd           # GraphicsOptionsDataManager test suite
-└── test_graphics_options_system_coordinator.gd     # System coordinator test suite
+├── test_audio_options_data_manager.gd              # AudioOptionsDataManager test suite
+├── test_control_mapping_manager.gd                 # ControlMappingManager test suite
+├── test_graphics_options_data_manager.gd           # GraphicsOptionsDataManager test suite (MENU-010)
+└── test_graphics_options_system_coordinator.gd     # Graphics system coordinator test suite
 
 target/addons/wcs_asset_core/structures/
-└── graphics_settings_data.gd                       # Graphics settings data structure
+├── audio_settings_data.gd                          # Audio settings data structure
+└── control_mapping_data.gd                         # Control mapping data structure
 ```
 
 ### Scene Hierarchy
-- **graphics_options_system.tscn**: Root scene containing all components
-  - GraphicsOptionsDataManager (script node)
-  - GraphicsOptionsDisplayController (scene instance)
-- **graphics_options.tscn**: Complete UI layout with resolution controls, quality settings, and performance monitoring
+- **audio_control_system.tscn**: Root scene containing all components
+  - AudioOptionsDataManager (script node)
+  - ControlMappingManager (script node)
+  - AudioControlDisplayController (scene instance)
+- **audio_control_options.tscn**: Complete UI layout with tabbed interface for audio, controls, and accessibility
 - **Integration Scenes**: Designed for embedding in main menu and options workflows
 
 ---
 
 **Package Status**: Production Ready  
 **BMAD Epic**: EPIC-006 Menu Navigation System  
-**Story**: MENU-010 - Graphics and Performance Options System  
+**Story**: MENU-011 - Audio Configuration and Control Mapping System  
 **Completion Date**: 2025-01-06  
 
-This package successfully implements a comprehensive graphics and performance options system that provides all functionality from the original WCS options while leveraging modern Godot architecture, enhanced hardware detection, and maintaining consistency with established project patterns from EPIC-001 through EPIC-006.
+This package successfully implements a comprehensive audio and control configuration system that provides all functionality from the original WCS options while leveraging modern Godot architecture, enhanced device detection, real-time feedback systems, and maintaining consistency with established project patterns from EPIC-001 through EPIC-006.

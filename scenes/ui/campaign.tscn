@@ -1,6 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://dqlfd84wchxpb"]
-
-[ext_resource type="Script" path="res://scenes/ui/campaign.gd" id="1_gkum6"]
-
-[node name="Campaign" type="Node2D"]
-script = ExtResource("1_gkum6")
