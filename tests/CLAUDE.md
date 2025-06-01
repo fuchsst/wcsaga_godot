@@ -27,3 +27,6 @@ Unit tests and validation for WCS-Godot systems using GdUnit4.
 - Asset tests use addon structure paths
 - Manager tests verify initialization order
 - Comprehensive validation framework included
+
+Read TEST_STRUCTURE.md before adding/editing tests.
+Update TEST_STRUCTURE.md after adding/editing tests.
