@@ -3,18 +3,12 @@
 ## Purpose
 Unit tests and validation for WCS-Godot systems using GdUnit4.
 
-## Structure
-- **Core manager tests**: Autoload functionality validation
-- **Asset pipeline tests**: Asset loading and conversion
-- **Mission data tests**: Mission validation framework
-- **Configuration tests**: Settings and preferences
-
 ## Key Guidelines
 - Use GdUnit4 framework: `addons/gdUnit4/`
+- Follow the same subdirectory structure as in the `scripts` folder
 - Test file naming: `test_*.gd`
 - Run tests: `bash addons/gdUnit4/runtest.sh -a tests/`
 - Static typing required in all test files
-- Follow the same subdirectory structure as in the `scripts` folder
 
 ## Test Categories
 - **Unit Tests**: Individual component testing
@@ -28,5 +22,5 @@ Unit tests and validation for WCS-Godot systems using GdUnit4.
 - Manager tests verify initialization order
 - Comprehensive validation framework included
 
-Read TEST_STRUCTURE.md before adding/editing tests.
-Update TEST_STRUCTURE.md after adding/editing tests.
+Read `TEST_STRUCTURE.md` before adding/editing tests.
+Update `TEST_STRUCTURE.md` after adding/editing tests.
