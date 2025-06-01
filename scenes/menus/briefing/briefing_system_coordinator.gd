@@ -12,13 +12,15 @@ signal ship_selection_requested()
 signal weapon_selection_requested()
 signal mission_start_requested()
 
-# System components
-var briefing_manager: BriefingDataManager = null
-var display_controller: BriefingDisplayController = null
+# System components (from scene)
+@onready var briefing_manager: BriefingDataManager = $BriefingDataManager
+@onready var display_controller: BriefingDisplayController = $BriefingDisplay
+@onready var audio_player: AudioStreamPlayer = $BriefingAudioPlayer
+
+# Tactical map (created dynamically)
 var tactical_map_viewer: TacticalMapViewer = null
 
 # Audio management
-var audio_player: AudioStreamPlayer = null
 var current_audio_stream: AudioStream = null
 
 # Current state
@@ -41,7 +43,7 @@ var ui_theme_manager: UIThemeManager = null
 func _ready() -> void:
 	"""Initialize briefing system coordinator."""
 	_setup_dependencies()
-	_setup_system_components()
+	_setup_tactical_map()
 	_setup_signal_connections()
 
 func _setup_dependencies() -> void:
@@ -56,34 +58,19 @@ func _setup_dependencies() -> void:
 	if not theme_nodes.is_empty():
 		ui_theme_manager = theme_nodes[0] as UIThemeManager
 
-func _setup_system_components() -> void:
-	"""Setup all briefing system components."""
-	# Create briefing data manager
-	briefing_manager = BriefingDataManager.create_briefing_manager()
-	briefing_manager.enable_dynamic_objectives = true
-	briefing_manager.enable_ship_recommendations = enable_ship_recommendations
-	briefing_manager.enable_narrative_processing = true
-	briefing_manager.enable_sexp_evaluation = true
-	add_child(briefing_manager)
-	
-	# Create display controller
-	display_controller = BriefingDisplayController.create_briefing_display()
-	display_controller.enable_tactical_map = enable_tactical_map
-	display_controller.enable_audio_playback = enable_audio_briefing
-	display_controller.enable_ship_recommendations = enable_ship_recommendations
-	display_controller.visible = false
-	add_child(display_controller)
-	
-	# Create tactical map viewer (integrated into display controller)
+func _setup_tactical_map() -> void:
+	"""Setup tactical map viewer if enabled."""
 	if enable_tactical_map:
-		tactical_map_viewer = TacticalMapViewer.create_tactical_map_viewer()
-		# Will be integrated with display controller's tactical panel
-	
-	# Create audio player for briefing audio
-	if enable_audio_briefing:
-		audio_player = AudioStreamPlayer.new()
-		audio_player.name = "BriefingAudioPlayer"
-		add_child(audio_player)
+		# Load tactical map scene
+		var tactical_map_scene: PackedScene = preload("res://scenes/menus/briefing/tactical_map.tscn")
+		tactical_map_viewer = tactical_map_scene.instantiate() as TacticalMapViewer
+		
+		# Configure the tactical map
+		tactical_map_viewer.enable_camera_animation = true
+		tactical_map_viewer.enable_icon_interaction = true
+		tactical_map_viewer.show_grid = true
+		
+		# Will be integrated with display controller's tactical panel when shown
 
 func _setup_signal_connections() -> void:
 	"""Setup signal connections between components."""
@@ -478,9 +465,9 @@ func debug_get_system_info() -> Dictionary:
 # ============================================================================
 
 static func create_briefing_system() -> BriefingSystemCoordinator:
-	"""Create a new briefing system coordinator instance."""
-	var coordinator: BriefingSystemCoordinator = BriefingSystemCoordinator.new()
-	coordinator.name = "BriefingSystemCoordinator"
+	"""Create a new briefing system coordinator instance from scene."""
+	var scene: PackedScene = preload("res://scenes/menus/briefing/briefing_system.tscn")
+	var coordinator: BriefingSystemCoordinator = scene.instantiate() as BriefingSystemCoordinator
 	return coordinator
 
 static func launch_briefing_view(parent_node: Node, mission_data: MissionData) -> BriefingSystemCoordinator:

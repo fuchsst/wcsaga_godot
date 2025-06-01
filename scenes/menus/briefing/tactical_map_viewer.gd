@@ -3,16 +3,23 @@ extends Control
 
 ## Tactical map visualization for mission briefings.
 ## Displays mission area, waypoints, enemy positions, and tactical information.
-## Provides 3D visualization of briefing content with interactive elements.
+## Works with tactical_map.tscn scene for UI structure.
 
 signal icon_selected(icon_data: BriefingIconData)
 signal waypoint_selected(waypoint_index: int)
 signal map_camera_changed(position: Vector3, orientation: Basis)
 
-# 3D Visualization
-var viewport_3d: SubViewport = null
-var camera_3d: Camera3D = null
-var tactical_scene: Node3D = null
+# 3D Visualization (from scene)
+@onready var viewport_3d: SubViewport = $Viewport3D
+@onready var tactical_scene: Node3D = $Viewport3D/TacticalScene
+@onready var camera_3d: Camera3D = $Viewport3D/TacticalScene/TacticalCamera
+
+# UI Controls (from scene)
+@onready var camera_controls: VBoxContainer = $CameraControls
+@onready var zoom_slider: HSlider = $CameraControls/ZoomSlider
+@onready var reset_camera_button: Button = $CameraControls/ResetCameraButton
+@onready var toggle_grid_button: Button = $CameraControls/ToggleGridButton
+@onready var icon_update_timer: Timer = $IconUpdateTimer
 
 # Map data
 var current_briefing_stage: BriefingStageData = null
@@ -31,12 +38,6 @@ var icon_material: StandardMaterial3D = null
 var line_material: StandardMaterial3D = null
 var waypoint_material: StandardMaterial3D = null
 
-# UI Controls
-var camera_controls: VBoxContainer = null
-var zoom_slider: HSlider = null
-var reset_camera_button: Button = null
-var toggle_grid_button: Button = null
-
 # Configuration
 @export var enable_camera_animation: bool = true
 @export var enable_icon_interaction: bool = true
@@ -44,39 +45,22 @@ var toggle_grid_button: Button = null
 @export var show_coordinates: bool = false
 
 # Performance
-var icon_update_timer: Timer = null
 var last_camera_update_time: float = 0.0
 
 func _ready() -> void:
 	"""Initialize tactical map viewer."""
-	_setup_3d_viewport()
-	_setup_ui_controls()
+	_setup_signal_connections()
 	_setup_materials()
-	_setup_timer()
+	_setup_environment()
 	name = "TacticalMapViewer"
 
-func _setup_3d_viewport() -> void:
-	"""Setup 3D viewport for tactical display."""
-	# Create viewport
-	viewport_3d = SubViewport.new()
-	viewport_3d.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	viewport_3d.render_target_update_mode = SubViewport.UPDATE_ALWAYS
-	add_child(viewport_3d)
-	
-	# Create tactical scene root
-	tactical_scene = Node3D.new()
-	tactical_scene.name = "TacticalScene"
-	viewport_3d.add_child(tactical_scene)
-	
-	# Create camera
-	camera_3d = Camera3D.new()
-	camera_3d.name = "TacticalCamera"
-	camera_3d.position = Vector3(0, 50, 100)
-	camera_3d.look_at(Vector3.ZERO, Vector3.UP)
-	tactical_scene.add_child(camera_3d)
-	
-	# Add environment and lighting
-	_setup_environment()
+func _setup_signal_connections() -> void:
+	"""Setup signal connections with scene UI elements."""
+	# UI control connections
+	zoom_slider.value_changed.connect(_on_zoom_changed)
+	reset_camera_button.pressed.connect(_on_reset_camera_pressed)
+	toggle_grid_button.pressed.connect(_on_toggle_grid_pressed)
+	icon_update_timer.timeout.connect(_on_icon_update_timer_timeout)
 
 func _setup_environment() -> void:
 	"""Setup 3D environment and lighting."""
@@ -88,14 +72,6 @@ func _setup_environment() -> void:
 	environment.ambient_light_color = Color(0.3, 0.3, 0.4)
 	environment.ambient_light_energy = 0.3
 	camera_3d.environment = environment
-	
-	# Directional light
-	var light: DirectionalLight3D = DirectionalLight3D.new()
-	light.name = "TacticalLight"
-	light.position = Vector3(10, 20, 10)
-	light.look_at(Vector3.ZERO, Vector3.UP)
-	light.light_energy = 0.8
-	tactical_scene.add_child(light)
 	
 	# Grid (if enabled)
 	if show_grid:
@@ -131,38 +107,6 @@ func _create_grid() -> void:
 		line_z.position = Vector3(i, 0, 0)
 		tactical_scene.add_child(line_z)
 
-func _setup_ui_controls() -> void:
-	"""Setup UI controls for camera and map interaction."""
-	camera_controls = VBoxContainer.new()
-	camera_controls.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
-	camera_controls.offset_left = 10
-	camera_controls.offset_top = 10
-	add_child(camera_controls)
-	
-	# Zoom control
-	var zoom_label: Label = Label.new()
-	zoom_label.text = "Zoom"
-	camera_controls.add_child(zoom_label)
-	
-	zoom_slider = HSlider.new()
-	zoom_slider.min_value = 10.0
-	zoom_slider.max_value = 200.0
-	zoom_slider.value = 100.0
-	zoom_slider.custom_minimum_size = Vector2(150, 0)
-	zoom_slider.value_changed.connect(_on_zoom_changed)
-	camera_controls.add_child(zoom_slider)
-	
-	# Reset camera button
-	reset_camera_button = Button.new()
-	reset_camera_button.text = "Reset View"
-	reset_camera_button.pressed.connect(_on_reset_camera_pressed)
-	camera_controls.add_child(reset_camera_button)
-	
-	# Toggle grid button
-	toggle_grid_button = Button.new()
-	toggle_grid_button.text = "Toggle Grid"
-	toggle_grid_button.pressed.connect(_on_toggle_grid_pressed)
-	camera_controls.add_child(toggle_grid_button)
 
 func _setup_materials() -> void:
 	"""Setup materials for tactical elements."""
@@ -187,13 +131,6 @@ func _setup_materials() -> void:
 	waypoint_material.emission = Color.GREEN * 0.4
 	waypoint_material.flags_unshaded = true
 
-func _setup_timer() -> void:
-	"""Setup update timer for performance management."""
-	icon_update_timer = Timer.new()
-	icon_update_timer.wait_time = 0.1  # 10 FPS updates
-	icon_update_timer.timeout.connect(_on_icon_update_timer_timeout)
-	add_child(icon_update_timer)
-	icon_update_timer.start()
 
 # ============================================================================
 # PUBLIC API
@@ -504,7 +441,7 @@ func _on_icon_update_timer_timeout() -> void:
 # ============================================================================
 
 static func create_tactical_map_viewer() -> TacticalMapViewer:
-	"""Create a new tactical map viewer instance."""
-	var viewer: TacticalMapViewer = TacticalMapViewer.new()
-	viewer.name = "TacticalMapViewer"
+	"""Create a new tactical map viewer instance from scene."""
+	var scene: PackedScene = preload("res://scenes/menus/briefing/tactical_map.tscn")
+	var viewer: TacticalMapViewer = scene.instantiate() as TacticalMapViewer
 	return viewer

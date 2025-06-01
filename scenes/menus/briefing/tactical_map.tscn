@@ -1,0 +1,59 @@
+[gd_scene load_steps=2 format=3 uid="uid://ckmhhtd01qm5i"]
+
+[ext_resource type="Script" path="res://scenes/menus/briefing/tactical_map_viewer.gd" id="1_82fhy"]
+
+[node name="TacticalMap" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_82fhy")
+
+[node name="Viewport3D" type="SubViewport" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+render_target_update_mode = 4
+
+[node name="TacticalScene" type="Node3D" parent="Viewport3D"]
+
+[node name="TacticalCamera" type="Camera3D" parent="Viewport3D/TacticalScene"]
+transform = Transform3D(1, 0, 0, 0, 0.642788, 0.766044, 0, -0.766044, 0.642788, 0, 50, 100)
+
+[node name="TacticalLight" type="DirectionalLight3D" parent="Viewport3D/TacticalScene"]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 10, 20, 10)
+light_energy = 0.8
+
+[node name="CameraControls" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = -120.0
+offset_right = 160.0
+offset_bottom = -10.0
+
+[node name="ZoomLabel" type="Label" parent="CameraControls"]
+layout_mode = 2
+text = "Zoom"
+
+[node name="ZoomSlider" type="HSlider" parent="CameraControls"]
+layout_mode = 2
+custom_minimum_size = Vector2(150, 0)
+min_value = 10.0
+max_value = 200.0
+value = 100.0
+
+[node name="ResetCameraButton" type="Button" parent="CameraControls"]
+layout_mode = 2
+text = "Reset View"
+
+[node name="ToggleGridButton" type="Button" parent="CameraControls"]
+layout_mode = 2
+text = "Toggle Grid"
+
+[node name="IconUpdateTimer" type="Timer" parent="."]
+wait_time = 0.1
+autostart = true

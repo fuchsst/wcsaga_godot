@@ -14,3 +14,10 @@ Main directories:
 * scripts: The folder for the Godot script game logic (used in scenes and other scripts)
 * shaders: Custom shaders to replicate specific WCS effects
 * tests: gdUnit4 test suites to test the scripts and scenes (use `target\addons\gdUnit4\runtest.sh` to run the tests)
+
+Godot Coding Guidelines:
+* Use scenes to define UI elements and reusable game objects
+* Use gd scripts to define logic in the scripts folder
+* make sure to define tests in the tests folder (with the same subdirectory structure)
+* Define data structures in addons/wcs_asst_core
+* use .tres resources to store game data

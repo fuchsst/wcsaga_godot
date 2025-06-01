@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3 uid="uid://bekc3nhtrgcai"]
+
+[ext_resource type="Script" path="res://scenes/menus/briefing/briefing_system_coordinator.gd" id="1_2mhrl"]
+[ext_resource type="PackedScene" uid="uid://db85s1oxpxqkc" path="res://scenes/menus/briefing/briefing_display.tscn" id="2_vxgqw"]
+
+[node name="BriefingSystem" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_2mhrl")
+
+[node name="BriefingDataManager" type="Node" parent="."]
+script = res://scenes/menus/briefing/briefing_data_manager.gd
+
+[node name="BriefingDisplay" parent="." instance=ExtResource("2_vxgqw")]
+visible = false
+
+[node name="BriefingAudioPlayer" type="AudioStreamPlayer" parent="."]

@@ -1,0 +1,205 @@
+[gd_scene load_steps=2 format=3 uid="uid://db85s1oxpxqkc"]
+
+[ext_resource type="Script" path="res://scenes/menus/briefing/briefing_display_controller.gd" id="1_nvh1j"]
+
+[node name="BriefingDisplay" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_nvh1j")
+
+[node name="MainContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="HeaderContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[sub_resource type="LabelSettings" id="LabelSettings_1"]
+font_size = 24
+
+[sub_resource type="LabelSettings" id="LabelSettings_2"]
+font_size = 18
+
+[sub_resource type="LabelSettings" id="LabelSettings_3"]
+font_size = 18
+
+[sub_resource type="LabelSettings" id="LabelSettings_4"]
+font_size = 18
+
+[sub_resource type="LabelSettings" id="LabelSettings_5"]
+font_size = 18
+
+[node name="MissionTitleLabel" type="Label" parent="MainContainer/HeaderContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Mission Briefing"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="StageCounterLabel" type="Label" parent="MainContainer/HeaderContainer"]
+layout_mode = 2
+text = "Stage 1 of 1"
+horizontal_alignment = 2
+
+[node name="ContentContainer" type="HSplitContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LeftPanel" type="VBoxContainer" parent="MainContainer/ContentContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(400, 0)
+
+[node name="ObjectivesGroup" type="VBoxContainer" parent="MainContainer/ContentContainer/LeftPanel"]
+layout_mode = 2
+
+[node name="ObjectivesHeader" type="Label" parent="MainContainer/ContentContainer/LeftPanel/ObjectivesGroup"]
+layout_mode = 2
+text = "Mission Objectives"
+label_settings = SubResource("LabelSettings_2")
+
+[node name="ObjectivesScroll" type="ScrollContainer" parent="MainContainer/ContentContainer/LeftPanel/ObjectivesGroup"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 200)
+size_flags_vertical = 3
+
+[node name="ObjectivesPanel" type="VBoxContainer" parent="MainContainer/ContentContainer/LeftPanel/ObjectivesGroup/ObjectivesScroll"]
+layout_mode = 2
+
+[node name="NarrativeGroup" type="VBoxContainer" parent="MainContainer/ContentContainer/LeftPanel"]
+layout_mode = 2
+
+[node name="NarrativeHeader" type="HBoxContainer" parent="MainContainer/ContentContainer/LeftPanel/NarrativeGroup"]
+layout_mode = 2
+
+[node name="NarrativeTitle" type="Label" parent="MainContainer/ContentContainer/LeftPanel/NarrativeGroup/NarrativeHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Briefing"
+label_settings = SubResource("LabelSettings_3")
+
+[node name="AudioControls" type="HBoxContainer" parent="MainContainer/ContentContainer/LeftPanel/NarrativeGroup/NarrativeHeader"]
+layout_mode = 2
+
+[node name="PlayAudioButton" type="Button" parent="MainContainer/ContentContainer/LeftPanel/NarrativeGroup/NarrativeHeader/AudioControls"]
+layout_mode = 2
+custom_minimum_size = Vector2(60, 0)
+text = "Play"
+
+[node name="PauseAudioButton" type="Button" parent="MainContainer/ContentContainer/LeftPanel/NarrativeGroup/NarrativeHeader/AudioControls"]
+layout_mode = 2
+custom_minimum_size = Vector2(60, 0)
+disabled = true
+text = "Pause"
+
+[node name="AudioProgress" type="ProgressBar" parent="MainContainer/ContentContainer/LeftPanel/NarrativeGroup/NarrativeHeader/AudioControls"]
+layout_mode = 2
+custom_minimum_size = Vector2(100, 0)
+size_flags_horizontal = 3
+
+[node name="NarrativeScroll" type="ScrollContainer" parent="MainContainer/ContentContainer/LeftPanel/NarrativeGroup"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 250)
+size_flags_vertical = 3
+
+[node name="NarrativePanel" type="VBoxContainer" parent="MainContainer/ContentContainer/LeftPanel/NarrativeGroup/NarrativeScroll"]
+layout_mode = 2
+
+[node name="RightPanel" type="VBoxContainer" parent="MainContainer/ContentContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(400, 0)
+
+[node name="TacticalMapGroup" type="VBoxContainer" parent="MainContainer/ContentContainer/RightPanel"]
+layout_mode = 2
+
+[node name="TacticalMapHeader" type="Label" parent="MainContainer/ContentContainer/RightPanel/TacticalMapGroup"]
+layout_mode = 2
+text = "Tactical Overview"
+label_settings = SubResource("LabelSettings_4")
+
+[node name="TacticalMapPanel" type="Control" parent="MainContainer/ContentContainer/RightPanel/TacticalMapGroup"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 300)
+size_flags_vertical = 3
+
+[node name="TacticalMapBackground" type="Panel" parent="MainContainer/ContentContainer/RightPanel/TacticalMapGroup/TacticalMapPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="TacticalMapPlaceholder" type="Label" parent="MainContainer/ContentContainer/RightPanel/TacticalMapGroup/TacticalMapPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "Tactical Map
+(3D visualization)"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ShipRecommendationsGroup" type="VBoxContainer" parent="MainContainer/ContentContainer/RightPanel"]
+layout_mode = 2
+
+[node name="RecommendationsHeader" type="Label" parent="MainContainer/ContentContainer/RightPanel/ShipRecommendationsGroup"]
+layout_mode = 2
+text = "Ship Recommendations"
+label_settings = SubResource("LabelSettings_5")
+
+[node name="RecommendationsScroll" type="ScrollContainer" parent="MainContainer/ContentContainer/RightPanel/ShipRecommendationsGroup"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 200)
+size_flags_vertical = 3
+
+[node name="ShipRecommendationsPanel" type="VBoxContainer" parent="MainContainer/ContentContainer/RightPanel/ShipRecommendationsGroup/RecommendationsScroll"]
+layout_mode = 2
+
+[node name="NavigationContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="StageNavigation" type="HBoxContainer" parent="MainContainer/NavigationContainer"]
+layout_mode = 2
+
+[node name="FirstStageButton" type="Button" parent="MainContainer/NavigationContainer/StageNavigation"]
+layout_mode = 2
+text = "First"
+
+[node name="PrevStageButton" type="Button" parent="MainContainer/NavigationContainer/StageNavigation"]
+layout_mode = 2
+text = "Previous"
+
+[node name="NextStageButton" type="Button" parent="MainContainer/NavigationContainer/StageNavigation"]
+layout_mode = 2
+text = "Next"
+
+[node name="LastStageButton" type="Button" parent="MainContainer/NavigationContainer/StageNavigation"]
+layout_mode = 2
+text = "Last"
+
+[node name="Spacer" type="Control" parent="MainContainer/NavigationContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ActionButtons" type="HBoxContainer" parent="MainContainer/NavigationContainer"]
+layout_mode = 2
+
+[node name="ShipSelectButton" type="Button" parent="MainContainer/NavigationContainer/ActionButtons"]
+layout_mode = 2
+text = "Ship Selection"
+
+[node name="WeaponSelectButton" type="Button" parent="MainContainer/NavigationContainer/ActionButtons"]
+layout_mode = 2
+text = "Weapon Selection"
+
+[node name="StartMissionButton" type="Button" parent="MainContainer/NavigationContainer/ActionButtons"]
+layout_mode = 2
+text = "Start Mission"
+modulate = Color(0, 1, 0, 1)
+
+[node name="CloseButton" type="Button" parent="MainContainer/NavigationContainer/ActionButtons"]
+layout_mode = 2
+text = "Close"

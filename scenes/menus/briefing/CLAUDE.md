@@ -4,6 +4,8 @@
 
 The Mission Briefing Package provides a comprehensive mission briefing interface that displays objectives, background, and tactical information for the WCS-Godot conversion project. This package implements complete briefing lifecycle management including dynamic content generation, SEXP evaluation, tactical visualization, and audio synchronization while maintaining compatibility with WCS briefing systems and mission data structures.
 
+**Architecture**: Uses Godot scenes for UI structure and GDScript for logic, following proper Godot development patterns with scene composition over programmatic UI creation.
+
 ## Key Classes
 
 ### BriefingDataManager
@@ -35,15 +37,20 @@ var current_stage: BriefingStageData = briefing_manager.get_current_stage()
 ```
 
 ### BriefingDisplayController
-**Purpose**: Interactive briefing display with tabbed interface and comprehensive presentation.
+**Purpose**: Interactive briefing display logic controller that works with briefing_display.tscn scene.
 
 **Responsibilities**:
-- Multi-panel briefing interface (objectives, narrative, tactical map, recommendations)
+- UI logic for multi-panel briefing interface (objectives, narrative, tactical map, recommendations)
 - Stage navigation controls with first/previous/next/last functionality
 - Audio playback controls with synchronized briefing narration
 - Ship and weapon selection integration
 - Real-time display updates with stage transitions
-- Export functionality integration
+- Signal routing between UI components
+
+**Scene Structure**: `briefing_display.tscn`
+- Uses @onready vars to reference scene nodes
+- UI layout defined in scene, logic handled in script
+- Follows Godot best practices for scene composition
 
 **Usage**:
 ```gdscript
@@ -59,7 +66,7 @@ display_controller.stage_navigation_requested.connect(_on_stage_navigation)
 ```
 
 ### TacticalMapViewer
-**Purpose**: 3D tactical map visualization with interactive briefing icons and waypoints.
+**Purpose**: 3D tactical map visualization logic controller that works with tactical_map.tscn scene.
 
 **Responsibilities**:
 - 3D briefing icon rendering with type-specific visualization
@@ -68,6 +75,12 @@ display_controller.stage_navigation_requested.connect(_on_stage_navigation)
 - Camera animation synchronization with briefing stages
 - Interactive icon selection and information display
 - Grid reference system and camera controls
+
+**Scene Structure**: `tactical_map.tscn`
+- Contains SubViewport with 3D scene for tactical display
+- UI controls for camera manipulation defined in scene
+- 3D environment and lighting setup in scene
+- Timer for icon updates configured in scene
 
 **Usage**:
 ```gdscript
@@ -86,7 +99,7 @@ tactical_viewer.set_camera_position(position, orientation, animate_transition)
 ```
 
 ### BriefingSystemCoordinator
-**Purpose**: Complete briefing system workflow coordination and integration management.
+**Purpose**: Complete briefing system workflow coordination using briefing_system.tscn scene.
 
 **Responsibilities**:
 - Component lifecycle management and signal routing
@@ -95,6 +108,12 @@ tactical_viewer.set_camera_position(position, orientation, animate_transition)
 - Ship recommendation system coordination
 - Main menu integration and scene transitions
 - Error handling and recovery procedures
+
+**Scene Structure**: `briefing_system.tscn`
+- Contains BriefingDataManager, BriefingDisplay, and AudioStreamPlayer as child nodes
+- Coordinator script references components via @onready
+- TacticalMapViewer loaded dynamically when needed
+- Complete system encapsulated in single scene
 
 **Usage**:
 ```gdscript
@@ -385,11 +404,15 @@ func _on_campaign_mission_selected(mission_data: MissionData) -> void:
 
 ## File Structure and Organization
 
+### Scene-Based Architecture
 ```
 target/scenes/menus/briefing/
+├── briefing_system.tscn               # Main briefing system scene
+├── briefing_display.tscn              # UI layout for briefing display
+├── tactical_map.tscn                  # 3D tactical map scene
 ├── briefing_data_manager.gd           # Core data management and SEXP evaluation
-├── briefing_display_controller.gd     # Interactive briefing UI presentation
-├── tactical_map_viewer.gd             # 3D tactical visualization
+├── briefing_display_controller.gd     # UI logic controller
+├── tactical_map_viewer.gd             # 3D tactical visualization logic
 ├── briefing_system_coordinator.gd     # System coordination and integration
 └── CLAUDE.md                          # This documentation
 
@@ -404,6 +427,14 @@ target/addons/wcs_asset_core/resources/mission/
 ├── briefing_icon_data.gd              # Tactical icon data structure
 └── briefing_line_data.gd              # Tactical line data structure
 ```
+
+### Scene Hierarchy
+- **briefing_system.tscn**: Root scene containing all components
+  - BriefingDataManager (script node)
+  - BriefingDisplay (scene instance)
+  - BriefingAudioPlayer (AudioStreamPlayer)
+- **briefing_display.tscn**: Complete UI layout with all panels and controls
+- **tactical_map.tscn**: 3D visualization with SubViewport and UI controls
 
 ## Error Handling and Recovery
 
