@@ -1,0 +1,292 @@
+[gd_scene load_steps=2 format=3 uid="uid://bw5nx2v8d7l6h"]
+
+[ext_resource type="Script" path="res://scenes/menus/options/control_mapping_manager.gd" id="1_m8k7q"]
+
+[node name="ControlMapping" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_m8k7q")
+
+[node name="BackgroundPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="MainContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 50.0
+offset_top = 50.0
+offset_right = -50.0
+offset_bottom = -50.0
+
+[node name="HeaderContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="MainContainer/HeaderContainer"]
+layout_mode = 2
+text = "Control Mapping"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="BackButton" type="Button" parent="MainContainer/HeaderContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Back"
+
+[node name="HSeparator" type="HSeparator" parent="MainContainer"]
+layout_mode = 2
+
+[node name="ControlsContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CategoryPanel" type="VBoxContainer" parent="MainContainer/ControlsContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+custom_minimum_size = Vector2(200, 0)
+
+[node name="CategoryLabel" type="Label" parent="MainContainer/ControlsContainer/CategoryPanel"]
+layout_mode = 2
+text = "Categories"
+
+[node name="CategoryList" type="ItemList" parent="MainContainer/ControlsContainer/CategoryPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VSeparator" type="VSeparator" parent="MainContainer/ControlsContainer"]
+layout_mode = 2
+
+[node name="MappingPanel" type="VBoxContainer" parent="MainContainer/ControlsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MappingHeader" type="HBoxContainer" parent="MainContainer/ControlsContainer/MappingPanel"]
+layout_mode = 2
+
+[node name="CategoryTitleLabel" type="Label" parent="MainContainer/ControlsContainer/MappingPanel/MappingHeader"]
+layout_mode = 2
+text = "Select a category"
+
+[node name="Spacer" type="Control" parent="MainContainer/ControlsContainer/MappingPanel/MappingHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SearchContainer" type="HBoxContainer" parent="MainContainer/ControlsContainer/MappingPanel/MappingHeader"]
+layout_mode = 2
+
+[node name="SearchLabel" type="Label" parent="MainContainer/ControlsContainer/MappingPanel/MappingHeader/SearchContainer"]
+layout_mode = 2
+text = "Search:"
+
+[node name="SearchLineEdit" type="LineEdit" parent="MainContainer/ControlsContainer/MappingPanel/MappingHeader/SearchContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(200, 0)
+placeholder_text = "Filter controls..."
+
+[node name="MappingScrollContainer" type="ScrollContainer" parent="MainContainer/ControlsContainer/MappingPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MappingList" type="VBoxContainer" parent="MainContainer/ControlsContainer/MappingPanel/MappingScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VSeparator2" type="VSeparator" parent="MainContainer/ControlsContainer"]
+layout_mode = 2
+
+[node name="SettingsPanel" type="VBoxContainer" parent="MainContainer/ControlsContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+custom_minimum_size = Vector2(300, 0)
+
+[node name="DeviceSettingsGroup" type="GroupBox" parent="MainContainer/ControlsContainer/SettingsPanel"]
+layout_mode = 2
+text = "Device Settings"
+
+[node name="DeviceGrid" type="GridContainer" parent="MainContainer/ControlsContainer/SettingsPanel/DeviceSettingsGroup"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 30.0
+offset_right = -10.0
+offset_bottom = -10.0
+columns = 2
+
+[node name="InputMethodLabel" type="Label" parent="MainContainer/ControlsContainer/SettingsPanel/DeviceSettingsGroup/DeviceGrid"]
+layout_mode = 2
+text = "Input Method:"
+
+[node name="InputMethodOption" type="OptionButton" parent="MainContainer/ControlsContainer/SettingsPanel/DeviceSettingsGroup/DeviceGrid"]
+layout_mode = 2
+
+[node name="MouseSettingsGroup" type="GroupBox" parent="MainContainer/ControlsContainer/SettingsPanel"]
+layout_mode = 2
+text = "Mouse Settings"
+
+[node name="MouseGrid" type="GridContainer" parent="MainContainer/ControlsContainer/SettingsPanel/MouseSettingsGroup"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 30.0
+offset_right = -10.0
+offset_bottom = -10.0
+columns = 2
+
+[node name="MouseSensitivityLabel" type="Label" parent="MainContainer/ControlsContainer/SettingsPanel/MouseSettingsGroup/MouseGrid"]
+layout_mode = 2
+text = "Sensitivity:"
+
+[node name="MouseSensitivitySlider" type="HSlider" parent="MainContainer/ControlsContainer/SettingsPanel/MouseSettingsGroup/MouseGrid"]
+layout_mode = 2
+min_value = 0.1
+max_value = 10.0
+step = 0.1
+value = 1.0
+
+[node name="MouseInvertXLabel" type="Label" parent="MainContainer/ControlsContainer/SettingsPanel/MouseSettingsGroup/MouseGrid"]
+layout_mode = 2
+text = "Invert X-Axis:"
+
+[node name="MouseInvertXCheckBox" type="CheckBox" parent="MainContainer/ControlsContainer/SettingsPanel/MouseSettingsGroup/MouseGrid"]
+layout_mode = 2
+
+[node name="MouseInvertYLabel" type="Label" parent="MainContainer/ControlsContainer/SettingsPanel/MouseSettingsGroup/MouseGrid"]
+layout_mode = 2
+text = "Invert Y-Axis:"
+
+[node name="MouseInvertYCheckBox" type="CheckBox" parent="MainContainer/ControlsContainer/SettingsPanel/MouseSettingsGroup/MouseGrid"]
+layout_mode = 2
+
+[node name="MouseDeadzoneLabel" type="Label" parent="MainContainer/ControlsContainer/SettingsPanel/MouseSettingsGroup/MouseGrid"]
+layout_mode = 2
+text = "Deadzone:"
+
+[node name="MouseDeadzoneSlider" type="HSlider" parent="MainContainer/ControlsContainer/SettingsPanel/MouseSettingsGroup/MouseGrid"]
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+value = 0.1
+
+[node name="GamepadSettingsGroup" type="GroupBox" parent="MainContainer/ControlsContainer/SettingsPanel"]
+layout_mode = 2
+text = "Gamepad Settings"
+
+[node name="GamepadGrid" type="GridContainer" parent="MainContainer/ControlsContainer/SettingsPanel/GamepadSettingsGroup"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 30.0
+offset_right = -10.0
+offset_bottom = -10.0
+columns = 2
+
+[node name="GamepadSensitivityLabel" type="Label" parent="MainContainer/ControlsContainer/SettingsPanel/GamepadSettingsGroup/GamepadGrid"]
+layout_mode = 2
+text = "Sensitivity:"
+
+[node name="GamepadSensitivitySlider" type="HSlider" parent="MainContainer/ControlsContainer/SettingsPanel/GamepadSettingsGroup/GamepadGrid"]
+layout_mode = 2
+min_value = 0.1
+max_value = 10.0
+step = 0.1
+value = 1.0
+
+[node name="GamepadDeadzoneLabel" type="Label" parent="MainContainer/ControlsContainer/SettingsPanel/GamepadSettingsGroup/GamepadGrid"]
+layout_mode = 2
+text = "Deadzone:"
+
+[node name="GamepadDeadzoneSlider" type="HSlider" parent="MainContainer/ControlsContainer/SettingsPanel/GamepadSettingsGroup/GamepadGrid"]
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+value = 0.2
+
+[node name="VibrationLabel" type="Label" parent="MainContainer/ControlsContainer/SettingsPanel/GamepadSettingsGroup/GamepadGrid"]
+layout_mode = 2
+text = "Vibration:"
+
+[node name="VibrationCheckBox" type="CheckBox" parent="MainContainer/ControlsContainer/SettingsPanel/GamepadSettingsGroup/GamepadGrid"]
+layout_mode = 2
+
+[node name="VibrationStrengthLabel" type="Label" parent="MainContainer/ControlsContainer/SettingsPanel/GamepadSettingsGroup/GamepadGrid"]
+layout_mode = 2
+text = "Vibration Strength:"
+
+[node name="VibrationStrengthSlider" type="HSlider" parent="MainContainer/ControlsContainer/SettingsPanel/GamepadSettingsGroup/GamepadGrid"]
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="ButtonContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="ConflictLabel" type="Label" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "No conflicts detected"
+modulate = Color(0, 1, 0, 1)
+
+[node name="Spacer2" type="Control" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ClearAllButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "Clear All"
+
+[node name="ResetButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "Reset to Defaults"
+
+[node name="ApplyButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "Apply"
+
+[node name="OKButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "OK"
+
+[node name="BindingDialog" type="AcceptDialog" parent="."]
+title = "Press a key or button..."
+initial_position = 2
+size = Vector2i(400, 200)
+
+[node name="BindingDialogContainer" type="VBoxContainer" parent="BindingDialog"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -49.0
+
+[node name="BindingLabel" type="Label" parent="BindingDialog/BindingDialogContainer"]
+layout_mode = 2
+text = "Press the key, mouse button, or gamepad button you want to assign to this action."
+autowrap_mode = 2
+
+[node name="CurrentBindingLabel" type="Label" parent="BindingDialog/BindingDialogContainer"]
+layout_mode = 2
+text = "Current binding: None"
+
+[node name="InputDisplay" type="Label" parent="BindingDialog/BindingDialogContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Waiting for input..."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[sub_resource type="LabelSettings" id="LabelSettings_1"]
+font_size = 24

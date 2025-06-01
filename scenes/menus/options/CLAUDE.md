@@ -1,10 +1,13 @@
-# Audio and Control Options Package Documentation
+# Options Menu Package
 
-## Package Purpose
+## Purpose
+This package provides comprehensive options and settings management for WCS-Godot, including graphics, audio, and control configuration interfaces with sophisticated backend data management.
 
-The Audio and Control Options Package provides comprehensive audio configuration and control mapping for the WCS-Godot conversion project. This package implements complete audio settings management including volume control, device detection, real-time audio testing, control mapping, conflict resolution, and accessibility features while maintaining compatibility with WCS options systems and the Godot engine.
+## Package Overview
 
-**Architecture**: Uses Godot scenes for UI structure and GDScript for logic, following proper Godot development patterns with ConfigurationManager integration, comprehensive settings validation, and modern input system integration.
+This package implements complete options management including graphics configuration, audio settings, control mapping, and unified settings persistence. The system provides real-time validation, device detection, conflict resolution, accessibility features, and maintains compatibility with WCS options systems while leveraging Godot's modern input and audio systems.
+
+**Architecture**: Uses Godot scenes for UI structure and GDScript for sophisticated backend logic, following proper Godot development patterns with ConfigurationManager integration, comprehensive settings validation, and modern engine integration.
 
 ## Key Classes
 

@@ -1,0 +1,202 @@
+[gd_scene load_steps=4 format=3 uid="uid://bsrym3hvhdygs"]
+
+[ext_resource type="Script" path="res://scenes/menus/main_menu/main_menu_controller.gd" id="1_0hdqx"]
+
+[sub_resource type="Animation" id="Animation_1"]
+resource_name = "background_idle"
+length = 30.0
+loop_mode = 1
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_1"]
+_data = {
+"background_idle": SubResource("Animation_1")
+}
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 1
+script = ExtResource("1_0hdqx")
+
+[node name="BackgroundContainer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="BackgroundImage" type="TextureRect" parent="BackgroundContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="AnimatedBackground" type="AnimationPlayer" parent="BackgroundContainer/BackgroundImage"]
+libraries = {
+"": SubResource("AnimationLibrary_1")
+}
+autoplay = "background_idle"
+
+[node name="OverlayEffects" type="Control" parent="BackgroundContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="MenuOptionsContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 100.0
+offset_top = -175.0
+offset_right = 300.0
+offset_bottom = 175.0
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="PilotManagementButton" type="Button" parent="MenuOptionsContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(200, 50)
+focus_mode = 2
+text = "Pilot Management"
+
+[node name="CampaignButton" type="Button" parent="MenuOptionsContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(200, 50)
+focus_mode = 2
+text = "Campaign"
+
+[node name="ReadyRoomButton" type="Button" parent="MenuOptionsContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(200, 50)
+focus_mode = 2
+text = "Ready Room"
+
+[node name="TechRoomButton" type="Button" parent="MenuOptionsContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(200, 50)
+focus_mode = 2
+text = "Tech Room"
+
+[node name="OptionsButton" type="Button" parent="MenuOptionsContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(200, 50)
+focus_mode = 2
+text = "Options"
+
+[node name="CreditsButton" type="Button" parent="MenuOptionsContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(200, 50)
+focus_mode = 2
+text = "Credits"
+
+[node name="ExitButton" type="Button" parent="MenuOptionsContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(200, 50)
+focus_mode = 2
+text = "Exit"
+
+[node name="NavigationPanel" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -300.0
+offset_bottom = 200.0
+
+[node name="TitleLabel" type="Label" parent="NavigationPanel"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -250.0
+offset_top = 20.0
+offset_bottom = 50.0
+text = "Wing Commander Saga"
+horizontal_alignment = 2
+
+[node name="StatusLabel" type="Label" parent="NavigationPanel"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -200.0
+offset_top = 60.0
+offset_bottom = 80.0
+text = "Main Hall"
+horizontal_alignment = 2
+
+[node name="VersionLabel" type="Label" parent="NavigationPanel"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -150.0
+offset_top = 100.0
+offset_bottom = 120.0
+text = "v1.0.0"
+horizontal_alignment = 2
+
+[node name="StatusDisplay" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -100.0
+
+[node name="PerformanceMonitor" type="Label" parent="StatusDisplay"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -200.0
+offset_top = 20.0
+offset_bottom = 40.0
+text = "FPS: 60"
+horizontal_alignment = 2
+
+[node name="ConnectionStatus" type="Label" parent="StatusDisplay"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -200.0
+offset_top = 50.0
+offset_bottom = 70.0
+text = "Connected"
+horizontal_alignment = 2
+
+[node name="MainHallAudio" type="Node" parent="."]
+
+[node name="AmbientPlayer" type="AudioStreamPlayer" parent="MainHallAudio"]
+volume_db = -10.0
+
+[node name="EffectsPlayer" type="AudioStreamPlayer" parent="MainHallAudio"]
+volume_db = -5.0
+
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="MainHallAudio"]
+volume_db = -15.0
+
+[node name="TransitionEffects" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="FadeOverlay" type="ColorRect" parent="TransitionEffects"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0)
+
+[node name="TransitionAnimation" type="AnimationPlayer" parent="TransitionEffects"]

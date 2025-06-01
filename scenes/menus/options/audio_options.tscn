@@ -1,0 +1,343 @@
+[gd_scene load_steps=2 format=3 uid="uid://dql3v8y1gm8ey"]
+
+[ext_resource type="Script" path="res://scenes/menus/options/audio_control_display_controller.gd" id="1_bc42q"]
+
+[node name="AudioOptions" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_bc42q")
+
+[node name="BackgroundPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="MainContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 50.0
+offset_top = 50.0
+offset_right = -50.0
+offset_bottom = -50.0
+
+[node name="HeaderContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="MainContainer/HeaderContainer"]
+layout_mode = 2
+text = "Audio Settings"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="BackButton" type="Button" parent="MainContainer/HeaderContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Back"
+
+[node name="HSeparator" type="HSeparator" parent="MainContainer"]
+layout_mode = 2
+
+[node name="SettingsContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LeftPanel" type="VBoxContainer" parent="MainContainer/SettingsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VolumeSettingsGroup" type="GroupBox" parent="MainContainer/SettingsContainer/LeftPanel"]
+layout_mode = 2
+text = "Volume Settings"
+
+[node name="VolumeGrid" type="GridContainer" parent="MainContainer/SettingsContainer/LeftPanel/VolumeSettingsGroup"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 30.0
+offset_right = -10.0
+offset_bottom = -10.0
+columns = 3
+
+[node name="MasterVolumeLabel" type="Label" parent="MainContainer/SettingsContainer/LeftPanel/VolumeSettingsGroup/VolumeGrid"]
+layout_mode = 2
+text = "Master Volume:"
+
+[node name="MasterVolumeSlider" type="HSlider" parent="MainContainer/SettingsContainer/LeftPanel/VolumeSettingsGroup/VolumeGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="MasterVolumeValue" type="Label" parent="MainContainer/SettingsContainer/LeftPanel/VolumeSettingsGroup/VolumeGrid"]
+layout_mode = 2
+text = "100%"
+
+[node name="MusicVolumeLabel" type="Label" parent="MainContainer/SettingsContainer/LeftPanel/VolumeSettingsGroup/VolumeGrid"]
+layout_mode = 2
+text = "Music Volume:"
+
+[node name="MusicVolumeSlider" type="HSlider" parent="MainContainer/SettingsContainer/LeftPanel/VolumeSettingsGroup/VolumeGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.01
+value = 0.8
+
+[node name="MusicVolumeValue" type="Label" parent="MainContainer/SettingsContainer/LeftPanel/VolumeSettingsGroup/VolumeGrid"]
+layout_mode = 2
+text = "80%"
+
+[node name="EffectsVolumeLabel" type="Label" parent="MainContainer/SettingsContainer/LeftPanel/VolumeSettingsGroup/VolumeGrid"]
+layout_mode = 2
+text = "Effects Volume:"
+
+[node name="EffectsVolumeSlider" type="HSlider" parent="MainContainer/SettingsContainer/LeftPanel/VolumeSettingsGroup/VolumeGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.01
+value = 0.9
+
+[node name="EffectsVolumeValue" type="Label" parent="MainContainer/SettingsContainer/LeftPanel/VolumeSettingsGroup/VolumeGrid"]
+layout_mode = 2
+text = "90%"
+
+[node name="VoiceVolumeLabel" type="Label" parent="MainContainer/SettingsContainer/LeftPanel/VolumeSettingsGroup/VolumeGrid"]
+layout_mode = 2
+text = "Voice Volume:"
+
+[node name="VoiceVolumeSlider" type="HSlider" parent="MainContainer/SettingsContainer/LeftPanel/VolumeSettingsGroup/VolumeGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="VoiceVolumeValue" type="Label" parent="MainContainer/SettingsContainer/LeftPanel/VolumeSettingsGroup/VolumeGrid"]
+layout_mode = 2
+text = "100%"
+
+[node name="AmbientVolumeLabel" type="Label" parent="MainContainer/SettingsContainer/LeftPanel/VolumeSettingsGroup/VolumeGrid"]
+layout_mode = 2
+text = "Ambient Volume:"
+
+[node name="AmbientVolumeSlider" type="HSlider" parent="MainContainer/SettingsContainer/LeftPanel/VolumeSettingsGroup/VolumeGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.01
+value = 0.7
+
+[node name="AmbientVolumeValue" type="Label" parent="MainContainer/SettingsContainer/LeftPanel/VolumeSettingsGroup/VolumeGrid"]
+layout_mode = 2
+text = "70%"
+
+[node name="UIVolumeLabel" type="Label" parent="MainContainer/SettingsContainer/LeftPanel/VolumeSettingsGroup/VolumeGrid"]
+layout_mode = 2
+text = "UI Volume:"
+
+[node name="UIVolumeSlider" type="HSlider" parent="MainContainer/SettingsContainer/LeftPanel/VolumeSettingsGroup/VolumeGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.01
+value = 0.8
+
+[node name="UIVolumeValue" type="Label" parent="MainContainer/SettingsContainer/LeftPanel/VolumeSettingsGroup/VolumeGrid"]
+layout_mode = 2
+text = "80%"
+
+[node name="AudioQualityGroup" type="GroupBox" parent="MainContainer/SettingsContainer/LeftPanel"]
+layout_mode = 2
+text = "Audio Quality"
+
+[node name="AudioQualityGrid" type="GridContainer" parent="MainContainer/SettingsContainer/LeftPanel/AudioQualityGroup"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 30.0
+offset_right = -10.0
+offset_bottom = -10.0
+columns = 2
+
+[node name="SampleRateLabel" type="Label" parent="MainContainer/SettingsContainer/LeftPanel/AudioQualityGroup/AudioQualityGrid"]
+layout_mode = 2
+text = "Sample Rate:"
+
+[node name="SampleRateOption" type="OptionButton" parent="MainContainer/SettingsContainer/LeftPanel/AudioQualityGroup/AudioQualityGrid"]
+layout_mode = 2
+
+[node name="BitDepthLabel" type="Label" parent="MainContainer/SettingsContainer/LeftPanel/AudioQualityGroup/AudioQualityGrid"]
+layout_mode = 2
+text = "Bit Depth:"
+
+[node name="BitDepthOption" type="OptionButton" parent="MainContainer/SettingsContainer/LeftPanel/AudioQualityGroup/AudioQualityGrid"]
+layout_mode = 2
+
+[node name="ChannelsLabel" type="Label" parent="MainContainer/SettingsContainer/LeftPanel/AudioQualityGroup/AudioQualityGrid"]
+layout_mode = 2
+text = "Audio Channels:"
+
+[node name="ChannelsOption" type="OptionButton" parent="MainContainer/SettingsContainer/LeftPanel/AudioQualityGroup/AudioQualityGrid"]
+layout_mode = 2
+
+[node name="RightPanel" type="VBoxContainer" parent="MainContainer/SettingsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SpatialAudioGroup" type="GroupBox" parent="MainContainer/SettingsContainer/RightPanel"]
+layout_mode = 2
+text = "Spatial Audio"
+
+[node name="SpatialAudioGrid" type="GridContainer" parent="MainContainer/SettingsContainer/RightPanel/SpatialAudioGroup"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 30.0
+offset_right = -10.0
+offset_bottom = -10.0
+columns = 2
+
+[node name="Enable3DAudioLabel" type="Label" parent="MainContainer/SettingsContainer/RightPanel/SpatialAudioGroup/SpatialAudioGrid"]
+layout_mode = 2
+text = "Enable 3D Audio:"
+
+[node name="Enable3DAudioCheckBox" type="CheckBox" parent="MainContainer/SettingsContainer/RightPanel/SpatialAudioGroup/SpatialAudioGrid"]
+layout_mode = 2
+
+[node name="DopplerEffectLabel" type="Label" parent="MainContainer/SettingsContainer/RightPanel/SpatialAudioGroup/SpatialAudioGrid"]
+layout_mode = 2
+text = "Doppler Effect:"
+
+[node name="DopplerEffectCheckBox" type="CheckBox" parent="MainContainer/SettingsContainer/RightPanel/SpatialAudioGroup/SpatialAudioGrid"]
+layout_mode = 2
+
+[node name="ReverbLabel" type="Label" parent="MainContainer/SettingsContainer/RightPanel/SpatialAudioGroup/SpatialAudioGrid"]
+layout_mode = 2
+text = "Reverb:"
+
+[node name="ReverbCheckBox" type="CheckBox" parent="MainContainer/SettingsContainer/RightPanel/SpatialAudioGroup/SpatialAudioGrid"]
+layout_mode = 2
+
+[node name="AudioOcclusionLabel" type="Label" parent="MainContainer/SettingsContainer/RightPanel/SpatialAudioGroup/SpatialAudioGrid"]
+layout_mode = 2
+text = "Audio Occlusion:"
+
+[node name="AudioOcclusionCheckBox" type="CheckBox" parent="MainContainer/SettingsContainer/RightPanel/SpatialAudioGroup/SpatialAudioGrid"]
+layout_mode = 2
+
+[node name="VoiceAndSubtitlesGroup" type="GroupBox" parent="MainContainer/SettingsContainer/RightPanel"]
+layout_mode = 2
+text = "Voice & Subtitles"
+
+[node name="VoiceGrid" type="GridContainer" parent="MainContainer/SettingsContainer/RightPanel/VoiceAndSubtitlesGroup"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 30.0
+offset_right = -10.0
+offset_bottom = -10.0
+columns = 2
+
+[node name="VoiceEnabledLabel" type="Label" parent="MainContainer/SettingsContainer/RightPanel/VoiceAndSubtitlesGroup/VoiceGrid"]
+layout_mode = 2
+text = "Voice Enabled:"
+
+[node name="VoiceEnabledCheckBox" type="CheckBox" parent="MainContainer/SettingsContainer/RightPanel/VoiceAndSubtitlesGroup/VoiceGrid"]
+layout_mode = 2
+
+[node name="BriefingVoiceLabel" type="Label" parent="MainContainer/SettingsContainer/RightPanel/VoiceAndSubtitlesGroup/VoiceGrid"]
+layout_mode = 2
+text = "Briefing Voice:"
+
+[node name="BriefingVoiceCheckBox" type="CheckBox" parent="MainContainer/SettingsContainer/RightPanel/VoiceAndSubtitlesGroup/VoiceGrid"]
+layout_mode = 2
+
+[node name="SubtitlesLabel" type="Label" parent="MainContainer/SettingsContainer/RightPanel/VoiceAndSubtitlesGroup/VoiceGrid"]
+layout_mode = 2
+text = "Subtitles:"
+
+[node name="SubtitlesCheckBox" type="CheckBox" parent="MainContainer/SettingsContainer/RightPanel/VoiceAndSubtitlesGroup/VoiceGrid"]
+layout_mode = 2
+
+[node name="SubtitleSizeLabel" type="Label" parent="MainContainer/SettingsContainer/RightPanel/VoiceAndSubtitlesGroup/VoiceGrid"]
+layout_mode = 2
+text = "Subtitle Size:"
+
+[node name="SubtitleSizeOption" type="OptionButton" parent="MainContainer/SettingsContainer/RightPanel/VoiceAndSubtitlesGroup/VoiceGrid"]
+layout_mode = 2
+
+[node name="DeviceSettingsGroup" type="GroupBox" parent="MainContainer/SettingsContainer/RightPanel"]
+layout_mode = 2
+text = "Device Settings"
+
+[node name="DeviceGrid" type="GridContainer" parent="MainContainer/SettingsContainer/RightPanel/DeviceSettingsGroup"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 30.0
+offset_right = -10.0
+offset_bottom = -10.0
+columns = 2
+
+[node name="AudioDeviceLabel" type="Label" parent="MainContainer/SettingsContainer/RightPanel/DeviceSettingsGroup/DeviceGrid"]
+layout_mode = 2
+text = "Audio Device:"
+
+[node name="AudioDeviceOption" type="OptionButton" parent="MainContainer/SettingsContainer/RightPanel/DeviceSettingsGroup/DeviceGrid"]
+layout_mode = 2
+
+[node name="BufferSizeLabel" type="Label" parent="MainContainer/SettingsContainer/RightPanel/DeviceSettingsGroup/DeviceGrid"]
+layout_mode = 2
+text = "Buffer Size:"
+
+[node name="BufferSizeOption" type="OptionButton" parent="MainContainer/SettingsContainer/RightPanel/DeviceSettingsGroup/DeviceGrid"]
+layout_mode = 2
+
+[node name="ButtonContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="PresetLabel" type="Label" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "Quality Preset:"
+
+[node name="PresetOption" type="OptionButton" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+
+[node name="Spacer" type="Control" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TestButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "Test Audio"
+
+[node name="ResetButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "Reset to Defaults"
+
+[node name="ApplyButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "Apply"
+
+[node name="OKButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "OK"
+
+[sub_resource type="LabelSettings" id="LabelSettings_1"]
+font_size = 24
