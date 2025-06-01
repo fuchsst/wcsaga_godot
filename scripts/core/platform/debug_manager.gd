@@ -6,7 +6,6 @@ extends RefCounted
 ## Provides WCS-compatible API while leveraging Godot's built-in debugging capabilities.
 
 const WCSConstants = preload("res://scripts/core/foundation/wcs_constants.gd")
-const PlatformUtils = preload("res://scripts/core/platform/platform_utils.gd")
 
 ## Debug output levels matching WCS outwnd system
 enum LogLevel {
@@ -391,18 +390,18 @@ static func dump_config() -> void:
 	log_info(Category.GENERAL, "=== End Configuration ===")
 
 ## Load debug configuration from settings
-static func load_config_from_settings(settings_manager: SettingsManager) -> void:
+static func load_config_from_settings() -> void:
 	if not _is_initialized:
 		_ensure_initialized()
 	
 	# Load log level
-	var level_value: int = settings_manager.os_config_read_uint("Debug", "log_level", LogLevel.INFO)
+	var level_value: int = SettingsManager.os_config_read_uint("Debug", "log_level", LogLevel.INFO)
 	if level_value >= 0 and level_value < LogLevel.size():
 		set_log_level(level_value)
 	
 	# Load file logging setting
-	var file_logging: bool = settings_manager.os_config_read_uint("Debug", "file_logging", 0) > 0
-	var log_path: String = settings_manager.os_config_read_string("Debug", "log_file_path", _log_file_path)
+	var file_logging: bool = SettingsManager.os_config_read_uint("Debug", "file_logging", 0) > 0
+	var log_path: String = SettingsManager.os_config_read_string("Debug", "log_file_path", _log_file_path)
 	
 	if file_logging:
 		enable_file_logging(log_path)
@@ -412,27 +411,27 @@ static func load_config_from_settings(settings_manager: SettingsManager) -> void
 	# Load category states
 	for i: int in range(_category_names.size()):
 		var category_key: String = "category_" + _category_names[i].to_lower()
-		var enabled: bool = settings_manager.os_config_read_uint("Debug", category_key, 1) > 0
+		var enabled: bool = SettingsManager.os_config_read_uint("Debug", category_key, 1) > 0
 		set_category_enabled(i, enabled)
 	
 	log_info(Category.GENERAL, "Debug configuration loaded from settings")
 
 ## Save debug configuration to settings
-static func save_config_to_settings(settings_manager: SettingsManager) -> void:
+static func save_config_to_settings() -> void:
 	if not _is_initialized:
 		return
 	
 	# Save log level
-	settings_manager.os_config_write_uint("Debug", "log_level", _log_level)
+	SettingsManager.os_config_write_uint("Debug", "log_level", _log_level)
 	
 	# Save file logging settings
-	settings_manager.os_config_write_uint("Debug", "file_logging", 1 if _output_to_file else 0)
-	settings_manager.os_config_write_string("Debug", "log_file_path", _log_file_path)
+	SettingsManager.os_config_write_uint("Debug", "file_logging", 1 if _output_to_file else 0)
+	SettingsManager.os_config_write_string("Debug", "log_file_path", _log_file_path)
 	
 	# Save category states
 	for i: int in range(_category_names.size()):
 		var category_key: String = "category_" + _category_names[i].to_lower()
 		var enabled: bool = _enabled_categories[i] if i < _enabled_categories.size() else true
-		settings_manager.os_config_write_uint("Debug", category_key, 1 if enabled else 0)
+		SettingsManager.os_config_write_uint("Debug", category_key, 1 if enabled else 0)
 	
 	log_info(Category.GENERAL, "Debug configuration saved to settings")

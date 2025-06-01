@@ -5,8 +5,7 @@ extends Node
 ## Provides graceful degradation, error recovery, and detailed error reporting.
 ## Integrates with DebugManager for consistent error logging and tracking.
 
-const DebugManager = preload("res://scripts/core/platform/debug_manager.gd")
-const PlatformUtils = preload("res://scripts/core/platform/platform_utils.gd")
+# Note: Using global class names directly - DebugManager and PlatformUtils
 
 ## Error severity levels for classification and handling
 enum Severity {

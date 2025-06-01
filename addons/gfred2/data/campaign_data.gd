@@ -222,194 +222,189 @@ func duplicate_campaign() -> CampaignData:
 	
 	return duplicate
 
-class_name CampaignMission
-extends Resource
+class CampaignMission extends Resource:
 
-## Individual mission within a campaign.
+	## Individual mission within a campaign.
 
-@export var mission_id: String = ""
-@export var mission_name: String = ""
-@export var mission_filename: String = ""
-@export var mission_description: String = ""
-@export var mission_author: String = ""
-@export var position: Vector2 = Vector2.ZERO  # Position in campaign flow diagram
-@export var prerequisite_missions: Array[String] = []
-@export var mission_branches: Array[CampaignMissionBranch] = []
-@export var mission_flags: Array[String] = []
-@export var is_required: bool = true
-@export var difficulty_level: int = 1
-@export var mission_briefing_text: String = ""
-@export var mission_debriefing_text: String = ""
+	@export var mission_id: String = ""
+	@export var mission_name: String = ""
+	@export var mission_filename: String = ""
+	@export var mission_description: String = ""
+	@export var mission_author: String = ""
+	@export var position: Vector2 = Vector2.ZERO  # Position in campaign flow diagram
+	@export var prerequisite_missions: Array[String] = []
+	@export var mission_branches: Array[CampaignMissionBranch] = []
+	@export var mission_flags: Array[String] = []
+	@export var is_required: bool = true
+	@export var difficulty_level: int = 1
+	@export var mission_briefing_text: String = ""
+	@export var mission_debriefing_text: String = ""
 
-func _init() -> void:
-	resource_name = "CampaignMission"
-	if mission_id.is_empty():
-		mission_id = "mission_%d" % (Time.get_ticks_msec() % 100000)
+	func _init() -> void:
+		resource_name = "CampaignMission"
+		if mission_id.is_empty():
+			mission_id = "mission_%d" % (Time.get_ticks_msec() % 100000)
 
-## Validates mission data
-func validate_mission() -> Array[String]:
-	var errors: Array[String] = []
-	
-	if mission_id.is_empty():
-		errors.append("Mission must have an ID")
-	
-	if mission_name.is_empty():
-		errors.append("Mission must have a name")
-	
-	if mission_filename.is_empty():
-		errors.append("Mission must have a filename")
-	
-	# Validate mission branches
-	for i in range(mission_branches.size()):
-		var branch: CampaignMissionBranch = mission_branches[i]
-		var branch_errors: Array[String] = branch.validate_branch()
-		for error in branch_errors:
-			errors.append("Branch %d: %s" % [i + 1, error])
-	
-	return errors
+	## Validates mission data
+	func validate_mission() -> Array[String]:
+		var errors: Array[String] = []
+		
+		if mission_id.is_empty():
+			errors.append("Mission must have an ID")
+		
+		if mission_name.is_empty():
+			errors.append("Mission must have a name")
+		
+		if mission_filename.is_empty():
+			errors.append("Mission must have a filename")
+		
+		# Validate mission branches
+		for i in range(mission_branches.size()):
+			var branch: CampaignMissionBranch = mission_branches[i]
+			var branch_errors: Array[String] = branch.validate_branch()
+			for error in branch_errors:
+				errors.append("Branch %d: %s" % [i + 1, error])
+		
+		return errors
 
-## Adds a prerequisite mission
-func add_prerequisite(mission_id: String) -> void:
-	if not prerequisite_missions.has(mission_id):
-		prerequisite_missions.append(mission_id)
+	## Adds a prerequisite mission
+	func add_prerequisite(mission_id: String) -> void:
+		if not prerequisite_missions.has(mission_id):
+			prerequisite_missions.append(mission_id)
 
-## Removes a prerequisite mission
-func remove_prerequisite(mission_id: String) -> void:
-	prerequisite_missions.erase(mission_id)
+	## Removes a prerequisite mission
+	func remove_prerequisite(mission_id: String) -> void:
+		prerequisite_missions.erase(mission_id)
 
-## Adds a mission branch
-func add_mission_branch(branch: CampaignMissionBranch) -> void:
-	mission_branches.append(branch)
+	## Adds a mission branch
+	func add_mission_branch(branch: CampaignMissionBranch) -> void:
+		mission_branches.append(branch)
 
-## Removes a mission branch
-func remove_mission_branch(branch_index: int) -> void:
-	if branch_index >= 0 and branch_index < mission_branches.size():
-		mission_branches.remove_at(branch_index)
+	## Removes a mission branch
+	func remove_mission_branch(branch_index: int) -> void:
+		if branch_index >= 0 and branch_index < mission_branches.size():
+			mission_branches.remove_at(branch_index)
 
-## Duplicates mission data
-func duplicate_mission() -> CampaignMission:
-	var duplicate: CampaignMission = CampaignMission.new()
-	duplicate.mission_id = mission_id + "_copy"
-	duplicate.mission_name = mission_name + " (Copy)"
-	duplicate.mission_filename = mission_filename
-	duplicate.mission_description = mission_description
-	duplicate.mission_author = mission_author
-	duplicate.position = position + Vector2(50, 50)  # Offset copy position
-	duplicate.prerequisite_missions = prerequisite_missions.duplicate()
-	duplicate.mission_flags = mission_flags.duplicate()
-	duplicate.is_required = is_required
-	duplicate.difficulty_level = difficulty_level
-	duplicate.mission_briefing_text = mission_briefing_text
-	duplicate.mission_debriefing_text = mission_debriefing_text
-	
-	for branch in mission_branches:
-		duplicate.mission_branches.append(branch.duplicate_branch())
-	
-	return duplicate
+	## Duplicates mission data
+	func duplicate_mission() -> CampaignMission:
+		var duplicate: CampaignMission = CampaignMission.new()
+		duplicate.mission_id = mission_id + "_copy"
+		duplicate.mission_name = mission_name + " (Copy)"
+		duplicate.mission_filename = mission_filename
+		duplicate.mission_description = mission_description
+		duplicate.mission_author = mission_author
+		duplicate.position = position + Vector2(50, 50)  # Offset copy position
+		duplicate.prerequisite_missions = prerequisite_missions.duplicate()
+		duplicate.mission_flags = mission_flags.duplicate()
+		duplicate.is_required = is_required
+		duplicate.difficulty_level = difficulty_level
+		duplicate.mission_briefing_text = mission_briefing_text
+		duplicate.mission_debriefing_text = mission_debriefing_text
+		
+		for branch in mission_branches:
+			duplicate.mission_branches.append(branch.duplicate_branch())
+		
+		return duplicate
 
-class_name CampaignMissionBranch
-extends Resource
-
+class CampaignMissionBranch extends Resource:
 ## Branching logic for campaign missions.
 
-enum BranchType {
-	SUCCESS,    # Mission completed successfully
-	FAILURE,    # Mission failed
-	CONDITION   # Custom SEXP condition
-}
+	enum BranchType {
+		SUCCESS,    # Mission completed successfully
+		FAILURE,    # Mission failed
+		CONDITION   # Custom SEXP condition
+	}
 
-@export var branch_type: BranchType = BranchType.SUCCESS
-@export var target_mission_id: String = ""
-@export var branch_condition: String = ""  # SEXP expression for conditional branches
-@export var branch_description: String = ""
-@export var is_enabled: bool = true
+	@export var branch_type: BranchType = BranchType.SUCCESS
+	@export var target_mission_id: String = ""
+	@export var branch_condition: String = ""  # SEXP expression for conditional branches
+	@export var branch_description: String = ""
+	@export var is_enabled: bool = true
 
-func _init() -> void:
-	resource_name = "CampaignMissionBranch"
+	func _init() -> void:
+		resource_name = "CampaignMissionBranch"
 
-## Validates branch data
-func validate_branch() -> Array[String]:
-	var errors: Array[String] = []
-	
-	if target_mission_id.is_empty():
-		errors.append("Branch must have a target mission")
-	
-	if branch_type == BranchType.CONDITION and branch_condition.is_empty():
-		errors.append("Conditional branch must have a condition expression")
-	
-	return errors
+	## Validates branch data
+	func validate_branch() -> Array[String]:
+		var errors: Array[String] = []
+		
+		if target_mission_id.is_empty():
+			errors.append("Branch must have a target mission")
+		
+		if branch_type == BranchType.CONDITION and branch_condition.is_empty():
+			errors.append("Conditional branch must have a condition expression")
+		
+		return errors
 
-## Duplicates branch data
-func duplicate_branch() -> CampaignMissionBranch:
-	var duplicate: CampaignMissionBranch = CampaignMissionBranch.new()
-	duplicate.branch_type = branch_type
-	duplicate.target_mission_id = target_mission_id
-	duplicate.branch_condition = branch_condition
-	duplicate.branch_description = branch_description
-	duplicate.is_enabled = is_enabled
-	return duplicate
+	## Duplicates branch data
+	func duplicate_branch() -> CampaignMissionBranch:
+		var duplicate: CampaignMissionBranch = CampaignMissionBranch.new()
+		duplicate.branch_type = branch_type
+		duplicate.target_mission_id = target_mission_id
+		duplicate.branch_condition = branch_condition
+		duplicate.branch_description = branch_description
+		duplicate.is_enabled = is_enabled
+		return duplicate
 
-class_name CampaignVariable
-extends Resource
-
+class CampaignVariable extends Resource:
 ## Campaign-wide variable for persistent state.
 
-enum VariableType {
-	INTEGER,
-	FLOAT,
-	BOOLEAN,
-	STRING
-}
+	enum VariableType {
+		INTEGER,
+		FLOAT,
+		BOOLEAN,
+		STRING
+	}
 
-@export var variable_name: String = ""
-@export var variable_type: VariableType = VariableType.INTEGER
-@export var initial_value: String = "0"
-@export var description: String = ""
-@export var is_persistent: bool = true
+	@export var variable_name: String = ""
+	@export var variable_type: VariableType = VariableType.INTEGER
+	@export var initial_value: String = "0"
+	@export var description: String = ""
+	@export var is_persistent: bool = true
 
-func _init() -> void:
-	resource_name = "CampaignVariable"
+	func _init() -> void:
+		resource_name = "CampaignVariable"
 
-## Validates variable data
-func validate_variable() -> Array[String]:
-	var errors: Array[String] = []
-	
-	if variable_name.is_empty():
-		errors.append("Variable must have a name")
-	
-	# Validate initial value format
-	match variable_type:
-		VariableType.INTEGER:
-			if not initial_value.is_valid_int():
-				errors.append("Initial value must be a valid integer")
-		VariableType.FLOAT:
-			if not initial_value.is_valid_float():
-				errors.append("Initial value must be a valid float")
-		VariableType.BOOLEAN:
-			if not (initial_value.to_lower() in ["true", "false", "0", "1"]):
-				errors.append("Initial value must be a valid boolean (true/false/0/1)")
-	
-	return errors
+	## Validates variable data
+	func validate_variable() -> Array[String]:
+		var errors: Array[String] = []
+		
+		if variable_name.is_empty():
+			errors.append("Variable must have a name")
+		
+		# Validate initial value format
+		match variable_type:
+			VariableType.INTEGER:
+				if not initial_value.is_valid_int():
+					errors.append("Initial value must be a valid integer")
+			VariableType.FLOAT:
+				if not initial_value.is_valid_float():
+					errors.append("Initial value must be a valid float")
+			VariableType.BOOLEAN:
+				if not (initial_value.to_lower() in ["true", "false", "0", "1"]):
+					errors.append("Initial value must be a valid boolean (true/false/0/1)")
+		
+		return errors
 
-## Gets the typed initial value
-func get_typed_initial_value() -> Variant:
-	match variable_type:
-		VariableType.INTEGER:
-			return initial_value.to_int()
-		VariableType.FLOAT:
-			return initial_value.to_float()
-		VariableType.BOOLEAN:
-			return initial_value.to_lower() in ["true", "1"]
-		VariableType.STRING:
-			return initial_value
-	return null
+	## Gets the typed initial value
+	func get_typed_initial_value() -> Variant:
+		match variable_type:
+			VariableType.INTEGER:
+				return initial_value.to_int()
+			VariableType.FLOAT:
+				return initial_value.to_float()
+			VariableType.BOOLEAN:
+				return initial_value.to_lower() in ["true", "1"]
+			VariableType.STRING:
+				return initial_value
+		return null
 
-## Duplicates variable data
-func duplicate_variable() -> CampaignVariable:
-	var duplicate: CampaignVariable = CampaignVariable.new()
-	duplicate.variable_name = variable_name
-	duplicate.variable_type = variable_type
-	duplicate.initial_value = initial_value
-	duplicate.description = description
-	duplicate.is_persistent = is_persistent
-	return duplicate
+	## Duplicates variable data
+	func duplicate_variable() -> CampaignVariable:
+		var duplicate: CampaignVariable = CampaignVariable.new()
+		duplicate.variable_name = variable_name
+		duplicate.variable_type = variable_type
+		duplicate.initial_value = initial_value
+		duplicate.description = description
+		duplicate.is_persistent = is_persistent
+		return duplicate

@@ -75,13 +75,8 @@ static func create_directory_recursive(dir_path: String) -> ErrorCode:
 	if DirAccess.dir_exists_absolute(normalized_path):
 		return ErrorCode.SUCCESS
 	
-	# Create directory recursively
-	var dir_access: DirAccess = DirAccess.open("res://")
-	if dir_access == null:
-		push_error("PlatformUtils: Failed to open directory access")
-		return ErrorCode.GENERIC_ERROR
-	
-	var result: Error = dir_access.make_dir_recursive_absolute(normalized_path)
+	# Create directory recursively using static method
+	var result: Error = DirAccess.make_dir_recursive_absolute(normalized_path)
 	if result != OK:
 		push_error("PlatformUtils: Failed to create directory '%s' - Error: %d" % [normalized_path, result])
 		return _convert_godot_error_to_platform_error(result)

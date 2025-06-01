@@ -177,267 +177,257 @@ func get_configuration_summary() -> Dictionary:
 	return summary
 
 ## AI Behavior Configuration
-class_name AIBehaviorConfig
-extends Resource
+class AIBehaviorConfig extends Resource:
 
-@export var ai_class: String = ""
-@export var ai_goals: Array[AIGoalConfig] = []
-@export var combat_behavior: String = "default"
-@export var formation_behavior: String = "default"
-@export var aggressiveness: float = 1.0
-@export var accuracy: float = 1.0
-@export var evasion: float = 1.0
-@export var courage: float = 1.0
+	@export var ai_class: String = ""
+	@export var ai_goals: Array[AIGoalConfig] = []
+	@export var combat_behavior: String = "default"
+	@export var formation_behavior: String = "default"
+	@export var aggressiveness: float = 1.0
+	@export var accuracy: float = 1.0
+	@export var evasion: float = 1.0
+	@export var courage: float = 1.0
 
-func has_custom_behavior() -> bool:
-	return ai_class != "" or ai_goals.size() > 0 or combat_behavior != "default"
+	func has_custom_behavior() -> bool:
+		return ai_class != "" or ai_goals.size() > 0 or combat_behavior != "default"
 
-func validate() -> Array[String]:
-	var errors: Array[String] = []
-	
-	if aggressiveness < 0.0 or aggressiveness > 10.0:
-		errors.append("Aggressiveness must be between 0.0 and 10.0")
-	
-	if accuracy < 0.0 or accuracy > 10.0:
-		errors.append("Accuracy must be between 0.0 and 10.0")
-	
-	return errors
+	func validate() -> Array[String]:
+		var errors: Array[String] = []
+		
+		if aggressiveness < 0.0 or aggressiveness > 10.0:
+			errors.append("Aggressiveness must be between 0.0 and 10.0")
+		
+		if accuracy < 0.0 or accuracy > 10.0:
+			errors.append("Accuracy must be between 0.0 and 10.0")
+		
+		return errors
 
-func duplicate() -> AIBehaviorConfig:
-	var new_config: AIBehaviorConfig = AIBehaviorConfig.new()
-	new_config.ai_class = ai_class
-	new_config.ai_goals = ai_goals.duplicate(true)
-	new_config.combat_behavior = combat_behavior
-	new_config.formation_behavior = formation_behavior
-	new_config.aggressiveness = aggressiveness
-	new_config.accuracy = accuracy
-	new_config.evasion = evasion
-	new_config.courage = courage
-	return new_config
+	func duplicate() -> AIBehaviorConfig:
+		var new_config: AIBehaviorConfig = AIBehaviorConfig.new()
+		new_config.ai_class = ai_class
+		new_config.ai_goals = ai_goals.duplicate(true)
+		new_config.combat_behavior = combat_behavior
+		new_config.formation_behavior = formation_behavior
+		new_config.aggressiveness = aggressiveness
+		new_config.accuracy = accuracy
+		new_config.evasion = evasion
+		new_config.courage = courage
+		return new_config
 
 ## Wing Formation Configuration
-class_name WingFormationConfig
-extends Resource
+class WingFormationConfig extends Resource:
 
-@export var formation_type: String = "default"
-@export var formation_distance: float = 100.0
-@export var formation_spread: float = 50.0
-@export var leader_ship: String = ""
-@export var formation_flags: Array[String] = []
+	@export var formation_type: String = "default"
+	@export var formation_distance: float = 100.0
+	@export var formation_spread: float = 50.0
+	@export var leader_ship: String = ""
+	@export var formation_flags: Array[String] = []
 
-func duplicate() -> WingFormationConfig:
-	var new_config: WingFormationConfig = WingFormationConfig.new()
-	new_config.formation_type = formation_type
-	new_config.formation_distance = formation_distance
-	new_config.formation_spread = formation_spread
-	new_config.leader_ship = leader_ship
-	new_config.formation_flags = formation_flags.duplicate()
-	return new_config
+	func duplicate() -> WingFormationConfig:
+		var new_config: WingFormationConfig = WingFormationConfig.new()
+		new_config.formation_type = formation_type
+		new_config.formation_distance = formation_distance
+		new_config.formation_spread = formation_spread
+		new_config.leader_ship = leader_ship
+		new_config.formation_flags = formation_flags.duplicate()
+		return new_config
 
 ## Weapon Loadout Configuration
-class_name WeaponLoadoutConfig
-extends Resource
+class WeaponLoadoutConfig extends Resource:
 
-@export var weapon_name: String = ""
-@export var weapon_class: String = ""
-@export var ammunition: int = 0
-@export var is_locked: bool = false
+	@export var weapon_name: String = ""
+	@export var weapon_class: String = ""
+	@export var ammunition: int = 0
+	@export var is_locked: bool = false
 
-func validate() -> Array[String]:
-	var errors: Array[String] = []
-	
-	if weapon_name.is_empty():
-		errors.append("Weapon name cannot be empty")
-	
-	if ammunition < 0:
-		errors.append("Ammunition cannot be negative")
-	
-	return errors
+	func validate() -> Array[String]:
+		var errors: Array[String] = []
+		
+		if weapon_name.is_empty():
+			errors.append("Weapon name cannot be empty")
+		
+		if ammunition < 0:
+			errors.append("Ammunition cannot be negative")
+		
+		return errors
 
 ## Weapon Slot Configuration
-class_name WeaponSlotConfig
-extends Resource
+class WeaponSlotConfig extends Resource:
 
-@export var slot_index: int = 0
-@export var weapon_class: String = ""
-@export var ammunition: int = 0
-@export var is_dual_fire: bool = false
-@export var is_locked: bool = false
+	@export var slot_index: int = 0
+	@export var weapon_class: String = ""
+	@export var ammunition: int = 0
+	@export var is_dual_fire: bool = false
+	@export var is_locked: bool = false
 
 ## Damage System Configuration
-class_name DamageSystemConfig
-extends Resource
+class DamageSystemConfig extends Resource:
 
-@export var damage_multiplier: float = 1.0
-@export var special_explosion_index: int = -1
-@export var subsystem_damage: Dictionary = {}  # subsystem_name -> damage_multiplier
-@export var invulnerable_subsystems: Array[String] = []
+	@export var damage_multiplier: float = 1.0
+	@export var special_explosion_index: int = -1
+	@export var subsystem_damage: Dictionary = {}  # subsystem_name -> damage_multiplier
+	@export var invulnerable_subsystems: Array[String] = []
 
-func has_custom_damage() -> bool:
-	return damage_multiplier != 1.0 or special_explosion_index != -1 or not subsystem_damage.is_empty()
+	func has_custom_damage() -> bool:
+		return damage_multiplier != 1.0 or special_explosion_index != -1 or not subsystem_damage.is_empty()
 
-func validate() -> Array[String]:
-	var errors: Array[String] = []
-	
-	if damage_multiplier < 0.0:
-		errors.append("Damage multiplier cannot be negative")
-	
-	return errors
+	func validate() -> Array[String]:
+		var errors: Array[String] = []
+		
+		if damage_multiplier < 0.0:
+			errors.append("Damage multiplier cannot be negative")
+		
+		return errors
 
-func duplicate() -> DamageSystemConfig:
-	var new_config: DamageSystemConfig = DamageSystemConfig.new()
-	new_config.damage_multiplier = damage_multiplier
-	new_config.special_explosion_index = special_explosion_index
-	new_config.subsystem_damage = subsystem_damage.duplicate()
-	new_config.invulnerable_subsystems = invulnerable_subsystems.duplicate()
-	return new_config
+	func duplicate() -> DamageSystemConfig:
+		var new_config: DamageSystemConfig = DamageSystemConfig.new()
+		new_config.damage_multiplier = damage_multiplier
+		new_config.special_explosion_index = special_explosion_index
+		new_config.subsystem_damage = subsystem_damage.duplicate()
+		new_config.invulnerable_subsystems = invulnerable_subsystems.duplicate()
+		return new_config
 
 ## Hitpoint Configuration
-class_name HitpointConfig
-extends Resource
+class HitpointConfig extends Resource:
 
-@export var hull_strength: float = 100.0
-@export var shield_strength: float = 100.0
-@export var subsystem_hitpoints: Dictionary = {}  # subsystem_name -> hitpoints
-@export var shield_recharge_rate: float = 1.0
-@export var shield_regeneration: bool = true
+	@export var hull_strength: float = 100.0
+	@export var shield_strength: float = 100.0
+	@export var subsystem_hitpoints: Dictionary = {}  # subsystem_name -> hitpoints
+	@export var shield_recharge_rate: float = 1.0
+	@export var shield_regeneration: bool = true
 
-func validate() -> Array[String]:
-	var errors: Array[String] = []
-	
-	if hull_strength <= 0.0:
-		errors.append("Hull strength must be positive")
-	
-	if shield_strength < 0.0:
-		errors.append("Shield strength cannot be negative")
-	
-	return errors
+	func validate() -> Array[String]:
+		var errors: Array[String] = []
+		
+		if hull_strength <= 0.0:
+			errors.append("Hull strength must be positive")
+		
+		if shield_strength < 0.0:
+			errors.append("Shield strength cannot be negative")
+		
+		return errors
 
-func duplicate() -> HitpointConfig:
-	var new_config: HitpointConfig = HitpointConfig.new()
-	new_config.hull_strength = hull_strength
-	new_config.shield_strength = shield_strength
-	new_config.subsystem_hitpoints = subsystem_hitpoints.duplicate()
-	new_config.shield_recharge_rate = shield_recharge_rate
-	new_config.shield_regeneration = shield_regeneration
-	return new_config
+	func duplicate() -> HitpointConfig:
+		var new_config: HitpointConfig = HitpointConfig.new()
+		new_config.hull_strength = hull_strength
+		new_config.shield_strength = shield_strength
+		new_config.subsystem_hitpoints = subsystem_hitpoints.duplicate()
+		new_config.shield_recharge_rate = shield_recharge_rate
+		new_config.shield_regeneration = shield_regeneration
+		return new_config
 
 ## Texture Replacement Configuration
-class_name TextureReplacementConfig
-extends Resource
+class TextureReplacementConfig extends Resource:
 
-@export var texture_replacements: Dictionary = {}  # original_texture -> replacement_texture
-@export var detail_textures: Dictionary = {}       # detail_slot -> texture_path
-@export var glow_textures: Dictionary = {}         # glow_slot -> texture_path
+	@export var texture_replacements: Dictionary = {}  # original_texture -> replacement_texture
+	@export var detail_textures: Dictionary = {}       # detail_slot -> texture_path
+	@export var glow_textures: Dictionary = {}         # glow_slot -> texture_path
 
-func has_replacements() -> bool:
-	return not texture_replacements.is_empty() or not detail_textures.is_empty()
+	func has_replacements() -> bool:
+		return not texture_replacements.is_empty() or not detail_textures.is_empty()
 
-func duplicate() -> TextureReplacementConfig:
-	var new_config: TextureReplacementConfig = TextureReplacementConfig.new()
-	new_config.texture_replacements = texture_replacements.duplicate()
-	new_config.detail_textures = detail_textures.duplicate()
-	new_config.glow_textures = glow_textures.duplicate()
-	return new_config
+	func duplicate() -> TextureReplacementConfig:
+		var new_config: TextureReplacementConfig = TextureReplacementConfig.new()
+		new_config.texture_replacements = texture_replacements.duplicate()
+		new_config.detail_textures = detail_textures.duplicate()
+		new_config.glow_textures = glow_textures.duplicate()
+		return new_config
 
 ## Ship Flag Configuration
-class_name ShipFlagConfig
-extends Resource
+class ShipFlagConfig extends Resource:
 
-@export var protect_ship: bool = false
-@export var beam_protect_ship: bool = false
-@export var escort: bool = false
-@export var invulnerable: bool = false
-@export var guardian: bool = false
-@export var vaporize: bool = false
-@export var stealth: bool = false
-@export var hidden_from_sensors: bool = false
-@export var scannable: bool = false
-@export var kamikaze: bool = false
-@export var no_dynamic: bool = false
-@export var red_alert_carry: bool = false
-@export var no_arrival_music: bool = false
-@export var no_arrival_warp: bool = false
-@export var no_departure_warp: bool = false
-@export var locked: bool = false
-@export var ignore_count: bool = false
-@export var escort_priority: int = 0
-@export var kamikaze_damage: int = 0
-@export var respawn_priority: int = 0
+	@export var protect_ship: bool = false
+	@export var beam_protect_ship: bool = false
+	@export var escort: bool = false
+	@export var invulnerable: bool = false
+	@export var guardian: bool = false
+	@export var vaporize: bool = false
+	@export var stealth: bool = false
+	@export var hidden_from_sensors: bool = false
+	@export var scannable: bool = false
+	@export var kamikaze: bool = false
+	@export var no_dynamic: bool = false
+	@export var red_alert_carry: bool = false
+	@export var no_arrival_music: bool = false
+	@export var no_arrival_warp: bool = false
+	@export var no_departure_warp: bool = false
+	@export var locked: bool = false
+	@export var ignore_count: bool = false
+	@export var escort_priority: int = 0
+	@export var kamikaze_damage: int = 0
+	@export var respawn_priority: int = 0
 
-func get_active_flag_count() -> int:
-	var count: int = 0
-	
-	if protect_ship: count += 1
-	if beam_protect_ship: count += 1
-	if escort: count += 1
-	if invulnerable: count += 1
-	if guardian: count += 1
-	if vaporize: count += 1
-	if stealth: count += 1
-	if hidden_from_sensors: count += 1
-	if scannable: count += 1
-	if kamikaze: count += 1
-	if no_dynamic: count += 1
-	if red_alert_carry: count += 1
-	if no_arrival_music: count += 1
-	if no_arrival_warp: count += 1
-	if no_departure_warp: count += 1
-	if locked: count += 1
-	if ignore_count: count += 1
-	
-	return count
+	func get_active_flag_count() -> int:
+		var count: int = 0
+		
+		if protect_ship: count += 1
+		if beam_protect_ship: count += 1
+		if escort: count += 1
+		if invulnerable: count += 1
+		if guardian: count += 1
+		if vaporize: count += 1
+		if stealth: count += 1
+		if hidden_from_sensors: count += 1
+		if scannable: count += 1
+		if kamikaze: count += 1
+		if no_dynamic: count += 1
+		if red_alert_carry: count += 1
+		if no_arrival_music: count += 1
+		if no_arrival_warp: count += 1
+		if no_departure_warp: count += 1
+		if locked: count += 1
+		if ignore_count: count += 1
+		
+		return count
 
-func duplicate() -> ShipFlagConfig:
-	var new_config: ShipFlagConfig = ShipFlagConfig.new()
-	new_config.protect_ship = protect_ship
-	new_config.beam_protect_ship = beam_protect_ship
-	new_config.escort = escort
-	new_config.invulnerable = invulnerable
-	new_config.guardian = guardian
-	new_config.vaporize = vaporize
-	new_config.stealth = stealth
-	new_config.hidden_from_sensors = hidden_from_sensors
-	new_config.scannable = scannable
-	new_config.kamikaze = kamikaze
-	new_config.no_dynamic = no_dynamic
-	new_config.red_alert_carry = red_alert_carry
-	new_config.no_arrival_music = no_arrival_music
-	new_config.no_arrival_warp = no_arrival_warp
-	new_config.no_departure_warp = no_departure_warp
-	new_config.locked = locked
-	new_config.ignore_count = ignore_count
-	new_config.escort_priority = escort_priority
-	new_config.kamikaze_damage = kamikaze_damage
-	new_config.respawn_priority = respawn_priority
-	return new_config
+	func duplicate() -> ShipFlagConfig:
+		var new_config: ShipFlagConfig = ShipFlagConfig.new()
+		new_config.protect_ship = protect_ship
+		new_config.beam_protect_ship = beam_protect_ship
+		new_config.escort = escort
+		new_config.invulnerable = invulnerable
+		new_config.guardian = guardian
+		new_config.vaporize = vaporize
+		new_config.stealth = stealth
+		new_config.hidden_from_sensors = hidden_from_sensors
+		new_config.scannable = scannable
+		new_config.kamikaze = kamikaze
+		new_config.no_dynamic = no_dynamic
+		new_config.red_alert_carry = red_alert_carry
+		new_config.no_arrival_music = no_arrival_music
+		new_config.no_arrival_warp = no_arrival_warp
+		new_config.no_departure_warp = no_departure_warp
+		new_config.locked = locked
+		new_config.ignore_count = ignore_count
+		new_config.escort_priority = escort_priority
+		new_config.kamikaze_damage = kamikaze_damage
+		new_config.respawn_priority = respawn_priority
+		return new_config
 
 ## Arrival/Departure Configuration
-class_name ArrivalDepartureConfig
-extends Resource
+class ArrivalDepartureConfig extends Resource:
 
-@export var location_type: String = "hyperspace"  # hyperspace, docking_bay, near_ship, etc.
-@export var target_ship: String = ""
-@export var distance: float = 1000.0
-@export var delay: float = 0.0
-@export var cue_expression: String = ""
-@export var path_mask: int = 0
+	@export var location_type: String = "hyperspace"  # hyperspace, docking_bay, near_ship, etc.
+	@export var target_ship: String = ""
+	@export var distance: float = 1000.0
+	@export var delay: float = 0.0
+	@export var cue_expression: String = ""
+	@export var path_mask: int = 0
 
-func duplicate() -> ArrivalDepartureConfig:
-	var new_config: ArrivalDepartureConfig = ArrivalDepartureConfig.new()
-	new_config.location_type = location_type
-	new_config.target_ship = target_ship
-	new_config.distance = distance
-	new_config.delay = delay
-	new_config.cue_expression = cue_expression
-	new_config.path_mask = path_mask
-	return new_config
+	func duplicate() -> ArrivalDepartureConfig:
+		var new_config: ArrivalDepartureConfig = ArrivalDepartureConfig.new()
+		new_config.location_type = location_type
+		new_config.target_ship = target_ship
+		new_config.distance = distance
+		new_config.delay = delay
+		new_config.cue_expression = cue_expression
+		new_config.path_mask = path_mask
+		return new_config
 
 ## AI Goal Configuration
-class_name AIGoalConfig
-extends Resource
+class AIGoalConfig extends Resource:
 
-@export var goal_type: String = ""
-@export var target: String = ""
-@export var priority: int = 89
-@export var flags: Array[String] = []
+	@export var goal_type: String = ""
+	@export var target: String = ""
+	@export var priority: int = 89
+	@export var flags: Array[String] = []
