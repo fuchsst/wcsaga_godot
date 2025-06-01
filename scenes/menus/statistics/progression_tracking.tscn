@@ -1,0 +1,190 @@
+[gd_scene load_steps=2 format=3 uid="uid://c9m8n7qr4k3ws"]
+
+[ext_resource type="Script" path="res://scenes/menus/statistics/progression_tracker.gd" id="1_z4k8m"]
+
+[node name="ProgressionTracking" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_z4k8m")
+
+[node name="BackgroundPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="MainContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 50.0
+offset_top = 50.0
+offset_right = -50.0
+offset_bottom = -50.0
+
+[node name="HeaderContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="MainContainer/HeaderContainer"]
+layout_mode = 2
+text = "Progression Tracking"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="BackButton" type="Button" parent="MainContainer/HeaderContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Back"
+
+[node name="HSeparator" type="HSeparator" parent="MainContainer"]
+layout_mode = 2
+
+[node name="ContentContainer" type="HSplitContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+split_offset = 300
+
+[node name="ProgressionListPanel" type="VBoxContainer" parent="MainContainer/ContentContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ProgressionListTitle" type="Label" parent="MainContainer/ContentContainer/ProgressionListPanel"]
+layout_mode = 2
+text = "Progression Categories"
+horizontal_alignment = 1
+
+[node name="ProgressionFilter" type="HBoxContainer" parent="MainContainer/ContentContainer/ProgressionListPanel"]
+layout_mode = 2
+
+[node name="FilterLabel" type="Label" parent="MainContainer/ContentContainer/ProgressionListPanel/ProgressionFilter"]
+layout_mode = 2
+text = "Category:"
+
+[node name="FilterOption" type="OptionButton" parent="MainContainer/ContentContainer/ProgressionListPanel/ProgressionFilter"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ProgressionScroll" type="ScrollContainer" parent="MainContainer/ContentContainer/ProgressionListPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ProgressionList" type="VBoxContainer" parent="MainContainer/ContentContainer/ProgressionListPanel/ProgressionScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ProgressionDetailsPanel" type="VBoxContainer" parent="MainContainer/ContentContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ProgressionDetailsTitle" type="Label" parent="MainContainer/ContentContainer/ProgressionDetailsPanel"]
+layout_mode = 2
+text = "Progression Details"
+horizontal_alignment = 1
+
+[node name="ProgressionDetailsSeparator" type="HSeparator" parent="MainContainer/ContentContainer/ProgressionDetailsPanel"]
+layout_mode = 2
+
+[node name="ProgressionDetailsContent" type="VBoxContainer" parent="MainContainer/ContentContainer/ProgressionDetailsPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SelectedProgressionTitle" type="Label" parent="MainContainer/ContentContainer/ProgressionDetailsPanel/ProgressionDetailsContent"]
+layout_mode = 2
+text = "[Select a progression item]"
+horizontal_alignment = 1
+label_settings = SubResource("LabelSettings_2")
+
+[node name="ProgressionDescription" type="RichTextLabel" parent="MainContainer/ContentContainer/ProgressionDetailsPanel/ProgressionDetailsContent"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[center][i]Select a progression item to view details.[/i][/center]"
+fit_content = true
+
+[node name="ProgressionInfoGrid" type="GridContainer" parent="MainContainer/ContentContainer/ProgressionDetailsPanel/ProgressionDetailsContent"]
+layout_mode = 2
+columns = 2
+
+[node name="CurrentProgressLabel" type="Label" parent="MainContainer/ContentContainer/ProgressionDetailsPanel/ProgressionDetailsContent/ProgressionInfoGrid"]
+layout_mode = 2
+text = "Current Progress:"
+
+[node name="CurrentProgressValue" type="Label" parent="MainContainer/ContentContainer/ProgressionDetailsPanel/ProgressionDetailsContent/ProgressionInfoGrid"]
+layout_mode = 2
+text = "[Select an item]"
+
+[node name="NextMilestoneLabel" type="Label" parent="MainContainer/ContentContainer/ProgressionDetailsPanel/ProgressionDetailsContent/ProgressionInfoGrid"]
+layout_mode = 2
+text = "Next Milestone:"
+
+[node name="NextMilestoneValue" type="Label" parent="MainContainer/ContentContainer/ProgressionDetailsPanel/ProgressionDetailsContent/ProgressionInfoGrid"]
+layout_mode = 2
+text = "[Select an item]"
+
+[node name="RequiredProgressLabel" type="Label" parent="MainContainer/ContentContainer/ProgressionDetailsPanel/ProgressionDetailsContent/ProgressionInfoGrid"]
+layout_mode = 2
+text = "Required Progress:"
+
+[node name="RequiredProgressValue" type="Label" parent="MainContainer/ContentContainer/ProgressionDetailsPanel/ProgressionDetailsContent/ProgressionInfoGrid"]
+layout_mode = 2
+text = "[Select an item]"
+
+[node name="TimeEstimateLabel" type="Label" parent="MainContainer/ContentContainer/ProgressionDetailsPanel/ProgressionDetailsContent/ProgressionInfoGrid"]
+layout_mode = 2
+text = "Time Estimate:"
+
+[node name="TimeEstimateValue" type="Label" parent="MainContainer/ContentContainer/ProgressionDetailsPanel/ProgressionDetailsContent/ProgressionInfoGrid"]
+layout_mode = 2
+text = "[Select an item]"
+
+[node name="ProgressionProgressBar" type="ProgressBar" parent="MainContainer/ContentContainer/ProgressionDetailsPanel/ProgressionDetailsContent"]
+layout_mode = 2
+value = 0.0
+show_percentage = true
+
+[node name="MilestonesList" type="VBoxContainer" parent="MainContainer/ContentContainer/ProgressionDetailsPanel/ProgressionDetailsContent"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MilestonesTitle" type="Label" parent="MainContainer/ContentContainer/ProgressionDetailsPanel/ProgressionDetailsContent/MilestonesList"]
+layout_mode = 2
+text = "Milestones"
+horizontal_alignment = 1
+
+[node name="MilestonesScroll" type="ScrollContainer" parent="MainContainer/ContentContainer/ProgressionDetailsPanel/ProgressionDetailsContent/MilestonesList"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MilestonesContainer" type="VBoxContainer" parent="MainContainer/ContentContainer/ProgressionDetailsPanel/ProgressionDetailsContent/MilestonesList/MilestonesScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ButtonContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="ResetProgressButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "Reset Progress"
+
+[node name="ExportProgressButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "Export Progress"
+
+[node name="Spacer" type="Control" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CloseButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "Close"
+
+[node name="ConfirmationDialog" type="ConfirmationDialog" parent="."]
+title = "Reset Progress"
+
+[sub_resource type="LabelSettings" id="LabelSettings_1"]
+font_size = 24
+
+[sub_resource type="LabelSettings" id="LabelSettings_2"]
+font_size = 18

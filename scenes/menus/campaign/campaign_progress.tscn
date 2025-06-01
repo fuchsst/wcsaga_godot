@@ -1,0 +1,235 @@
+[gd_scene load_steps=2 format=3 uid="uid://blx7r4ps9t2ws"]
+
+[ext_resource type="Script" path="res://scenes/menus/campaign/campaign_progress_controller.gd" id="1_n8k2m"]
+
+[node name="CampaignProgress" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_n8k2m")
+
+[node name="BackgroundPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="MainContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 50.0
+offset_top = 50.0
+offset_right = -50.0
+offset_bottom = -50.0
+
+[node name="HeaderContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="MainContainer/HeaderContainer"]
+layout_mode = 2
+text = "Campaign Progress"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="BackButton" type="Button" parent="MainContainer/HeaderContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Back"
+
+[node name="HSeparator" type="HSeparator" parent="MainContainer"]
+layout_mode = 2
+
+[node name="CampaignInfoContainer" type="VBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="CampaignTitle" type="Label" parent="MainContainer/CampaignInfoContainer"]
+layout_mode = 2
+text = "[Campaign Name]"
+horizontal_alignment = 1
+label_settings = SubResource("LabelSettings_2")
+
+[node name="CampaignStats" type="GridContainer" parent="MainContainer/CampaignInfoContainer"]
+layout_mode = 2
+columns = 4
+
+[node name="MissionsCompletedLabel" type="Label" parent="MainContainer/CampaignInfoContainer/CampaignStats"]
+layout_mode = 2
+text = "Missions Completed:"
+
+[node name="MissionsCompletedValue" type="Label" parent="MainContainer/CampaignInfoContainer/CampaignStats"]
+layout_mode = 2
+text = "0 / 0"
+
+[node name="TotalScoreLabel" type="Label" parent="MainContainer/CampaignInfoContainer/CampaignStats"]
+layout_mode = 2
+text = "Total Score:"
+
+[node name="TotalScoreValue" type="Label" parent="MainContainer/CampaignInfoContainer/CampaignStats"]
+layout_mode = 2
+text = "0"
+
+[node name="TimePlayedLabel" type="Label" parent="MainContainer/CampaignInfoContainer/CampaignStats"]
+layout_mode = 2
+text = "Time Played:"
+
+[node name="TimePlayedValue" type="Label" parent="MainContainer/CampaignInfoContainer/CampaignStats"]
+layout_mode = 2
+text = "00:00:00"
+
+[node name="DifficultyLabel" type="Label" parent="MainContainer/CampaignInfoContainer/CampaignStats"]
+layout_mode = 2
+text = "Difficulty:"
+
+[node name="DifficultyValue" type="Label" parent="MainContainer/CampaignInfoContainer/CampaignStats"]
+layout_mode = 2
+text = "Medium"
+
+[node name="ProgressBar" type="ProgressBar" parent="MainContainer/CampaignInfoContainer"]
+layout_mode = 2
+value = 0.0
+show_percentage = true
+
+[node name="ContentContainer" type="HSplitContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+split_offset = 400
+
+[node name="MissionListPanel" type="VBoxContainer" parent="MainContainer/ContentContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MissionListTitle" type="Label" parent="MainContainer/ContentContainer/MissionListPanel"]
+layout_mode = 2
+text = "Mission List"
+horizontal_alignment = 1
+
+[node name="MissionListContainer" type="VBoxContainer" parent="MainContainer/ContentContainer/MissionListPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MissionFilter" type="HBoxContainer" parent="MainContainer/ContentContainer/MissionListPanel/MissionListContainer"]
+layout_mode = 2
+
+[node name="FilterLabel" type="Label" parent="MainContainer/ContentContainer/MissionListPanel/MissionListContainer/MissionFilter"]
+layout_mode = 2
+text = "Filter:"
+
+[node name="FilterOption" type="OptionButton" parent="MainContainer/ContentContainer/MissionListPanel/MissionListContainer/MissionFilter"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MissionScroll" type="ScrollContainer" parent="MainContainer/ContentContainer/MissionListPanel/MissionListContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MissionList" type="VBoxContainer" parent="MainContainer/ContentContainer/MissionListPanel/MissionListContainer/MissionScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MissionDetailsPanel" type="VBoxContainer" parent="MainContainer/ContentContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MissionDetailsTitle" type="Label" parent="MainContainer/ContentContainer/MissionDetailsPanel"]
+layout_mode = 2
+text = "Mission Details"
+horizontal_alignment = 1
+
+[node name="MissionDetailsSeparator" type="HSeparator" parent="MainContainer/ContentContainer/MissionDetailsPanel"]
+layout_mode = 2
+
+[node name="MissionDetailsContent" type="VBoxContainer" parent="MainContainer/ContentContainer/MissionDetailsPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SelectedMissionTitle" type="Label" parent="MainContainer/ContentContainer/MissionDetailsPanel/MissionDetailsContent"]
+layout_mode = 2
+text = "[Select a mission]"
+horizontal_alignment = 1
+label_settings = SubResource("LabelSettings_3")
+
+[node name="MissionDescription" type="RichTextLabel" parent="MainContainer/ContentContainer/MissionDetailsPanel/MissionDetailsContent"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[center][i]Select a mission to view details.[/i][/center]"
+fit_content = true
+
+[node name="MissionStatsGrid" type="GridContainer" parent="MainContainer/ContentContainer/MissionDetailsPanel/MissionDetailsContent"]
+layout_mode = 2
+columns = 2
+
+[node name="ObjectivesCompletedLabel" type="Label" parent="MainContainer/ContentContainer/MissionDetailsPanel/MissionDetailsContent/MissionStatsGrid"]
+layout_mode = 2
+text = "Objectives:"
+
+[node name="ObjectivesCompletedValue" type="Label" parent="MainContainer/ContentContainer/MissionDetailsPanel/MissionDetailsContent/MissionStatsGrid"]
+layout_mode = 2
+text = "[Select a mission]"
+
+[node name="MissionScoreLabel" type="Label" parent="MainContainer/ContentContainer/MissionDetailsPanel/MissionDetailsContent/MissionStatsGrid"]
+layout_mode = 2
+text = "Score:"
+
+[node name="MissionScoreValue" type="Label" parent="MainContainer/ContentContainer/MissionDetailsPanel/MissionDetailsContent/MissionStatsGrid"]
+layout_mode = 2
+text = "[Select a mission]"
+
+[node name="MissionTimeLabel" type="Label" parent="MainContainer/ContentContainer/MissionDetailsPanel/MissionDetailsContent/MissionStatsGrid"]
+layout_mode = 2
+text = "Time:"
+
+[node name="MissionTimeValue" type="Label" parent="MainContainer/ContentContainer/MissionDetailsPanel/MissionDetailsContent/MissionStatsGrid"]
+layout_mode = 2
+text = "[Select a mission]"
+
+[node name="MissionStatusLabel" type="Label" parent="MainContainer/ContentContainer/MissionDetailsPanel/MissionDetailsContent/MissionStatsGrid"]
+layout_mode = 2
+text = "Status:"
+
+[node name="MissionStatusValue" type="Label" parent="MainContainer/ContentContainer/MissionDetailsPanel/MissionDetailsContent/MissionStatsGrid"]
+layout_mode = 2
+text = "[Select a mission]"
+
+[node name="MissionActions" type="HBoxContainer" parent="MainContainer/ContentContainer/MissionDetailsPanel/MissionDetailsContent"]
+layout_mode = 2
+
+[node name="ReplayButton" type="Button" parent="MainContainer/ContentContainer/MissionDetailsPanel/MissionDetailsContent/MissionActions"]
+layout_mode = 2
+text = "Replay Mission"
+disabled = true
+
+[node name="ViewBriefingButton" type="Button" parent="MainContainer/ContentContainer/MissionDetailsPanel/MissionDetailsContent/MissionActions"]
+layout_mode = 2
+text = "View Briefing"
+disabled = true
+
+[node name="ButtonContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="ExportButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "Export Progress"
+
+[node name="PrintButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "Print Report"
+
+[node name="Spacer" type="Control" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CloseButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "Close"
+
+[sub_resource type="LabelSettings" id="LabelSettings_1"]
+font_size = 24
+
+[sub_resource type="LabelSettings" id="LabelSettings_2"]
+font_size = 20
+
+[sub_resource type="LabelSettings" id="LabelSettings_3"]
+font_size = 16

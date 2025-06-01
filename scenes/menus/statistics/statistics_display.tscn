@@ -1,0 +1,384 @@
+[gd_scene load_steps=2 format=3 uid="uid://d8k7j5qr3m4ws"]
+
+[ext_resource type="Script" path="res://scenes/menus/statistics/statistics_display_controller.gd" id="1_x7k9m"]
+
+[node name="StatisticsDisplay" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_x7k9m")
+
+[node name="BackgroundPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="MainContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 50.0
+offset_top = 50.0
+offset_right = -50.0
+offset_bottom = -50.0
+
+[node name="HeaderContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="MainContainer/HeaderContainer"]
+layout_mode = 2
+text = "Pilot Statistics"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="ExportButton" type="Button" parent="MainContainer/HeaderContainer"]
+layout_mode = 2
+text = "Export"
+
+[node name="CloseButton" type="Button" parent="MainContainer/HeaderContainer"]
+layout_mode = 2
+text = "Close"
+
+[node name="HSeparator" type="HSeparator" parent="MainContainer"]
+layout_mode = 2
+
+[node name="TabContainer" type="TabContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Overview" type="Control" parent="MainContainer/TabContainer"]
+layout_mode = 2
+
+[node name="OverviewContent" type="VBoxContainer" parent="MainContainer/TabContainer/Overview"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+
+[node name="PilotInfo" type="HBoxContainer" parent="MainContainer/TabContainer/Overview/OverviewContent"]
+layout_mode = 2
+
+[node name="PilotPortrait" type="TextureRect" parent="MainContainer/TabContainer/Overview/OverviewContent/PilotInfo"]
+layout_mode = 2
+custom_minimum_size = Vector2(96, 96)
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PilotDetails" type="VBoxContainer" parent="MainContainer/TabContainer/Overview/OverviewContent/PilotInfo"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PilotCallsign" type="Label" parent="MainContainer/TabContainer/Overview/OverviewContent/PilotInfo/PilotDetails"]
+layout_mode = 2
+text = "Callsign: [Pilot Name]"
+label_settings = SubResource("LabelSettings_2")
+
+[node name="PilotSquadron" type="Label" parent="MainContainer/TabContainer/Overview/OverviewContent/PilotInfo/PilotDetails"]
+layout_mode = 2
+text = "Squadron: [Squadron Name]"
+
+[node name="PilotRank" type="Label" parent="MainContainer/TabContainer/Overview/OverviewContent/PilotInfo/PilotDetails"]
+layout_mode = 2
+text = "Rank: [Rank]"
+
+[node name="OverviewStatsGrid" type="GridContainer" parent="MainContainer/TabContainer/Overview/OverviewContent"]
+layout_mode = 2
+columns = 4
+
+[node name="TotalScoreLabel" type="Label" parent="MainContainer/TabContainer/Overview/OverviewContent/OverviewStatsGrid"]
+layout_mode = 2
+text = "Total Score:"
+
+[node name="TotalScoreValue" type="Label" parent="MainContainer/TabContainer/Overview/OverviewContent/OverviewStatsGrid"]
+layout_mode = 2
+text = "0"
+
+[node name="MissionsFlownLabel" type="Label" parent="MainContainer/TabContainer/Overview/OverviewContent/OverviewStatsGrid"]
+layout_mode = 2
+text = "Missions Flown:"
+
+[node name="MissionsFlownValue" type="Label" parent="MainContainer/TabContainer/Overview/OverviewContent/OverviewStatsGrid"]
+layout_mode = 2
+text = "0"
+
+[node name="FlightTimeLabel" type="Label" parent="MainContainer/TabContainer/Overview/OverviewContent/OverviewStatsGrid"]
+layout_mode = 2
+text = "Flight Time:"
+
+[node name="FlightTimeValue" type="Label" parent="MainContainer/TabContainer/Overview/OverviewContent/OverviewStatsGrid"]
+layout_mode = 2
+text = "00:00:00"
+
+[node name="TotalKillsLabel" type="Label" parent="MainContainer/TabContainer/Overview/OverviewContent/OverviewStatsGrid"]
+layout_mode = 2
+text = "Total Kills:"
+
+[node name="TotalKillsValue" type="Label" parent="MainContainer/TabContainer/Overview/OverviewContent/OverviewStatsGrid"]
+layout_mode = 2
+text = "0"
+
+[node name="RankDisplay" type="VBoxContainer" parent="MainContainer/TabContainer/Overview/OverviewContent"]
+layout_mode = 2
+
+[node name="RankTitle" type="Label" parent="MainContainer/TabContainer/Overview/OverviewContent/RankDisplay"]
+layout_mode = 2
+text = "Rank Progression"
+horizontal_alignment = 1
+
+[node name="RankProgressBar" type="ProgressBar" parent="MainContainer/TabContainer/Overview/OverviewContent/RankDisplay"]
+layout_mode = 2
+value = 0.0
+show_percentage = false
+
+[node name="RankProgressLabel" type="Label" parent="MainContainer/TabContainer/Overview/OverviewContent/RankDisplay"]
+layout_mode = 2
+text = "Progress to next rank: 0 points needed"
+horizontal_alignment = 1
+
+[node name="MedalShowcase" type="VBoxContainer" parent="MainContainer/TabContainer/Overview/OverviewContent"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MedalTitle" type="Label" parent="MainContainer/TabContainer/Overview/OverviewContent/MedalShowcase"]
+layout_mode = 2
+text = "Recent Medals"
+horizontal_alignment = 1
+
+[node name="MedalContainer" type="GridContainer" parent="MainContainer/TabContainer/Overview/OverviewContent/MedalShowcase"]
+layout_mode = 2
+size_flags_vertical = 3
+columns = 5
+
+[node name="Combat" type="Control" parent="MainContainer/TabContainer"]
+layout_mode = 2
+
+[node name="CombatContent" type="VBoxContainer" parent="MainContainer/TabContainer/Combat"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+
+[node name="CombatStatsGrid" type="GridContainer" parent="MainContainer/TabContainer/Combat/CombatContent"]
+layout_mode = 2
+columns = 4
+
+[node name="TotalKillsLabel2" type="Label" parent="MainContainer/TabContainer/Combat/CombatContent/CombatStatsGrid"]
+layout_mode = 2
+text = "Total Kills:"
+
+[node name="TotalKillsValue2" type="Label" parent="MainContainer/TabContainer/Combat/CombatContent/CombatStatsGrid"]
+layout_mode = 2
+text = "0"
+
+[node name="FighterKillsLabel" type="Label" parent="MainContainer/TabContainer/Combat/CombatContent/CombatStatsGrid"]
+layout_mode = 2
+text = "Fighter Kills:"
+
+[node name="FighterKillsValue" type="Label" parent="MainContainer/TabContainer/Combat/CombatContent/CombatStatsGrid"]
+layout_mode = 2
+text = "0"
+
+[node name="CapitalKillsLabel" type="Label" parent="MainContainer/TabContainer/Combat/CombatContent/CombatStatsGrid"]
+layout_mode = 2
+text = "Capital Ship Kills:"
+
+[node name="CapitalKillsValue" type="Label" parent="MainContainer/TabContainer/Combat/CombatContent/CombatStatsGrid"]
+layout_mode = 2
+text = "0"
+
+[node name="AssistsLabel" type="Label" parent="MainContainer/TabContainer/Combat/CombatContent/CombatStatsGrid"]
+layout_mode = 2
+text = "Assists:"
+
+[node name="AssistsValue" type="Label" parent="MainContainer/TabContainer/Combat/CombatContent/CombatStatsGrid"]
+layout_mode = 2
+text = "0"
+
+[node name="KillBreakdownChart" type="Control" parent="MainContainer/TabContainer/Combat/CombatContent"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="KillBreakdownTitle" type="Label" parent="MainContainer/TabContainer/Combat/CombatContent/KillBreakdownChart"]
+layout_mode = 2
+text = "Kill Breakdown by Ship Type"
+horizontal_alignment = 1
+
+[node name="EffectivenessBars" type="VBoxContainer" parent="MainContainer/TabContainer/Combat/CombatContent"]
+layout_mode = 2
+
+[node name="EffectivenessTitle" type="Label" parent="MainContainer/TabContainer/Combat/CombatContent/EffectivenessBars"]
+layout_mode = 2
+text = "Combat Effectiveness"
+horizontal_alignment = 1
+
+[node name="Accuracy" type="Control" parent="MainContainer/TabContainer"]
+layout_mode = 2
+
+[node name="AccuracyContent" type="VBoxContainer" parent="MainContainer/TabContainer/Accuracy"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+
+[node name="AccuracyStatsGrid" type="GridContainer" parent="MainContainer/TabContainer/Accuracy/AccuracyContent"]
+layout_mode = 2
+columns = 4
+
+[node name="OverallAccuracyLabel" type="Label" parent="MainContainer/TabContainer/Accuracy/AccuracyContent/AccuracyStatsGrid"]
+layout_mode = 2
+text = "Overall Accuracy:"
+
+[node name="OverallAccuracyValue" type="Label" parent="MainContainer/TabContainer/Accuracy/AccuracyContent/AccuracyStatsGrid"]
+layout_mode = 2
+text = "0%"
+
+[node name="ShotsFiredLabel" type="Label" parent="MainContainer/TabContainer/Accuracy/AccuracyContent/AccuracyStatsGrid"]
+layout_mode = 2
+text = "Shots Fired:"
+
+[node name="ShotsFiredValue" type="Label" parent="MainContainer/TabContainer/Accuracy/AccuracyContent/AccuracyStatsGrid"]
+layout_mode = 2
+text = "0"
+
+[node name="ShotsHitLabel" type="Label" parent="MainContainer/TabContainer/Accuracy/AccuracyContent/AccuracyStatsGrid"]
+layout_mode = 2
+text = "Shots Hit:"
+
+[node name="ShotsHitValue" type="Label" parent="MainContainer/TabContainer/Accuracy/AccuracyContent/AccuracyStatsGrid"]
+layout_mode = 2
+text = "0"
+
+[node name="MissilesAccuracyLabel" type="Label" parent="MainContainer/TabContainer/Accuracy/AccuracyContent/AccuracyStatsGrid"]
+layout_mode = 2
+text = "Missile Accuracy:"
+
+[node name="MissilesAccuracyValue" type="Label" parent="MainContainer/TabContainer/Accuracy/AccuracyContent/AccuracyStatsGrid"]
+layout_mode = 2
+text = "0%"
+
+[node name="WeaponAccuracyChart" type="Control" parent="MainContainer/TabContainer/Accuracy/AccuracyContent"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="WeaponAccuracyTitle" type="Label" parent="MainContainer/TabContainer/Accuracy/AccuracyContent/WeaponAccuracyChart"]
+layout_mode = 2
+text = "Accuracy by Weapon Type"
+horizontal_alignment = 1
+
+[node name="AccuracyTrendChart" type="Control" parent="MainContainer/TabContainer/Accuracy/AccuracyContent"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="AccuracyTrendTitle" type="Label" parent="MainContainer/TabContainer/Accuracy/AccuracyContent/AccuracyTrendChart"]
+layout_mode = 2
+text = "Accuracy Trend Over Time"
+horizontal_alignment = 1
+
+[node name="Progression" type="Control" parent="MainContainer/TabContainer"]
+layout_mode = 2
+
+[node name="ProgressionContent" type="VBoxContainer" parent="MainContainer/TabContainer/Progression"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+
+[node name="ProgressionStatsGrid" type="GridContainer" parent="MainContainer/TabContainer/Progression/ProgressionContent"]
+layout_mode = 2
+columns = 4
+
+[node name="CurrentRankLabel" type="Label" parent="MainContainer/TabContainer/Progression/ProgressionContent/ProgressionStatsGrid"]
+layout_mode = 2
+text = "Current Rank:"
+
+[node name="CurrentRankValue" type="Label" parent="MainContainer/TabContainer/Progression/ProgressionContent/ProgressionStatsGrid"]
+layout_mode = 2
+text = "Ensign"
+
+[node name="PromotionPointsLabel" type="Label" parent="MainContainer/TabContainer/Progression/ProgressionContent/ProgressionStatsGrid"]
+layout_mode = 2
+text = "Promotion Points:"
+
+[node name="PromotionPointsValue" type="Label" parent="MainContainer/TabContainer/Progression/ProgressionContent/ProgressionStatsGrid"]
+layout_mode = 2
+text = "0"
+
+[node name="MedalsEarnedLabel" type="Label" parent="MainContainer/TabContainer/Progression/ProgressionContent/ProgressionStatsGrid"]
+layout_mode = 2
+text = "Medals Earned:"
+
+[node name="MedalsEarnedValue" type="Label" parent="MainContainer/TabContainer/Progression/ProgressionContent/ProgressionStatsGrid"]
+layout_mode = 2
+text = "0"
+
+[node name="CampaignsCompletedLabel" type="Label" parent="MainContainer/TabContainer/Progression/ProgressionContent/ProgressionStatsGrid"]
+layout_mode = 2
+text = "Campaigns Completed:"
+
+[node name="CampaignsCompletedValue" type="Label" parent="MainContainer/TabContainer/Progression/ProgressionContent/ProgressionStatsGrid"]
+layout_mode = 2
+text = "0"
+
+[node name="RankProgressionChart" type="Control" parent="MainContainer/TabContainer/Progression/ProgressionContent"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="RankProgressionTitle" type="Label" parent="MainContainer/TabContainer/Progression/ProgressionContent/RankProgressionChart"]
+layout_mode = 2
+text = "Rank Progression Timeline"
+horizontal_alignment = 1
+
+[node name="History" type="Control" parent="MainContainer/TabContainer"]
+layout_mode = 2
+
+[node name="HistoryContent" type="VBoxContainer" parent="MainContainer/TabContainer/History"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+
+[node name="HistoryFilter" type="HBoxContainer" parent="MainContainer/TabContainer/History/HistoryContent"]
+layout_mode = 2
+
+[node name="FilterLabel" type="Label" parent="MainContainer/TabContainer/History/HistoryContent/HistoryFilter"]
+layout_mode = 2
+text = "Filter by:"
+
+[node name="FilterOption" type="OptionButton" parent="MainContainer/TabContainer/History/HistoryContent/HistoryFilter"]
+layout_mode = 2
+
+[node name="HistoryScroll" type="ScrollContainer" parent="MainContainer/TabContainer/History/HistoryContent"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HistoryList" type="VBoxContainer" parent="MainContainer/TabContainer/History/HistoryContent/HistoryScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[sub_resource type="LabelSettings" id="LabelSettings_1"]
+font_size = 24
+
+[sub_resource type="LabelSettings" id="LabelSettings_2"]
+font_size = 18

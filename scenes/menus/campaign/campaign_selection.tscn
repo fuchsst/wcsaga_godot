@@ -1,0 +1,183 @@
+[gd_scene load_steps=2 format=3 uid="uid://cmj8q4nr2k7ws"]
+
+[ext_resource type="Script" path="res://scenes/menus/campaign/campaign_selection_controller.gd" id="1_v7k3m"]
+
+[node name="CampaignSelection" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_v7k3m")
+
+[node name="BackgroundPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="MainContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 50.0
+offset_top = 50.0
+offset_right = -50.0
+offset_bottom = -50.0
+
+[node name="HeaderContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="MainContainer/HeaderContainer"]
+layout_mode = 2
+text = "Campaign Selection"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="BackButton" type="Button" parent="MainContainer/HeaderContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Back"
+
+[node name="HSeparator" type="HSeparator" parent="MainContainer"]
+layout_mode = 2
+
+[node name="CampaignBrowser" type="HSplitContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+split_offset = 300
+
+[node name="CampaignListPanel" type="VBoxContainer" parent="MainContainer/CampaignBrowser"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CampaignListTitle" type="Label" parent="MainContainer/CampaignBrowser/CampaignListPanel"]
+layout_mode = 2
+text = "Available Campaigns"
+horizontal_alignment = 1
+
+[node name="CampaignList" type="ItemList" parent="MainContainer/CampaignBrowser/CampaignListPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CampaignPreviewPanel" type="VBoxContainer" parent="MainContainer/CampaignBrowser"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PreviewTitle" type="Label" parent="MainContainer/CampaignBrowser/CampaignPreviewPanel"]
+layout_mode = 2
+text = "Campaign Preview"
+horizontal_alignment = 1
+
+[node name="PreviewSeparator" type="HSeparator" parent="MainContainer/CampaignBrowser/CampaignPreviewPanel"]
+layout_mode = 2
+
+[node name="CampaignPreview" type="VBoxContainer" parent="MainContainer/CampaignBrowser/CampaignPreviewPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PreviewTitleLabel" type="Label" parent="MainContainer/CampaignBrowser/CampaignPreviewPanel/CampaignPreview"]
+layout_mode = 2
+text = "[Select a campaign]"
+horizontal_alignment = 1
+label_settings = SubResource("LabelSettings_2")
+
+[node name="PreviewDescription" type="RichTextLabel" parent="MainContainer/CampaignBrowser/CampaignPreviewPanel/CampaignPreview"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[center][i]Select a campaign to view its description.[/i][/center]"
+fit_content = true
+
+[node name="PreviewInfo" type="VBoxContainer" parent="MainContainer/CampaignBrowser/CampaignPreviewPanel/CampaignPreview"]
+layout_mode = 2
+
+[node name="CampaignInfoGrid" type="GridContainer" parent="MainContainer/CampaignBrowser/CampaignPreviewPanel/CampaignPreview/PreviewInfo"]
+layout_mode = 2
+columns = 2
+
+[node name="MissionsLabel" type="Label" parent="MainContainer/CampaignBrowser/CampaignPreviewPanel/CampaignPreview/PreviewInfo/CampaignInfoGrid"]
+layout_mode = 2
+text = "Missions:"
+
+[node name="MissionsValue" type="Label" parent="MainContainer/CampaignBrowser/CampaignPreviewPanel/CampaignPreview/PreviewInfo/CampaignInfoGrid"]
+layout_mode = 2
+text = "[Select a campaign]"
+
+[node name="StatusLabel" type="Label" parent="MainContainer/CampaignBrowser/CampaignPreviewPanel/CampaignPreview/PreviewInfo/CampaignInfoGrid"]
+layout_mode = 2
+text = "Status:"
+
+[node name="StatusValue" type="Label" parent="MainContainer/CampaignBrowser/CampaignPreviewPanel/CampaignPreview/PreviewInfo/CampaignInfoGrid"]
+layout_mode = 2
+text = "[Select a campaign]"
+
+[node name="ProgressLabel" type="Label" parent="MainContainer/CampaignBrowser/CampaignPreviewPanel/CampaignPreview/PreviewInfo/CampaignInfoGrid"]
+layout_mode = 2
+text = "Progress:"
+
+[node name="ProgressValue" type="Label" parent="MainContainer/CampaignBrowser/CampaignPreviewPanel/CampaignPreview/PreviewInfo/CampaignInfoGrid"]
+layout_mode = 2
+text = "[Select a campaign]"
+
+[node name="ProgressDisplay" type="VBoxContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ProgressTitle" type="Label" parent="MainContainer/ProgressDisplay"]
+layout_mode = 2
+text = "Mission Progress"
+horizontal_alignment = 1
+
+[node name="ProgressSeparator" type="HSeparator" parent="MainContainer/ProgressDisplay"]
+layout_mode = 2
+
+[node name="MissionProgressContainer" type="HBoxContainer" parent="MainContainer/ProgressDisplay"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MissionProgressList" type="ItemList" parent="MainContainer/ProgressDisplay/MissionProgressContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MissionDetails" type="VBoxContainer" parent="MainContainer/ProgressDisplay/MissionProgressContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MissionDetailsTitle" type="Label" parent="MainContainer/ProgressDisplay/MissionProgressContainer/MissionDetails"]
+layout_mode = 2
+text = "Mission Details"
+horizontal_alignment = 1
+
+[node name="MissionDetailsContent" type="RichTextLabel" parent="MainContainer/ProgressDisplay/MissionProgressContainer/MissionDetails"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[center][i]Select a mission to view details.[/i][/center]"
+fit_content = true
+
+[node name="ButtonContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="SelectButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "Select Campaign"
+disabled = true
+
+[node name="ProgressButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "View Progress"
+disabled = true
+
+[node name="Spacer" type="Control" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CancelButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "Cancel"
+
+[sub_resource type="LabelSettings" id="LabelSettings_1"]
+font_size = 24
+
+[sub_resource type="LabelSettings" id="LabelSettings_2"]
+font_size = 18

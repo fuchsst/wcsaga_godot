@@ -1,0 +1,174 @@
+[gd_scene load_steps=2 format=3 uid="uid://chm7n5qr3v8ws"]
+
+[ext_resource type="Script" path="res://scenes/menus/pilot/pilot_selection_controller.gd" id="1_x8h2m"]
+
+[node name="PilotSelection" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_x8h2m")
+
+[node name="BackgroundPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="MainContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 50.0
+offset_top = 50.0
+offset_right = -50.0
+offset_bottom = -50.0
+
+[node name="HeaderContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="MainContainer/HeaderContainer"]
+layout_mode = 2
+text = "Select Pilot"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="BackButton" type="Button" parent="MainContainer/HeaderContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Back"
+
+[node name="HSeparator" type="HSeparator" parent="MainContainer"]
+layout_mode = 2
+
+[node name="ContentContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PilotListPanel" type="VBoxContainer" parent="MainContainer/ContentContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PilotListTitle" type="Label" parent="MainContainer/ContentContainer/PilotListPanel"]
+layout_mode = 2
+text = "Available Pilots"
+horizontal_alignment = 1
+
+[node name="PilotScroll" type="ScrollContainer" parent="MainContainer/ContentContainer/PilotListPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PilotListContainer" type="VBoxContainer" parent="MainContainer/ContentContainer/PilotListPanel/PilotScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PaginationContainer" type="HBoxContainer" parent="MainContainer/ContentContainer/PilotListPanel"]
+layout_mode = 2
+
+[node name="PrevPageButton" type="Button" parent="MainContainer/ContentContainer/PilotListPanel/PaginationContainer"]
+layout_mode = 2
+text = "< Previous"
+disabled = true
+
+[node name="PageLabel" type="Label" parent="MainContainer/ContentContainer/PilotListPanel/PaginationContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Page 1 of 1"
+horizontal_alignment = 1
+
+[node name="NextPageButton" type="Button" parent="MainContainer/ContentContainer/PilotListPanel/PaginationContainer"]
+layout_mode = 2
+text = "Next >"
+disabled = true
+
+[node name="PreviewPanel" type="VBoxContainer" parent="MainContainer/ContentContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PreviewTitle" type="Label" parent="MainContainer/ContentContainer/PreviewPanel"]
+layout_mode = 2
+text = "Pilot Preview"
+horizontal_alignment = 1
+
+[node name="PreviewSeparator" type="HSeparator" parent="MainContainer/ContentContainer/PreviewPanel"]
+layout_mode = 2
+
+[node name="PreviewContent" type="VBoxContainer" parent="MainContainer/ContentContainer/PreviewPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PreviewImage" type="TextureRect" parent="MainContainer/ContentContainer/PreviewPanel/PreviewContent"]
+layout_mode = 2
+custom_minimum_size = Vector2(128, 128)
+size_flags_horizontal = 4
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PreviewInfoContainer" type="VBoxContainer" parent="MainContainer/ContentContainer/PreviewPanel/PreviewContent"]
+layout_mode = 2
+
+[node name="PreviewCallsign" type="Label" parent="MainContainer/ContentContainer/PreviewPanel/PreviewContent/PreviewInfoContainer"]
+layout_mode = 2
+text = "Callsign: [Select a pilot]"
+horizontal_alignment = 1
+
+[node name="PreviewSquadron" type="Label" parent="MainContainer/ContentContainer/PreviewPanel/PreviewContent/PreviewInfoContainer"]
+layout_mode = 2
+text = "Squadron: [Select a pilot]"
+horizontal_alignment = 1
+
+[node name="PreviewRank" type="Label" parent="MainContainer/ContentContainer/PreviewPanel/PreviewContent/PreviewInfoContainer"]
+layout_mode = 2
+text = "Rank: [Select a pilot]"
+horizontal_alignment = 1
+
+[node name="PreviewScore" type="Label" parent="MainContainer/ContentContainer/PreviewPanel/PreviewContent/PreviewInfoContainer"]
+layout_mode = 2
+text = "Score: [Select a pilot]"
+horizontal_alignment = 1
+
+[node name="PreviewMissions" type="Label" parent="MainContainer/ContentContainer/PreviewPanel/PreviewContent/PreviewInfoContainer"]
+layout_mode = 2
+text = "Missions: [Select a pilot]"
+horizontal_alignment = 1
+
+[node name="PreviewLastPlayed" type="Label" parent="MainContainer/ContentContainer/PreviewPanel/PreviewContent/PreviewInfoContainer"]
+layout_mode = 2
+text = "Last Played: [Select a pilot]"
+horizontal_alignment = 1
+
+[node name="ButtonContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="SelectButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "Select Pilot"
+disabled = true
+
+[node name="CreateButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "Create New Pilot"
+
+[node name="DeleteButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "Delete Pilot"
+disabled = true
+
+[node name="StatsButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "View Statistics"
+disabled = true
+
+[node name="Spacer" type="Control" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CancelButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "Cancel"
+
+[node name="ConfirmationDialog" type="ConfirmationDialog" parent="."]
+title = "Delete Pilot"
+
+[sub_resource type="LabelSettings" id="LabelSettings_1"]
+font_size = 24

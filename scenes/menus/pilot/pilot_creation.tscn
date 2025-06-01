@@ -1,0 +1,162 @@
+[gd_scene load_steps=2 format=3 uid="uid://bgm3j5rvhk2ws"]
+
+[ext_resource type="Script" path="res://scenes/menus/pilot/pilot_creation_controller.gd" id="1_p9q7k"]
+
+[node name="PilotCreation" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_p9q7k")
+
+[node name="BackgroundPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="MainContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 50.0
+offset_top = 50.0
+offset_right = -50.0
+offset_bottom = -50.0
+
+[node name="HeaderContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="MainContainer/HeaderContainer"]
+layout_mode = 2
+text = "Create New Pilot"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="CancelButton" type="Button" parent="MainContainer/HeaderContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Cancel"
+
+[node name="HSeparator" type="HSeparator" parent="MainContainer"]
+layout_mode = 2
+
+[node name="ContentContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CreationForm" type="VBoxContainer" parent="MainContainer/ContentContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CallsignContainer" type="VBoxContainer" parent="MainContainer/ContentContainer/CreationForm"]
+layout_mode = 2
+
+[node name="CallsignLabel" type="Label" parent="MainContainer/ContentContainer/CreationForm/CallsignContainer"]
+layout_mode = 2
+text = "Callsign (Required):"
+
+[node name="CallsignInput" type="LineEdit" parent="MainContainer/ContentContainer/CreationForm/CallsignContainer"]
+layout_mode = 2
+placeholder_text = "Enter your callsign..."
+max_length = 20
+
+[node name="CallsignValidationLabel" type="Label" parent="MainContainer/ContentContainer/CreationForm/CallsignContainer"]
+layout_mode = 2
+text = "Callsign must be 3-20 characters, letters and numbers only"
+modulate = Color(0.7, 0.7, 0.7, 1)
+
+[node name="SquadronContainer" type="VBoxContainer" parent="MainContainer/ContentContainer/CreationForm"]
+layout_mode = 2
+
+[node name="SquadronLabel" type="Label" parent="MainContainer/ContentContainer/CreationForm/SquadronContainer"]
+layout_mode = 2
+text = "Squadron (Optional):"
+
+[node name="SquadronInput" type="LineEdit" parent="MainContainer/ContentContainer/CreationForm/SquadronContainer"]
+layout_mode = 2
+placeholder_text = "Enter squadron name..."
+max_length = 30
+
+[node name="PortraitContainer" type="VBoxContainer" parent="MainContainer/ContentContainer/CreationForm"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PortraitLabel" type="Label" parent="MainContainer/ContentContainer/CreationForm/PortraitContainer"]
+layout_mode = 2
+text = "Select Portrait:"
+
+[node name="PortraitScroll" type="ScrollContainer" parent="MainContainer/ContentContainer/CreationForm/PortraitContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PortraitGrid" type="GridContainer" parent="MainContainer/ContentContainer/CreationForm/PortraitContainer/PortraitScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 4
+
+[node name="PreviewPanel" type="VBoxContainer" parent="MainContainer/ContentContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PreviewTitle" type="Label" parent="MainContainer/ContentContainer/PreviewPanel"]
+layout_mode = 2
+text = "Pilot Preview"
+horizontal_alignment = 1
+
+[node name="PreviewSeparator" type="HSeparator" parent="MainContainer/ContentContainer/PreviewPanel"]
+layout_mode = 2
+
+[node name="PreviewInfo" type="VBoxContainer" parent="MainContainer/ContentContainer/PreviewPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PreviewImage" type="TextureRect" parent="MainContainer/ContentContainer/PreviewPanel/PreviewInfo"]
+layout_mode = 2
+custom_minimum_size = Vector2(128, 128)
+size_flags_horizontal = 4
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PreviewDetails" type="VBoxContainer" parent="MainContainer/ContentContainer/PreviewPanel/PreviewInfo"]
+layout_mode = 2
+
+[node name="PreviewCallsign" type="Label" parent="MainContainer/ContentContainer/PreviewPanel/PreviewInfo/PreviewDetails"]
+layout_mode = 2
+text = "Callsign: [Not Set]"
+horizontal_alignment = 1
+
+[node name="PreviewSquadron" type="Label" parent="MainContainer/ContentContainer/PreviewPanel/PreviewInfo/PreviewDetails"]
+layout_mode = 2
+text = "Squadron: [Not Set]"
+horizontal_alignment = 1
+
+[node name="PreviewRank" type="Label" parent="MainContainer/ContentContainer/PreviewPanel/PreviewInfo/PreviewDetails"]
+layout_mode = 2
+text = "Rank: Ensign"
+horizontal_alignment = 1
+
+[node name="ButtonContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="Spacer" type="Control" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CreateButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "Create Pilot"
+disabled = true
+
+[node name="ValidationDisplay" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="ValidationMessage" type="AcceptDialog" parent="ValidationDisplay"]
+title = "Validation Error"
+
+[sub_resource type="LabelSettings" id="LabelSettings_1"]
+font_size = 24

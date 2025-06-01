@@ -1,0 +1,321 @@
+[gd_scene load_steps=2 format=3 uid="uid://c7m6l9qr8k5ws"]
+
+[ext_resource type="Script" path="res://scenes/menus/debriefing/debriefing_system_coordinator.gd" id="1_w4k9m"]
+
+[node name="MissionResults" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_w4k9m")
+
+[node name="BackgroundPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="MainContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 50.0
+offset_top = 50.0
+offset_right = -50.0
+offset_bottom = -50.0
+
+[node name="HeaderContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="MissionTitleLabel" type="Label" parent="MainContainer/HeaderContainer"]
+layout_mode = 2
+text = "Mission Results"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="MissionStatusLabel" type="Label" parent="MainContainer/HeaderContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "ANALYZING..."
+label_settings = SubResource("LabelSettings_2")
+
+[node name="HSeparator" type="HSeparator" parent="MainContainer"]
+layout_mode = 2
+
+[node name="ResultsContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ObjectivesPanel" type="VBoxContainer" parent="MainContainer/ResultsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ObjectivesTitle" type="Label" parent="MainContainer/ResultsContainer/ObjectivesPanel"]
+layout_mode = 2
+text = "Objectives Status"
+horizontal_alignment = 1
+label_settings = SubResource("LabelSettings_3")
+
+[node name="ObjectivesSeparator" type="HSeparator" parent="MainContainer/ResultsContainer/ObjectivesPanel"]
+layout_mode = 2
+
+[node name="ObjectivesScroll" type="ScrollContainer" parent="MainContainer/ResultsContainer/ObjectivesPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ObjectivesList" type="VBoxContainer" parent="MainContainer/ResultsContainer/ObjectivesPanel/ObjectivesScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ObjectivesSummary" type="VBoxContainer" parent="MainContainer/ResultsContainer/ObjectivesPanel"]
+layout_mode = 2
+
+[node name="ObjectivesCompletedLabel" type="Label" parent="MainContainer/ResultsContainer/ObjectivesPanel/ObjectivesSummary"]
+layout_mode = 2
+text = "Objectives Completed: 0 / 0"
+horizontal_alignment = 1
+
+[node name="ObjectivesSuccessRate" type="ProgressBar" parent="MainContainer/ResultsContainer/ObjectivesPanel/ObjectivesSummary"]
+layout_mode = 2
+value = 0.0
+show_percentage = true
+
+[node name="ScorePanel" type="VBoxContainer" parent="MainContainer/ResultsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ScoreTitle" type="Label" parent="MainContainer/ResultsContainer/ScorePanel"]
+layout_mode = 2
+text = "Mission Score"
+horizontal_alignment = 1
+label_settings = SubResource("LabelSettings_3")
+
+[node name="ScoreSeparator" type="HSeparator" parent="MainContainer/ResultsContainer/ScorePanel"]
+layout_mode = 2
+
+[node name="ScoreBreakdown" type="VBoxContainer" parent="MainContainer/ResultsContainer/ScorePanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="BaseScoreContainer" type="HBoxContainer" parent="MainContainer/ResultsContainer/ScorePanel/ScoreBreakdown"]
+layout_mode = 2
+
+[node name="BaseScoreLabel" type="Label" parent="MainContainer/ResultsContainer/ScorePanel/ScoreBreakdown/BaseScoreContainer"]
+layout_mode = 2
+text = "Base Score:"
+
+[node name="BaseScoreValue" type="Label" parent="MainContainer/ResultsContainer/ScorePanel/ScoreBreakdown/BaseScoreContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "0"
+
+[node name="ObjectiveBonusContainer" type="HBoxContainer" parent="MainContainer/ResultsContainer/ScorePanel/ScoreBreakdown"]
+layout_mode = 2
+
+[node name="ObjectiveBonusLabel" type="Label" parent="MainContainer/ResultsContainer/ScorePanel/ScoreBreakdown/ObjectiveBonusContainer"]
+layout_mode = 2
+text = "Objective Bonus:"
+
+[node name="ObjectiveBonusValue" type="Label" parent="MainContainer/ResultsContainer/ScorePanel/ScoreBreakdown/ObjectiveBonusContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "0"
+
+[node name="PerformanceBonusContainer" type="HBoxContainer" parent="MainContainer/ResultsContainer/ScorePanel/ScoreBreakdown"]
+layout_mode = 2
+
+[node name="PerformanceBonusLabel" type="Label" parent="MainContainer/ResultsContainer/ScorePanel/ScoreBreakdown/PerformanceBonusContainer"]
+layout_mode = 2
+text = "Performance Bonus:"
+
+[node name="PerformanceBonusValue" type="Label" parent="MainContainer/ResultsContainer/ScorePanel/ScoreBreakdown/PerformanceBonusContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "0"
+
+[node name="TimeMultiplierContainer" type="HBoxContainer" parent="MainContainer/ResultsContainer/ScorePanel/ScoreBreakdown"]
+layout_mode = 2
+
+[node name="TimeMultiplierLabel" type="Label" parent="MainContainer/ResultsContainer/ScorePanel/ScoreBreakdown/TimeMultiplierContainer"]
+layout_mode = 2
+text = "Time Multiplier:"
+
+[node name="TimeMultiplierValue" type="Label" parent="MainContainer/ResultsContainer/ScorePanel/ScoreBreakdown/TimeMultiplierContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "1.0x"
+
+[node name="ScoreSeparator2" type="HSeparator" parent="MainContainer/ResultsContainer/ScorePanel/ScoreBreakdown"]
+layout_mode = 2
+
+[node name="TotalScoreContainer" type="HBoxContainer" parent="MainContainer/ResultsContainer/ScorePanel/ScoreBreakdown"]
+layout_mode = 2
+
+[node name="TotalScoreLabel" type="Label" parent="MainContainer/ResultsContainer/ScorePanel/ScoreBreakdown/TotalScoreContainer"]
+layout_mode = 2
+text = "Total Score:"
+label_settings = SubResource("LabelSettings_4")
+
+[node name="TotalScoreValue" type="Label" parent="MainContainer/ResultsContainer/ScorePanel/ScoreBreakdown/TotalScoreContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "0"
+label_settings = SubResource("LabelSettings_4")
+
+[node name="PerformancePanel" type="VBoxContainer" parent="MainContainer/ResultsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PerformanceTitle" type="Label" parent="MainContainer/ResultsContainer/PerformancePanel"]
+layout_mode = 2
+text = "Performance Metrics"
+horizontal_alignment = 1
+label_settings = SubResource("LabelSettings_3")
+
+[node name="PerformanceSeparator" type="HSeparator" parent="MainContainer/ResultsContainer/PerformancePanel"]
+layout_mode = 2
+
+[node name="PerformanceMetrics" type="VBoxContainer" parent="MainContainer/ResultsContainer/PerformancePanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="FlightTimeContainer" type="HBoxContainer" parent="MainContainer/ResultsContainer/PerformancePanel/PerformanceMetrics"]
+layout_mode = 2
+
+[node name="FlightTimeLabel" type="Label" parent="MainContainer/ResultsContainer/PerformancePanel/PerformanceMetrics/FlightTimeContainer"]
+layout_mode = 2
+text = "Flight Time:"
+
+[node name="FlightTimeValue" type="Label" parent="MainContainer/ResultsContainer/PerformancePanel/PerformanceMetrics/FlightTimeContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "00:00:00"
+
+[node name="KillsContainer" type="HBoxContainer" parent="MainContainer/ResultsContainer/PerformancePanel/PerformanceMetrics"]
+layout_mode = 2
+
+[node name="KillsLabel" type="Label" parent="MainContainer/ResultsContainer/PerformancePanel/PerformanceMetrics/KillsContainer"]
+layout_mode = 2
+text = "Kills:"
+
+[node name="KillsValue" type="Label" parent="MainContainer/ResultsContainer/PerformancePanel/PerformanceMetrics/KillsContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "0"
+
+[node name="AccuracyContainer" type="HBoxContainer" parent="MainContainer/ResultsContainer/PerformancePanel/PerformanceMetrics"]
+layout_mode = 2
+
+[node name="AccuracyLabel" type="Label" parent="MainContainer/ResultsContainer/PerformancePanel/PerformanceMetrics/AccuracyContainer"]
+layout_mode = 2
+text = "Accuracy:"
+
+[node name="AccuracyValue" type="Label" parent="MainContainer/ResultsContainer/PerformancePanel/PerformanceMetrics/AccuracyContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "0%"
+
+[node name="DamageDealtContainer" type="HBoxContainer" parent="MainContainer/ResultsContainer/PerformancePanel/PerformanceMetrics"]
+layout_mode = 2
+
+[node name="DamageDealtLabel" type="Label" parent="MainContainer/ResultsContainer/PerformancePanel/PerformanceMetrics/DamageDealtContainer"]
+layout_mode = 2
+text = "Damage Dealt:"
+
+[node name="DamageDealtValue" type="Label" parent="MainContainer/ResultsContainer/PerformancePanel/PerformanceMetrics/DamageDealtContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "0"
+
+[node name="DamageTakenContainer" type="HBoxContainer" parent="MainContainer/ResultsContainer/PerformancePanel/PerformanceMetrics"]
+layout_mode = 2
+
+[node name="DamageTakenLabel" type="Label" parent="MainContainer/ResultsContainer/PerformancePanel/PerformanceMetrics/DamageTakenContainer"]
+layout_mode = 2
+text = "Damage Taken:"
+
+[node name="DamageTakenValue" type="Label" parent="MainContainer/ResultsContainer/PerformancePanel/PerformanceMetrics/DamageTakenContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "0"
+
+[node name="EfficiencyContainer" type="HBoxContainer" parent="MainContainer/ResultsContainer/PerformancePanel/PerformanceMetrics"]
+layout_mode = 2
+
+[node name="EfficiencyLabel" type="Label" parent="MainContainer/ResultsContainer/PerformancePanel/PerformanceMetrics/EfficiencyContainer"]
+layout_mode = 2
+text = "Efficiency Rating:"
+
+[node name="EfficiencyValue" type="Label" parent="MainContainer/ResultsContainer/PerformancePanel/PerformanceMetrics/EfficiencyContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "C"
+
+[node name="ButtonContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="DetailedStatsButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "Detailed Statistics"
+
+[node name="SaveReplayButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "Save Replay"
+
+[node name="Spacer" type="Control" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ContinueButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "Continue to Debriefing"
+
+[node name="LoadingOverlay" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+visible = false
+
+[node name="LoadingBackground" type="ColorRect" parent="LoadingOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.5)
+
+[node name="LoadingContent" type="VBoxContainer" parent="LoadingOverlay"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -50.0
+offset_right = 100.0
+offset_bottom = 50.0
+
+[node name="LoadingLabel" type="Label" parent="LoadingOverlay/LoadingContent"]
+layout_mode = 2
+text = "Analyzing Mission Results..."
+horizontal_alignment = 1
+
+[node name="LoadingProgress" type="ProgressBar" parent="LoadingOverlay/LoadingContent"]
+layout_mode = 2
+value = 0.0
+
+[sub_resource type="LabelSettings" id="LabelSettings_1"]
+font_size = 24
+
+[sub_resource type="LabelSettings" id="LabelSettings_2"]
+font_size = 18
+font_color = Color(1, 1, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_3"]
+font_size = 16
+
+[sub_resource type="LabelSettings" id="LabelSettings_4"]
+font_size = 18
+font_color = Color(0, 1, 0, 1)

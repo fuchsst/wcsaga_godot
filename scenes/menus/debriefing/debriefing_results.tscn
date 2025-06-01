@@ -1,0 +1,277 @@
+[gd_scene load_steps=2 format=3 uid="uid://b6j9k8nr5l4ws"]
+
+[ext_resource type="Script" path="res://scenes/menus/debriefing/debriefing_display_controller.gd" id="1_y5k7m"]
+
+[node name="DebriefingResults" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_y5k7m")
+
+[node name="BackgroundPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="MainContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 50.0
+offset_top = 50.0
+offset_right = -50.0
+offset_bottom = -50.0
+
+[node name="HeaderContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="MissionTitleLabel" type="Label" parent="MainContainer/HeaderContainer"]
+layout_mode = 2
+text = "Mission Debriefing"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="MissionResultLabel" type="Label" parent="MainContainer/HeaderContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "MISSION SUCCESSFUL"
+label_settings = SubResource("LabelSettings_2")
+
+[node name="HSeparator" type="HSeparator" parent="MainContainer"]
+layout_mode = 2
+
+[node name="ContentContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LeftPanel" type="VBoxContainer" parent="MainContainer/ContentContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ObjectivesGroup" type="VBoxContainer" parent="MainContainer/ContentContainer/LeftPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ObjectivesTitle" type="Label" parent="MainContainer/ContentContainer/LeftPanel/ObjectivesGroup"]
+layout_mode = 2
+text = "Mission Objectives"
+horizontal_alignment = 1
+label_settings = SubResource("LabelSettings_3")
+
+[node name="ObjectivesList" type="VBoxContainer" parent="MainContainer/ContentContainer/LeftPanel/ObjectivesGroup"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PerformanceGroup" type="VBoxContainer" parent="MainContainer/ContentContainer/LeftPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PerformanceTitle" type="Label" parent="MainContainer/ContentContainer/LeftPanel/PerformanceGroup"]
+layout_mode = 2
+text = "Performance Summary"
+horizontal_alignment = 1
+label_settings = SubResource("LabelSettings_3")
+
+[node name="PerformanceList" type="VBoxContainer" parent="MainContainer/ContentContainer/LeftPanel/PerformanceGroup"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CenterPanel" type="VBoxContainer" parent="MainContainer/ContentContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="StatisticsGroup" type="VBoxContainer" parent="MainContainer/ContentContainer/CenterPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="StatisticsTitle" type="Label" parent="MainContainer/ContentContainer/CenterPanel/StatisticsGroup"]
+layout_mode = 2
+text = "Mission Statistics"
+horizontal_alignment = 1
+label_settings = SubResource("LabelSettings_3")
+
+[node name="StatisticsTabs" type="TabContainer" parent="MainContainer/ContentContainer/CenterPanel/StatisticsGroup"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MissionStats" type="ScrollContainer" parent="MainContainer/ContentContainer/CenterPanel/StatisticsGroup/StatisticsTabs"]
+layout_mode = 2
+
+[node name="MissionStatsList" type="VBoxContainer" parent="MainContainer/ContentContainer/CenterPanel/StatisticsGroup/StatisticsTabs/MissionStats"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CombatStats" type="ScrollContainer" parent="MainContainer/ContentContainer/CenterPanel/StatisticsGroup/StatisticsTabs"]
+layout_mode = 2
+
+[node name="CombatStatsList" type="VBoxContainer" parent="MainContainer/ContentContainer/CenterPanel/StatisticsGroup/StatisticsTabs/CombatStats"]
+label_layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AccuracyStats" type="ScrollContainer" parent="MainContainer/ContentContainer/CenterPanel/StatisticsGroup/StatisticsTabs"]
+layout_mode = 2
+
+[node name="AccuracyStatsList" type="VBoxContainer" parent="MainContainer/ContentContainer/CenterPanel/StatisticsGroup/StatisticsTabs/AccuracyStats"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RightPanel" type="VBoxContainer" parent="MainContainer/ContentContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AwardsGroup" type="VBoxContainer" parent="MainContainer/ContentContainer/RightPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="AwardsTitle" type="Label" parent="MainContainer/ContentContainer/RightPanel/AwardsGroup"]
+layout_mode = 2
+text = "Awards & Recognition"
+horizontal_alignment = 1
+label_settings = SubResource("LabelSettings_3")
+
+[node name="AwardsContainer" type="VBoxContainer" parent="MainContainer/ContentContainer/RightPanel/AwardsGroup"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MedalDisplay" type="GridContainer" parent="MainContainer/ContentContainer/RightPanel/AwardsGroup/AwardsContainer"]
+layout_mode = 2
+columns = 2
+
+[node name="PromotionDisplay" type="VBoxContainer" parent="MainContainer/ContentContainer/RightPanel/AwardsGroup/AwardsContainer"]
+layout_mode = 2
+
+[node name="ProgressionGroup" type="VBoxContainer" parent="MainContainer/ContentContainer/RightPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ProgressionTitle" type="Label" parent="MainContainer/ContentContainer/RightPanel/ProgressionGroup"]
+layout_mode = 2
+text = "Pilot Progression"
+horizontal_alignment = 1
+label_settings = SubResource("LabelSettings_3")
+
+[node name="ProgressionInfo" type="VBoxContainer" parent="MainContainer/ContentContainer/RightPanel/ProgressionGroup"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="RankProgress" type="VBoxContainer" parent="MainContainer/ContentContainer/RightPanel/ProgressionGroup/ProgressionInfo"]
+layout_mode = 2
+
+[node name="RankProgressLabel" type="Label" parent="MainContainer/ContentContainer/RightPanel/ProgressionGroup/ProgressionInfo/RankProgress"]
+layout_mode = 2
+text = "Rank Progress"
+horizontal_alignment = 1
+
+[node name="RankProgressBar" type="ProgressBar" parent="MainContainer/ContentContainer/RightPanel/ProgressionGroup/ProgressionInfo/RankProgress"]
+layout_mode = 2
+value = 0.0
+show_percentage = false
+
+[node name="RankProgressText" type="Label" parent="MainContainer/ContentContainer/RightPanel/ProgressionGroup/ProgressionInfo/RankProgress"]
+layout_mode = 2
+text = "Progress to next rank: 0 points"
+horizontal_alignment = 1
+
+[node name="ScoreProgress" type="VBoxContainer" parent="MainContainer/ContentContainer/RightPanel/ProgressionGroup/ProgressionInfo"]
+layout_mode = 2
+
+[node name="ScoreProgressLabel" type="Label" parent="MainContainer/ContentContainer/RightPanel/ProgressionGroup/ProgressionInfo/ScoreProgress"]
+layout_mode = 2
+text = "Mission Score"
+horizontal_alignment = 1
+
+[node name="ScoreValue" type="Label" parent="MainContainer/ContentContainer/RightPanel/ProgressionGroup/ProgressionInfo/ScoreProgress"]
+layout_mode = 2
+text = "0 points"
+horizontal_alignment = 1
+label_settings = SubResource("LabelSettings_4")
+
+[node name="ButtonContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="ReplayButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "Replay Mission"
+
+[node name="ViewStatsButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "View Full Statistics"
+
+[node name="Spacer" type="Control" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ContinueButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "Continue Campaign"
+
+[node name="AcceptButton" type="Button" parent="MainContainer/ButtonContainer"]
+layout_mode = 2
+text = "Accept"
+
+[node name="AwardCeremony" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+visible = false
+
+[node name="CeremonyBackground" type="ColorRect" parent="AwardCeremony"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.8)
+
+[node name="CeremonyContent" type="VBoxContainer" parent="AwardCeremony"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -150.0
+offset_right = 200.0
+offset_bottom = 150.0
+
+[node name="CeremonyTitle" type="Label" parent="AwardCeremony/CeremonyContent"]
+layout_mode = 2
+text = "Congratulations!"
+horizontal_alignment = 1
+label_settings = SubResource("LabelSettings_1")
+
+[node name="CeremonyDescription" type="RichTextLabel" parent="AwardCeremony/CeremonyContent"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[center]You have earned a medal![/center]"
+fit_content = true
+
+[node name="CeremonyMedal" type="TextureRect" parent="AwardCeremony/CeremonyContent"]
+layout_mode = 2
+custom_minimum_size = Vector2(64, 64)
+size_flags_horizontal = 4
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CeremonyContinue" type="Button" parent="AwardCeremony/CeremonyContent"]
+layout_mode = 2
+text = "Continue"
+
+[sub_resource type="LabelSettings" id="LabelSettings_1"]
+font_size = 24
+
+[sub_resource type="LabelSettings" id="LabelSettings_2"]
+font_size = 20
+font_color = Color(0, 1, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_3"]
+font_size = 16
+
+[sub_resource type="LabelSettings" id="LabelSettings_4"]
+font_size = 20
+font_color = Color(1, 1, 0, 1)
