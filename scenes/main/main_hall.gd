@@ -1,28 +1,33 @@
+class_name MainHallController
 extends Control
+
+## Legacy main hall controller - DEPRECATED
+## This controller is being replaced by the new EPIC-006 menu system.
+## Use MainMenuController from scenes/menus/main_menu/ for new implementations.
 
 # Sound configuration
 @export var sounds: GameSounds
 
 # Sound indices from tbl file
-const DOOR_OPEN_SOUND = 23
-const DOOR_CLOSE_SOUND = 24
-const HOTSPOT_ON_SOUND = 36
-const HOTSPOT_OFF_SOUND = 37
-const AMBIENT_LOOP_SOUND = 38
+const DOOR_OPEN_SOUND: int = 23
+const DOOR_CLOSE_SOUND: int = 24
+const HOTSPOT_ON_SOUND: int = 36
+const HOTSPOT_OFF_SOUND: int = 37
+const AMBIENT_LOOP_SOUND: int = 38
 
 # Intercom sound configuration
-const INTERCOM_MIN_DELAY = 30000  # 30 seconds
-const INTERCOM_MAX_DELAY = 45000  # 45 seconds
-const INTERCOM_SOUNDS = [44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61]
+const INTERCOM_MIN_DELAY: int = 30000  # 30 seconds
+const INTERCOM_MAX_DELAY: int = 45000  # 45 seconds
+const INTERCOM_SOUNDS: Array[int] = [44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61]
 
 # Animation states
 enum DoorState {CLOSED, OPENING, OPEN, CLOSING}
-var door_states = {}
+var door_states: Dictionary = {}
 
 # Sound handles
-var ambient_loop_handle = -1
-var intercom_sound_handle = -1
-var door_sound_handles = {}
+var ambient_loop_handle: int = -1
+var intercom_sound_handle: int = -1
+var door_sound_handles: Dictionary = {}
 
 # Current mouse region
 var current_mouse_region = null
@@ -162,13 +167,39 @@ func _on_exit_pressed() -> void:
 	get_tree().quit()
 
 func _transition_to_scene(scene_key: String) -> void:
+	"""Transition to scene using GameStateManager integration."""
 	# Let door animation and sound finish before transitioning
 	await get_tree().create_timer(0.5).timeout
 	
-	SceneManager.change_scene(scene_key,
-		SceneManager.create_options(0.5, "fade"),
-		SceneManager.create_options(0.5, "fade"),
-		SceneManager.create_general_options(Color.BLACK))
+	# Use GameStateManager for state transitions (EPIC-006 pattern)
+	if GameStateManager:
+		# Map legacy scene keys to GameState enum values
+		var target_state: GameStateManager.GameState
+		match scene_key:
+			"barracks":
+				target_state = GameStateManager.GameState.MAIN_MENU  # Will need proper barracks state
+			"briefing":
+				target_state = GameStateManager.GameState.BRIEFING
+			"tech_room":
+				target_state = GameStateManager.GameState.MAIN_MENU  # Will need proper tech room state
+			"options":
+				target_state = GameStateManager.GameState.OPTIONS
+			"campaign":
+				target_state = GameStateManager.GameState.CAMPAIGN_MENU
+			_:
+				push_warning("MainHallController: Unknown scene key: %s" % scene_key)
+				return
+		
+		GameStateManager.change_state(target_state)
+	else:
+		# Fallback to direct SceneManager usage
+		if SceneManager and SceneManager.has_method("change_scene"):
+			SceneManager.change_scene(scene_key,
+				SceneManager.create_options(0.5, "fade"),
+				SceneManager.create_options(0.5, "fade"),
+				SceneManager.create_general_options(Color.BLACK))
+		else:
+			push_error("MainHallController: Neither GameStateManager nor SceneManager available")
 
 func _on_barracks_pressed() -> void:
 	_transition_to_scene("barracks")
