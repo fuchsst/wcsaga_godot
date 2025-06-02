@@ -6,6 +6,10 @@ extends Node
 ## This manager replaces the original WCS main loop state machine with a 
 ## Godot-native implementation using signals and proper scene management.
 
+# EPIC-007 Enhanced transition system imports
+const EnhancedTransitionManager = preload("res://scripts/core/game_flow/state_management/enhanced_transition_manager.gd")
+const StateValidator = preload("res://scripts/core/game_flow/state_management/state_validator.gd")
+
 signal state_changed(old_state: GameState, new_state: GameState)
 signal state_transition_started(target_state: GameState)
 signal state_transition_completed(final_state: GameState)
@@ -14,6 +18,7 @@ signal manager_shutdown()
 signal critical_error(error_message: String)
 
 enum GameState {
+	# Core menu and navigation states (existing)
 	MAIN_MENU,
 	BRIEFING,
 	MISSION,
@@ -22,7 +27,15 @@ enum GameState {
 	CAMPAIGN_MENU,
 	LOADING,
 	FRED_EDITOR,
-	SHUTDOWN
+	SHUTDOWN,
+	
+	# Enhanced game flow states for EPIC-007
+	PILOT_SELECTION,     # Pilot management and selection
+	SHIP_SELECTION,      # Ship and loadout selection 
+	MISSION_COMPLETE,    # Mission completion processing
+	CAMPAIGN_COMPLETE,   # Campaign completion state
+	STATISTICS_REVIEW,   # Statistics and achievements review
+	SAVE_GAME_MENU       # Save/load interface
 }
 
 # Configuration
@@ -95,6 +108,7 @@ func _validate_configuration() -> bool:
 func _initialize_scene_map() -> void:
 	# Map game states to their corresponding scene paths
 	scene_map = {
+		# Core states (existing)
 		GameState.MAIN_MENU: "res://scenes/ui/main_menu.tscn",
 		GameState.BRIEFING: "res://scenes/ui/briefing.tscn", 
 		GameState.MISSION: "res://scenes/gameplay/mission.tscn",
@@ -102,7 +116,15 @@ func _initialize_scene_map() -> void:
 		GameState.OPTIONS: "res://scenes/ui/options.tscn",
 		GameState.CAMPAIGN_MENU: "res://scenes/ui/campaign_menu.tscn",
 		GameState.LOADING: "res://scenes/ui/loading.tscn",
-		GameState.FRED_EDITOR: "res://scenes/tools/fred_editor.tscn"
+		GameState.FRED_EDITOR: "res://scenes/tools/fred_editor.tscn",
+		
+		# Enhanced game flow states (EPIC-007)
+		GameState.PILOT_SELECTION: "res://scenes/ui/pilot_selection.tscn",
+		GameState.SHIP_SELECTION: "res://scenes/ui/ship_selection.tscn",
+		GameState.MISSION_COMPLETE: "res://scenes/ui/mission_complete.tscn",
+		GameState.CAMPAIGN_COMPLETE: "res://scenes/ui/campaign_complete.tscn",
+		GameState.STATISTICS_REVIEW: "res://scenes/ui/statistics_review.tscn",
+		GameState.SAVE_GAME_MENU: "res://scenes/ui/save_game_menu.tscn"
 	}
 	
 	if enable_state_logging:
@@ -317,6 +339,14 @@ func _on_state_exit(state: GameState) -> void:
 			_cleanup_briefing_state()
 		GameState.FRED_EDITOR:
 			_cleanup_editor_state()
+		GameState.PILOT_SELECTION:
+			_cleanup_pilot_selection_state()
+		GameState.SHIP_SELECTION:
+			_cleanup_ship_selection_state()
+		GameState.MISSION_COMPLETE:
+			_cleanup_mission_complete_state()
+		GameState.SAVE_GAME_MENU:
+			_cleanup_save_game_menu_state()
 
 func _on_state_enter(state: GameState) -> void:
 	# Handle state-specific enter logic
@@ -327,6 +357,14 @@ func _on_state_enter(state: GameState) -> void:
 			_initialize_briefing_state()
 		GameState.FRED_EDITOR:
 			_initialize_editor_state()
+		GameState.PILOT_SELECTION:
+			_initialize_pilot_selection_state()
+		GameState.SHIP_SELECTION:
+			_initialize_ship_selection_state()
+		GameState.MISSION_COMPLETE:
+			_initialize_mission_complete_state()
+		GameState.SAVE_GAME_MENU:
+			_initialize_save_game_menu_state()
 
 func _cleanup_mission_state() -> void:
 	# Clear mission-specific data
@@ -356,17 +394,121 @@ func _initialize_editor_state() -> void:
 	# Set up FRED editor environment
 	pass
 
+# EPIC-007 Enhanced state management methods
+var enhanced_transition_manager: EnhancedTransitionManager
+
+## Enhanced transition method with validation and error recovery (EPIC-007)
+func request_enhanced_state_change(new_state: GameState, data: Dictionary = {}) -> bool:
+	if not is_initialized:
+		push_error("GameStateManager: Cannot change state - manager not initialized")
+		return false
+	
+	if is_transitioning:
+		push_warning("GameStateManager: State transition already in progress")
+		return false
+	
+	if current_state == new_state:
+		if enable_state_logging:
+			print("GameStateManager: Already in requested state: %s" % GameState.keys()[new_state])
+		return true
+	
+	# Use enhanced transition manager for validation and execution
+	if not enhanced_transition_manager:
+		enhanced_transition_manager = EnhancedTransitionManager.new()
+		_setup_enhanced_transition_signals()
+	
+	var result: EnhancedTransitionManager.EnhancedTransitionResult = await enhanced_transition_manager.execute_enhanced_transition(current_state, new_state, data)
+	
+	if not result.success:
+		push_error("GameStateManager: Enhanced transition failed: %s" % result.error_message)
+		return false
+	
+	if enable_state_logging:
+		print("GameStateManager: Enhanced transition completed in %.2fms: %s -> %s" % [result.transition_time_ms, GameState.keys()[current_state], GameState.keys()[new_state]])
+		if result.rollback_performed:
+			print("GameStateManager: Rollback was performed during transition")
+	
+	return true
+
+func _setup_enhanced_transition_signals() -> void:
+	if enhanced_transition_manager:
+		enhanced_transition_manager.transition_validation_failed.connect(_on_transition_validation_failed)
+		enhanced_transition_manager.transition_performance_warning.connect(_on_transition_performance_warning)
+		enhanced_transition_manager.transition_rollback_performed.connect(_on_transition_rollback_performed)
+
+func _on_transition_validation_failed(from_state: GameState, to_state: GameState, error_message: String) -> void:
+	push_warning("GameStateManager: Transition validation failed %s -> %s: %s" % [GameState.keys()[from_state], GameState.keys()[to_state], error_message])
+
+func _on_transition_performance_warning(transition_time_ms: float, from_state: GameState, to_state: GameState) -> void:
+	push_warning("GameStateManager: Slow transition detected %s -> %s: %.2fms" % [GameState.keys()[from_state], GameState.keys()[to_state], transition_time_ms])
+
+func _on_transition_rollback_performed(from_state: GameState, to_state: GameState, reason: String) -> void:
+	push_warning("GameStateManager: Transition rollback performed %s -> %s: %s" % [GameState.keys()[from_state], GameState.keys()[to_state], reason])
+
+func _cleanup_pilot_selection_state() -> void:
+	# Clean up pilot selection data
+	if enable_state_logging:
+		print("GameStateManager: Cleaning up pilot selection state")
+
+func _cleanup_ship_selection_state() -> void:
+	# Clean up ship selection data
+	if enable_state_logging:
+		print("GameStateManager: Cleaning up ship selection state")
+	
+	# Clear ship selection data
+	set_session_data("selected_ship", null)
+	set_session_data("ship_loadout", null)
+
+func _cleanup_mission_complete_state() -> void:
+	# Clean up mission completion data
+	if enable_state_logging:
+		print("GameStateManager: Cleaning up mission complete state")
+
+func _cleanup_save_game_menu_state() -> void:
+	# Clean up save game menu data
+	if enable_state_logging:
+		print("GameStateManager: Cleaning up save game menu state")
+
+func _initialize_pilot_selection_state() -> void:
+	# Set up pilot selection environment
+	if enable_state_logging:
+		print("GameStateManager: Initializing pilot selection state")
+
+func _initialize_ship_selection_state() -> void:
+	# Set up ship selection environment
+	if enable_state_logging:
+		print("GameStateManager: Initializing ship selection state")
+
+func _initialize_mission_complete_state() -> void:
+	# Set up mission completion environment
+	if enable_state_logging:
+		print("GameStateManager: Initializing mission complete state")
+
+func _initialize_save_game_menu_state() -> void:
+	# Set up save game menu environment
+	if enable_state_logging:
+		print("GameStateManager: Initializing save game menu state")
+
 func _is_valid_transition(from_state: GameState, to_state: GameState) -> bool:
-	# Define valid state transitions
+	# Define valid state transitions including enhanced game flow
 	var valid_transitions: Dictionary = {
-		GameState.MAIN_MENU: [GameState.BRIEFING, GameState.OPTIONS, GameState.CAMPAIGN_MENU, GameState.FRED_EDITOR, GameState.SHUTDOWN],
-		GameState.BRIEFING: [GameState.MISSION, GameState.MAIN_MENU, GameState.OPTIONS],
-		GameState.MISSION: [GameState.DEBRIEF, GameState.MAIN_MENU, GameState.OPTIONS],
-		GameState.DEBRIEF: [GameState.MAIN_MENU, GameState.BRIEFING],
-		GameState.OPTIONS: [GameState.MAIN_MENU, GameState.BRIEFING, GameState.MISSION],
-		GameState.CAMPAIGN_MENU: [GameState.MAIN_MENU, GameState.BRIEFING],
+		# Core state transitions (existing)
+		GameState.MAIN_MENU: [GameState.BRIEFING, GameState.OPTIONS, GameState.CAMPAIGN_MENU, GameState.PILOT_SELECTION, GameState.SAVE_GAME_MENU, GameState.STATISTICS_REVIEW, GameState.FRED_EDITOR, GameState.SHUTDOWN],
+		GameState.BRIEFING: [GameState.MISSION, GameState.SHIP_SELECTION, GameState.MAIN_MENU, GameState.CAMPAIGN_MENU, GameState.OPTIONS],
+		GameState.MISSION: [GameState.MISSION_COMPLETE, GameState.DEBRIEF, GameState.MAIN_MENU, GameState.OPTIONS],
+		GameState.DEBRIEF: [GameState.MAIN_MENU, GameState.BRIEFING, GameState.CAMPAIGN_MENU, GameState.STATISTICS_REVIEW],
+		GameState.OPTIONS: [GameState.MAIN_MENU, GameState.BRIEFING, GameState.MISSION, GameState.PILOT_SELECTION, GameState.CAMPAIGN_MENU],
+		GameState.CAMPAIGN_MENU: [GameState.MAIN_MENU, GameState.BRIEFING, GameState.PILOT_SELECTION],
 		GameState.LOADING: [GameState.MAIN_MENU, GameState.BRIEFING, GameState.MISSION],
-		GameState.FRED_EDITOR: [GameState.MAIN_MENU]
+		GameState.FRED_EDITOR: [GameState.MAIN_MENU],
+		
+		# Enhanced game flow state transitions (EPIC-007)
+		GameState.PILOT_SELECTION: [GameState.MAIN_MENU, GameState.CAMPAIGN_MENU, GameState.STATISTICS_REVIEW],
+		GameState.SHIP_SELECTION: [GameState.BRIEFING, GameState.LOADING],
+		GameState.MISSION_COMPLETE: [GameState.DEBRIEF, GameState.CAMPAIGN_COMPLETE],
+		GameState.CAMPAIGN_COMPLETE: [GameState.MAIN_MENU, GameState.STATISTICS_REVIEW],
+		GameState.STATISTICS_REVIEW: [GameState.MAIN_MENU, GameState.PILOT_SELECTION, GameState.CAMPAIGN_MENU],
+		GameState.SAVE_GAME_MENU: [GameState.MAIN_MENU, GameState.PILOT_SELECTION, GameState.OPTIONS]
 	}
 	
 	if not valid_transitions.has(from_state):
