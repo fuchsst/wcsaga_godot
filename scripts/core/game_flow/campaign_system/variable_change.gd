@@ -6,8 +6,8 @@ extends Resource
 ## analytics, and potential rollback functionality.
 
 @export var variable_name: String = ""                    ## Name of the variable that changed
-@export var old_value: Variant                           ## Previous value before change
-@export var new_value: Variant                          ## New value after change
+@export var old_value: Variant = null                     ## Previous value before change
+@export var new_value: Variant = null                   ## New value after change
 @export var change_time: int = 0                        ## Unix timestamp when change occurred
 @export var scope: CampaignVariables.VariableScope = CampaignVariables.VariableScope.CAMPAIGN  ## Variable scope
 @export var source: String = ""                         ## Source that caused the change (script, SEXP, etc.)
