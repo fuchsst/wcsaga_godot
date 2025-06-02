@@ -332,7 +332,7 @@ func test_all_achievement_definitions_complete():
 		assert_that(definition.description).is_not_empty()
 		
 		# Verify criteria is a dictionary
-		assert_that(definition.criteria).is_instance_of(Dictionary)
+		assert_that(definition.criteria is Dictionary).is_true()
 
 func test_all_medal_definitions_complete():
 	"""Test all medal definitions have required fields"""
@@ -352,4 +352,4 @@ func test_all_medal_definitions_complete():
 		assert_that(definition.description).is_not_empty()
 		
 		# Verify criteria is a dictionary
-		assert_that(definition.criteria).is_instance_of(Dictionary)
+		assert_that(definition.criteria is Dictionary).is_true()

@@ -48,3 +48,4 @@ venv.bak/
 **/*.webm
 
 .util-scripts/
+reports/
