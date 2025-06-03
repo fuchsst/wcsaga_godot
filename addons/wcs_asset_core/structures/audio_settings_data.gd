@@ -32,7 +32,7 @@ extends BaseAssetData
 @export var subtitle_background: bool = true
 
 # Audio device settings
-@export var audio_device: String = \"Default\"
+@export var audio_device: String = "Default"
 @export var buffer_size: int = 1024  # 512, 1024, 2048, 4096
 @export var enable_audio_monitoring: bool = false
 
@@ -78,10 +78,10 @@ enum ChannelConfiguration {
 
 func _init() -> void:
 	super._init()
-	data_type = \"AudioSettingsData\"
+	self.data_type = "AudioSettingsData"
 
 func is_valid() -> bool:
-	\"\"\"Validate audio settings data integrity.\"\"\"
+	"""Validate audio settings data integrity."""
 	if not super.is_valid():
 		return false
 	
@@ -134,12 +134,12 @@ func is_valid() -> bool:
 	return true
 
 func clone() -> AudioSettingsData:
-	\"\"\"Create a deep copy of audio settings.\"\"\"
+	"""Create a deep copy of audio settings."""
 	var cloned_data: AudioSettingsData = AudioSettingsData.new()
 	
 	# Copy base properties
 	cloned_data.asset_id = asset_id
-	cloned_data.display_name = display_name
+	cloned_data.asset_name = asset_name
 	cloned_data.description = description
 	cloned_data.tags = tags.duplicate()
 	cloned_data.metadata = metadata.duplicate(true)
@@ -191,101 +191,101 @@ func clone() -> AudioSettingsData:
 	return cloned_data
 
 func get_volume_levels() -> Dictionary:
-	\"\"\"Get all volume levels as a dictionary.\"\"\"
+	"""Get all volume levels as a dictionary."""
 	return {
-		\"master\": master_volume,
-		\"music\": music_volume,
-		\"effects\": effects_volume,
-		\"voice\": voice_volume,
-		\"ambient\": ambient_volume,
-		\"ui\": ui_volume
+		"master": master_volume,
+		"music": music_volume,
+		"effects": effects_volume,
+		"voice": voice_volume,
+		"ambient": ambient_volume,
+		"ui": ui_volume
 	}
 
 func set_volume_levels(volumes: Dictionary) -> void:
-	\"\"\"Set volume levels from dictionary.\"\"\"
-	if volumes.has(\"master\"):
+	"""Set volume levels from dictionary."""
+	if volumes.has("master"):
 		master_volume = clamp(volumes.master, 0.0, 1.0)
-	if volumes.has(\"music\"):
+	if volumes.has("music"):
 		music_volume = clamp(volumes.music, 0.0, 1.0)
-	if volumes.has(\"effects\"):
+	if volumes.has("effects"):
 		effects_volume = clamp(volumes.effects, 0.0, 1.0)
-	if volumes.has(\"voice\"):
+	if volumes.has("voice"):
 		voice_volume = clamp(volumes.voice, 0.0, 1.0)
-	if volumes.has(\"ambient\"):
+	if volumes.has("ambient"):
 		ambient_volume = clamp(volumes.ambient, 0.0, 1.0)
-	if volumes.has(\"ui\"):
+	if volumes.has("ui"):
 		ui_volume = clamp(volumes.ui, 0.0, 1.0)
 
 func get_quality_preset_name(preset: AudioQualityPreset) -> String:
-	\"\"\"Get human-readable name for audio quality preset.\"\"\"
+	"""Get human-readable name for audio quality preset."""
 	match preset:
 		AudioQualityPreset.LOW:
-			return \"Low Quality\"
+			return "Low Quality"
 		AudioQualityPreset.MEDIUM:
-			return \"Medium Quality\"
+			return "Medium Quality"
 		AudioQualityPreset.HIGH:
-			return \"High Quality\"
+			return "High Quality"
 		AudioQualityPreset.ULTRA:
-			return \"Ultra Quality\"
+			return "Ultra Quality"
 		AudioQualityPreset.CUSTOM:
-			return \"Custom\"
+			return "Custom"
 		_:
-			return \"Unknown\"
+			return "Unknown"
 
 func get_sample_rate_name(rate: int) -> String:
-	\"\"\"Get human-readable name for sample rate.\"\"\"
+	"""Get human-readable name for sample rate."""
 	match rate:
 		22050:
-			return \"22.05 kHz\"
+			return "22.05 kHz"
 		44100:
-			return \"44.1 kHz (CD Quality)\"
+			return "44.1 kHz (CD Quality)"
 		48000:
-			return \"48 kHz (Studio)\"
+			return "48 kHz (Studio)"
 		96000:
-			return \"96 kHz (High-Res)\"
+			return "96 kHz (High-Res)"
 		_:
-			return str(rate) + \" Hz\"
+			return str(rate) + " Hz"
 
 func get_bit_depth_name(depth: int) -> String:
-	\"\"\"Get human-readable name for bit depth.\"\"\"
+	"""Get human-readable name for bit depth."""
 	match depth:
 		16:
-			return \"16-bit (CD Quality)\"
+			return "16-bit (CD Quality)"
 		24:
-			return \"24-bit (Studio)\"
+			return "24-bit (Studio)"
 		32:
-			return \"32-bit (High-Res)\"
+			return "32-bit (High-Res)"
 		_:
-			return str(depth) + \"-bit\"
+			return str(depth) + "-bit"
 
 func get_channel_configuration_name(channels: int) -> String:
-	\"\"\"Get human-readable name for channel configuration.\"\"\"
+	"""Get human-readable name for channel configuration."""
 	match channels:
 		1:
-			return \"Mono\"
+			return "Mono"
 		2:
-			return \"Stereo\"
+			return "Stereo"
 		6:
-			return \"5.1 Surround\"
+			return "5.1 Surround"
 		8:
-			return \"7.1 Surround\"
+			return "7.1 Surround"
 		_:
-			return str(channels) + \" Channels\"
+			return str(channels) + " Channels"
 
 func get_subtitle_size_name(size: int) -> String:
-	\"\"\"Get human-readable name for subtitle size.\"\"\"
+	"""Get human-readable name for subtitle size."""
 	match size:
 		0:
-			return \"Small\"
+			return "Small"
 		1:
-			return \"Medium\"
+			return "Medium"
 		2:
-			return \"Large\"
+			return "Large"
 		_:
-			return \"Unknown\"
+			return "Unknown"
 
 func apply_quality_preset(preset: AudioQualityPreset) -> void:
-	\"\"\"Apply predefined quality preset to audio settings.\"\"\"
+	"""Apply predefined quality preset to audio settings."""
 	match preset:
 		AudioQualityPreset.LOW:
 			sample_rate = 22050
@@ -328,7 +328,7 @@ func apply_quality_preset(preset: AudioQualityPreset) -> void:
 			dynamic_range_compression = false
 
 func get_estimated_memory_usage() -> float:
-	\"\"\"Estimate memory usage in MB based on current settings.\"\"\"
+	"""Estimate memory usage in MB based on current settings."""
 	var base_usage: float = 10.0  # Base memory for audio system
 	
 	# Sample rate impact
@@ -354,7 +354,7 @@ func get_estimated_memory_usage() -> float:
 	return base_usage
 
 func get_estimated_cpu_impact() -> String:
-	\"\"\"Get estimated CPU impact description.\"\"\"
+	"""Get estimated CPU impact description."""
 	var impact_score: int = 0
 	
 	# Sample rate impact
@@ -393,16 +393,16 @@ func get_estimated_cpu_impact() -> String:
 	
 	# Categorize impact
 	if impact_score <= 3:
-		return \"Low\"
+		return "Low"
 	elif impact_score <= 8:
-		return \"Medium\"
+		return "Medium"
 	elif impact_score <= 15:
-		return \"High\"
+		return "High"
 	else:
-		return \"Very High\"
+		return "Very High"
 
 func reset_to_defaults() -> void:
-	\"\"\"Reset all audio settings to default values.\"\"\"
+	"""Reset all audio settings to default values."""
 	master_volume = 1.0
 	music_volume = 0.8
 	effects_volume = 0.9
@@ -426,7 +426,7 @@ func reset_to_defaults() -> void:
 	subtitle_size = 1
 	subtitle_background = true
 	
-	audio_device = \"Default\"
+	audio_device = "Default"
 	buffer_size = 1024
 	enable_audio_monitoring = false
 	

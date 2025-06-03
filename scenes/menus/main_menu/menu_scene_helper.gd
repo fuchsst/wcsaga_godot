@@ -108,7 +108,7 @@ func _process(_delta: float) -> void:
 		push_warning("MenuSceneHelper: Transition time exceeded target: %.1fms" % elapsed_time)
 	
 	# Monitor memory usage
-	var current_memory: float = OS.get_static_memory_usage(false) / 1024.0 / 1024.0  # Convert to MB
+	var current_memory: float = OS.get_static_memory_usage() / 1024.0 / 1024.0  # Convert to MB
 	var memory_delta: float = current_memory - memory_usage_start
 	
 	if memory_delta > memory_limit_mb:
@@ -254,7 +254,7 @@ func _start_transition_monitoring(scene_path: String, transition_type: WCSTransi
 	is_transitioning = true
 	current_transition_type = transition_type
 	transition_start_time = Time.get_time_dict_from_system()["unix"] * 1000.0
-	memory_usage_start = OS.get_static_memory_usage(false) / 1024.0 / 1024.0  # MB
+	memory_usage_start = OS.get_static_memory_usage() / 1024.0 / 1024.0  # MB
 	
 	transition_started.emit(get_tree().current_scene.scene_file_path if get_tree().current_scene else "", 
 							scene_path, transition_type)
@@ -333,7 +333,7 @@ func get_performance_stats() -> Dictionary:
 	return {
 		"average_transition_time_ms": average_transition_time,
 		"total_transitions": transition_history.size(),
-		"current_memory_usage_mb": OS.get_static_memory_usage(false) / 1024.0 / 1024.0,
+		"current_memory_usage_mb": OS.get_static_memory_usage() / 1024.0 / 1024.0,
 		"memory_limit_mb": memory_limit_mb,
 		"performance_target_ms": max_transition_time_ms
 	}

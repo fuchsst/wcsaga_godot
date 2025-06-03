@@ -29,6 +29,8 @@ var _last_validation_time: int = 0
 var _is_validation_dirty: bool = true
 
 ## Abstract interface - must be implemented by subclasses
+func _init() -> void:
+	pass
 
 func is_valid() -> bool:
 	"""Check if the asset data is valid.
