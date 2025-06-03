@@ -4,7 +4,7 @@ extends RefCounted
 ## Godot rendering state management and optimization
 
 var current_environment: Environment
-var current_camera_effects: CameraEffects
+var current_camera_effects: CameraAttributes
 var render_layers: Dictionary = {}
 var viewport_config: Dictionary = {}
 
@@ -24,7 +24,6 @@ func configure_space_environment() -> void:
 	current_environment.ambient_light_color = Color(0.05, 0.05, 0.1)
 	
 	# Tone mapping for space visuals
-	current_environment.tonemap_mode = Environment.TONE_MAP_ACES
 	current_environment.tonemap_exposure = 1.0
 	
 	# Glow/bloom settings for energy effects
@@ -53,16 +52,22 @@ func configure_space_environment() -> void:
 
 func setup_default_environment() -> void:
 	current_environment = Environment.new()
-	current_camera_effects = CameraEffects.new()
+	current_camera_effects = CameraAttributes.new()
 
 func apply_environment_to_viewport() -> void:
-	var main_viewport: Viewport = Engine.get_main_loop() as Viewport
-	if main_viewport and current_environment:
-		main_viewport.environment = current_environment
-		print("RenderStateManager: Applied environment to main viewport")
+	var scene_tree: SceneTree = Engine.get_main_loop() as SceneTree
+	if scene_tree and current_environment:
+		var main_viewport: Window = scene_tree.get_root()
+		if main_viewport:
+			main_viewport.world_3d.environment = current_environment
+			print("RenderStateManager: Applied environment to main viewport")
 
 func configure_viewport_for_quality(quality_level: int) -> void:
-	var main_viewport: Viewport = Engine.get_main_loop() as Viewport
+	var scene_tree: SceneTree = Engine.get_main_loop() as SceneTree
+	if not scene_tree:
+		push_error("Could not get scene tree")
+		return
+	var main_viewport: Window = scene_tree.get_root()
 	if not main_viewport:
 		push_error("Could not get main viewport")
 		return
@@ -89,22 +94,22 @@ func configure_viewport_for_quality(quality_level: int) -> void:
 
 func configure_camera_effects(quality_level: int) -> void:
 	if not current_camera_effects:
-		current_camera_effects = CameraEffects.new()
+		current_camera_effects = CameraAttributes.new()
 	
-	# Configure camera effects based on quality
+	# Configure camera attributes based on quality
+	# Note: DOF effects moved to post-processing in Godot 4.4
 	match quality_level:
 		0, 1: # Low/Medium
-			current_camera_effects.dof_blur_far_enabled = false
-			current_camera_effects.dof_blur_near_enabled = false
-		2: # High
-			current_camera_effects.dof_blur_far_enabled = true
-			current_camera_effects.dof_blur_far_distance = 100.0
-			current_camera_effects.dof_blur_near_enabled = false
+			if current_camera_effects is CameraAttributesPractical:
+				(current_camera_effects as CameraAttributesPractical).auto_exposure_enabled = false
+		2: # High  
+			if current_camera_effects is CameraAttributesPractical:
+				(current_camera_effects as CameraAttributesPractical).auto_exposure_enabled = true
+				(current_camera_effects as CameraAttributesPractical).auto_exposure_speed = 0.5
 		3: # Ultra
-			current_camera_effects.dof_blur_far_enabled = true
-			current_camera_effects.dof_blur_far_distance = 150.0
-			current_camera_effects.dof_blur_near_enabled = true
-			current_camera_effects.dof_blur_near_distance = 2.0
+			if current_camera_effects is CameraAttributesPractical:
+				(current_camera_effects as CameraAttributesPractical).auto_exposure_enabled = true
+				(current_camera_effects as CameraAttributesPractical).auto_exposure_speed = 1.0
 
 func set_render_layer_visibility(layer: int, visible: bool) -> void:
 	render_layers[layer] = visible
@@ -127,7 +132,7 @@ func set_bloom_settings(enabled: bool, intensity: float, threshold: float) -> vo
 func get_current_environment() -> Environment:
 	return current_environment
 
-func get_current_camera_effects() -> CameraEffects:
+func get_current_camera_effects() -> CameraAttributes:
 	return current_camera_effects
 
 func cleanup() -> void:

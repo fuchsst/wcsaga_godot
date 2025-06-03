@@ -61,17 +61,12 @@ func update_performance_metrics() -> void:
 	var fps: float = Engine.get_frames_per_second()
 	var frame_time: float = 1000.0 / fps if fps > 0 else 0.0
 	
-	var draw_calls: int = RenderingServer.get_rendering_info(
-		RenderingServer.RENDERING_INFO_TYPE_VISIBLE,
-		RenderingServer.RENDERING_INFO_DRAW_CALLS_IN_FRAME
-	)
+	# Note: Godot 4.4 has simplified rendering info API
+	var draw_calls: int = Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)
 	
-	var vertices: int = RenderingServer.get_rendering_info(
-		RenderingServer.RENDERING_INFO_TYPE_VISIBLE,
-		RenderingServer.RENDERING_INFO_VERTICES_IN_FRAME
-	)
+	var vertices: int = Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME)
 	
-	var memory_usage: int = OS.get_static_memory_usage_by_type()
+	var memory_usage: int = Performance.get_monitor(Performance.MEMORY_STATIC)
 	
 	# Update history
 	_add_to_history(fps, frame_time, draw_calls, memory_usage)

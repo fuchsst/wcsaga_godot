@@ -1,4 +1,3 @@
-class_name GraphicsRenderingEngine
 extends Node
 
 ## Central graphics rendering engine managing all visual systems
@@ -13,19 +12,24 @@ signal quality_level_adjusted(new_quality: int)
 signal graphics_settings_changed(settings: GraphicsSettingsData)
 signal render_quality_changed(quality_level: int)
 
+# Material system signals (GR-002)
+signal material_loaded(material_name: String, material: StandardMaterial3D)
+signal material_validation_failed(material_name: String, errors: Array[String])
+signal material_cache_updated(cache_size: int, memory_usage: int)
+
 var render_state_manager: RenderStateManager
 var performance_monitor: PerformanceMonitor
 var graphics_settings: GraphicsSettingsData
 var current_quality_level: int = 2
 var is_initialized: bool = false
 
-# Graphics subsystems
+# Graphics subsystems (initialized at runtime to avoid dependency issues)
 var material_system: WCSMaterialSystem
-var shader_manager: WCSShaderManager
-var lighting_controller: WCSLightingController
-var effects_manager: WCSEffectsManager
-var texture_streamer: WCSTextureStreamer
-var model_renderer: WCSModelRenderer
+var shader_manager
+var lighting_controller
+var effects_manager
+var texture_streamer
+var model_renderer
 
 func _ready() -> void:
 	name = "GraphicsRenderingEngine"
@@ -60,12 +64,10 @@ func initialize_graphics_engine() -> void:
 func _initialize_core_components() -> void:
 	# Create core management components
 	render_state_manager = RenderStateManager.new()
-	if render_state_manager:
-		render_state_manager.name = "RenderStateManager"
+	# Note: RenderStateManager extends RefCounted, which doesn't have a 'name' property
 	
 	performance_monitor = PerformanceMonitor.new()
-	if performance_monitor:
-		performance_monitor.name = "PerformanceMonitor"
+	# Note: PerformanceMonitor extends RefCounted, which doesn't have a 'name' property
 	
 	# Connect performance monitoring signals
 	performance_monitor.performance_warning.connect(_on_performance_warning)
@@ -75,7 +77,7 @@ func _initialize_graphics_subsystems() -> void:
 	# Initialize graphics subsystems
 	print("GraphicsRenderingEngine: Initializing graphics subsystems...")
 	
-	# GR-002: Material System
+	# GR-002: Material System (IMPLEMENTED)
 	material_system = WCSMaterialSystem.new()
 	material_system.name = "WCSMaterialSystem"
 	add_child(material_system)
@@ -83,21 +85,16 @@ func _initialize_graphics_subsystems() -> void:
 	# Connect material system signals
 	material_system.material_loaded.connect(_on_material_loaded)
 	material_system.material_validation_failed.connect(_on_material_validation_failed)
+	material_system.material_cache_updated.connect(_on_material_cache_updated)
 	
-	print("GraphicsRenderingEngine: Material system initialized")
+	print("GraphicsRenderingEngine: Material system initialized with EPIC-002 integration")
 	
-	# GR-003: Shader Manager
-	shader_manager = WCSShaderManager.new()
-	shader_manager.name = "WCSShaderManager"
-	add_child(shader_manager)
+	# GR-003: Shader Manager (placeholder for future implementation)  
+	# shader_manager = WCSShaderManager.new()  # To be implemented in GR-003
+	# shader_manager.name = "WCSShaderManager"
+	# add_child(shader_manager)
 	
-	# Connect shader system signals
-	shader_manager.shader_compiled.connect(_on_shader_compiled)
-	shader_manager.shader_loading_completed.connect(_on_shader_loading_completed)
-	shader_manager.effect_created.connect(_on_effect_created)
-	shader_manager.shader_performance_warning.connect(_on_shader_performance_warning)
-	
-	print("GraphicsRenderingEngine: Shader system initialized")
+	print("GraphicsRenderingEngine: Shader system placeholder ready for GR-003")
 	
 	# TODO: Initialize other subsystems in subsequent stories
 	# GR-004: Texture Streamer  
@@ -127,7 +124,7 @@ func _load_graphics_settings() -> void:
 func _create_default_graphics_settings() -> void:
 	graphics_settings = GraphicsSettingsData.new()
 	# Default settings will be properly configured
-	current_quality_level = graphics_settings.render_quality
+	current_quality_level = _calculate_overall_quality_level()
 	
 	# Save default settings
 	var error: Error = ResourceSaver.save(graphics_settings, "user://graphics_settings.tres")
@@ -139,7 +136,7 @@ func _apply_graphics_settings() -> void:
 		push_error("No graphics settings to apply")
 		return
 	
-	current_quality_level = graphics_settings.render_quality
+	current_quality_level = _calculate_overall_quality_level()
 	
 	# Apply settings to Godot rendering
 	_configure_godot_quality_settings()
@@ -149,7 +146,7 @@ func _apply_graphics_settings() -> void:
 
 func _configure_godot_rendering() -> void:
 	# Configure Godot's rendering server for space environments
-	var rs: RenderingServer = RenderingServer
+	# RenderingServer is directly accessible without type declaration
 	
 	# Set up space rendering parameters
 	if render_state_manager:
@@ -196,13 +193,13 @@ func _apply_ultra_quality_settings() -> void:
 		graphics_settings.texture_quality = 3
 
 func _register_with_coordinator() -> void:
-	# Register with ManagerCoordinator if available
-	var coordinator: ManagerCoordinator = get_node("/root/ManagerCoordinator") as ManagerCoordinator
+	# ManagerCoordinator will automatically detect and connect to GraphicsRenderingEngine
+	# through its _connect_to_managers() method when both are ready
+	var coordinator: Node = get_node_or_null("/root/ManagerCoordinator")
 	if coordinator:
-		coordinator.register_manager("GraphicsRenderingEngine", self)
-		print("GraphicsRenderingEngine: Registered with ManagerCoordinator")
+		print("GraphicsRenderingEngine: ManagerCoordinator found - connections will be established automatically")
 	else:
-		push_warning("ManagerCoordinator not found - continuing without registration")
+		push_warning("ManagerCoordinator not found - graphics system will operate independently")
 
 func set_render_quality(quality_level: int) -> void:
 	if quality_level < 0 or quality_level > 3:
@@ -216,7 +213,7 @@ func set_render_quality(quality_level: int) -> void:
 	current_quality_level = quality_level
 	
 	if graphics_settings:
-		graphics_settings.render_quality = quality_level
+		_apply_quality_level_to_settings(quality_level)
 		_save_graphics_settings()
 	
 	_apply_graphics_settings()
@@ -276,16 +273,25 @@ func _exit_tree() -> void:
 	if is_initialized:
 		shutdown_graphics_engine()
 
-# Material System Signal Handlers
+# Material System Signal Handlers (GR-002 IMPLEMENTED)
 func _on_material_loaded(material_name: String, material: StandardMaterial3D) -> void:
 	print("GraphicsRenderingEngine: Material loaded: ", material_name)
+	material_loaded.emit(material_name, material)
 
 func _on_material_validation_failed(material_name: String, errors: Array[String]) -> void:
 	push_warning("GraphicsRenderingEngine: Material validation failed for " + material_name)
 	for error in errors:
 		push_warning("  - " + error)
+	material_validation_failed.emit(material_name, errors)
 
-# Public API for Material System
+func _on_material_cache_updated(cache_size: int, memory_usage: int) -> void:
+	material_cache_updated.emit(cache_size, memory_usage)
+	
+	# Monitor cache for performance warnings
+	if cache_size > 80:  # Warning when cache is 80% full
+		graphics_performance_warning.emit("material_cache", float(cache_size))
+
+# Public API for Material System (GR-002 IMPLEMENTED)
 func load_material(material_path: String) -> StandardMaterial3D:
 	if material_system:
 		return material_system.load_material_from_asset(material_path)
@@ -310,9 +316,9 @@ func get_material_cache_stats() -> Dictionary:
 	if material_system:
 		return material_system.get_cache_stats()
 	else:
-		return {}
+		return {"status": "not_initialized", "message": "Material system not ready"}
 
-# Shader System Signal Handlers
+# Shader System Signal Handlers (placeholder for GR-003)
 func _on_shader_compiled(shader_name: String, success: bool) -> void:
 	if success:
 		print("GraphicsRenderingEngine: Shader compiled successfully: ", shader_name)
@@ -328,52 +334,98 @@ func _on_effect_created(effect_id: String, effect_type: String) -> void:
 func _on_shader_performance_warning(shader_name: String, frame_time: float) -> void:
 	push_warning("GraphicsRenderingEngine: Shader performance warning for " + shader_name + " - frame time: " + str(frame_time) + "ms")
 
-# Public API for Shader System
+# Public API for Shader System (placeholder for GR-003)
 func create_weapon_effect(weapon_type: String, start_pos: Vector3, end_pos: Vector3, 
                          color: Color = Color.RED, intensity: float = 1.0) -> Node3D:
-	if shader_manager:
-		return shader_manager.create_weapon_effect(weapon_type, start_pos, end_pos, color, intensity)
-	else:
-		push_error("Shader system not initialized")
-		return null
+	push_warning("Shader system not yet implemented - use GR-003 implementation")
+	return null
 
 func create_shield_impact_effect(impact_pos: Vector3, shield_node: Node3D, intensity: float = 1.0) -> void:
-	if shader_manager:
-		shader_manager.create_shield_impact_effect(impact_pos, shield_node, intensity)
-	else:
-		push_error("Shader system not initialized")
+	push_warning("Shader system not yet implemented - use GR-003 implementation")
 
 func create_explosion_effect(position: Vector3, explosion_type: String, scale_factor: float = 1.0) -> Node3D:
-	if shader_manager:
-		return shader_manager.create_explosion_effect(position, explosion_type, scale_factor)
-	else:
-		push_error("Shader system not initialized")
-		return null
+	push_warning("Shader system not yet implemented - use GR-003 implementation")
+	return null
 
 func create_engine_trail_effect(ship_node: Node3D, engine_points: Array[Vector3], 
                                trail_color: Color = Color.CYAN, intensity: float = 1.0) -> Array[Node3D]:
-	if shader_manager:
-		return shader_manager.create_engine_trail_effect(ship_node, engine_points, trail_color, intensity)
-	else:
-		push_error("Shader system not initialized")
-		return []
+	push_warning("Shader system not yet implemented - use GR-003 implementation")
+	return []
 
 func get_shader(shader_name: String) -> Shader:
-	if shader_manager:
-		return shader_manager.get_shader(shader_name)
-	else:
-		push_error("Shader system not initialized")
-		return null
+	push_warning("Shader system not yet implemented - use GR-003 implementation")
+	return null
 
 func create_material_with_shader(shader_name: String, parameters: Dictionary = {}) -> ShaderMaterial:
-	if shader_manager:
-		return shader_manager.create_material_with_shader(shader_name, parameters)
-	else:
-		push_error("Shader system not initialized")
-		return null
+	push_warning("Shader system not yet implemented - use GR-003 implementation")
+	return null
 
 func get_shader_cache_stats() -> Dictionary:
-	if shader_manager:
-		return shader_manager.get_shader_cache_stats()
-	else:
-		return {}
+	return {"status": "not_implemented", "message": "Shader system will be implemented in GR-003"}
+
+# Helper methods for GraphicsSettingsData integration
+
+func _calculate_overall_quality_level() -> int:
+	"""Calculate overall quality level from individual quality settings."""
+	if not graphics_settings:
+		return 2  # Default to medium quality
+	
+	# Average the individual quality settings
+	var total_quality: int = (
+		graphics_settings.texture_quality +
+		graphics_settings.shadow_quality +
+		graphics_settings.effects_quality +
+		graphics_settings.model_quality +
+		graphics_settings.shader_quality
+	)
+	
+	return mini(3, maxi(0, total_quality / 5))
+
+func _apply_quality_level_to_settings(quality_level: int) -> void:
+	"""Apply overall quality level to individual graphics settings."""
+	if not graphics_settings:
+		return
+	
+	match quality_level:
+		0:  # Low quality
+			graphics_settings.texture_quality = 1
+			graphics_settings.shadow_quality = 0
+			graphics_settings.effects_quality = 1
+			graphics_settings.model_quality = 1
+			graphics_settings.shader_quality = 1
+			graphics_settings.particle_density = 0.3
+			graphics_settings.antialiasing_enabled = false
+			graphics_settings.bloom_enabled = false
+		1:  # Medium quality
+			graphics_settings.texture_quality = 2
+			graphics_settings.shadow_quality = 1
+			graphics_settings.effects_quality = 2
+			graphics_settings.model_quality = 2
+			graphics_settings.shader_quality = 2
+			graphics_settings.particle_density = 0.6
+			graphics_settings.antialiasing_enabled = true
+			graphics_settings.antialiasing_level = 1
+			graphics_settings.bloom_enabled = true
+		2:  # High quality
+			graphics_settings.texture_quality = 3
+			graphics_settings.shadow_quality = 2
+			graphics_settings.effects_quality = 3
+			graphics_settings.model_quality = 3
+			graphics_settings.shader_quality = 3
+			graphics_settings.particle_density = 0.8
+			graphics_settings.antialiasing_enabled = true
+			graphics_settings.antialiasing_level = 2
+			graphics_settings.bloom_enabled = true
+			graphics_settings.screen_space_reflections = true
+		3:  # Ultra quality
+			graphics_settings.texture_quality = 4
+			graphics_settings.shadow_quality = 3
+			graphics_settings.effects_quality = 4
+			graphics_settings.model_quality = 4
+			graphics_settings.shader_quality = 4
+			graphics_settings.particle_density = 1.0
+			graphics_settings.antialiasing_enabled = true
+			graphics_settings.antialiasing_level = 3
+			graphics_settings.bloom_enabled = true
+			graphics_settings.screen_space_reflections = true
+			graphics_settings.screen_space_ambient_occlusion = true

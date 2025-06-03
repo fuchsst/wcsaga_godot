@@ -12,7 +12,8 @@ var required_managers: Array[String] = [
 	"ObjectManager",
 	"GameStateManager", 
 	"PhysicsManager",
-	"InputManager"
+	"InputManager",
+	"GraphicsRenderingEngine"
 ]
 
 var manager_ready_count: int = 0
@@ -45,6 +46,12 @@ func _connect_to_managers() -> void:
 		InputManager.manager_initialized.connect(_on_manager_initialized.bind("InputManager"))
 		InputManager.critical_error.connect(_on_manager_critical_error.bind("InputManager"))
 		InputManager.input_action_triggered.connect(_on_input_action)
+	
+	if GraphicsRenderingEngine:
+		GraphicsRenderingEngine.graphics_engine_initialized.connect(_on_manager_initialized.bind("GraphicsRenderingEngine"))
+		GraphicsRenderingEngine.critical_graphics_error.connect(_on_manager_critical_error.bind("GraphicsRenderingEngine"))
+		GraphicsRenderingEngine.graphics_performance_warning.connect(_on_graphics_performance_warning)
+		GraphicsRenderingEngine.quality_level_adjusted.connect(_on_graphics_quality_adjusted)
 	
 	# Set up inter-manager connections
 	_setup_inter_manager_signals()
@@ -162,6 +169,37 @@ func _take_screenshot() -> void:
 	
 	image.save_png(filename)
 	print("ManagerCoordinator: Screenshot saved: %s" % filename)
+
+func _on_graphics_performance_warning(system: String, metric: float) -> void:
+	# Handle graphics performance warnings
+	print("ManagerCoordinator: Graphics performance warning from %s - metric: %.2f" % [system, metric])
+	
+	# Could trigger automatic quality adjustments or alerts
+	match system:
+		"framerate":
+			if metric < 30.0:
+				print("ManagerCoordinator: Critical framerate drop detected")
+		"memory":
+			if metric > 80.0:  # Percentage
+				print("ManagerCoordinator: High graphics memory usage detected")
+		"draw_calls":
+			if metric > 2000:
+				print("ManagerCoordinator: High draw call count detected")
+
+func _on_graphics_quality_adjusted(new_quality: int) -> void:
+	# Handle automatic graphics quality adjustments
+	print("ManagerCoordinator: Graphics quality automatically adjusted to level %d" % new_quality)
+	
+	# Could save the new quality setting or notify other systems
+	if GameStateManager:
+		# Inform other systems about quality changes that might affect performance
+		match new_quality:
+			0, 1:  # Low quality
+				# Could reduce particle effects, simplify physics, etc.
+				pass
+			2, 3:  # High/Ultra quality
+				# Could enable advanced features, increase update rates, etc.
+				pass
 
 # Debug and diagnostics
 

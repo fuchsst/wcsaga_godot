@@ -45,6 +45,10 @@ enum Type {
 	WEAPON_TEXTURE = 502,
 	EFFECT_TEXTURE = 503,
 	UI_TEXTURE = 504,
+	MATERIAL = 510,
+	SHIP_MATERIAL = 511,
+	WEAPON_MATERIAL = 512,
+	EFFECT_MATERIAL = 513,
 	
 	# Audio assets
 	AUDIO = 600,
@@ -130,6 +134,10 @@ static var TYPE_NAMES: Dictionary = {
 	Type.WEAPON_TEXTURE: "Weapon Texture",
 	Type.EFFECT_TEXTURE: "Effect Texture",
 	Type.UI_TEXTURE: "UI Texture",
+	Type.MATERIAL: "Material",
+	Type.SHIP_MATERIAL: "Ship Material",
+	Type.WEAPON_MATERIAL: "Weapon Material",
+	Type.EFFECT_MATERIAL: "Effect Material",
 	
 	# Audio
 	Type.AUDIO: "Audio",
@@ -203,6 +211,10 @@ static var TYPE_CATEGORIES: Dictionary = {
 	Type.WEAPON_TEXTURE: Category.VISUAL,
 	Type.EFFECT_TEXTURE: Category.VISUAL,
 	Type.UI_TEXTURE: Category.VISUAL,
+	Type.MATERIAL: Category.VISUAL,
+	Type.SHIP_MATERIAL: Category.VISUAL,
+	Type.WEAPON_MATERIAL: Category.VISUAL,
+	Type.EFFECT_MATERIAL: Category.VISUAL,
 	
 	# Audio
 	Type.AUDIO: Category.AUDIO,

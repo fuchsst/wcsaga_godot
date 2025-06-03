@@ -55,7 +55,7 @@ enum FullscreenMode {
 func _init() -> void:
 	"""Initialize graphics settings data."""
 	super()
-	asset_type = "graphics_settings"
+	asset_type = AssetTypes.Type.BASE_ASSET
 	_set_default_values()
 
 func _set_default_values() -> void:
@@ -67,65 +67,52 @@ func _set_default_values() -> void:
 # VALIDATION
 # ============================================================================
 
-func is_valid() -> bool:
-	"""Check if graphics settings are valid."""
-	if not super.is_valid():
-		return false
+func get_validation_errors() -> Array[String]:
+	"""Check if graphics settings are valid and return any errors."""
+	var errors: Array[String] = super.get_validation_errors()
 	
 	# Validate resolution
 	if resolution_width <= 0 or resolution_height <= 0:
-		validation_errors.append("Invalid resolution dimensions")
-		return false
+		errors.append("Invalid resolution dimensions")
 	
 	if resolution_width < 640 or resolution_height < 480:
-		validation_errors.append("Resolution too small (minimum 640x480)")
-		return false
+		errors.append("Resolution too small (minimum 640x480)")
 	
 	# Validate quality settings
 	if not _is_in_range(texture_quality, 0, 4):
-		validation_errors.append("Texture quality out of range (0-4)")
-		return false
+		errors.append("Texture quality out of range (0-4)")
 	
 	if not _is_in_range(shadow_quality, 0, 4):
-		validation_errors.append("Shadow quality out of range (0-4)")
-		return false
+		errors.append("Shadow quality out of range (0-4)")
 	
 	if not _is_in_range(effects_quality, 0, 4):
-		validation_errors.append("Effects quality out of range (0-4)")
-		return false
+		errors.append("Effects quality out of range (0-4)")
 	
 	if not _is_in_range(model_quality, 0, 4):
-		validation_errors.append("Model quality out of range (0-4)")
-		return false
+		errors.append("Model quality out of range (0-4)")
 	
 	# Validate anti-aliasing
 	if not _is_in_range(antialiasing_level, 1, 3):
-		validation_errors.append("Anti-aliasing level out of range (1-3)")
-		return false
+		errors.append("Anti-aliasing level out of range (1-3)")
 	
 	# Validate frame rate
 	if max_fps < 0:
-		validation_errors.append("Invalid frame rate limit (must be >= 0)")
-		return false
+		errors.append("Invalid frame rate limit (must be >= 0)")
 	
 	if max_fps > 0 and max_fps < 30:
-		validation_errors.append("Frame rate limit too low (minimum 30 FPS)")
-		return false
+		errors.append("Frame rate limit too low (minimum 30 FPS)")
 	
 	# Validate performance settings
 	if not _is_in_range(particle_density, 0.1, 2.0):
-		validation_errors.append("Particle density out of range (0.1-2.0)")
-		return false
+		errors.append("Particle density out of range (0.1-2.0)")
 	
 	if not _is_in_range(draw_distance, 0.5, 2.0):
-		validation_errors.append("Draw distance out of range (0.5-2.0)")
-		return false
+		errors.append("Draw distance out of range (0.5-2.0)")
 	
 	if not _is_in_range(level_of_detail_bias, 0.5, 2.0):
-		validation_errors.append("LOD bias out of range (0.5-2.0)")
-		return false
+		errors.append("LOD bias out of range (0.5-2.0)")
 	
-	return true
+	return errors
 
 func _is_in_range(value: float, min_val: float, max_val: float) -> bool:
 	"""Check if value is within range."""

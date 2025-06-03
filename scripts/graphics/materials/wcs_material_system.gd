@@ -244,7 +244,7 @@ func _apply_shield_material_enhancements(material: StandardMaterial3D, material_
 func _apply_effect_material_enhancements(material: StandardMaterial3D, material_data: MaterialData) -> void:
 	# Effect materials are typically additive and bright
 	if material_data.blend_mode == "ADD":
-		material.blend_mode = BaseMaterial3D.BLEND_ADD
+		material.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
 	
 	# Effects are usually unshaded
 	material.flags_unshaded = true
@@ -266,7 +266,7 @@ func get_material(material_name: String) -> StandardMaterial3D:
 			return cached_material
 	
 	# Try discovering material by name through asset registry
-	var material_paths: Array[String] = WCSAssetRegistry.search_assets(material_name, "MaterialData")
+	var material_paths: Array[String] = WCSAssetRegistry.search_assets(material_name, AssetTypes.Type.MATERIAL)
 	if not material_paths.is_empty():
 		return load_material_from_asset(material_paths[0])
 	
@@ -329,7 +329,7 @@ func create_fallback_material(material_type: MaterialData.MaterialType) -> Stand
 			fallback.emission_enabled = true
 			fallback.emission = Color.WHITE
 			fallback.emission_energy = 3.0
-			fallback.blend_mode = BaseMaterial3D.BLEND_ADD
+			fallback.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
 			fallback.flags_unshaded = true
 		_:
 			fallback.albedo_color = Color.MAGENTA  # Obvious error material
