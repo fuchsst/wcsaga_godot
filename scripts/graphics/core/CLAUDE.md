@@ -98,7 +98,7 @@ monitor.quality_adjustment_needed.connect(_on_quality_adjustment)
 ## Testing Notes
 
 ### Unit Test Status
-⚠️ **Known Issue**: Unit tests encounter class registration conflicts with existing project structure. This is a testing infrastructure limitation, not a functional issue.
+✅ **Resolved**: Autoload singleton conflict resolved by removing class_name declaration from graphics_rendering_engine.gd since it's used as a singleton.
 
 **Test Files Created**:
 - `tests/scripts/graphics/core/test_graphics_integration.gd` - Basic integration tests
@@ -106,7 +106,7 @@ monitor.quality_adjustment_needed.connect(_on_quality_adjustment)
 - `tests/scripts/graphics/core/test_graphics_rendering_engine.gd` - Engine functionality tests
 - `tests/scripts/graphics/core/test_performance_monitor.gd` - Performance monitoring tests
 
-**Manual Testing**: Core functionality verified through project startup and basic operations.
+**Manual Testing**: Core functionality verified through project startup and basic operations. Engine initializes successfully as autoload singleton.
 
 ### Future Testing
 Integration tests will be more reliable once full graphics subsystem is implemented and integrated into scene tree.

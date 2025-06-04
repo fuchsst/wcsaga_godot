@@ -1,4 +1,3 @@
-class_name GraphicsRenderingEngine
 extends Node
 
 ## Central graphics rendering engine managing all visual systems

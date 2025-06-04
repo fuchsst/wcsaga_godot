@@ -1,0 +1,38 @@
+[gd_scene load_steps=3 format=3 uid="uid://bx4ewxmexcpwa"]
+
+[ext_resource type="Script" path="res://scripts/core/objects/base_space_object.gd" id="1_fh4jb"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_1xm2s"]
+radius = 1.0
+
+[node name="BaseSpaceObject" type="Node3D"]
+script = ExtResource("1_fh4jb")
+object_category = 0
+max_health = 100.0
+collision_radius = 1.0
+physics_enabled = true
+collision_enabled = true
+
+[node name="PhysicsBody" type="RigidBody3D" parent="."]
+mass = 1.0
+gravity_scale = 0.0
+linear_damp = 0.0
+angular_damp = 0.0
+freeze_mode = 1
+
+[node name="CollisionShape" type="CollisionShape3D" parent="PhysicsBody"]
+shape = SubResource("SphereShape3D_1xm2s")
+
+[node name="MeshInstance" type="MeshInstance3D" parent="PhysicsBody"]
+
+[node name="DestructionTimer" type="Timer" parent="."]
+wait_time = 5.0
+one_shot = true
+
+[node name="DebugInfo" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+billboard = 1
+no_depth_test = true
+albedo_color = Color(1, 1, 0, 1)
+font_size = 8
+text = "BaseSpaceObject"

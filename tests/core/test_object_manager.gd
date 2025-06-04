@@ -234,3 +234,108 @@ func test_object_data_validation() -> void:
 	
 	assert_that(obj).is_not_null()
 	# Object should have corrected or default values
+
+# ============================================================================
+# OBJ-002: Enhanced Space Object Tests
+# ============================================================================
+
+func test_space_object_creation() -> void:
+	# Test space object creation with asset core types
+	var ship: BaseSpaceObject = object_manager.create_space_object(1)  # ObjectTypes.Type.SHIP
+	test_objects.append(ship)
+	
+	assert_that(ship).is_not_null()
+	assert_that(ship.object_type_enum).is_equal(1)
+
+func test_space_object_pooling() -> void:
+	# Enable pooling
+	object_manager.enable_object_pooling = true
+	
+	# Create and destroy space objects to test pooling
+	var ship1: BaseSpaceObject = object_manager.create_space_object(1)  # SHIP
+	var ship1_id: int = ship1.get_object_id()
+	
+	object_manager.destroy_space_object(ship1)
+	await wait_frames(2)  # Wait for cleanup
+	
+	# Create another ship (should use pooled object)
+	var ship2: BaseSpaceObject = object_manager.create_space_object(1)  # SHIP
+	test_objects.append(ship2)
+	
+	assert_that(ship2).is_not_null()
+	# Should be different object with different ID (pooled objects get new IDs)
+	assert_that(ship2.get_object_id()).is_not_equal(ship1_id)
+
+func test_space_object_lifecycle() -> void:
+	# Create space object
+	var fighter: BaseSpaceObject = object_manager.create_space_object(105)  # FIGHTER
+	test_objects.append(fighter)
+	
+	assert_that(fighter).is_not_null()
+	assert_that(fighter.is_object_active()).is_true()
+	
+	# Test deactivation
+	fighter.deactivate()
+	assert_that(fighter.is_object_active()).is_false()
+	
+	# Test activation
+	fighter.activate()
+	assert_that(fighter.is_object_active()).is_true()
+
+func test_space_object_registry() -> void:
+	var initial_count: int = object_manager.space_objects_registry.size()
+	
+	# Create space object
+	var ship: BaseSpaceObject = object_manager.create_space_object(1)  # SHIP
+	test_objects.append(ship)
+	
+	var object_id: int = ship.get_object_id()
+	
+	# Verify registration
+	assert_that(object_manager.space_objects_registry.size()).is_equal(initial_count + 1)
+	assert_that(object_manager.get_space_object_by_id(object_id)).is_same(ship)
+
+func test_spatial_queries() -> void:
+	# Create objects at different positions
+	var ship1: BaseSpaceObject = object_manager.create_space_object(1)  # SHIP
+	ship1.global_position = Vector3(0, 0, 0)
+	
+	var ship2: BaseSpaceObject = object_manager.create_space_object(1)  # SHIP
+	ship2.global_position = Vector3(50, 0, 0)
+	
+	var ship3: BaseSpaceObject = object_manager.create_space_object(1)  # SHIP
+	ship3.global_position = Vector3(200, 0, 0)
+	
+	test_objects.append_array([ship1, ship2, ship3])
+	
+	# Test radius query
+	var nearby_objects: Array[BaseSpaceObject] = object_manager.get_space_objects_in_radius(Vector3(0, 0, 0), 100.0)
+	
+	# Should find ship1 and ship2, but not ship3
+	assert_that(nearby_objects).has_size(2)
+	assert_that(nearby_objects).contains(ship1)
+	assert_that(nearby_objects).contains(ship2)
+	assert_that(nearby_objects).not_contains(ship3)
+
+func test_space_object_signals() -> void:
+	var signal_monitor = monitor_signals(object_manager)
+	
+	# Test space_object_created signal
+	var ship: BaseSpaceObject = object_manager.create_space_object(1)  # SHIP
+	test_objects.append(ship)
+	
+	assert_signal(signal_monitor).is_emitted("space_object_created", [ship, ship.get_object_id()])
+
+func test_sexp_integration() -> void:
+	# Create named ship for SEXP testing
+	var ship: BaseSpaceObject = object_manager.create_space_object(1)  # SHIP
+	ship.name = "TestShip"
+	test_objects.append(ship)
+	
+	# Test SEXP object queries
+	var found_ship: BaseSpaceObject = object_manager.sexp_get_ship_by_name("TestShip")
+	assert_that(found_ship).is_same(ship)
+	
+	# Test object count by type
+	var ship_count: int = object_manager.sexp_get_object_count_by_type(1)  # SHIP
+	assert_that(ship_count).is_greater_equal(1)

@@ -36,7 +36,7 @@ extends BaseAssetData
 @export var engine_positions: Array[Vector3] = []
 
 func _init() -> void:
-	resource_type = "WCSModelData"
+	resource_name = "WCSModelData"
 
 func is_valid() -> bool:
 	var errors: Array[String] = get_validation_errors()
@@ -195,14 +195,14 @@ func estimate_triangle_count() -> int:
 	triangle_count = total_triangles
 	return triangle_count
 
-func set_ship_class_data(class_name: String) -> void:
-	ship_class = class_name
-	model_name = class_name + "_model"
+func set_ship_class_data(ship_class_name: String):
+	ship_class = ship_class_name
+	model_name = ship_class_name + "_model"
 
-func create_for_ship_class(class_name: String, glb_path: String) -> WCSModelData:
+func create_for_ship_class(ship_class_name: String, glb_path: String) -> WCSModelData:
 	var model_data: WCSModelData = WCSModelData.new()
-	model_data.ship_class = class_name
-	model_data.model_name = class_name + "_model"
+	model_data.ship_class = ship_class_name
+	model_data.model_name = ship_class_name + "_model"
 	model_data.glb_model_path = glb_path
 	model_data.model_type = "ship"
 	
