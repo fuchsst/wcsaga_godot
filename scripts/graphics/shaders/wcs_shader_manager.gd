@@ -13,6 +13,12 @@ signal effect_animation_completed(effect_id: String)
 signal shader_performance_warning(shader_name: String, frame_time: float)
 signal effect_quality_adjusted(quality_level: int)
 
+# GR-003: Enhanced shader system components
+var shader_cache_system: ShaderCache
+var effect_processor: EffectProcessor
+var post_processor: PostProcessor
+
+# Legacy cache for compatibility
 var shader_cache: Dictionary = {}
 var shader_templates: Dictionary = {}
 var active_effects: Dictionary = {}
@@ -26,10 +32,28 @@ var shader_performance_data: Dictionary = {}
 
 func _ready() -> void:
 	name = "WCSShaderManager"
+	_initialize_shader_system()
 	_create_fallback_shader()
 	load_wcs_shader_library()
 	setup_effect_pools()
-	print("WCSShaderManager: Initialized with shader library and effect pools")
+	print("WCSShaderManager: Initialized with enhanced shader system (GR-003)")
+
+func _initialize_shader_system() -> void:
+	# Initialize GR-003 components
+	shader_cache_system = ShaderCache.new()
+	effect_processor = EffectProcessor.new()
+	post_processor = PostProcessor.new()
+	
+	# Connect signals for integration
+	shader_cache_system.shader_compilation_completed.connect(_on_shader_compiled)
+	effect_processor.effect_started.connect(func(id: String, type: String): effect_created.emit(id, type))
+	effect_processor.effect_finished.connect(func(id: String): effect_destroyed.emit(id))
+	effect_processor.performance_impact_warning.connect(func(id: String, impact: float): shader_performance_warning.emit(id, impact))
+	
+	# Initialize WCS Shader Library
+	WCSShaderLibrary.initialize()
+	
+	print("WCSShaderManager: Enhanced shader system components initialized")
 
 func _create_fallback_shader() -> void:
 	# Create a simple fallback shader for when shaders fail to load
@@ -129,13 +153,36 @@ func _create_pool_effect_node(effect_type: String) -> MeshInstance3D:
 	return node
 
 func get_shader(shader_name: String) -> Shader:
+	# Try enhanced cache system first
+	if shader_cache_system:
+		var shader_def: Dictionary = WCSShaderLibrary.get_shader_definition(shader_name)
+		if not shader_def.is_empty():
+			var shader_path: String = shader_def.get("path", "")
+			if not shader_path.is_empty():
+				var cached_shader: Shader = shader_cache_system.get_shader(shader_path)
+				if cached_shader:
+					return cached_shader
+	
+	# Fall back to legacy cache
 	if shader_name in shader_cache:
 		return shader_cache[shader_name]
 	
 	push_warning("Shader not found: " + shader_name + ", using fallback")
 	return fallback_shader
 
+func _on_shader_compiled(shader_path: String, success: bool) -> void:
+	var shader_name: String = shader_path.get_file().get_basename()
+	shader_compiled.emit(shader_name, success)
+
 func create_material_with_shader(shader_name: String, parameters: Dictionary = {}) -> ShaderMaterial:
+	# Get default parameters from shader library and merge with custom parameters
+	var default_params: Dictionary = WCSShaderLibrary.get_default_shader_params(shader_name)
+	var final_params: Dictionary = default_params.duplicate()
+	final_params.merge(parameters)
+	
+	# Apply quality adjustments
+	final_params = WCSShaderLibrary.get_quality_adjusted_params(final_params, current_quality_level)
+	
 	var shader: Shader = get_shader(shader_name)
 	if not shader:
 		return null
@@ -144,9 +191,9 @@ func create_material_with_shader(shader_name: String, parameters: Dictionary = {
 	material.shader = shader
 	
 	# Apply shader parameters
-	for param_name in parameters:
-		material.set_shader_parameter(param_name, parameters[param_name])
-		shader_parameter_updated.emit(shader_name, param_name, parameters[param_name])
+	for param_name in final_params:
+		material.set_shader_parameter(param_name, final_params[param_name])
+		shader_parameter_updated.emit(shader_name, param_name, final_params[param_name])
 	
 	return material
 
@@ -534,3 +581,166 @@ func _get_pool_usage_stats() -> Dictionary:
 	for pool_type in effect_pools:
 		stats[pool_type] = effect_pools[pool_type].size()
 	return stats
+
+## GR-003: Enhanced shader system methods
+
+## Create enhanced weapon effect using effect processor
+func create_enhanced_weapon_effect(weapon_type: String, node: Node3D, 
+                                  parameters: Dictionary = {}, duration: float = 0.2) -> String:
+	if not effect_processor:
+		push_error("WCSShaderManager: Effect processor not initialized")
+		return ""
+	
+	var effect_id: String = _generate_effect_id()
+	var effect_template: String = _get_weapon_template(weapon_type)
+	
+	if effect_processor.start_effect(effect_id, effect_template, node, parameters, duration):
+		return effect_id
+	else:
+		return ""
+
+## Create shield impact effect using effect processor
+func create_enhanced_shield_impact(shield_node: Node3D, impact_pos: Vector3, 
+                                  intensity: float = 1.0) -> String:
+	if not effect_processor:
+		push_error("WCSShaderManager: Effect processor not initialized")
+		return ""
+	
+	var effect_id: String = _generate_effect_id()
+	var shield_params: Dictionary = WCSShaderLibrary.create_shield_shader_params(intensity, Color.CYAN)
+	shield_params["impact_position"] = impact_pos
+	shield_params["impact_intensity"] = intensity
+	
+	if effect_processor.start_effect(effect_id, "shield_standard", shield_node, shield_params, 1.0):
+		return effect_id
+	else:
+		return ""
+
+## Update effect parameter using effect processor
+func update_enhanced_effect_parameter(effect_id: String, parameter: String, 
+                                     value: Variant, animate: bool = false) -> bool:
+	if not effect_processor:
+		return false
+	
+	return effect_processor.update_effect_parameter(effect_id, parameter, value, animate)
+
+## Stop enhanced effect with optional fade
+func stop_enhanced_effect(effect_id: String, fade_out: bool = false) -> bool:
+	if not effect_processor:
+		return false
+	
+	return effect_processor.stop_effect(effect_id, fade_out)
+
+## Initialize post-processing pipeline
+func initialize_post_processing(viewport: Viewport) -> bool:
+	if not post_processor:
+		push_error("WCSShaderManager: Post processor not initialized")
+		return false
+	
+	return post_processor.initialize_post_processing(viewport)
+
+## Apply post-processing to camera
+func apply_post_processing_to_camera(camera: Camera3D) -> bool:
+	if not post_processor:
+		return false
+	
+	return post_processor.apply_to_camera(camera)
+
+## Create weapon flash effect
+func create_weapon_flash_effect(intensity: float = 2.0, duration: float = 0.1) -> void:
+	if post_processor:
+		post_processor.create_flash_effect(intensity, duration, Color.WHITE)
+
+## Create explosion flash effect
+func create_explosion_flash_effect(intensity: float = 3.0, color: Color = Color.ORANGE) -> void:
+	if post_processor:
+		post_processor.create_flash_effect(intensity, 0.15, color)
+
+## Enable shader hot reload for development
+func enable_shader_hot_reload(enabled: bool) -> void:
+	if shader_cache_system:
+		shader_cache_system.set_hot_reload_enabled(enabled)
+		print("WCSShaderManager: Shader hot reload %s" % ("enabled" if enabled else "disabled"))
+
+## Precompile all WCS shaders
+func precompile_all_shaders() -> Dictionary:
+	if not shader_cache_system:
+		return {"error": "Shader cache system not initialized"}
+	
+	var shader_paths: Array[String] = []
+	for shader_def in WCSShaderLibrary.get_available_shaders():
+		var definition: Dictionary = WCSShaderLibrary.get_shader_definition(shader_def)
+		var path: String = definition.get("path", "")
+		if not path.is_empty():
+			shader_paths.append(path)
+	
+	return shader_cache_system.precompile_shaders(shader_paths)
+
+## Get comprehensive shader system statistics
+func get_enhanced_stats() -> Dictionary:
+	var stats: Dictionary = get_shader_cache_stats()
+	
+	if shader_cache_system:
+		stats["cache_system"] = shader_cache_system.get_cache_stats()
+	
+	if effect_processor:
+		stats["effect_processor"] = effect_processor.get_performance_stats()
+	
+	if post_processor:
+		stats["post_processing"] = post_processor.get_post_processing_stats()
+	
+	stats["shader_library"] = {
+		"available_shaders": WCSShaderLibrary.get_available_shaders().size(),
+		"available_templates": WCSShaderLibrary.get_available_templates().size()
+	}
+	
+	return stats
+
+## Get weapon template name for effect processor
+func _get_weapon_template(weapon_type: String) -> String:
+	match weapon_type.to_lower():
+		"laser":
+			return "laser_red"
+		"plasma":
+			return "plasma_heavy"
+		"missile":
+			return "missile_standard"
+		_:
+			return "laser_red"  # Default fallback
+
+## Process effect timers and performance monitoring
+func _process(delta: float) -> void:
+	if effect_processor:
+		effect_processor.process_effect_timers(delta)
+		effect_processor.update_performance_monitoring(delta)
+
+## Clear shader cache
+func clear_shader_cache() -> void:
+	if shader_cache_system:
+		shader_cache_system.clear_cache()
+	
+	# Also clear legacy cache
+	shader_cache.clear()
+	print("WCSShaderManager: All shader caches cleared")
+
+## Validate and cleanup shader system
+func validate_and_cleanup() -> Dictionary:
+	var results: Dictionary = {"cleaned_legacy": 0, "cache_validation": {}}
+	
+	if shader_cache_system:
+		results["cache_validation"] = shader_cache_system.validate_cache()
+		results["cleaned_cache"] = shader_cache_system.cleanup_invalid_entries()
+	
+	# Clean up orphaned effects
+	var orphaned_effects: Array[String] = []
+	for effect_id in active_effects:
+		var effect_node: Node3D = active_effects[effect_id]
+		if not is_instance_valid(effect_node):
+			orphaned_effects.append(effect_id)
+	
+	for effect_id in orphaned_effects:
+		active_effects.erase(effect_id)
+		results["cleaned_legacy"] += 1
+	
+	print("WCSShaderManager: System validation and cleanup completed")
+	return results

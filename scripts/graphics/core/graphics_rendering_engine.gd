@@ -1,3 +1,4 @@
+class_name GraphicsRenderingEngine
 extends Node
 
 ## Central graphics rendering engine managing all visual systems
@@ -28,7 +29,8 @@ var material_system: WCSMaterialSystem
 var shader_manager
 var lighting_controller
 var effects_manager
-var texture_streamer
+var texture_streamer: WCSTextureStreamer
+var texture_quality_manager: TextureQualityManager
 var model_renderer
 
 func _ready() -> void:
@@ -89,16 +91,68 @@ func _initialize_graphics_subsystems() -> void:
 	
 	print("GraphicsRenderingEngine: Material system initialized with EPIC-002 integration")
 	
-	# GR-003: Shader Manager (placeholder for future implementation)  
-	# shader_manager = WCSShaderManager.new()  # To be implemented in GR-003
-	# shader_manager.name = "WCSShaderManager"
-	# add_child(shader_manager)
+	# GR-003: Shader Manager (IMPLEMENTED)
+	shader_manager = WCSShaderManager.new()
+	shader_manager.name = "WCSShaderManager"
+	add_child(shader_manager)
 	
-	print("GraphicsRenderingEngine: Shader system placeholder ready for GR-003")
+	# Connect shader system signals
+	shader_manager.shader_compiled.connect(_on_shader_compiled)
+	shader_manager.shader_loading_completed.connect(_on_shader_loading_completed)
+	shader_manager.effect_created.connect(_on_effect_created)
+	shader_manager.effect_destroyed.connect(_on_effect_destroyed)
+	shader_manager.shader_performance_warning.connect(_on_shader_performance_warning)
+	
+	print("GraphicsRenderingEngine: Enhanced shader system initialized with GR-003 features")
+	
+	# GR-004: Texture Streaming and Management System (IMPLEMENTED)
+	texture_quality_manager = TextureQualityManager.new()
+	texture_streamer = WCSTextureStreamer.new()
+	texture_streamer.name = "WCSTextureStreamer"
+	add_child(texture_streamer)
+	
+	# Connect texture system signals
+	texture_streamer.texture_loaded.connect(_on_texture_loaded)
+	texture_streamer.texture_loading_failed.connect(_on_texture_loading_failed)
+	texture_streamer.memory_usage_updated.connect(_on_texture_memory_updated)
+	texture_streamer.memory_pressure_detected.connect(_on_texture_memory_pressure)
+	texture_streamer.texture_quality_changed.connect(_on_texture_quality_changed)
+	
+	texture_quality_manager.quality_preset_applied.connect(_on_texture_quality_preset_applied)
+	texture_quality_manager.texture_optimized.connect(_on_texture_optimized)
+	
+	# Apply quality settings to texture system
+	var recommended_quality: TextureQualityManager.QualityPreset = texture_quality_manager.get_recommended_quality()
+	texture_quality_manager.apply_quality_preset(recommended_quality)
+	
+	# Configure texture cache based on current quality level
+	var texture_memory_budget: int = texture_quality_manager.get_texture_memory_budget(recommended_quality)
+	texture_streamer.set_cache_size_limit(texture_memory_budget / (1024 * 1024))  # Convert to MB
+	
+	print("GraphicsRenderingEngine: Texture streaming system initialized with quality level: %s" % texture_quality_manager.get_quality_settings(recommended_quality).name)
+	
+	# GR-005: Dynamic Lighting and Space Environment System (IMPLEMENTED)
+	lighting_controller = WCSLightingController.new()
+	lighting_controller.name = "WCSLightingController"
+	add_child(lighting_controller)
+	
+	# Connect lighting system signals
+	lighting_controller.lighting_profile_changed.connect(_on_lighting_profile_changed)
+	lighting_controller.ambient_light_updated.connect(_on_ambient_light_updated)
+	lighting_controller.main_star_light_configured.connect(_on_main_star_light_configured)
+	lighting_controller.dynamic_light_created.connect(_on_dynamic_light_created)
+	lighting_controller.dynamic_light_destroyed.connect(_on_dynamic_light_destroyed)
+	lighting_controller.lighting_quality_adjusted.connect(_on_lighting_quality_adjusted)
+	
+	# Configure lighting quality based on graphics settings
+	lighting_controller.set_lighting_quality(current_quality_level)
+	
+	# Apply default deep space lighting profile
+	lighting_controller.apply_lighting_profile(WCSLightingController.LightingProfile.DEEP_SPACE)
+	
+	print("GraphicsRenderingEngine: Dynamic lighting and space environment system initialized")
 	
 	# TODO: Initialize other subsystems in subsequent stories
-	# GR-004: Texture Streamer  
-	# GR-005: Lighting Controller
 	# GR-006: Effects Manager
 	# GR-007: Model Renderer
 	# GR-008: Advanced features
@@ -218,6 +272,27 @@ func set_render_quality(quality_level: int) -> void:
 	
 	_apply_graphics_settings()
 	
+	# Apply quality changes to texture system
+	if texture_quality_manager and texture_streamer:
+		var texture_quality_preset: TextureQualityManager.QualityPreset
+		match quality_level:
+			0:
+				texture_quality_preset = TextureQualityManager.QualityPreset.POTATO
+			1:
+				texture_quality_preset = TextureQualityManager.QualityPreset.LOW
+			2:
+				texture_quality_preset = TextureQualityManager.QualityPreset.MEDIUM
+			3:
+				texture_quality_preset = TextureQualityManager.QualityPreset.HIGH
+			_:
+				texture_quality_preset = TextureQualityManager.QualityPreset.ULTRA
+		
+		apply_texture_quality_preset(texture_quality_preset)
+	
+	# Apply quality changes to lighting system
+	if lighting_controller:
+		lighting_controller.set_lighting_quality(quality_level)
+	
 	quality_level_adjusted.emit(quality_level)
 	render_quality_changed.emit(quality_level)
 	
@@ -331,37 +406,316 @@ func _on_shader_loading_completed(total_shaders: int, failed_shaders: int) -> vo
 func _on_effect_created(effect_id: String, effect_type: String) -> void:
 	print("GraphicsRenderingEngine: Effect created: %s (%s)" % [effect_id, effect_type])
 
+func _on_effect_destroyed(effect_id: String) -> void:
+	print("GraphicsRenderingEngine: Effect destroyed: %s" % effect_id)
+
 func _on_shader_performance_warning(shader_name: String, frame_time: float) -> void:
 	push_warning("GraphicsRenderingEngine: Shader performance warning for " + shader_name + " - frame time: " + str(frame_time) + "ms")
+	graphics_performance_warning.emit("shader_system", frame_time)
 
-# Public API for Shader System (placeholder for GR-003)
+# Texture System Signal Handlers (GR-004 IMPLEMENTED)
+func _on_texture_loaded(texture_path: String, texture: Texture2D) -> void:
+	print("GraphicsRenderingEngine: Texture loaded: ", texture_path.get_file())
+
+func _on_texture_loading_failed(texture_path: String, error: String) -> void:
+	push_warning("GraphicsRenderingEngine: Texture loading failed for " + texture_path + " - " + error)
+
+func _on_texture_memory_updated(vram_mb: int, system_mb: int) -> void:
+	# Monitor texture memory usage for performance warnings
+	if vram_mb > 400:  # Warning when texture memory exceeds 400MB
+		graphics_performance_warning.emit("texture_memory", float(vram_mb))
+
+func _on_texture_memory_pressure(usage_percent: float) -> void:
+	push_warning("GraphicsRenderingEngine: Texture memory pressure detected: %.1f%%" % usage_percent)
+	graphics_performance_warning.emit("texture_memory_pressure", usage_percent)
+
+func _on_texture_quality_changed(quality_level: int) -> void:
+	print("GraphicsRenderingEngine: Texture quality changed to level %d" % quality_level)
+
+func _on_texture_quality_preset_applied(preset_name: String, quality_level: int) -> void:
+	print("GraphicsRenderingEngine: Texture quality preset applied: %s (level %d)" % [preset_name, quality_level])
+
+func _on_texture_optimized(texture_path: String, original_size: int, optimized_size: int) -> void:
+	var compression_ratio: float = float(optimized_size) / float(original_size)
+	print("GraphicsRenderingEngine: Texture optimized: %s (%.1f%% of original size)" % [texture_path, compression_ratio * 100.0])
+
+# Lighting System Signal Handlers (GR-005 IMPLEMENTED)
+func _on_lighting_profile_changed(profile_name: String) -> void:
+	print("GraphicsRenderingEngine: Lighting profile changed to: ", profile_name)
+
+func _on_ambient_light_updated(color: Color, intensity: float) -> void:
+	print("GraphicsRenderingEngine: Ambient light updated - Color: %s, Intensity: %.2f" % [color, intensity])
+
+func _on_main_star_light_configured(direction: Vector3, intensity: float) -> void:
+	print("GraphicsRenderingEngine: Main star light configured - Direction: %s, Intensity: %.2f" % [direction, intensity])
+
+func _on_dynamic_light_created(light_id: String, light: Light3D) -> void:
+	print("GraphicsRenderingEngine: Dynamic light created: %s" % light_id)
+
+func _on_dynamic_light_destroyed(light_id: String) -> void:
+	print("GraphicsRenderingEngine: Dynamic light destroyed: %s" % light_id)
+
+func _on_lighting_quality_adjusted(quality_level: int) -> void:
+	print("GraphicsRenderingEngine: Lighting quality adjusted to level %d" % quality_level)
+
+# Public API for Shader System (GR-003 IMPLEMENTED)
 func create_weapon_effect(weapon_type: String, start_pos: Vector3, end_pos: Vector3, 
                          color: Color = Color.RED, intensity: float = 1.0) -> Node3D:
-	push_warning("Shader system not yet implemented - use GR-003 implementation")
-	return null
+	if shader_manager:
+		return shader_manager.create_weapon_effect(weapon_type, start_pos, end_pos, color, intensity)
+	else:
+		push_error("Shader system not initialized")
+		return null
 
-func create_shield_impact_effect(impact_pos: Vector3, shield_node: Node3D, intensity: float = 1.0) -> void:
-	push_warning("Shader system not yet implemented - use GR-003 implementation")
+func create_enhanced_weapon_effect(weapon_type: String, node: Node3D, 
+                                  parameters: Dictionary = {}, duration: float = 0.2) -> String:
+	if shader_manager:
+		return shader_manager.create_enhanced_weapon_effect(weapon_type, node, parameters, duration)
+	else:
+		push_error("Shader system not initialized")
+		return ""
 
-func create_explosion_effect(position: Vector3, explosion_type: String, scale_factor: float = 1.0) -> Node3D:
-	push_warning("Shader system not yet implemented - use GR-003 implementation")
-	return null
+func create_shield_impact_effect(impact_pos: Vector3, shield_node: Node3D, 
+                                intensity: float = 1.0) -> void:
+	if shader_manager:
+		shader_manager.create_shield_impact_effect(impact_pos, shield_node, intensity)
+	else:
+		push_error("Shader system not initialized")
+
+func create_explosion_effect(position: Vector3, explosion_type: String, 
+                           scale_factor: float = 1.0) -> Node3D:
+	if shader_manager:
+		return shader_manager.create_explosion_effect(position, explosion_type, scale_factor)
+	else:
+		push_error("Shader system not initialized")
+		return null
 
 func create_engine_trail_effect(ship_node: Node3D, engine_points: Array[Vector3], 
                                trail_color: Color = Color.CYAN, intensity: float = 1.0) -> Array[Node3D]:
-	push_warning("Shader system not yet implemented - use GR-003 implementation")
-	return []
+	if shader_manager:
+		return shader_manager.create_engine_trail_effect(ship_node, engine_points, trail_color, intensity)
+	else:
+		push_error("Shader system not initialized")
+		return []
+
+func apply_post_processing_to_camera(camera: Camera3D) -> bool:
+	if shader_manager:
+		return shader_manager.apply_post_processing_to_camera(camera)
+	else:
+		push_error("Shader system not initialized")
+		return false
+
+func create_weapon_flash_effect(intensity: float = 2.0) -> void:
+	if shader_manager:
+		shader_manager.create_weapon_flash_effect(intensity)
+	else:
+		push_error("Shader system not initialized")
+
+func create_explosion_flash_effect(intensity: float = 3.0, color: Color = Color.ORANGE) -> void:
+	if shader_manager:
+		shader_manager.create_explosion_flash_effect(intensity, color)
+	else:
+		push_error("Shader system not initialized")
+
+func enable_shader_hot_reload(enabled: bool) -> void:
+	if shader_manager:
+		shader_manager.enable_shader_hot_reload(enabled)
+	else:
+		push_error("Shader system not initialized")
+
+# Additional shader system API methods
+func get_shader_system_stats() -> Dictionary:
+	if shader_manager:
+		return shader_manager.get_enhanced_stats()
+	else:
+		return {"status": "not_initialized", "message": "Shader system not ready"}
+
+
 
 func get_shader(shader_name: String) -> Shader:
-	push_warning("Shader system not yet implemented - use GR-003 implementation")
-	return null
+	if shader_manager:
+		return shader_manager.get_shader(shader_name)
+	else:
+		push_error("Shader system not initialized")
+		return null
 
 func create_material_with_shader(shader_name: String, parameters: Dictionary = {}) -> ShaderMaterial:
-	push_warning("Shader system not yet implemented - use GR-003 implementation")
-	return null
+	if shader_manager:
+		return shader_manager.create_material_with_shader(shader_name, parameters)
+	else:
+		push_error("Shader system not initialized")
+		return null
 
 func get_shader_cache_stats() -> Dictionary:
-	return {"status": "not_implemented", "message": "Shader system will be implemented in GR-003"}
+	if shader_manager:
+		return shader_manager.get_shader_cache_stats()
+	else:
+		return {"status": "not_initialized", "message": "Shader system not ready"}
+
+# Public API for Texture System (GR-004 IMPLEMENTED)
+func load_texture(texture_path: String, priority: int = 5) -> Texture2D:
+	if texture_streamer:
+		return texture_streamer.load_texture(texture_path, priority)
+	else:
+		push_error("Texture system not initialized")
+		return null
+
+func load_texture_sync(texture_path: String) -> Texture2D:
+	if texture_streamer:
+		return texture_streamer.load_texture_sync(texture_path)
+	else:
+		push_error("Texture system not initialized")
+		return null
+
+func preload_textures(texture_paths: Array[String], priority: int = 3) -> void:
+	if texture_streamer:
+		texture_streamer.preload_textures(texture_paths, priority)
+	else:
+		push_error("Texture system not initialized")
+
+func unload_texture(texture_path: String) -> void:
+	if texture_streamer:
+		texture_streamer.unload_texture(texture_path)
+	else:
+		push_error("Texture system not initialized")
+
+func set_texture_quality_level(quality_level: int) -> void:
+	if texture_streamer:
+		texture_streamer.set_quality_level(quality_level)
+	else:
+		push_error("Texture system not initialized")
+
+func apply_texture_quality_preset(preset: TextureQualityManager.QualityPreset) -> void:
+	if texture_quality_manager:
+		texture_quality_manager.apply_quality_preset(preset)
+		
+		# Update texture cache size based on new quality
+		var texture_memory_budget: int = texture_quality_manager.get_texture_memory_budget(preset)
+		if texture_streamer:
+			texture_streamer.set_cache_size_limit(texture_memory_budget / (1024 * 1024))
+	else:
+		push_error("Texture system not initialized")
+
+func get_texture_cache_statistics() -> Dictionary:
+	if texture_streamer:
+		return texture_streamer.get_cache_statistics()
+	else:
+		return {"status": "not_initialized", "message": "Texture system not ready"}
+
+func optimize_texture(texture: Texture2D, texture_type: String) -> Texture2D:
+	if texture_quality_manager:
+		return texture_quality_manager.optimize_texture(texture, texture_type)
+	else:
+		push_error("Texture system not initialized")
+		return texture
+
+func get_recommended_texture_quality() -> TextureQualityManager.QualityPreset:
+	if texture_quality_manager:
+		return texture_quality_manager.get_recommended_quality()
+	else:
+		push_error("Texture system not initialized")
+		return TextureQualityManager.QualityPreset.MEDIUM
+
+func clear_texture_cache() -> void:
+	if texture_streamer:
+		texture_streamer.clear_cache()
+	else:
+		push_error("Texture system not initialized")
+
+func warm_texture_cache_for_scene(scene_textures: Array[String]) -> void:
+	if texture_streamer:
+		texture_streamer.warm_cache_for_scene(scene_textures)
+	else:
+		push_error("Texture system not initialized")
+
+func get_texture_info(texture_path: String) -> Dictionary:
+	if texture_streamer:
+		return texture_streamer.get_texture_info(texture_path)
+	else:
+		return {"status": "not_initialized", "message": "Texture system not ready"}
+
+func get_texture_quality_settings() -> Dictionary:
+	if texture_quality_manager:
+		return texture_quality_manager.get_quality_settings()
+	else:
+		return {"status": "not_initialized", "message": "Texture system not ready"}
+
+func get_texture_system_hardware_info() -> Dictionary:
+	if texture_quality_manager:
+		return texture_quality_manager.get_hardware_info()
+	else:
+		return {"status": "not_initialized", "message": "Texture system not ready"}
+
+# Public API for Lighting System (GR-005 IMPLEMENTED)
+func apply_lighting_profile(profile: WCSLightingController.LightingProfile) -> void:
+	if lighting_controller:
+		lighting_controller.apply_lighting_profile(profile)
+	else:
+		push_error("Lighting system not initialized")
+
+func create_weapon_muzzle_flash(position: Vector3, color: Color = Color.WHITE, 
+                               intensity: float = 3.0, range: float = 25.0,
+                               lifetime: float = 0.15) -> String:
+	if lighting_controller:
+		return lighting_controller.create_weapon_muzzle_flash(position, color, intensity, range, lifetime)
+	else:
+		push_error("Lighting system not initialized")
+		return ""
+
+func create_explosion_light(position: Vector3, explosion_type: String = "medium",
+                           scale_factor: float = 1.0, lifetime: float = 2.0) -> String:
+	if lighting_controller:
+		return lighting_controller.create_explosion_light(position, explosion_type, scale_factor, lifetime)
+	else:
+		push_error("Lighting system not initialized")
+		return ""
+
+func create_engine_glow_lights(ship_node: Node3D, engine_positions: Array[Vector3],
+                               color: Color = Color.CYAN, intensity: float = 1.5) -> Array[String]:
+	if lighting_controller:
+		return lighting_controller.create_engine_glow_lights(ship_node, engine_positions, color, intensity)
+	else:
+		push_error("Lighting system not initialized")
+		return []
+
+func create_dynamic_light(light_type: WCSLightingController.DynamicLightType, position: Vector3, 
+                          properties: Dictionary = {}) -> String:
+	if lighting_controller:
+		return lighting_controller.create_dynamic_light(light_type, position, properties)
+	else:
+		push_error("Lighting system not initialized")
+		return ""
+
+func destroy_dynamic_light(light_id: String) -> void:
+	if lighting_controller:
+		lighting_controller.destroy_dynamic_light(light_id)
+	else:
+		push_error("Lighting system not initialized")
+
+func set_lighting_quality(quality: int) -> void:
+	if lighting_controller:
+		lighting_controller.set_lighting_quality(quality)
+	else:
+		push_error("Lighting system not initialized")
+
+func get_lighting_statistics() -> Dictionary:
+	if lighting_controller:
+		return lighting_controller.get_lighting_statistics()
+	else:
+		return {"status": "not_initialized", "message": "Lighting system not ready"}
+
+func cleanup_expired_lights() -> void:
+	if lighting_controller:
+		lighting_controller.cleanup_expired_lights()
+	else:
+		push_error("Lighting system not initialized")
+
+func get_lighting_environment() -> Environment:
+	if lighting_controller:
+		return lighting_controller.get_environment()
+	else:
+		push_error("Lighting system not initialized")
+		return null
 
 # Helper methods for GraphicsSettingsData integration
 

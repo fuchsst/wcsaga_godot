@@ -62,11 +62,18 @@ func test_quality_level_adjustment() -> void:
 
 func test_signal_emissions() -> void:
 	# Test that appropriate signals are emitted
-	var signal_monitor = monitor_signal(graphics_engine, "quality_level_adjusted")
+	var signal_emitted: bool = false
+	var emitted_value: int = -1
+	
+	graphics_engine.quality_level_adjusted.connect(func(value: int): 
+		signal_emitted = true
+		emitted_value = value
+	)
 	
 	graphics_engine.set_render_quality(1)
 	
-	assert_that(signal_monitor).was_emitted_with([1])
+	assert_that(signal_emitted).is_true()
+	assert_that(emitted_value).is_equal(1)
 
 func test_performance_monitoring_integration() -> void:
 	# Test that performance monitor is properly integrated

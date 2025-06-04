@@ -314,7 +314,7 @@ func _get_bytes_per_pixel(format: Image.Format) -> int:
 			return 2
 		Image.FORMAT_RGB8:
 			return 3
-		Image.FORMAT_RGBA8, Image.FORMAT_RGBAF, Image.FORMAT_RGBA4444, Image.FORMAT_RGBA5551:
+		Image.FORMAT_RGBA8, Image.FORMAT_RGBAF, Image.FORMAT_RGBA4444:
 			return 4
 		_:
 			return 4  # Default to 4 bytes

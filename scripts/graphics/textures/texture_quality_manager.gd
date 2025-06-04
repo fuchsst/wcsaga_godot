@@ -135,7 +135,7 @@ func _detect_hardware_capabilities() -> void:
 	
 	hardware_capabilities = {
 		"vram_mb": _estimate_vram_size(),
-		"system_ram_mb": OS.get_static_memory_usage_by_type().get("max", 4096) / (1024 * 1024),
+		"system_ram_mb": _estimate_system_memory_mb(),
 		"cpu_cores": OS.get_processor_count(),
 		"renderer": RenderingServer.get_rendering_device().get_device_name() if rendering_device else "Unknown",
 		"platform": OS.get_name()
@@ -146,6 +146,16 @@ func _detect_hardware_capabilities() -> void:
 		hardware_capabilities.system_ram_mb, 
 		hardware_capabilities.cpu_cores
 	])
+
+func _estimate_system_memory_mb() -> int:
+	# Rough system memory estimation based on platform
+	match OS.get_name():
+		"Windows", "macOS", "Linux":
+			return 8192  # 8GB conservative estimate for desktop
+		"Android", "iOS":
+			return 4096  # 4GB for mobile devices
+		_:
+			return 4096  # Default to 4GB
 
 func _estimate_vram_size() -> int:
 	# Rough VRAM estimation based on platform and renderer

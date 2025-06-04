@@ -91,8 +91,13 @@ func load_model_data(model_path: String) -> WCSModelData:
 	if model_path in model_cache:
 		return model_cache[model_path]
 	
-	# Load ModelData through EPIC-002 asset system
-	var model_data: WCSModelData = WCSAssetLoader.load_asset(model_path)
+	# Try to load as Resource directly first (for testing/development)
+	var model_data: WCSModelData = load(model_path) as WCSModelData
+	
+	# If not found, try through WCS asset system
+	if not model_data and WCSAssetLoader:
+		model_data = WCSAssetLoader.load_asset(model_path) as WCSModelData
+	
 	if not model_data:
 		model_loading_failed.emit(model_path, "Failed to load ModelData from asset system")
 		return null
@@ -201,7 +206,16 @@ func _apply_materials_recursive(node: Node3D, material_mappings: Dictionary) -> 
 		# Find material mapping for this mesh
 		if node_name in material_mappings:
 			var material_path: String = material_mappings[node_name]
-			var material: StandardMaterial3D = material_system.load_material_from_asset(material_path)
+			var material: StandardMaterial3D = null
+			
+			# Try material system if available
+			if material_system and material_system.has_method("get_material"):
+				material = material_system.get_material(material_path)
+			
+			# Fallback to direct loading
+			if not material:
+				material = load(material_path) as StandardMaterial3D
+			
 			if material:
 				mesh_instance.material_override = material
 	

@@ -77,7 +77,8 @@ func test_performance_metrics_calculation() -> void:
 
 func test_auto_adjustment_suggestions() -> void:
 	# Test automatic quality adjustment suggestions
-	var adjustment_monitor = monitor_signal(performance_monitor, "quality_adjustment_needed")
+	var signal_emitted: bool = false
+	performance_monitor.quality_adjustment_needed.connect(func(value: int): signal_emitted = true)
 	
 	performance_monitor.enable_auto_adjustment(true)
 	performance_monitor.consecutive_poor_frames = 5
@@ -85,11 +86,12 @@ func test_auto_adjustment_suggestions() -> void:
 	# Simulate poor performance
 	performance_monitor._suggest_quality_adjustment(25.0, 2500.0, 600.0)
 	
-	assert_that(adjustment_monitor).was_emitted()
+	assert_that(signal_emitted).is_true()
 
 func test_performance_warnings() -> void:
 	# Test performance warning emission
-	var warning_monitor = monitor_signal(performance_monitor, "performance_warning")
+	var signal_emitted: bool = false
+	performance_monitor.performance_warning.connect(func(system: String, metric: float): signal_emitted = true)
 	
 	# Simulate warning condition
 	var metrics: Dictionary = {
@@ -100,7 +102,7 @@ func test_performance_warnings() -> void:
 	
 	performance_monitor._check_performance_thresholds(metrics)
 	
-	assert_that(warning_monitor).was_emitted()
+	assert_that(signal_emitted).is_true()
 
 func test_performance_score_calculation() -> void:
 	# Test performance score calculation with known values
