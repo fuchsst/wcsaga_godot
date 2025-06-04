@@ -366,3 +366,133 @@ func debug_info() -> String:
 		physics_body.mass if physics_body else 1.0
 	]
 	return base_info + " " + space_info
+
+# --- Serialization Support (OBJ-004) ---
+
+## Serialize this space object to dictionary format
+## AC1: Captures all essential BaseSpaceObject state
+func serialize_to_dictionary(options: Dictionary = {}) -> Dictionary:
+	var ObjectSerialization = preload("res://scripts/core/objects/object_serialization.gd")
+	return ObjectSerialization.serialize_space_object(self, options)
+
+## Deserialize space object state from dictionary
+## AC3: Recreates object with identical state
+func deserialize_from_dictionary(serialized_data: Dictionary) -> bool:
+	var ObjectSerialization = preload("res://scripts/core/objects/object_serialization.gd")
+	
+	# Validate data first
+	if not serialized_data.has("critical"):
+		push_error("BaseSpaceObject: Cannot deserialize - missing critical data")
+		return false
+	
+	# Restore critical state
+	if serialized_data.has("critical"):
+		ObjectSerialization._restore_critical_state(self, serialized_data["critical"])
+	
+	# Restore physics state
+	if serialized_data.has("physics"):
+		ObjectSerialization._restore_physics_state(self, serialized_data["physics"])
+	
+	# Restore metadata
+	if serialized_data.has("metadata"):
+		ObjectSerialization._restore_metadata_state(self, serialized_data["metadata"])
+	
+	# Restore visual state if present
+	if serialized_data.has("visual"):
+		ObjectSerialization._restore_visual_state(self, serialized_data["visual"])
+	
+	return true
+
+## Check if object state has changed for incremental saves
+## AC4: Support for incremental saves with only changed objects
+func has_state_changed(last_state_hash: String) -> bool:
+	var ObjectSerialization = preload("res://scripts/core/objects/object_serialization.gd")
+	return ObjectSerialization.has_object_changed(self, last_state_hash)
+
+## Get state hash for incremental save comparison
+func get_state_hash() -> String:
+	var ObjectSerialization = preload("res://scripts/core/objects/object_serialization.gd")
+	return ObjectSerialization._calculate_object_state_hash(self)
+
+## Create a save data resource for this object
+## AC6: Integration with save game system
+func create_save_data(options: Dictionary = {}) -> Resource:
+	var SpaceObjectSaveData = preload("res://addons/wcs_asset_core/resources/save_system/space_object_save_data.gd")
+	
+	var save_data = SpaceObjectSaveData.new()
+	save_data.initialize_from_objects([self], options)
+	
+	return save_data
+
+## Restore object state from save data resource
+## AC6: Integration with save game system
+func restore_from_save_data(save_data: Resource) -> bool:
+	if not save_data:
+		push_error("BaseSpaceObject: Cannot restore from null save data")
+		return false
+	
+	var objects: Array[BaseSpaceObject] = save_data.restore_objects()
+	if objects.is_empty():
+		push_error("BaseSpaceObject: Failed to restore objects from save data")
+		return false
+	
+	# Use first object's data to restore this object
+	var source_data: Dictionary = objects[0].serialize_to_dictionary()
+	return deserialize_from_dictionary(source_data)
+
+## Get object data for save game integration
+## Used by SaveGameManager for mission persistence
+func get_save_game_data() -> Dictionary:
+	return {
+		"object_class": get_script().resource_path if get_script() else "",
+		"serialized_data": serialize_to_dictionary({"include_relationships": true}),
+		"save_timestamp": Time.get_unix_time_from_system(),
+		"object_summary": {
+			"id": get_object_id(),
+			"type": get_object_type(),
+			"position": global_position,
+			"health": get("current_health") if "current_health" in self else (get("max_health") if "max_health" in self else 100.0)
+		}
+	}
+
+## Restore object from save game data
+## Used by SaveGameManager for mission loading
+func restore_from_save_game_data(save_game_data: Dictionary) -> bool:
+	if not save_game_data.has("serialized_data"):
+		push_error("BaseSpaceObject: Save game data missing serialized_data")
+		return false
+	
+	return deserialize_from_dictionary(save_game_data["serialized_data"])
+
+## Enhanced RigidBody3D state restoration (deferred call)
+func _restore_rigid_body_state(physics_data: Dictionary) -> void:
+	if not physics_body or physics_data.is_empty():
+		return
+	
+	# Restore RigidBody3D properties
+	if physics_data.has("linear_velocity"):
+		physics_body.linear_velocity = str_to_var(physics_data["linear_velocity"])
+	
+	if physics_data.has("angular_velocity"):
+		physics_body.angular_velocity = str_to_var(physics_data["angular_velocity"])
+	
+	if physics_data.has("gravity_scale"):
+		physics_body.gravity_scale = physics_data["gravity_scale"]
+	
+	if physics_data.has("linear_damp"):
+		physics_body.linear_damp = physics_data["linear_damp"]
+	
+	if physics_data.has("angular_damp"):
+		physics_body.angular_damp = physics_data["angular_damp"]
+	
+	if physics_data.has("collision_layer"):
+		physics_body.collision_layer = physics_data["collision_layer"]
+	
+	if physics_data.has("collision_mask"):
+		physics_body.collision_mask = physics_data["collision_mask"]
+	
+	if physics_data.has("continuous_cd"):
+		physics_body.continuous_cd = physics_data["continuous_cd"]
+	
+	if physics_data.has("max_contacts_reported"):
+		physics_body.max_contacts_reported = physics_data["max_contacts_reported"]
