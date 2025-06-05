@@ -83,6 +83,24 @@ var frame_rate_samples: Array[float] = []  # Frame rate tracking for optimizatio
 var physics_budget_exceeded_count: int = 0  # Count of budget violations
 var automatic_optimization_enabled: bool = true  # Enable automatic optimization
 
+# OBJ-008: Physics State Synchronization and Consistency System
+var state_sync_enabled: bool = true  # Enable state synchronization between custom and Godot physics
+var sync_performance_enabled: bool = true  # Enable sync performance tracking
+var sync_validation_enabled: bool = true  # Enable state validation during sync
+var sync_conflict_resolution_enabled: bool = true  # Enable automatic conflict resolution
+var sync_error_recovery_enabled: bool = true  # Enable error detection and recovery
+
+# State sync tracking
+var physics_state_sync_data: Dictionary = {}  # object_id -> PhysicsStateSyncData
+var sync_performance_metrics: Dictionary = {
+	"sync_time_ms": 0.0,
+	"validation_time_ms": 0.0, 
+	"conflicts_resolved": 0,
+	"errors_recovered": 0,
+	"sync_operations_per_frame": 0
+}
+var sync_error_count: int = 0  # Count of sync errors for monitoring
+
 # OBJ-007: LOD Distance Thresholds (tuned based on WCS analysis)
 var near_distance_threshold: float = 2000.0   # HIGH to MEDIUM transition
 var medium_distance_threshold: float = 5000.0  # MEDIUM to LOW transition  
@@ -354,6 +372,12 @@ func _process_space_physics_bodies(delta: float) -> void:
 	# OBJ-007: Update LOD levels periodically
 	_update_lod_levels()
 	
+	# OBJ-008: Reset sync performance metrics for this frame
+	if sync_performance_enabled:
+		sync_performance_metrics.sync_time_ms = 0.0
+		sync_performance_metrics.validation_time_ms = 0.0
+		sync_performance_metrics.sync_operations_per_frame = 0
+	
 	for body in space_physics_bodies:
 		if not is_instance_valid(body) or not body.has_method("get_physics_profile"):
 			continue
@@ -370,8 +394,25 @@ func _process_space_physics_bodies(delta: float) -> void:
 		if lod_enabled and not _should_update_this_frame(body):
 			continue
 		
+		# OBJ-008: Pre-physics state synchronization and validation
+		if state_sync_enabled:
+			var validation_result: Dictionary = validate_physics_state(body)
+			if not validation_result.is_valid:
+				detect_and_recover_state_corruption(body)
+			
+			# Synchronize state before physics processing
+			sync_physics_state(body)
+		
 		# Apply WCS-style physics based on profile
 		_apply_wcs_physics_to_body(body, physics_profile, delta)
+		
+		# OBJ-008: Post-physics state validation and capture
+		if state_sync_enabled:
+			var object_id: int = body.get_instance_id()
+			if object_id in physics_state_sync_data:
+				var sync_data: PhysicsStateSyncData = physics_state_sync_data[object_id]
+				_capture_current_state(sync_data)  # Update last valid state
+		
 		space_physics_objects_processed += 1
 
 func _apply_wcs_physics_to_body(body: RigidBody3D, profile: PhysicsProfile, delta: float) -> void:
@@ -886,7 +927,16 @@ func get_performance_stats() -> Dictionary:
 			"medium": medium_distance_threshold,
 			"far": far_distance_threshold,
 			"cull": cull_distance_threshold
-		}
+		},
+		# OBJ-008: State Synchronization Performance Metrics
+		"state_sync_enabled": state_sync_enabled,
+		"sync_objects_tracked": physics_state_sync_data.size(),
+		"sync_time_ms": sync_performance_metrics.sync_time_ms,
+		"validation_time_ms": sync_performance_metrics.validation_time_ms,
+		"sync_operations_per_frame": sync_performance_metrics.sync_operations_per_frame,
+		"conflicts_resolved": sync_performance_metrics.conflicts_resolved,
+		"errors_recovered": sync_performance_metrics.errors_recovered,
+		"sync_error_count": sync_error_count
 	}
 
 func debug_draw_physics_bodies() -> void:
@@ -1187,6 +1237,10 @@ func debug_print_physics_info() -> void:
 	print("Cached physics profiles: %d" % physics_profiles_cache.size())  # EPIC-009
 	print("LOD enabled: %s" % lod_enabled)  # OBJ-007
 	print("LOD objects tracked: %d" % lod_object_data.size())  # OBJ-007
+	print("State sync enabled: %s" % state_sync_enabled)  # OBJ-008
+	print("Sync objects tracked: %d" % physics_state_sync_data.size())  # OBJ-008
+	print("Sync conflicts resolved: %d" % sync_performance_metrics.conflicts_resolved)  # OBJ-008
+	print("Sync errors recovered: %d" % sync_performance_metrics.errors_recovered)  # OBJ-008
 	print("=================================")
 
 # OBJ-007: LOD Physics Optimization Functions
@@ -1209,6 +1263,29 @@ class LODObjectData:
 		is_culled = false
 		last_update_frame = 0
 		update_interval_frames = 1  # Default to every frame
+
+# OBJ-008: Physics State Synchronization Data Structure
+class PhysicsStateSyncData:
+	var object: Node3D
+	var custom_physics_body: CustomPhysicsBody
+	var rigid_body: RigidBody3D
+	var last_sync_time: float
+	var sync_conflicts: int
+	var last_valid_state: Dictionary
+	var state_corruption_count: int
+	var sync_enabled: bool
+	var validation_errors: Array[String]
+	
+	func _init(obj: Node3D, custom_body: CustomPhysicsBody = null, godot_body: RigidBody3D = null) -> void:
+		object = obj
+		custom_physics_body = custom_body
+		rigid_body = godot_body
+		last_sync_time = 0.0
+		sync_conflicts = 0
+		last_valid_state = {}
+		state_corruption_count = 0
+		sync_enabled = true
+		validation_errors = []
 
 ## Set player position for LOD distance calculations
 func set_player_position(position: Vector3) -> void:
@@ -1431,3 +1508,573 @@ func force_lod_recalculation() -> void:
 	"""Force immediate LOD recalculation for all space physics objects."""
 	lod_update_frame_counter = 0
 	print("PhysicsManager: Forced LOD recalculation for %d objects" % space_physics_bodies.size())
+
+# OBJ-008: Physics State Synchronization and Consistency Functions
+
+## Register object for physics state synchronization
+func register_physics_state_sync(object: Node3D, custom_body: CustomPhysicsBody = null, rigid_body: RigidBody3D = null) -> bool:
+	"""Register an object for physics state synchronization.
+	
+	Args:
+		object: Node3D object to synchronize
+		custom_body: CustomPhysicsBody component (optional)
+		rigid_body: RigidBody3D component (optional)
+		
+	Returns:
+		true if registration successful
+	"""
+	if not state_sync_enabled:
+		return false
+		
+	if not is_instance_valid(object):
+		push_error("PhysicsManager: Cannot register invalid object for state sync")
+		return false
+		
+	var object_id: int = object.get_instance_id()
+	
+	# Create sync data entry
+	var sync_data: PhysicsStateSyncData = PhysicsStateSyncData.new(object, custom_body, rigid_body)
+	physics_state_sync_data[object_id] = sync_data
+	
+	# Initialize with current state
+	_capture_current_state(sync_data)
+	
+	print("PhysicsManager: Registered object for state sync: %s" % object.name)
+	return true
+
+## Unregister object from physics state synchronization
+func unregister_physics_state_sync(object: Node3D) -> void:
+	"""Unregister an object from physics state synchronization.
+	
+	Args:
+		object: Node3D object to unregister
+	"""
+	if not is_instance_valid(object):
+		return
+		
+	var object_id: int = object.get_instance_id()
+	if object_id in physics_state_sync_data:
+		physics_state_sync_data.erase(object_id)
+		print("PhysicsManager: Unregistered object from state sync: %s" % object.name)
+
+## Synchronize physics state between custom and Godot physics (AC1)
+func sync_physics_state(object: Node3D) -> bool:
+	"""Synchronize physics state between CustomPhysicsBody and RigidBody3D.
+	
+	Args:
+		object: Node3D object to synchronize
+		
+	Returns:
+		true if synchronization successful
+	"""
+	if not state_sync_enabled:
+		return true
+		
+	var sync_start_time: float = Time.get_ticks_usec() / 1000.0
+	
+	var object_id: int = object.get_instance_id()
+	if not object_id in physics_state_sync_data:
+		return false
+		
+	var sync_data: PhysicsStateSyncData = physics_state_sync_data[object_id]
+	if not sync_data.sync_enabled:
+		return true
+		
+	var sync_success: bool = _perform_state_synchronization(sync_data)
+	
+	# Track performance
+	if sync_performance_enabled:
+		var sync_end_time: float = Time.get_ticks_usec() / 1000.0
+		var sync_time: float = sync_end_time - sync_start_time
+		sync_performance_metrics.sync_time_ms += sync_time
+		sync_performance_metrics.sync_operations_per_frame += 1
+	
+	sync_data.last_sync_time = Time.get_ticks_msec() / 1000.0
+	return sync_success
+
+## Validate physics state properties (AC2)
+func validate_physics_state(object: Node3D) -> Dictionary:
+	"""Validate physics state properties remain within expected ranges.
+	
+	Args:
+		object: Node3D object to validate
+		
+	Returns:
+		Dictionary containing validation results
+	"""
+	var validation_start_time: float = Time.get_ticks_usec() / 1000.0
+	
+	var result: Dictionary = {
+		"is_valid": true,
+		"errors": [],
+		"warnings": [],
+		"corrected_values": []
+	}
+	
+	if not sync_validation_enabled:
+		return result
+		
+	var object_id: int = object.get_instance_id()
+	if not object_id in physics_state_sync_data:
+		result.is_valid = false
+		result.errors.append("Object not registered for state sync")
+		return result
+		
+	var sync_data: PhysicsStateSyncData = physics_state_sync_data[object_id]
+	
+	# Validate CustomPhysicsBody if present
+	if sync_data.custom_physics_body:
+		_validate_custom_physics_body(sync_data.custom_physics_body, result)
+		
+	# Validate RigidBody3D if present
+	if sync_data.rigid_body:
+		_validate_rigid_body_3d(sync_data.rigid_body, result)
+	
+	# Track validation performance
+	if sync_performance_enabled:
+		var validation_end_time: float = Time.get_ticks_usec() / 1000.0
+		var validation_time: float = validation_end_time - validation_start_time
+		sync_performance_metrics.validation_time_ms += validation_time
+	
+	return result
+
+## Resolve state conflicts when physics systems diverge (AC3)
+func resolve_state_conflict(object: Node3D, custom_state: Dictionary, godot_state: Dictionary) -> Dictionary:
+	"""Resolve state conflicts between custom and Godot physics.
+	
+	Args:
+		object: Node3D object with conflicting state
+		custom_state: State from CustomPhysicsBody
+		godot_state: State from RigidBody3D
+		
+	Returns:
+		Dictionary containing resolved state
+	"""
+	if not sync_conflict_resolution_enabled:
+		return custom_state  # Default to custom physics
+		
+	var object_id: int = object.get_instance_id()
+	if not object_id in physics_state_sync_data:
+		return custom_state
+		
+	var sync_data: PhysicsStateSyncData = physics_state_sync_data[object_id]
+	sync_data.sync_conflicts += 1
+	sync_performance_metrics.conflicts_resolved += 1
+	
+	var resolved_state: Dictionary = {}
+	
+	# Resolve position conflicts (prefer Godot for collision-affected objects)
+	if godot_state.has("position") and custom_state.has("position"):
+		var pos_difference: float = godot_state.position.distance_to(custom_state.position)
+		if pos_difference > 1.0:  # Significant difference
+			resolved_state.position = godot_state.position  # Prefer Godot for collision accuracy
+		else:
+			resolved_state.position = custom_state.position  # Use custom for minor differences
+	
+	# Resolve velocity conflicts (apply WCS constraints)
+	if godot_state.has("velocity") and custom_state.has("velocity"):
+		var godot_vel: Vector3 = godot_state.velocity
+		var custom_vel: Vector3 = custom_state.velocity
+		
+		# Apply WCS speed limits
+		if godot_vel.length() > MAX_SHIP_SPEED:
+			godot_vel = godot_vel.normalized() * RESET_SHIP_SPEED
+			
+		resolved_state.velocity = godot_vel
+	
+	# Resolve angular velocity conflicts (apply WCS rotational caps)
+	if godot_state.has("angular_velocity") and custom_state.has("angular_velocity"):
+		var angular_vel: Vector3 = godot_state.angular_velocity
+		angular_vel = _apply_rotational_velocity_caps(angular_vel)
+		resolved_state.angular_velocity = angular_vel
+	
+	print("PhysicsManager: Resolved state conflict for object: %s" % object.name)
+	return resolved_state
+
+## Detect and recover from physics state corruption (AC5)
+func detect_and_recover_state_corruption(object: Node3D) -> bool:
+	"""Detect and recover from edge cases like NaN values or extreme velocities.
+	
+	Args:
+		object: Node3D object to check and recover
+		
+	Returns:
+		true if recovery was successful
+	"""
+	if not sync_error_recovery_enabled:
+		return true
+		
+	var object_id: int = object.get_instance_id()
+	if not object_id in physics_state_sync_data:
+		return false
+		
+	var sync_data: PhysicsStateSyncData = physics_state_sync_data[object_id]
+	var corruption_detected: bool = false
+	var recovery_successful: bool = true
+	
+	# Check CustomPhysicsBody for corruption
+	if sync_data.custom_physics_body:
+		if _detect_custom_body_corruption(sync_data.custom_physics_body):
+			corruption_detected = true
+			recovery_successful = _recover_custom_body_state(sync_data.custom_physics_body, sync_data)
+	
+	# Check RigidBody3D for corruption
+	if sync_data.rigid_body:
+		if _detect_rigid_body_corruption(sync_data.rigid_body):
+			corruption_detected = true
+			recovery_successful = _recover_rigid_body_state(sync_data.rigid_body, sync_data)
+	
+	if corruption_detected:
+		sync_data.state_corruption_count += 1
+		sync_error_count += 1
+		sync_performance_metrics.errors_recovered += 1
+		
+		if recovery_successful:
+			print("PhysicsManager: Recovered from state corruption for object: %s" % object.name)
+		else:
+			push_error("PhysicsManager: Failed to recover from state corruption for object: %s" % object.name)
+	
+	return recovery_successful
+
+## Get state synchronization performance metrics
+func get_sync_performance_metrics() -> Dictionary:
+	"""Get performance metrics for state synchronization.
+	
+	Returns:
+		Dictionary containing sync performance data
+	"""
+	return sync_performance_metrics.duplicate()
+
+## Enable/disable state synchronization system
+func set_state_sync_enabled(enabled: bool) -> void:
+	"""Enable or disable physics state synchronization system.
+	
+	Args:
+		enabled: true to enable state sync, false to disable
+	"""
+	state_sync_enabled = enabled
+	print("PhysicsManager: State synchronization %s" % ("enabled" if enabled else "disabled"))
+
+# OBJ-008: Internal State Synchronization Helper Functions
+
+## Capture current state for baseline comparison
+func _capture_current_state(sync_data: PhysicsStateSyncData) -> void:
+	"""Capture current physics state for validation and comparison."""
+	var state: Dictionary = {}
+	
+	if sync_data.custom_physics_body:
+		state.custom_position = sync_data.custom_physics_body.global_position
+		state.custom_velocity = sync_data.custom_physics_body.velocity
+		state.custom_angular_velocity = sync_data.custom_physics_body.angular_velocity
+		state.custom_mass = sync_data.custom_physics_body.mass
+	
+	if sync_data.rigid_body:
+		state.godot_position = sync_data.rigid_body.global_position
+		state.godot_velocity = sync_data.rigid_body.linear_velocity
+		state.godot_angular_velocity = sync_data.rigid_body.angular_velocity
+		state.godot_mass = sync_data.rigid_body.mass
+	
+	sync_data.last_valid_state = state
+
+## Perform actual state synchronization between physics systems
+func _perform_state_synchronization(sync_data: PhysicsStateSyncData) -> bool:
+	"""Perform one-direction state synchronization from CustomPhysicsBody to RigidBody3D."""
+	if not sync_data.custom_physics_body and not sync_data.rigid_body:
+		return false
+	
+	var sync_successful: bool = true
+	
+	# Sync from CustomPhysicsBody to RigidBody3D
+	if sync_data.custom_physics_body and sync_data.rigid_body:
+		# Position synchronization
+		var pos_diff: float = sync_data.custom_physics_body.global_position.distance_to(sync_data.rigid_body.global_position)
+		if pos_diff > 0.1:  # Significant position difference
+			sync_data.rigid_body.global_position = sync_data.custom_physics_body.global_position
+		
+		# Velocity synchronization (prefer custom physics for WCS behavior)
+		sync_data.rigid_body.linear_velocity = sync_data.custom_physics_body.velocity
+		sync_data.rigid_body.angular_velocity = sync_data.custom_physics_body.angular_velocity
+		
+		# Mass synchronization
+		if abs(sync_data.rigid_body.mass - sync_data.custom_physics_body.mass) > 0.01:
+			sync_data.rigid_body.mass = sync_data.custom_physics_body.mass
+	
+	return sync_successful
+
+## Validate CustomPhysicsBody state
+func _validate_custom_physics_body(custom_body: CustomPhysicsBody, result: Dictionary) -> void:
+	"""Validate CustomPhysicsBody state properties."""
+	# Check for NaN values
+	if not _is_vector_valid(custom_body.velocity):
+		result.is_valid = false
+		result.errors.append("CustomPhysicsBody has invalid velocity (NaN)")
+		custom_body.velocity = Vector3.ZERO
+		result.corrected_values.append("Reset velocity to zero")
+	
+	if not _is_vector_valid(custom_body.angular_velocity):
+		result.is_valid = false
+		result.errors.append("CustomPhysicsBody has invalid angular velocity (NaN)")
+		custom_body.angular_velocity = Vector3.ZERO
+		result.corrected_values.append("Reset angular velocity to zero")
+	
+	# Check velocity limits
+	var speed: float = custom_body.velocity.length()
+	if speed > MAX_SHIP_SPEED:
+		result.warnings.append("CustomPhysicsBody speed exceeds maximum (%d)" % MAX_SHIP_SPEED)
+		custom_body.velocity = custom_body.velocity.normalized() * RESET_SHIP_SPEED
+		result.corrected_values.append("Applied speed cap")
+	
+	# Check rotational velocity limits
+	var rotvel_magnitude: float = custom_body.angular_velocity.length()
+	if rotvel_magnitude > ROTVEL_CAP:
+		result.warnings.append("CustomPhysicsBody rotational velocity exceeds cap")
+		custom_body.angular_velocity = _apply_rotational_velocity_caps(custom_body.angular_velocity)
+		result.corrected_values.append("Applied rotational velocity cap")
+	
+	# Check mass validity
+	if custom_body.mass <= 0.0:
+		result.is_valid = false
+		result.errors.append("CustomPhysicsBody has invalid mass")
+		custom_body.mass = 1.0
+		result.corrected_values.append("Reset mass to 1.0")
+
+## Validate RigidBody3D state
+func _validate_rigid_body_3d(rigid_body: RigidBody3D, result: Dictionary) -> void:
+	"""Validate RigidBody3D state properties."""
+	# Check for NaN values
+	if not _is_vector_valid(rigid_body.linear_velocity):
+		result.is_valid = false
+		result.errors.append("RigidBody3D has invalid linear velocity (NaN)")
+		rigid_body.linear_velocity = Vector3.ZERO
+		result.corrected_values.append("Reset linear velocity to zero")
+	
+	if not _is_vector_valid(rigid_body.angular_velocity):
+		result.is_valid = false
+		result.errors.append("RigidBody3D has invalid angular velocity (NaN)")
+		rigid_body.angular_velocity = Vector3.ZERO
+		result.corrected_values.append("Reset angular velocity to zero")
+	
+	# Check velocity limits
+	var speed: float = rigid_body.linear_velocity.length()
+	if speed > MAX_SHIP_SPEED:
+		result.warnings.append("RigidBody3D speed exceeds maximum (%d)" % MAX_SHIP_SPEED)
+		rigid_body.linear_velocity = rigid_body.linear_velocity.normalized() * RESET_SHIP_SPEED
+		result.corrected_values.append("Applied speed cap")
+	
+	# Check rotational velocity limits
+	var rotvel_magnitude: float = rigid_body.angular_velocity.length()
+	if rotvel_magnitude > ROTVEL_CAP:
+		result.warnings.append("RigidBody3D rotational velocity exceeds cap")
+		rigid_body.angular_velocity = _apply_rotational_velocity_caps(rigid_body.angular_velocity)
+		result.corrected_values.append("Applied rotational velocity cap")
+	
+	# Check mass validity
+	if rigid_body.mass <= 0.0:
+		result.is_valid = false
+		result.errors.append("RigidBody3D has invalid mass")
+		rigid_body.mass = 1.0
+		result.corrected_values.append("Reset mass to 1.0")
+
+## Detect corruption in CustomPhysicsBody
+func _detect_custom_body_corruption(custom_body: CustomPhysicsBody) -> bool:
+	"""Detect state corruption in CustomPhysicsBody."""
+	# Check for NaN or infinite values
+	if not _is_vector_valid(custom_body.velocity) or not _is_vector_valid(custom_body.angular_velocity):
+		return true
+	
+	# Check for extreme values
+	if custom_body.velocity.length() > MAX_SHIP_SPEED * 10.0:  # 10x over limit
+		return true
+	
+	if custom_body.angular_velocity.length() > ROTVEL_CAP * 10.0:  # 10x over rotational limit
+		return true
+	
+	# Check for invalid mass
+	if custom_body.mass <= 0.0 or custom_body.mass > 1000000.0:  # Extreme mass values
+		return true
+	
+	return false
+
+## Detect corruption in RigidBody3D
+func _detect_rigid_body_corruption(rigid_body: RigidBody3D) -> bool:
+	"""Detect state corruption in RigidBody3D."""
+	# Check for NaN or infinite values
+	if not _is_vector_valid(rigid_body.linear_velocity) or not _is_vector_valid(rigid_body.angular_velocity):
+		return true
+	
+	# Check for extreme values
+	if rigid_body.linear_velocity.length() > MAX_SHIP_SPEED * 10.0:
+		return true
+	
+	if rigid_body.angular_velocity.length() > ROTVEL_CAP * 10.0:
+		return true
+	
+	# Check for invalid mass
+	if rigid_body.mass <= 0.0 or rigid_body.mass > 1000000.0:
+		return true
+	
+	return false
+
+## Recover CustomPhysicsBody state from corruption
+func _recover_custom_body_state(custom_body: CustomPhysicsBody, sync_data: PhysicsStateSyncData) -> bool:
+	"""Recover CustomPhysicsBody from state corruption."""
+	var recovery_successful: bool = true
+	
+	# Reset to last valid state if available
+	if not sync_data.last_valid_state.is_empty():
+		if sync_data.last_valid_state.has("custom_velocity"):
+			custom_body.velocity = sync_data.last_valid_state.custom_velocity
+		if sync_data.last_valid_state.has("custom_angular_velocity"):
+			custom_body.angular_velocity = sync_data.last_valid_state.custom_angular_velocity
+		if sync_data.last_valid_state.has("custom_mass"):
+			custom_body.mass = sync_data.last_valid_state.custom_mass
+	else:
+		# Reset to safe defaults
+		custom_body.velocity = Vector3.ZERO
+		custom_body.angular_velocity = Vector3.ZERO
+		custom_body.mass = 1.0
+	
+	# Validate the recovered state
+	if _detect_custom_body_corruption(custom_body):
+		# Complete reset if recovery failed
+		custom_body.velocity = Vector3.ZERO
+		custom_body.angular_velocity = Vector3.ZERO
+		custom_body.mass = 1.0
+		recovery_successful = false
+	
+	return recovery_successful
+
+## Recover RigidBody3D state from corruption
+func _recover_rigid_body_state(rigid_body: RigidBody3D, sync_data: PhysicsStateSyncData) -> bool:
+	"""Recover RigidBody3D from state corruption."""
+	var recovery_successful: bool = true
+	
+	# Reset to last valid state if available
+	if not sync_data.last_valid_state.is_empty():
+		if sync_data.last_valid_state.has("godot_velocity"):
+			rigid_body.linear_velocity = sync_data.last_valid_state.godot_velocity
+		if sync_data.last_valid_state.has("godot_angular_velocity"):
+			rigid_body.angular_velocity = sync_data.last_valid_state.godot_angular_velocity
+		if sync_data.last_valid_state.has("godot_mass"):
+			rigid_body.mass = sync_data.last_valid_state.godot_mass
+	else:
+		# Reset to safe defaults
+		rigid_body.linear_velocity = Vector3.ZERO
+		rigid_body.angular_velocity = Vector3.ZERO
+		rigid_body.mass = 1.0
+	
+	# Validate the recovered state
+	if _detect_rigid_body_corruption(rigid_body):
+		# Complete reset if recovery failed
+		rigid_body.linear_velocity = Vector3.ZERO
+		rigid_body.angular_velocity = Vector3.ZERO
+		rigid_body.mass = 1.0
+		recovery_successful = false
+	
+	return recovery_successful
+
+## Check if vector contains valid (non-NaN, non-infinite) values
+func _is_vector_valid(vec: Vector3) -> bool:
+	"""Check if a Vector3 contains valid floating-point values."""
+	return not (is_nan(vec.x) or is_nan(vec.y) or is_nan(vec.z) or 
+				is_inf(vec.x) or is_inf(vec.y) or is_inf(vec.z))
+
+# OBJ-008: Debug Visualization Tools for State Synchronization (AC6)
+
+## Debug visualization for state synchronization status
+func debug_visualize_sync_status(object: Node3D) -> void:
+	"""Visualize state synchronization status for a specific object.
+	
+	Args:
+		object: Node3D object to visualize sync status for
+	"""
+	if not enable_debug_draw:
+		return
+	
+	var object_id: int = object.get_instance_id()
+	if not object_id in physics_state_sync_data:
+		print("DEBUG SYNC: Object %s not registered for state sync" % object.name)
+		return
+	
+	var sync_data: PhysicsStateSyncData = physics_state_sync_data[object_id]
+	
+	print("=== SYNC STATUS: %s ===" % object.name)
+	print("  Sync Enabled: %s" % sync_data.sync_enabled)
+	print("  Last Sync Time: %.3fs ago" % (Time.get_ticks_msec() / 1000.0 - sync_data.last_sync_time))
+	print("  Conflicts: %d" % sync_data.sync_conflicts)
+	print("  Corruption Count: %d" % sync_data.state_corruption_count)
+	print("  Validation Errors: %d" % sync_data.validation_errors.size())
+	
+	if sync_data.custom_physics_body and sync_data.rigid_body:
+		var pos_diff: float = sync_data.custom_physics_body.global_position.distance_to(sync_data.rigid_body.global_position)
+		var vel_diff: float = sync_data.custom_physics_body.velocity.distance_to(sync_data.rigid_body.linear_velocity)
+		print("  Position Difference: %.3f units" % pos_diff)
+		print("  Velocity Difference: %.3f units/s" % vel_diff)
+		
+		if pos_diff > 1.0:
+			print("  WARNING: Significant position divergence detected!")
+		if vel_diff > 10.0:
+			print("  WARNING: Significant velocity divergence detected!")
+	
+	print("========================")
+
+## Debug print all state synchronization conflicts
+func debug_print_sync_conflicts() -> void:
+	"""Print detailed information about all state synchronization conflicts."""
+	var total_conflicts: int = 0
+	var total_corruptions: int = 0
+	
+	print("=== STATE SYNC CONFLICTS REPORT ===")
+	
+	for object_id in physics_state_sync_data:
+		var sync_data: PhysicsStateSyncData = physics_state_sync_data[object_id]
+		
+		if sync_data.sync_conflicts > 0 or sync_data.state_corruption_count > 0:
+			print("Object: %s" % sync_data.object.name)
+			print("  Conflicts: %d" % sync_data.sync_conflicts)
+			print("  Corruptions: %d" % sync_data.state_corruption_count)
+			print("  Validation Errors: %s" % str(sync_data.validation_errors))
+			print("---")
+			
+			total_conflicts += sync_data.sync_conflicts
+			total_corruptions += sync_data.state_corruption_count
+	
+	print("TOTALS: Conflicts=%d, Corruptions=%d" % [total_conflicts, total_corruptions])
+	print("=====================================")
+
+## Debug print sync performance metrics
+func debug_print_sync_performance() -> void:
+	"""Print detailed state synchronization performance metrics."""
+	print("=== SYNC PERFORMANCE METRICS ===")
+	print("Sync Time: %.3fms per frame" % sync_performance_metrics.sync_time_ms)
+	print("Validation Time: %.3fms per frame" % sync_performance_metrics.validation_time_ms)
+	print("Sync Operations: %d per frame" % sync_performance_metrics.sync_operations_per_frame)
+	print("Conflicts Resolved: %d total" % sync_performance_metrics.conflicts_resolved)
+	print("Errors Recovered: %d total" % sync_performance_metrics.errors_recovered)
+	print("Sync Error Count: %d total" % sync_error_count)
+	
+	# Calculate efficiency metrics
+	var objects_tracked: int = physics_state_sync_data.size()
+	if objects_tracked > 0:
+		var avg_sync_time: float = sync_performance_metrics.sync_time_ms / objects_tracked
+		var avg_validation_time: float = sync_performance_metrics.validation_time_ms / objects_tracked
+		print("Average Sync Time per Object: %.4fms" % avg_sync_time)
+		print("Average Validation Time per Object: %.4fms" % avg_validation_time)
+		
+		# Check performance targets (AC4)
+		if avg_sync_time > 0.1:  # 0.1ms target
+			print("WARNING: Sync time exceeds target (0.02ms)")
+		if avg_validation_time > 0.05:  # 0.05ms target
+			print("WARNING: Validation time exceeds target (0.01ms)")
+	
+	print("=================================")
+
+## Enable debug visualization for state synchronization
+func set_sync_debug_enabled(enabled: bool) -> void:
+	"""Enable or disable debug visualization for state synchronization.
+	
+	Args:
+		enabled: true to enable sync debugging, false to disable
+	"""
+	enable_debug_draw = enabled
+	print("PhysicsManager: State sync debugging %s" % ("enabled" if enabled else "disabled"))
