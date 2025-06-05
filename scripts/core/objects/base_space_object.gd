@@ -186,6 +186,9 @@ func activate() -> void:
 			physics_body.set_freeze_mode(RigidBody3D.FREEZE_MODE_KINEMATIC)
 			physics_body.freeze = false
 		
+		# Register with enhanced force application system (OBJ-006)
+		_register_force_application()
+		
 		# Register with ObjectManager
 		# TODO: Re-enable when ObjectManager compilation is fixed
 		# if ObjectManager:
@@ -199,6 +202,9 @@ func deactivate() -> void:
 		
 		if physics_body:
 			physics_body.freeze = true
+		
+		# Unregister from enhanced force application system (OBJ-006)
+		_unregister_force_application()
 		
 		# Unregister from ObjectManager
 		# TODO: Re-enable when ObjectManager compilation is fixed
@@ -307,6 +313,159 @@ func _on_collision_body_entered(body: Node) -> void:
 func _on_collision_body_exited(body: Node) -> void:
 	# Handle collision exit if needed
 	pass
+
+# EPIC-009 OBJ-006: Force Application and Momentum Systems
+
+## Apply force to this space object with proper momentum conservation
+func apply_force(force: Vector3, application_point: Vector3 = Vector3.ZERO, impulse: bool = false) -> bool:
+	"""Apply force to this space object using the enhanced force application system.
+	
+	Args:
+		force: Force vector in world coordinates
+		application_point: Point to apply force (local coordinates, Vector3.ZERO for center of mass)
+		impulse: true for instantaneous impulse, false for continuous force
+		
+	Returns:
+		true if force applied successfully, false otherwise
+	"""
+	if not physics_body or not space_physics_enabled:
+		return false
+	
+	# Use PhysicsManager's enhanced force application if available
+	if PhysicsManager and PhysicsManager.has_method("apply_force_to_space_object"):
+		PhysicsManager.apply_force_to_space_object(physics_body, force, impulse, application_point)
+		return true
+	
+	# Fallback to direct Godot physics
+	if impulse:
+		if application_point == Vector3.ZERO:
+			physics_body.apply_central_impulse(force)
+		else:
+			physics_body.apply_impulse(force, application_point)
+	else:
+		if application_point == Vector3.ZERO:
+			physics_body.apply_central_force(force)
+		else:
+			physics_body.apply_force(force, application_point)
+	
+	# Track applied forces
+	applied_forces.append(force)
+	physics_state_changed.emit()
+	
+	return true
+
+## Set thruster input for realistic ship movement (OBJ-006 AC1, AC5)
+func set_thruster_input(forward: float, side: float, vertical: float, afterburner: bool = false) -> bool:
+	"""Set thruster input for this space object using WCS-style thruster physics.
+	
+	Args:
+		forward: Forward thrust (0-1, where 1 is maximum forward thrust)
+		side: Side thrust (-1 to 1, negative for left, positive for right)
+		vertical: Vertical thrust (-1 to 1, negative for down, positive for up)
+		afterburner: true to activate afterburner boost
+		
+	Returns:
+		true if thruster input applied successfully, false otherwise
+	"""
+	if not physics_body or not space_physics_enabled:
+		return false
+	
+	# Use enhanced ForceApplication system through PhysicsManager
+	if PhysicsManager and PhysicsManager.has_method("set_thruster_input"):
+		return PhysicsManager.set_thruster_input(physics_body, forward, side, vertical, afterburner)
+	
+	# Fallback thruster implementation
+	var thrust_force: float = 1000.0  # Default thrust magnitude
+	var thrust_vector: Vector3 = Vector3(-side, vertical, -forward) * thrust_force
+	
+	if afterburner:
+		thrust_vector *= 2.0  # Afterburner boost
+	
+	# Transform to world coordinates and apply
+	thrust_vector = global_transform.basis * thrust_vector
+	return apply_force(thrust_vector, Vector3.ZERO, false)
+
+## Apply WCS-style physics damping to maintain authentic space flight feel (OBJ-006 AC2)
+func apply_physics_damping(delta: float) -> void:
+	"""Apply WCS-style exponential damping for authentic space physics feel.
+	
+	Args:
+		delta: Time step for physics integration
+	"""
+	if not physics_body or not space_physics_enabled:
+		return
+	
+	# Use enhanced damping system through PhysicsManager  
+	if PhysicsManager and PhysicsManager.has_method("apply_wcs_damping"):
+		PhysicsManager.apply_wcs_damping(physics_body, delta)
+		return
+	
+	# Fallback basic damping
+	var damping_factor: float = 0.1
+	physics_body.linear_velocity *= exp(-delta / damping_factor)
+	physics_body.angular_velocity *= exp(-delta / damping_factor)
+
+## Get current momentum state of this object (OBJ-006 AC2)
+func get_momentum_state() -> Dictionary:
+	"""Get current momentum state for physics analysis and debugging.
+	
+	Returns:
+		Dictionary containing momentum data including linear/angular momentum, velocity, mass
+	"""
+	if not physics_body:
+		return {}
+	
+	# Use enhanced momentum tracking through PhysicsManager
+	if PhysicsManager and PhysicsManager.has_method("get_momentum_state"):
+		return PhysicsManager.get_momentum_state(physics_body)
+	
+	# Fallback momentum calculation
+	return {
+		"linear_momentum": physics_body.linear_velocity * physics_body.mass,
+		"angular_momentum": physics_body.angular_velocity,  # Simplified
+		"mass": physics_body.mass,
+		"linear_velocity": physics_body.linear_velocity,
+		"angular_velocity": physics_body.angular_velocity,
+		"kinetic_energy": 0.5 * physics_body.mass * physics_body.linear_velocity.length_squared()
+	}
+
+## Get current thruster state of this object (OBJ-006 AC5)
+func get_thruster_state() -> Dictionary:
+	"""Get current thruster state for display and debugging.
+	
+	Returns:
+		Dictionary containing thruster configuration and current thrust levels
+	"""
+	if not physics_body:
+		return {}
+	
+	# Use enhanced thruster tracking through PhysicsManager
+	if PhysicsManager and PhysicsManager.has_method("get_thruster_state"):
+		return PhysicsManager.get_thruster_state(physics_body)
+	
+	# Fallback empty state
+	return {
+		"forward_thrust": 0.0,
+		"side_thrust": 0.0,
+		"vert_thrust": 0.0,
+		"afterburner_active": false,
+		"max_thrust_force": 1000.0,
+		"thrust_efficiency": 1.0,
+		"current_thrust_vector": Vector3.ZERO
+	}
+
+## Register this object with the enhanced force application system
+func _register_force_application() -> void:
+	"""Register this object with PhysicsManager's enhanced force application system."""
+	if physics_body and PhysicsManager and PhysicsManager.has_method("register_space_physics_body"):
+		var physics_profile_resource = physics_profile if physics_profile else null
+		PhysicsManager.register_space_physics_body(physics_body, physics_profile_resource)
+
+## Unregister this object from the enhanced force application system
+func _unregister_force_application() -> void:
+	"""Unregister this object from PhysicsManager's enhanced force application system.""" 
+	if physics_body and PhysicsManager and PhysicsManager.has_method("unregister_space_physics_body"):
+		PhysicsManager.unregister_space_physics_body(physics_body)
 
 ## Reset object state for pooling
 func reset_state() -> void:

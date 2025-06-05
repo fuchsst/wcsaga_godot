@@ -35,6 +35,7 @@ const CustomPhysicsBody = preload("res://scripts/core/custom_physics_body.gd")
 const PhysicsProfile = preload("res://addons/wcs_asset_core/resources/object/physics_profile.gd")
 const ObjectTypes = preload("res://addons/wcs_asset_core/constants/object_types.gd")
 const CollisionLayers = preload("res://addons/wcs_asset_core/constants/collision_layers.gd")
+const UpdateFrequencies = preload("res://addons/wcs_asset_core/constants/update_frequencies.gd")
 
 # Configuration
 @export var physics_frequency: int = 60  # Fixed timestep Hz
@@ -72,6 +73,23 @@ var space_physics_bodies: Array[RigidBody3D] = []  # Space objects with physics 
 var physics_profiles_cache: Dictionary = {}  # Cached physics profiles by object type
 var force_applications: Array[Dictionary] = []  # Queued force applications
 var sexp_physics_queries: Dictionary = {}  # SEXP system physics queries
+
+# OBJ-007: LOD Physics Optimization System
+var lod_enabled: bool = true  # Enable LOD-based physics optimization
+var player_position: Vector3 = Vector3.ZERO  # Player position for distance calculations
+var lod_update_frame_counter: int = 0  # Frame counter for LOD updates
+var lod_object_data: Dictionary = {}  # object_id -> LODObjectData
+var frame_rate_samples: Array[float] = []  # Frame rate tracking for optimization
+var physics_budget_exceeded_count: int = 0  # Count of budget violations
+var automatic_optimization_enabled: bool = true  # Enable automatic optimization
+
+# OBJ-007: LOD Distance Thresholds (tuned based on WCS analysis)
+var near_distance_threshold: float = 2000.0   # HIGH to MEDIUM transition
+var medium_distance_threshold: float = 5000.0  # MEDIUM to LOW transition  
+var far_distance_threshold: float = 10000.0   # LOW to MINIMAL transition
+var cull_distance_threshold: float = 20000.0  # Physics culling threshold
+var player_importance_radius: float = 1000.0  # Always high frequency around player
+var physics_step_budget_ms: float = 2.0       # Target physics step time budget
 
 # EPIC-009 WCS Physics Constants (from physics.cpp analysis)
 const MAX_TURN_LIMIT: float = 0.2618  # ~15 degrees from WCS
@@ -265,6 +283,9 @@ func _physics_process(delta: float) -> void:
 	# Track performance
 	var step_end_time: float = Time.get_ticks_usec() / 1000.0
 	physics_step_time = step_end_time - step_start_time
+	
+	# OBJ-007: Track performance for automatic optimization
+	_track_performance_metrics(1.0 / (delta if delta > 0 else 0.0167))
 
 func _step_custom_physics(delta: float) -> void:
 	# Process all custom physics bodies (EPIC-001 foundation)
@@ -329,13 +350,24 @@ func _apply_thrust_forces(body: CustomPhysicsBody, delta: float) -> void:
 # EPIC-009 Space Physics Processing Functions
 
 func _process_space_physics_bodies(delta: float) -> void:
-	"""Process space physics bodies with WCS-style physics simulation."""
+	"""Process space physics bodies with WCS-style physics simulation and LOD optimization."""
+	# OBJ-007: Update LOD levels periodically
+	_update_lod_levels()
+	
 	for body in space_physics_bodies:
 		if not is_instance_valid(body) or not body.has_method("get_physics_profile"):
 			continue
 		
 		var physics_profile: PhysicsProfile = body.get_physics_profile()
 		if not physics_profile or not physics_profile.is_physics_enabled():
+			continue
+		
+		# OBJ-007: Check if object is culled
+		if lod_enabled and _is_object_culled(body):
+			continue
+		
+		# OBJ-007: Check update frequency for LOD
+		if lod_enabled and not _should_update_this_frame(body):
 			continue
 		
 		# Apply WCS-style physics based on profile
@@ -461,6 +493,7 @@ func _process_force_applications(delta: float) -> void:
 		var force_point: Vector3 = force_data.get("point", Vector3.ZERO)
 		
 		if is_instance_valid(target_body):
+			# Apply the force using Godot's physics system
 			if is_impulse:
 				if force_point != Vector3.ZERO:
 					target_body.apply_impulse(force, force_point)
@@ -472,8 +505,12 @@ func _process_force_applications(delta: float) -> void:
 				else:
 					target_body.apply_central_force(force)
 			
+			# Debug visualization for development testing (AC6)
+			if enable_debug_draw:
+				debug_visualize_force(target_body, force, force_point)
+			
 			force_applications_processed += 1
-			force_applied.emit(target_body, force, is_impulse)
+			force_applied.emit(target_body, force, force_point)
 	
 	force_applications.clear()
 
@@ -799,6 +836,28 @@ func sexp_apply_physics_impulse(object_id: int, impulse: Vector3) -> bool:
 # Performance and debugging
 
 func get_performance_stats() -> Dictionary:
+	# Calculate LOD statistics
+	var culled_count: int = 0
+	var frequency_counts: Dictionary = {
+		0: 0,  # HIGH_FREQUENCY
+		1: 0,  # MEDIUM_FREQUENCY
+		2: 0,  # LOW_FREQUENCY
+		3: 0   # MINIMAL_FREQUENCY
+	}
+	
+	for lod_data in lod_object_data.values():
+		if lod_data.is_culled:
+			culled_count += 1
+		frequency_counts[lod_data.current_frequency] += 1
+	
+	# Calculate average FPS
+	var avg_fps: float = 60.0
+	if frame_rate_samples.size() > 0:
+		var sum: float = 0.0
+		for fps in frame_rate_samples:
+			sum += fps
+		avg_fps = sum / frame_rate_samples.size()
+	
 	return {
 		"physics_bodies": custom_bodies.size(),
 		"space_physics_bodies": space_physics_bodies.size(),  # EPIC-009
@@ -813,7 +872,21 @@ func get_performance_stats() -> Dictionary:
 		"is_paused": physics_paused,
 		"space_physics_enabled": enable_space_physics,  # EPIC-009
 		"newtonian_physics": newtonian_physics,  # EPIC-009
-		"cached_physics_profiles": physics_profiles_cache.size()  # EPIC-009
+		"cached_physics_profiles": physics_profiles_cache.size(),  # EPIC-009
+		# OBJ-007: LOD Performance Metrics
+		"lod_enabled": lod_enabled,
+		"lod_objects_tracked": lod_object_data.size(),
+		"lod_objects_culled": culled_count,
+		"lod_frequency_counts": frequency_counts,
+		"average_fps": avg_fps,
+		"physics_budget_exceeded_count": physics_budget_exceeded_count,
+		"automatic_optimization_enabled": automatic_optimization_enabled,
+		"lod_thresholds": {
+			"near": near_distance_threshold,
+			"medium": medium_distance_threshold,
+			"far": far_distance_threshold,
+			"cull": cull_distance_threshold
+		}
 	}
 
 func debug_draw_physics_bodies() -> void:
@@ -869,7 +942,231 @@ func shutdown() -> void:
 func _exit_tree() -> void:
 	shutdown()
 
+# EPIC-009 OBJ-006: Enhanced Force Application and Momentum Systems
+
+## Set thruster input for realistic ship movement
+func set_thruster_input(body: RigidBody3D, forward: float, side: float, vertical: float, afterburner: bool = false) -> bool:
+	"""Set thruster input for a physics body using WCS-style thruster physics.
+	
+	Args:
+		body: RigidBody3D to control
+		forward: Forward thrust (0-1, where 1 is maximum forward thrust) 
+		side: Side thrust (-1 to 1, negative for left, positive for right)
+		vertical: Vertical thrust (-1 to 1, negative for down, positive for up)
+		afterburner: true to activate afterburner boost
+		
+	Returns:
+		true if thruster input applied successfully, false otherwise
+	"""
+	if not is_instance_valid(body) or body not in space_physics_bodies:
+		push_error("PhysicsManager: Body not registered for thruster control")
+		return false
+	
+	# Calculate thruster force based on WCS physics constants
+	var max_thrust: float = 1000.0  # Base thrust force
+	var thrust_vector: Vector3 = Vector3.ZERO
+	
+	# Forward/backward thrust (primary movement)
+	thrust_vector.z = -forward * max_thrust  # Negative Z is forward in Godot
+	
+	# Side thrust (strafe left/right)
+	thrust_vector.x = side * max_thrust * 0.7  # Reduced side thrust
+	
+	# Vertical thrust (up/down)
+	thrust_vector.y = vertical * max_thrust * 0.7  # Reduced vertical thrust
+	
+	# Apply afterburner boost 
+	if afterburner:
+		thrust_vector *= 2.0  # Afterburner multiplier from WCS analysis
+	
+	# Transform thrust vector to world coordinates
+	thrust_vector = body.global_transform.basis * thrust_vector
+	
+	# Apply as continuous force
+	apply_force_to_space_object(body, thrust_vector, false, Vector3.ZERO)
+	
+	return true
+
+## Apply WCS-style physics damping to maintain authentic space flight feel
+func apply_wcs_damping(body: RigidBody3D, delta: float) -> void:
+	"""Apply WCS-style exponential damping for authentic physics feel.
+	
+	Args:
+		body: RigidBody3D to apply damping to
+		delta: Time step for physics integration
+	"""
+	if not is_instance_valid(body) or body not in space_physics_bodies:
+		return
+	
+	# WCS damping algorithm: new_vel = dv * e^(-t/damping) + desired_vel
+	var damping_factor: float = 0.1  # Time constant from WCS analysis
+	
+	# Apply linear damping
+	var current_vel: Vector3 = body.linear_velocity
+	var damped_vel: Vector3 = _apply_wcs_damping(current_vel, Vector3.ZERO, damping_factor, delta)
+	body.linear_velocity = damped_vel
+	
+	# Apply rotational damping with velocity caps
+	var current_rotvel: Vector3 = body.angular_velocity
+	var capped_rotvel: Vector3 = _apply_rotational_velocity_caps(current_rotvel)
+	var damped_rotvel: Vector3 = _apply_wcs_damping(capped_rotvel, Vector3.ZERO, damping_factor, delta)
+	body.angular_velocity = damped_rotvel
+
+## Get current momentum state of a physics body
+func get_momentum_state(body: RigidBody3D) -> Dictionary:
+	"""Get current momentum state of a physics body.
+	
+	Args:
+		body: RigidBody3D to query
+		
+	Returns:
+		Dictionary containing momentum data or empty dict if not registered
+	"""
+	if not is_instance_valid(body) or body not in space_physics_bodies:
+		return {}
+	
+	# Calculate momentum components
+	var linear_momentum: Vector3 = body.linear_velocity * body.mass
+	var angular_momentum: Vector3 = body.angular_velocity * body.inertia.x  # Simplified inertia
+	var kinetic_energy: float = 0.5 * body.mass * body.linear_velocity.length_squared()
+	
+	return {
+		"linear_momentum": linear_momentum,
+		"angular_momentum": angular_momentum,
+		"mass": body.mass,
+		"linear_velocity": body.linear_velocity,
+		"angular_velocity": body.angular_velocity,
+		"kinetic_energy": kinetic_energy,
+		"speed": body.linear_velocity.length()
+	}
+
+## Get current thruster state of a physics body
+func get_thruster_state(body: RigidBody3D) -> Dictionary:
+	"""Get current thruster state of a physics body.
+	
+	Args:
+		body: RigidBody3D to query
+		
+	Returns:
+		Dictionary containing thruster data or empty dict if not registered
+	"""
+	if not is_instance_valid(body) or body not in space_physics_bodies:
+		return {}
+	
+	# Return default thruster state (would be enhanced with actual thruster tracking)
+	return {
+		"forward_thrust": 0.0,
+		"side_thrust": 0.0,
+		"vert_thrust": 0.0,
+		"afterburner_active": false,
+		"max_thrust_force": 1000.0,
+		"thrust_efficiency": 1.0,
+		"current_thrust_vector": Vector3.ZERO
+	}
+
+# Duplicate function removed - _apply_wcs_damping already exists above
+
+func _apply_rotational_velocity_caps(rotvel: Vector3) -> Vector3:
+	"""Apply WCS rotational velocity caps to prevent excessive rotation."""
+	var capped_rotvel: Vector3 = rotvel
+	
+	# Apply individual axis caps based on WCS constants
+	if abs(capped_rotvel.x) > ROTVEL_CAP:
+		capped_rotvel.x = sign(capped_rotvel.x) * ROTVEL_CAP
+	if abs(capped_rotvel.y) > ROTVEL_CAP:
+		capped_rotvel.y = sign(capped_rotvel.y) * ROTVEL_CAP
+	if abs(capped_rotvel.z) > ROTVEL_CAP:
+		capped_rotvel.z = sign(capped_rotvel.z) * ROTVEL_CAP
+	
+	return capped_rotvel
+
 # Debug helpers
+
+# EPIC-009 OBJ-006: Physics Debugging Tools
+
+## Enable/disable physics debugging visualization
+func set_physics_debugging(enabled: bool) -> void:
+	"""Enable or disable physics debugging visualization.
+	
+	Args:
+		enabled: true to enable physics debugging, false to disable
+	"""
+	enable_debug_draw = enabled
+	print("PhysicsManager: Physics debugging %s" % ("enabled" if enabled else "disabled"))
+
+## Visualize force vector for debugging
+func debug_visualize_force(body: RigidBody3D, force: Vector3, application_point: Vector3 = Vector3.ZERO, duration: float = 1.0) -> void:
+	"""Visualize a force vector for physics debugging.
+	
+	Args:
+		body: RigidBody3D the force is applied to
+		force: Force vector to visualize
+		application_point: Point where force is applied (local coordinates)
+		duration: How long to show the visualization in seconds
+	"""
+	if not enable_debug_draw:
+		return
+	
+	# Calculate world position for force visualization
+	var world_point: Vector3 = body.global_position
+	if application_point != Vector3.ZERO:
+		world_point = body.global_transform * application_point
+	
+	# Create debug visualization data
+	var debug_data: Dictionary = {
+		"type": "force_vector",
+		"start_pos": world_point,
+		"end_pos": world_point + (force * 0.01),  # Scale for visibility
+		"color": Color.RED,
+		"duration": duration,
+		"timestamp": Time.get_ticks_msec() / 1000.0
+	}
+	
+	# Store debug info (actual visualization would require a debug renderer)
+	print("DEBUG FORCE: Body=%s, Force=%.2f, Direction=%s" % [body.name, force.length(), force.normalized()])
+
+## Visualize momentum state for debugging  
+func debug_visualize_momentum(body: RigidBody3D) -> void:
+	"""Visualize momentum state of a physics body.
+	
+	Args:
+		body: RigidBody3D to visualize momentum for
+	"""
+	if not enable_debug_draw:
+		return
+	
+	var momentum_state: Dictionary = get_momentum_state(body)
+	if momentum_state.is_empty():
+		return
+	
+	var linear_momentum: Vector3 = momentum_state.get("linear_momentum", Vector3.ZERO)
+	var angular_momentum: Vector3 = momentum_state.get("angular_momentum", Vector3.ZERO)
+	var kinetic_energy: float = momentum_state.get("kinetic_energy", 0.0)
+	
+	print("DEBUG MOMENTUM: Body=%s" % body.name)
+	print("  Linear Momentum: %s (magnitude: %.2f)" % [linear_momentum, linear_momentum.length()])
+	print("  Angular Momentum: %s (magnitude: %.2f)" % [angular_momentum, angular_momentum.length()])
+	print("  Kinetic Energy: %.2f" % kinetic_energy)
+	print("  Speed: %.2f" % momentum_state.get("speed", 0.0))
+
+## Debug print all active forces for development testing
+func debug_print_active_forces() -> void:
+	"""Print all active force applications for debugging."""
+	if force_applications.size() == 0:
+		print("DEBUG: No active force applications")
+		return
+	
+	print("DEBUG: Active Force Applications (%d):" % force_applications.size())
+	for i in range(force_applications.size()):
+		var force_data: Dictionary = force_applications[i]
+		var body: RigidBody3D = force_data.get("body")
+		var force: Vector3 = force_data.get("force", Vector3.ZERO)
+		var is_impulse: bool = force_data.get("impulse", false)
+		
+		if is_instance_valid(body):
+			print("  [%d] Body: %s, Force: %s (%.2f), Type: %s" % [
+				i, body.name, force, force.length(), "Impulse" if is_impulse else "Continuous"
+			])
 
 func debug_print_physics_info() -> void:
 	print("=== PhysicsManager Debug Info ===")
@@ -888,4 +1185,249 @@ func debug_print_physics_info() -> void:
 	print("Space physics enabled: %s" % enable_space_physics)  # EPIC-009
 	print("Newtonian physics: %s" % newtonian_physics)  # EPIC-009
 	print("Cached physics profiles: %d" % physics_profiles_cache.size())  # EPIC-009
+	print("LOD enabled: %s" % lod_enabled)  # OBJ-007
+	print("LOD objects tracked: %d" % lod_object_data.size())  # OBJ-007
 	print("=================================")
+
+# OBJ-007: LOD Physics Optimization Functions
+
+## LOD Object Data Structure
+class LODObjectData:
+	var object: RigidBody3D
+	var object_type: ObjectTypes.Type
+	var current_frequency: int  # UpdateFrequencies.Frequency
+	var last_distance: float
+	var is_culled: bool
+	var last_update_frame: int
+	var update_interval_frames: int
+
+	func _init(obj: RigidBody3D, obj_type: ObjectTypes.Type) -> void:
+		object = obj
+		object_type = obj_type
+		current_frequency = 0  # HIGH_FREQUENCY
+		last_distance = 0.0
+		is_culled = false
+		last_update_frame = 0
+		update_interval_frames = 1  # Default to every frame
+
+## Set player position for LOD distance calculations
+func set_player_position(position: Vector3) -> void:
+	"""Set player position for distance-based LOD calculations."""
+	player_position = position
+
+## Update LOD levels for registered objects
+func _update_lod_levels() -> void:
+	"""Update LOD levels for space physics objects based on distance and importance."""
+	if not lod_enabled:
+		return
+	
+	lod_update_frame_counter += 1
+	
+	# Only update LOD every few frames to avoid overhead
+	if lod_update_frame_counter % 4 != 0:  # Update every 4 frames (15Hz at 60FPS)
+		return
+	
+	for body in space_physics_bodies:
+		if not is_instance_valid(body) or not body.has_method("get_object_id"):
+			continue
+		
+		var object_id: int = body.get_object_id()
+		
+		# Get or create LOD data for this object
+		var lod_data: LODObjectData
+		if object_id in lod_object_data:
+			lod_data = lod_object_data[object_id]
+		else:
+			# Determine object type
+			var obj_type: ObjectTypes.Type = ObjectTypes.Type.SHIP  # Default
+			if body.has_method("get_object_type"):
+				obj_type = body.get_object_type()
+			
+			lod_data = LODObjectData.new(body, obj_type)
+			lod_object_data[object_id] = lod_data
+		
+		# Calculate new LOD level
+		var new_frequency: UpdateFrequencies.Frequency = _calculate_lod_frequency(lod_data)
+		var should_cull: bool = _should_cull_object(lod_data)
+		
+		# Apply changes
+		if should_cull != lod_data.is_culled:
+			lod_data.is_culled = should_cull
+		
+		if new_frequency != lod_data.current_frequency:
+			lod_data.current_frequency = new_frequency
+			lod_data.update_interval_frames = _frequency_to_frame_interval(new_frequency)
+
+## Calculate LOD frequency based on distance and importance
+func _calculate_lod_frequency(lod_data: LODObjectData) -> int:
+	"""Calculate appropriate update frequency for an object."""
+	var distance: float = lod_data.object.global_position.distance_to(player_position)
+	lod_data.last_distance = distance
+	
+	# Player importance radius - always high frequency
+	if distance < player_importance_radius:
+		return 0  # HIGH_FREQUENCY
+	
+	# Check for active combat status
+	var is_in_combat: bool = false
+	if lod_data.object.has_method("get_engagement_status"):
+		is_in_combat = lod_data.object.get_engagement_status() == "ACTIVE_COMBAT"
+	
+	# Combat objects get priority
+	if is_in_combat and distance < medium_distance_threshold * 2.0:
+		return 0  # HIGH_FREQUENCY
+	
+	# Distance-based LOD
+	if distance < near_distance_threshold:
+		return 0  # HIGH_FREQUENCY
+	elif distance < medium_distance_threshold:
+		return 1  # MEDIUM_FREQUENCY
+	elif distance < far_distance_threshold:
+		return 2  # LOW_FREQUENCY
+	else:
+		return 3  # MINIMAL_FREQUENCY
+
+## Check if object should be culled
+func _should_cull_object(lod_data: LODObjectData) -> bool:
+	"""Determine if an object should be culled from physics simulation."""
+	# Never cull the player
+	if lod_data.object.has_method("is_player") and lod_data.object.is_player():
+		return false
+	
+	# Never cull objects in active combat
+	if lod_data.object.has_method("get_engagement_status"):
+		if lod_data.object.get_engagement_status() == "ACTIVE_COMBAT":
+			return false
+	
+	# Never cull weapons (they have short lifetimes anyway)
+	if lod_data.object_type == ObjectTypes.Type.WEAPON:
+		return false
+	
+	# Cull based on distance
+	return lod_data.last_distance > cull_distance_threshold
+
+## Check if object should update this frame
+func _should_update_this_frame(body: RigidBody3D) -> bool:
+	"""Check if object should be updated this physics frame based on LOD."""
+	if not body.has_method("get_object_id"):
+		return true  # Update if no ID method
+	
+	var object_id: int = body.get_object_id()
+	if not object_id in lod_object_data:
+		return true  # Update if not tracked
+	
+	var lod_data: LODObjectData = lod_object_data[object_id]
+	
+	# Check frame interval
+	var frames_since_update: int = lod_update_frame_counter - lod_data.last_update_frame
+	if frames_since_update >= lod_data.update_interval_frames:
+		lod_data.last_update_frame = lod_update_frame_counter
+		return true
+	
+	return false
+
+## Check if object is culled
+func _is_object_culled(body: RigidBody3D) -> bool:
+	"""Check if object is currently culled from physics."""
+	if not body.has_method("get_object_id"):
+		return false  # Don't cull if no ID method
+	
+	var object_id: int = body.get_object_id()
+	if not object_id in lod_object_data:
+		return false  # Don't cull if not tracked
+	
+	return lod_object_data[object_id].is_culled
+
+## Convert frequency to frame interval
+func _frequency_to_frame_interval(frequency: int) -> int:
+	"""Convert update frequency to frame interval."""
+	match frequency:
+		0:  # HIGH_FREQUENCY
+			return 1   # Every frame (60Hz)
+		1:  # MEDIUM_FREQUENCY
+			return 2   # Every 2 frames (30Hz)
+		2:  # LOW_FREQUENCY
+			return 4   # Every 4 frames (15Hz)
+		3:  # MINIMAL_FREQUENCY
+			return 12  # Every 12 frames (5Hz)
+		_:
+			return 1
+
+## Track performance metrics for automatic optimization
+func _track_performance_metrics(current_fps: float) -> void:
+	"""Track performance metrics and trigger automatic optimization if needed."""
+	if not automatic_optimization_enabled:
+		return
+	
+	# Store frame rate samples
+	frame_rate_samples.append(current_fps)
+	if frame_rate_samples.size() > 60:  # Keep 1 second of samples
+		frame_rate_samples.pop_front()
+	
+	# Check physics budget
+	if physics_step_time > physics_step_budget_ms:
+		physics_budget_exceeded_count += 1
+	
+	# Check for optimization trigger every 60 frames (1 second)
+	if lod_update_frame_counter % 60 == 0:
+		_check_automatic_optimization()
+
+## Check and apply automatic optimization
+func _check_automatic_optimization() -> void:
+	"""Check if automatic optimization should be triggered."""
+	if frame_rate_samples.size() < 30:  # Need enough samples
+		return
+	
+	# Calculate average FPS
+	var avg_fps: float = 0.0
+	for fps in frame_rate_samples:
+		avg_fps += fps
+	avg_fps /= frame_rate_samples.size()
+	
+	# Check for optimization triggers
+	var should_optimize: bool = false
+	var optimization_reason: String = ""
+	
+	if avg_fps < 50.0:  # FPS too low
+		should_optimize = true
+		optimization_reason = "LOW_FPS"
+	elif physics_budget_exceeded_count > 10:  # Physics budget exceeded too often
+		should_optimize = true
+		optimization_reason = "PHYSICS_BUDGET_EXCEEDED"
+	elif space_physics_bodies.size() > 150:  # Too many objects
+		should_optimize = true
+		optimization_reason = "HIGH_OBJECT_COUNT"
+	
+	if should_optimize:
+		_apply_automatic_optimization(optimization_reason, avg_fps)
+		physics_budget_exceeded_count = 0  # Reset counter
+
+## Apply automatic optimization
+func _apply_automatic_optimization(reason: String, current_fps: float) -> void:
+	"""Apply automatic performance optimization."""
+	print("PhysicsManager: Applying automatic optimization - %s (FPS: %.1f)" % [reason, current_fps])
+	
+	# Reduce LOD thresholds by 20%
+	near_distance_threshold *= 0.8
+	medium_distance_threshold *= 0.8
+	far_distance_threshold *= 0.8
+	cull_distance_threshold *= 0.8
+	
+	# Force immediate LOD recalculation
+	lod_update_frame_counter = 0
+	
+	print("PhysicsManager: LOD thresholds reduced - Near: %.0f, Medium: %.0f, Far: %.0f, Cull: %.0f" % [
+		near_distance_threshold, medium_distance_threshold, far_distance_threshold, cull_distance_threshold
+	])
+
+## Enable or disable LOD optimization
+func set_lod_optimization_enabled(enabled: bool) -> void:
+	"""Enable or disable LOD-based physics optimization."""
+	lod_enabled = enabled
+	print("PhysicsManager: LOD optimization %s" % ("enabled" if enabled else "disabled"))
+
+## Force LOD recalculation for all objects
+func force_lod_recalculation() -> void:
+	"""Force immediate LOD recalculation for all space physics objects."""
+	lod_update_frame_counter = 0
+	print("PhysicsManager: Forced LOD recalculation for %d objects" % space_physics_bodies.size())
