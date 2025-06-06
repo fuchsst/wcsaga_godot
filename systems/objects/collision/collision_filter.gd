@@ -50,6 +50,10 @@ func _ready() -> void:
 	_initialize_collision_type_matrix()
 	print("CollisionFilter: Initialized with WCS-style collision filtering")
 
+func _process(_delta: float) -> void:
+	"""Process temporary collision rules expiration."""
+	_process_temporary_rules()
+
 func _initialize_collision_type_matrix() -> void:
 	"""Initialize the collision type matrix defining which object types can collide."""
 	collision_type_matrix = {
@@ -263,10 +267,11 @@ func _objects_within_collision_distance(object_a: Node3D, object_b: Node3D) -> b
 ## Collision layer/mask filtering (Godot-specific)
 func _collision_layers_compatible(object_a: Node3D, object_b: Node3D) -> bool:
 	"""Check if objects' collision layers and masks are compatible."""
-	var layer_a: int = _get_object_collision_layer(object_a)
-	var mask_a: int = _get_object_collision_mask(object_a)
-	var layer_b: int = _get_object_collision_layer(object_b)
-	var mask_b: int = _get_object_collision_mask(object_b)
+	# Use effective layers/masks including runtime overrides (AC3)
+	var layer_a: int = get_object_effective_collision_layer(object_a)
+	var mask_a: int = get_object_effective_collision_mask(object_a)
+	var layer_b: int = get_object_effective_collision_layer(object_b)
+	var mask_b: int = get_object_effective_collision_mask(object_b)
 	
 	# Objects can collide if layer A is in mask B OR layer B is in mask A
 	return (layer_a & mask_b) != 0 or (layer_b & mask_a) != 0
@@ -488,3 +493,247 @@ func set_distance_filtering_enabled(enabled: bool) -> void:
 	"""
 	enable_distance_filtering = enabled
 	print("CollisionFilter: Distance filtering %s" % ("enabled" if enabled else "disabled"))
+
+## Dynamic collision mask management (AC3 - Runtime collision behavior changes)
+
+# Dynamic collision override storage
+var dynamic_collision_overrides: Dictionary = {}  # object_id -> {layer: int, mask: int}
+var temporary_collision_rules: Dictionary = {}    # rule_id -> {type_a: Type, type_b: Type, expires_at: int}
+
+signal collision_mask_changed(object: Node3D, new_layer: int, new_mask: int)
+signal temporary_rule_added(rule_id: String, type_a: ObjectTypes.Type, type_b: ObjectTypes.Type)
+signal temporary_rule_expired(rule_id: String)
+
+func set_object_collision_layer_runtime(obj: Node3D, layer: CollisionLayers.Layer) -> void:
+	"""Dynamically change an object's collision layer at runtime.
+	
+	Args:
+		obj: Object to modify
+		layer: New collision layer for the object
+	"""
+	var object_id: int = obj.get_instance_id()
+	var layer_bit: int = CollisionLayers.create_layer_bit(layer)
+	
+	# Store override
+	if not object_id in dynamic_collision_overrides:
+		dynamic_collision_overrides[object_id] = {}
+	
+	dynamic_collision_overrides[object_id]["layer"] = layer_bit
+	
+	# Apply to actual Godot physics object if supported
+	_apply_collision_layer_to_object(obj, layer_bit)
+	
+	collision_mask_changed.emit(obj, layer_bit, _get_object_collision_mask(obj))
+	print("CollisionFilter: Set runtime collision layer for %s to %s" % [obj.name, CollisionLayers.get_layer_name(layer)])
+
+func set_object_collision_mask_runtime(obj: Node3D, mask: int) -> void:
+	"""Dynamically change an object's collision mask at runtime.
+	
+	Args:
+		obj: Object to modify
+		mask: New collision mask bitmask
+	"""
+	var object_id: int = obj.get_instance_id()
+	
+	# Store override
+	if not object_id in dynamic_collision_overrides:
+		dynamic_collision_overrides[object_id] = {}
+	
+	dynamic_collision_overrides[object_id]["mask"] = mask
+	
+	# Apply to actual Godot physics object if supported
+	_apply_collision_mask_to_object(obj, mask)
+	
+	collision_mask_changed.emit(obj, _get_object_collision_layer(obj), mask)
+	print("CollisionFilter: Set runtime collision mask for %s to %d" % [obj.name, mask])
+
+func add_collision_layer_to_object_runtime(obj: Node3D, layer: CollisionLayers.Layer) -> void:
+	"""Add a collision layer to an object's existing layers at runtime.
+	
+	Args:
+		obj: Object to modify
+		layer: Layer to add to existing layers
+	"""
+	var current_layer: int = _get_object_collision_layer(obj)
+	var new_layer: int = CollisionLayers.add_layer(current_layer, layer)
+	
+	set_object_collision_layer_runtime(obj, layer)
+	print("CollisionFilter: Added layer %s to %s" % [CollisionLayers.get_layer_name(layer), obj.name])
+
+func remove_collision_layer_from_object_runtime(obj: Node3D, layer: CollisionLayers.Layer) -> void:
+	"""Remove a collision layer from an object's existing layers at runtime.
+	
+	Args:
+		obj: Object to modify  
+		layer: Layer to remove from existing layers
+	"""
+	var current_layer: int = _get_object_collision_layer(obj)
+	var new_layer: int = CollisionLayers.remove_layer(current_layer, layer)
+	
+	var object_id: int = obj.get_instance_id()
+	
+	# Store override
+	if not object_id in dynamic_collision_overrides:
+		dynamic_collision_overrides[object_id] = {}
+	
+	dynamic_collision_overrides[object_id]["layer"] = new_layer
+	
+	# Apply to actual Godot physics object if supported
+	_apply_collision_layer_to_object(obj, new_layer)
+	
+	collision_mask_changed.emit(obj, new_layer, _get_object_collision_mask(obj))
+	print("CollisionFilter: Removed layer %s from %s" % [CollisionLayers.get_layer_name(layer), obj.name])
+
+func add_temporary_collision_rule(rule_id: String, type_a: ObjectTypes.Type, type_b: ObjectTypes.Type, duration_ms: int) -> void:
+	"""Add a temporary collision rule that expires after a duration.
+	
+	Args:
+		rule_id: Unique identifier for this rule
+		type_a: First object type for collision rule
+		type_b: Second object type for collision rule
+		duration_ms: Rule duration in milliseconds
+	"""
+	var expires_at: int = Time.get_ticks_msec() + duration_ms
+	
+	temporary_collision_rules[rule_id] = {
+		"type_a": type_a,
+		"type_b": type_b,
+		"expires_at": expires_at
+	}
+	
+	# Add to collision type matrix temporarily
+	add_collision_type_rule(type_a, type_b)
+	
+	temporary_rule_added.emit(rule_id, type_a, type_b)
+	print("CollisionFilter: Added temporary collision rule %s: %s <-> %s (expires in %dms)" % [rule_id, type_a, type_b, duration_ms])
+
+func remove_temporary_collision_rule(rule_id: String) -> void:
+	"""Remove a temporary collision rule manually.
+	
+	Args:
+		rule_id: Rule identifier to remove
+	"""
+	if rule_id in temporary_collision_rules:
+		var rule: Dictionary = temporary_collision_rules[rule_id]
+		
+		# Remove from collision type matrix
+		remove_collision_type_rule(rule.type_a, rule.type_b)
+		
+		temporary_collision_rules.erase(rule_id)
+		temporary_rule_expired.emit(rule_id)
+		print("CollisionFilter: Removed temporary collision rule %s" % rule_id)
+
+func _process_temporary_rules() -> void:
+	"""Process and expire temporary collision rules. Called each frame."""
+	var current_time: int = Time.get_ticks_msec()
+	var expired_rules: Array[String] = []
+	
+	for rule_id in temporary_collision_rules:
+		var rule: Dictionary = temporary_collision_rules[rule_id]
+		if current_time >= rule.expires_at:
+			expired_rules.append(rule_id)
+	
+	# Remove expired rules
+	for rule_id in expired_rules:
+		remove_temporary_collision_rule(rule_id)
+
+func clear_object_collision_overrides(obj: Node3D) -> void:
+	"""Clear all collision overrides for an object, restoring default behavior.
+	
+	Args:
+		obj: Object to clear overrides for
+	"""
+	var object_id: int = obj.get_instance_id()
+	
+	if object_id in dynamic_collision_overrides:
+		dynamic_collision_overrides.erase(object_id)
+		print("CollisionFilter: Cleared collision overrides for %s" % obj.name)
+
+func get_object_effective_collision_layer(obj: Node3D) -> int:
+	"""Get the effective collision layer including any runtime overrides.
+	
+	Args:
+		obj: Object to query
+		
+	Returns:
+		Effective collision layer value
+	"""
+	var object_id: int = obj.get_instance_id()
+	
+	if object_id in dynamic_collision_overrides and "layer" in dynamic_collision_overrides[object_id]:
+		return dynamic_collision_overrides[object_id]["layer"]
+	
+	return _get_object_collision_layer(obj)
+
+func get_object_effective_collision_mask(obj: Node3D) -> int:
+	"""Get the effective collision mask including any runtime overrides.
+	
+	Args:
+		obj: Object to query
+		
+	Returns:
+		Effective collision mask value
+	"""
+	var object_id: int = obj.get_instance_id()
+	
+	if object_id in dynamic_collision_overrides and "mask" in dynamic_collision_overrides[object_id]:
+		return dynamic_collision_overrides[object_id]["mask"]
+	
+	return _get_object_collision_mask(obj)
+
+func _apply_collision_layer_to_object(obj: Node3D, layer: int) -> void:
+	"""Apply collision layer to actual Godot physics object if supported."""
+	# Try to apply to RigidBody3D
+	if obj is RigidBody3D:
+		(obj as RigidBody3D).collision_layer = layer
+		return
+	
+	# Try to apply to CharacterBody3D
+	if obj is CharacterBody3D:
+		(obj as CharacterBody3D).collision_layer = layer
+		return
+	
+	# Try to apply to Area3D
+	if obj is Area3D:
+		(obj as Area3D).collision_layer = layer
+		return
+	
+	# Try to find physics body child node
+	var physics_body: Node3D = _find_physics_body_child(obj)
+	if physics_body:
+		_apply_collision_layer_to_object(physics_body, layer)
+
+func _apply_collision_mask_to_object(obj: Node3D, mask: int) -> void:
+	"""Apply collision mask to actual Godot physics object if supported."""
+	# Try to apply to RigidBody3D
+	if obj is RigidBody3D:
+		(obj as RigidBody3D).collision_mask = mask
+		return
+	
+	# Try to apply to CharacterBody3D
+	if obj is CharacterBody3D:
+		(obj as CharacterBody3D).collision_mask = mask
+		return
+	
+	# Try to apply to Area3D
+	if obj is Area3D:
+		(obj as Area3D).collision_mask = mask
+		return
+	
+	# Try to find physics body child node
+	var physics_body: Node3D = _find_physics_body_child(obj)
+	if physics_body:
+		_apply_collision_mask_to_object(physics_body, mask)
+
+func _find_physics_body_child(parent: Node3D) -> Node3D:
+	"""Find a physics body child node recursively."""
+	for child in parent.get_children():
+		if child is RigidBody3D or child is CharacterBody3D or child is Area3D:
+			return child as Node3D
+		
+		# Search recursively in child nodes
+		var found: Node3D = _find_physics_body_child(child as Node3D)
+		if found:
+			return found
+	
+	return null
