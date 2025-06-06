@@ -42,7 +42,7 @@ window/stretch/mode="canvas_items"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/SignalVisualizer/plugin.cfg", "res://addons/godot_mcp/plugin.cfg", "res://addons/scene_manager/plugin.cfg", "res://addons/wcs_asset_core/plugin.cfg", "res://addons/gdUnit4/plugin.cfg")
+enabled=PackedStringArray("res://addons/gdUnit4/plugin.cfg", "res://addons/wcs_asset_core/plugin.cfg")
 
 [input]
 

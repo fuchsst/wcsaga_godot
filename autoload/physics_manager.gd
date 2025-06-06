@@ -504,28 +504,28 @@ func _apply_kinematic_physics(body: RigidBody3D, profile: PhysicsProfile, delta:
 	if profile.is_projectile:
 		_apply_projectile_physics(body, profile, delta)
 
-func _apply_momentum_conservation_to_rigidbody(body: RigidBody3D, delta: float) -> void:
+func _apply_momentum_conservation_to_rigidbody(_body: RigidBody3D, _delta: float) -> void:
 	"""Ensure proper momentum conservation for space physics."""
 	# Implement Newtonian physics corrections if needed
 	pass
 
-func _apply_afterburner_physics(body: RigidBody3D, profile: PhysicsProfile, delta: float) -> void:
+func _apply_afterburner_physics(_body: RigidBody3D, profile: PhysicsProfile, _delta: float) -> void:
 	"""Apply afterburner physics effects."""
 	var accel_multiplier: float = profile.afterburner_acceleration_multiplier
 	# Apply enhanced acceleration
 	pass
 
-func _apply_six_dof_movement(body: RigidBody3D, profile: PhysicsProfile, delta: float) -> void:
+func _apply_six_dof_movement(_body: RigidBody3D, _profile: PhysicsProfile, _delta: float) -> void:
 	"""Apply 6 degrees of freedom movement for space objects."""
 	# Implement full 6DOF physics
 	pass
 
-func _apply_projectile_physics(body: RigidBody3D, profile: PhysicsProfile, delta: float) -> void:
+func _apply_projectile_physics(_body: RigidBody3D, _profile: PhysicsProfile, _delta: float) -> void:
 	"""Apply physics for weapon projectiles."""
 	# Handle projectile lifetime and trajectory
 	pass
 
-func _process_force_applications(delta: float) -> void:
+func _process_force_applications(_delta: float) -> void:
 	"""Process queued force applications for space objects."""
 	for force_data in force_applications:
 		var target_body: RigidBody3D = force_data.get("body")
