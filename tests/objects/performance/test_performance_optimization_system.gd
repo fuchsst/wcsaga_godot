@@ -13,11 +13,18 @@ const PHYSICS_BUDGET_MS: float = 2.0
 
 # Test scene and object references
 var test_scene: Node
-var performance_monitor: PerformanceMonitor
-var memory_monitor: MemoryMonitor
-var gc_optimizer: GCOptimizer
-var resource_tracker: ResourceTracker
-var performance_profiler: PerformanceProfiler
+var performance_monitor: Node
+var memory_monitor: Node
+var gc_optimizer: Node
+var resource_tracker: Node
+var performance_profiler: Node
+
+# Class preloads
+const PerformanceMonitor = preload("res://systems/objects/optimization/performance_monitor.gd")
+const MemoryMonitor = preload("res://systems/objects/optimization/memory_monitor.gd")
+const GCOptimizer = preload("res://systems/objects/optimization/gc_optimizer.gd")
+const ResourceTracker = preload("res://systems/objects/optimization/resource_tracker.gd")
+const PerformanceProfiler = preload("res://systems/objects/optimization/performance_profiler.gd")
 
 # Mock objects for testing
 var mock_object_manager: Node
@@ -334,7 +341,7 @@ func test_performance_profiler_initialization() -> void:
 func test_performance_profiler_timing() -> void:
 	"""Test hierarchical timing functionality."""
 	# Start and end timing for test event
-	performance_profiler.start_timing("test_event", PerformanceProfiler.ProfileCategory.GAME_LOGIC)
+	performance_profiler.start_timing("test_event", 3)  # GAME_LOGIC category
 	
 	await await_millis(10)  # Simulate work
 	
@@ -354,7 +361,7 @@ func test_performance_profiler_bottleneck_detection() -> void:
 	)
 	
 	# Simulate long-running event
-	performance_profiler.start_timing("slow_event", PerformanceProfiler.ProfileCategory.PHYSICS)
+	performance_profiler.start_timing("slow_event", 1)  # PHYSICS category
 	
 	await await_millis(50)  # Long enough to trigger bottleneck
 	
@@ -366,7 +373,7 @@ func test_performance_profiler_trend_analysis() -> void:
 	"""Test performance trend analysis."""
 	# Generate multiple timing samples
 	for i in range(20):
-		performance_profiler.start_timing("trend_test", PerformanceProfiler.ProfileCategory.RENDERING)
+		performance_profiler.start_timing("trend_test", 2)  # RENDERING category
 		await await_millis(5)
 		performance_profiler.end_timing("trend_test")
 	
@@ -380,9 +387,9 @@ func test_performance_profiler_category_performance() -> void:
 	"""Test performance breakdown by category."""
 	# Time events in different categories
 	var categories: Array = [
-		PerformanceProfiler.ProfileCategory.PHYSICS,
-		PerformanceProfiler.ProfileCategory.RENDERING,
-		PerformanceProfiler.ProfileCategory.GAME_LOGIC
+		1,  # PHYSICS
+		2,  # RENDERING  
+		3   # GAME_LOGIC
 	]
 	
 	for category in categories:
