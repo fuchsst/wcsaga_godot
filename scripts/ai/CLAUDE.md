@@ -3,7 +3,7 @@
 ## Package Purpose
 This package implements the AI & Behavior Systems for the WCS-Godot conversion project (EPIC-010). It provides intelligent AI behavior for ships, formation flying, combat tactics, and autopilot systems using modern behavior tree architecture while maintaining WCS's tactical depth and authenticity.
 
-## Implementation Status: Navigation, Collision & Formation Complete (AI-001 through AI-007)
+## Implementation Status: Navigation, Collision, Formation & Autopilot Complete (AI-001 through AI-008)
 - ✅ **LimboAI Integration Setup**: Framework prepared for LimboAI addon integration (AI-001)
 - ✅ **WCS Behavior Tree Base Classes**: Custom action and condition node base classes (AI-001)
 - ✅ **AI Agent Framework**: Core WCSAIAgent class with performance monitoring (AI-001)
@@ -13,7 +13,8 @@ This package implements the AI & Behavior Systems for the WCS-Godot conversion p
 - ✅ **Navigation System**: Comprehensive waypoint navigation and path planning (AI-005)
 - ✅ **Collision System**: Advanced collision detection and avoidance with predictive algorithms (AI-006)
 - ✅ **Formation System**: Complete formation flying with 6 formation types and collision integration (AI-007)
-- ✅ **Integration Testing**: Complete test suite for AI foundation, navigation, collision, and formation components
+- ✅ **Autopilot System**: Player assistance and automation with safety monitoring and UI integration (AI-008)
+- ✅ **Integration Testing**: Complete test suite for AI foundation, navigation, collision, formation, and autopilot components
 
 ## Key Classes
 
@@ -83,6 +84,36 @@ This package implements the AI & Behavior Systems for the WCS-Godot conversion p
 - **Responsibility**: Key-value storage, data sharing between AI nodes, debugging support
 - **Key Features**: History tracking, merge operations, debug information
 
+### AutopilotManager
+- **Purpose**: Central autopilot system for player assistance and automation
+- **Type**: Node class
+- **Responsibility**: Autopilot mode switching, control handoff, safety integration, squadron coordination
+- **Key Features**: 6 autopilot modes, smooth transitions, emergency stop, performance tracking
+
+### AutopilotSafetyMonitor
+- **Purpose**: Safety monitoring system for autopilot operations
+- **Type**: Node class
+- **Responsibility**: Threat detection, collision prediction, emergency situation monitoring
+- **Key Features**: 5 threat levels, predictive collision detection, automatic safety override
+
+### SquadronAutopilotCoordinator
+- **Purpose**: Coordinates autopilot operations for multiple player ships in formation
+- **Type**: Node class
+- **Responsibility**: Squadron formation management, coordinated navigation, multi-ship autopilot
+- **Key Features**: 6 coordination modes, formation integrity monitoring, dynamic leadership
+
+### PlayerInputIntegration
+- **Purpose**: Manages seamless transitions between player control and autopilot
+- **Type**: Node class
+- **Responsibility**: Input monitoring, control blending, smooth handoffs, override detection
+- **Key Features**: Input conflict detection, blended control modes, transition smoothing
+
+### AutopilotUIIntegration
+- **Purpose**: UI integration for autopilot system status and controls
+- **Type**: Control class
+- **Responsibility**: Status display, manual controls, visual feedback, threat warnings
+- **Key Features**: Real-time status updates, threat indicators, control buttons, ETA display
+
 ## Usage Examples
 
 ### Creating an AI Agent
@@ -149,6 +180,40 @@ print("Formation integrity: ", integrity * 100.0, "%")
 
 # Get formation position for ship
 var target_pos: Vector3 = formation_manager.get_ship_formation_position(wingman1)
+```
+
+### Autopilot Usage
+```gdscript
+# Create autopilot manager for player ship
+var autopilot_manager: AutopilotManager = AutopilotManager.new()
+autopilot_manager.player_ship = player_ship
+player_ship.add_child(autopilot_manager)
+
+# Engage autopilot to single destination
+var destination: Vector3 = Vector3(2000, 0, 1000)
+var success: bool = autopilot_manager.engage_autopilot_to_position(destination)
+
+# Engage autopilot along path
+var path: Array[Vector3] = [Vector3(1000, 0, 0), Vector3(2000, 0, 0), Vector3(2000, 0, 1000)]
+autopilot_manager.engage_autopilot_along_path(path, AutopilotManager.AutopilotMode.PATH_FOLLOWING)
+
+# Create squadron autopilot
+var squadron_coordinator: SquadronAutopilotCoordinator = SquadronAutopilotCoordinator.new()
+var leader: Node3D = player_ship
+var members: Array[Node3D] = [wingman1, wingman2]
+var squadron_id: String = squadron_coordinator.create_squadron(leader, members, SquadronAutopilotCoordinator.CoordinationMode.LOOSE_FORMATION)
+
+# Monitor autopilot status
+var status: Dictionary = autopilot_manager.get_autopilot_status()
+print("Autopilot mode: ", status.get("mode"))
+print("ETA: ", status.get("eta_string"))
+print("Distance remaining: ", status.get("distance_to_destination"))
+
+# Safety monitoring
+var safety_monitor: AutopilotSafetyMonitor = autopilot_manager.get_node("AutopilotSafetyMonitor")
+if safety_monitor.has_active_threats():
+    var threat_level: AutopilotSafetyMonitor.ThreatLevel = safety_monitor.get_highest_threat_level()
+    print("Threat level: ", AutopilotSafetyMonitor.ThreatLevel.keys()[threat_level])
 ```
 
 ## Architecture Notes
