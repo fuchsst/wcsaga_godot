@@ -9,6 +9,9 @@ signal target_acquired(target: Node3D)
 signal target_lost(previous_target: Node3D)
 signal formation_position_updated(position: Vector3, rotation: Vector3)
 signal ai_state_changed(old_state: String, new_state: String)
+signal formation_disrupted(formation_id: String)
+signal formation_assigned(formation_id: String, position: int)
+signal formation_leadership_assigned(formation_id: String)
 
 @export var ai_personality: Resource ## AIPersonality resource
 @export var skill_level: float = 0.5
@@ -16,8 +19,11 @@ signal ai_state_changed(old_state: String, new_state: String)
 @export var behavior_tree: Resource
 
 var current_target: Node3D
-var formation_leader: WCSAIAgent
-var formation_position: int = -1
+var formation_leader: Node3D
+var formation_position_index: int = -1
+var formation_manager_ref: FormationManager
+var formation_id: String = ""
+var is_formation_leader: bool = false
 var last_decision_time: float
 var decision_frequency: float = 0.1
 var performance_monitor: Node
@@ -28,10 +34,14 @@ var firing_rate_modifier: float = 1.0
 var evasion_skill: float = 1.0
 var maneuver_speed: float = 1.0
 var formation_precision: float = 1.0
+var blackboard: AIBlackboard
 
 func _ready() -> void:
 	if not behavior_tree:
 		push_warning("WCSAIAgent: No behavior tree assigned")
+	
+	# Initialize blackboard
+	blackboard = AIBlackboard.new()
 	
 	# Initialize performance monitoring
 	performance_monitor = get_node_or_null("PerformanceMonitor")
@@ -103,15 +113,71 @@ func get_formation_status() -> Dictionary:
 	return {
 		"is_in_formation": formation_leader != null,
 		"formation_leader": formation_leader,
-		"formation_position": formation_position
+		"formation_position": formation_position_index,
+		"formation_id": formation_id,
+		"is_formation_leader": is_formation_leader
 	}
 
 func is_formation_leader() -> bool:
-	return formation_leader == null or formation_leader == self
+	return is_formation_leader
 
-func set_formation_leader(leader: WCSAIAgent, position: int = -1) -> void:
+func set_formation_leader(leader: Node3D, position: int = -1) -> void:
+	var old_leader: Node3D = formation_leader
 	formation_leader = leader
-	formation_position = position
+	formation_position_index = position
+	is_formation_leader = false
+	
+	if old_leader != leader:
+		formation_position_updated.emit(Vector3.ZERO, Vector3.ZERO)
+
+func set_formation_position_index(index: int) -> void:
+	formation_position_index = index
+
+func set_formation_manager(manager: FormationManager) -> void:
+	formation_manager_ref = manager
+
+func set_as_formation_leader(formation_id_val: String, manager: FormationManager) -> void:
+	formation_id = formation_id_val
+	formation_manager_ref = manager
+	is_formation_leader = true
+	formation_leader = null
+	formation_leadership_assigned.emit(formation_id)
+
+func clear_formation_assignment() -> void:
+	var old_formation_id: String = formation_id
+	formation_leader = null
+	formation_position_index = -1
+	formation_manager_ref = null
+	formation_id = ""
+	is_formation_leader = false
+	
+	if not old_formation_id.is_empty():
+		formation_disrupted.emit(old_formation_id)
+
+func clear_formation_leadership() -> void:
+	formation_id = ""
+	formation_manager_ref = null
+	is_formation_leader = false
+
+func get_formation_leader() -> Node3D:
+	return formation_leader
+
+func get_formation_position() -> Vector3:
+	if formation_manager_ref and not formation_id.is_empty():
+		var ship: Node3D = ship_controller.get_physics_body() if ship_controller else get_parent()
+		return formation_manager_ref.get_ship_formation_position(ship)
+	return Vector3.ZERO
+
+func get_formation_offset() -> Vector3:
+	# Calculate relative offset from leader
+	if formation_leader and formation_manager_ref:
+		var my_pos: Vector3 = get_position()
+		var leader_pos: Vector3 = formation_leader.global_position
+		return my_pos - leader_pos
+	return Vector3.ZERO
+
+func get_formation_id() -> String:
+	return formation_id
 
 func get_skill_level() -> float:
 	return skill_level
