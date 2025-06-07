@@ -23,11 +23,15 @@ var decision_frequency: float = 0.1
 var performance_monitor: Node
 var ship_controller: Node
 var current_ai_state: String = "idle"
+var accuracy_modifier: float = 1.0
+var firing_rate_modifier: float = 1.0
+var evasion_skill: float = 1.0
+var maneuver_speed: float = 1.0
+var formation_precision: float = 1.0
 
 func _ready() -> void:
 	if not behavior_tree:
 		push_warning("WCSAIAgent: No behavior tree assigned")
-		return
 	
 	# Initialize performance monitoring
 	performance_monitor = get_node_or_null("PerformanceMonitor")
@@ -35,11 +39,10 @@ func _ready() -> void:
 		performance_monitor = preload("res://scripts/ai/core/ai_performance_monitor.gd").new()
 		add_child(performance_monitor)
 	
-	# Find ship controller
-	ship_controller = get_parent()
-	if not ship_controller:
-		push_error("WCSAIAgent: Must be child of ship controller")
-		return
+	# Create and setup AI ship controller
+	var ship_controller_script = preload("res://scripts/ai/core/ai_ship_controller.gd")
+	ship_controller = ship_controller_script.new()
+	add_child(ship_controller)
 	
 	# Apply personality if available
 	if ai_personality:
@@ -52,6 +55,9 @@ func _ready() -> void:
 	# Connect signals
 	if has_signal("update_task"):
 		connect("update_task", _on_behavior_tree_update)
+	
+	# Register with AI Manager
+	call_deferred("_register_with_ai_manager")
 
 func _process(delta: float) -> void:
 	# Update AI at specified frequency
@@ -60,7 +66,7 @@ func _process(delta: float) -> void:
 		last_decision_time = Time.get_time_dict_from_system()["unix"]
 
 func apply_personality() -> void:
-	if not ai_personality or not ai_personality.has_method("apply_to_agent"):
+	if not ai_personality:
 		return
 	
 	ai_personality.apply_to_agent(self)
@@ -122,9 +128,18 @@ func set_aggression_level(level: float) -> void:
 func get_perceived_threat_level() -> float:
 	# Placeholder implementation - would integrate with threat assessment system
 	if current_target and is_enemy(current_target):
-		var distance: float = global_position.distance_to(current_target.global_position)
+		var my_position: Vector3 = get_position()
+		var distance: float = my_position.distance_to(current_target.global_position)
 		return max(0.0, 1.0 - (distance / 2000.0))  # Threat decreases with distance
 	return 0.0
+
+func get_position() -> Vector3:
+	if ship_controller and ship_controller.has_method("get_ship_position"):
+		return ship_controller.get_ship_position()
+	elif get_parent() and get_parent().has_method("global_position"):
+		return get_parent().global_position
+	else:
+		return Vector3.ZERO
 
 func is_enemy(target: Node) -> bool:
 	if not target or not target.has_method("get_team"):
@@ -176,11 +191,83 @@ func get_team() -> int:
 	return 0
 
 func get_velocity() -> Vector3:
-	if ship_controller and ship_controller.has_method("get_velocity"):
-		return ship_controller.get_velocity()
+	if ship_controller and ship_controller.has_method("get_ship_velocity"):
+		return ship_controller.get_ship_velocity()
 	return Vector3.ZERO
 
 func get_forward_vector() -> Vector3:
-	if ship_controller and ship_controller.has_method("get_forward_vector"):
-		return ship_controller.get_forward_vector()
+	if ship_controller and ship_controller.has_method("get_ship_forward_vector"):
+		return ship_controller.get_ship_forward_vector()
 	return Vector3.FORWARD
+
+# Personality integration methods
+func set_accuracy_modifier(modifier: float) -> void:
+	accuracy_modifier = modifier
+
+func set_firing_rate_modifier(modifier: float) -> void:
+	firing_rate_modifier = modifier
+
+func set_evasion_skill(skill: float) -> void:
+	evasion_skill = skill
+
+func set_maneuver_speed(speed: float) -> void:
+	maneuver_speed = speed
+
+func set_formation_precision(precision: float) -> void:
+	formation_precision = precision
+
+func get_accuracy_modifier() -> float:
+	return accuracy_modifier
+
+func get_firing_rate_modifier() -> float:
+	return firing_rate_modifier
+
+func get_evasion_skill() -> float:
+	return evasion_skill
+
+func get_maneuver_speed() -> float:
+	return maneuver_speed
+
+func get_formation_precision() -> float:
+	return formation_precision
+
+# AI Ship Controller integration
+func move_to_position(position: Vector3) -> void:
+	if ship_controller:
+		ship_controller.set_movement_target(position)
+
+func face_target(target: Node3D) -> void:
+	if ship_controller:
+		ship_controller.face_target(target)
+
+func fire_weapons(weapon_type: int = 0) -> bool:
+	if ship_controller:
+		return ship_controller.fire_weapons(weapon_type, current_target)
+	return false
+
+func execute_evasive_maneuvers(threat_direction: Vector3 = Vector3.ZERO) -> void:
+	if ship_controller:
+		var pattern: String = "random"
+		if ai_personality:
+			pattern = ai_personality.get_maneuver_preference()
+		ship_controller.execute_evasive_maneuvers(threat_direction, pattern)
+
+func get_health_percentage() -> float:
+	if ship_controller:
+		return ship_controller.get_ship_health_percentage()
+	return 1.0
+
+func get_mass() -> float:
+	if ship_controller:
+		return ship_controller.get_ship_mass()
+	return 100.0
+
+func is_destroyed() -> bool:
+	if ship_controller:
+		return ship_controller.is_ship_destroyed()
+	return false
+
+func _register_with_ai_manager() -> void:
+	var ai_manager: Node = get_node("/root/AIManager")
+	if ai_manager and ai_manager.has_method("register_ai_agent"):
+		ai_manager.register_ai_agent(self)

@@ -11,7 +11,12 @@ var ship_controller: Node
 var performance_start_time: int
 
 func _setup() -> void:
-	ai_agent = agent as WCSAIAgent
+	if has_method("get_agent"):
+		ai_agent = get_agent() as WCSAIAgent
+	else:
+		# Fallback for testing or non-LimboAI contexts
+		ai_agent = get_parent() as WCSAIAgent
+	
 	if ai_agent == null:
 		push_error("WCSBTCondition requires WCSAIAgent as agent")
 		return

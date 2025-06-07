@@ -1,0 +1,5 @@
+[gd_resource type="BehaviorTree" format=3]
+
+[resource]
+description = "Combat behavior tree for fighter-class ships. Handles target selection, attack patterns, evasive maneuvers, and weapon management."
+root_task = null

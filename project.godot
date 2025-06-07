@@ -33,7 +33,7 @@ WCSAssetRegistry="*res://addons/wcs_asset_core/loaders/registry_manager.gd"
 WCSAssetValidator="*res://addons/wcs_asset_core/loaders/validation_manager.gd"
 WCSConstants="*res://scripts/core/foundation/wcs_constants.gd"
 WCSPaths="*res://scripts/core/foundation/wcs_paths.gd"
-# AIManager="*res://scripts/ai/core/ai_manager.gd"
+AIManager="*res://scripts/ai/core/ai_manager.gd"
 # SexpManager="*res://addons/sexp/core/sexp_manager.gd"
 
 [display]
