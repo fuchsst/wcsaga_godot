@@ -7,11 +7,11 @@ enum Type {
 	WING,
 	WAYPOINT,
 	JUMP_NODE,
-	SUPPORT_SHIP,
-	SENTRY_GUN,
+	START,  # Player start points
+	DEBRIS,
 	CARGO,
 	NAV_BUOY,
-	DEBRIS
+	SENTRY_GUN
 }
 
 enum LocationType {

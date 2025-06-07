@@ -115,8 +115,7 @@ func _setup_visual_elements() -> void:
 	
 	# Animation tween
 	if animate_transitions:
-		animation_tween = Tween.new()
-		add_child(animation_tween)
+		animation_tween = create_tween()
 	
 	# Connect mouse input
 	gui_input.connect(_on_gui_input)
@@ -255,7 +254,7 @@ func _set_icon_text(text: String, color: Color) -> void:
 		temp_label.reparent(viewport)
 		
 		await get_tree().process_frame
-		var texture: ImageTexture = viewport.get_texture()
+		var texture: ViewportTexture = viewport.get_texture()
 		
 		if status_icon and texture:
 			status_icon.texture = texture

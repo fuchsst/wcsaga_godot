@@ -25,7 +25,7 @@ signal data_changed(property_name: String, old_value: Variant, new_value: Varian
 
 # Arrival conditions
 @export var arrival_delay: float = 0.0
-@export var arrival_cue: SexpNode = null
+@export var arrival_cue: SexpExpression = null
 @export var arrival_anchor: String = ""  # Reference point for arrival
 @export var arrival_distance: float = 1000.0
 
@@ -88,7 +88,7 @@ func _set(property: StringName, value: Variant) -> bool:
 			arrival_delay = max(0.0, value as float)
 			result = true
 		"arrival_cue":
-			arrival_cue = value as SexpNode
+			arrival_cue = value as SexpExpression
 			result = true
 		"arrival_anchor":
 			arrival_anchor = value as String
@@ -122,7 +122,7 @@ func _set(property: StringName, value: Variant) -> bool:
 
 ## Validates the reinforcement data
 func validate() -> ValidationResult:
-	var result: ValidationResult = ValidationResult.new()
+	var result: ValidationResult = ValidationResult.new("", "")
 	
 	# Validate basic properties
 	if reinforcement_id.is_empty():

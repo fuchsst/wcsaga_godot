@@ -600,32 +600,32 @@ func _on_debug_session_stopped(session_id: String) -> void:
 	status_label.text = "Debug session stopped"
 
 func _on_execution_paused(context: SexpDebugContext) -> void:
-	"""Handle execution pause from controls."""
+	## Handle execution pause from controls.
 	status_label.text = "Execution paused at breakpoint"
 
-func _on_breakpoint_added(breakpoint: SexpBreakpoint) -> void:
-	"""Handle breakpoint addition."""
+func _on_breakpoint_added(breakpoint: SexpDebugEvaluator.SexpBreakpoint) -> void:
+	## Handle breakpoint addition.
 	if debug_console:
-		debug_console.print_output("Breakpoint added: " + breakpoint.expression, Color.CYAN)
+		debug_console.print_output("Breakpoint added: " + breakpoint.expression_pattern, Color.CYAN)
 
-func _on_breakpoint_removed(breakpoint: SexpBreakpoint) -> void:
-	"""Handle breakpoint removal."""
+func _on_breakpoint_removed(breakpoint: SexpDebugEvaluator.SexpBreakpoint) -> void:
+	## Handle breakpoint removal.
 	if debug_console:
-		debug_console.print_output("Breakpoint removed: " + breakpoint.expression, Color.CYAN)
+		debug_console.print_output("Breakpoint removed: " + breakpoint.expression_pattern, Color.CYAN)
 
-func _on_breakpoint_hit(breakpoint: SexpBreakpoint, context: SexpDebugContext) -> void:
-	"""Handle breakpoint hit."""
-	status_label.text = "Breakpoint hit: " + breakpoint.expression
+func _on_breakpoint_hit(breakpoint: SexpDebugEvaluator.SexpBreakpoint, context: SexpDebugContext) -> void:
+	## Handle breakpoint hit.
+	status_label.text = "Breakpoint hit: " + breakpoint.expression_pattern
 	if debug_console:
-		debug_console.print_output("*** BREAKPOINT HIT: " + breakpoint.expression, Color.RED)
+		debug_console.print_output("*** BREAKPOINT HIT: " + breakpoint.expression_pattern, Color.RED)
 
 func _on_variable_watch_added(variable_name: String) -> void:
-	"""Handle variable watch addition."""
+	## Handle variable watch addition.
 	if debug_console:
 		debug_console.print_output("Watching variable: " + variable_name, Color.GREEN)
 
 func _on_variable_watch_removed(variable_name: String) -> void:
-	"""Handle variable watch removal."""
+	## Handle variable watch removal.
 	if debug_console:
 		debug_console.print_output("Stopped watching: " + variable_name, Color.GREEN)
 

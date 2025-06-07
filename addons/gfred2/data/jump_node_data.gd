@@ -99,7 +99,7 @@ func _set(property: StringName, value: Variant) -> bool:
 
 ## Validates the jump node data
 func validate() -> ValidationResult:
-	var result: ValidationResult = ValidationResult.new()
+	var result: ValidationResult = ValidationResult.new("", "")
 	
 	# Validate basic properties
 	if name.is_empty():

@@ -4,41 +4,41 @@ extends Node
 ## Clipboard for copy/paste operations in the FRED2 editor plugin.
 ## Handles object copying, cutting, and pasting with proper duplication.
 
-signal objects_copied(objects: Array[MissionObjectData])
-signal objects_pasted(objects: Array[MissionObjectData])
+signal objects_copied(objects: Array[MissionObject])
+signal objects_pasted(objects: Array[MissionObject])
 
 var object_manager: MissionObjectManager
-var clipboard_data: Array[MissionObjectData] = []
+var clipboard_data: Array[MissionObject] = []
 var is_cut_operation: bool = false
 
 func _ready() -> void:
 	name = "ObjectClipboard"
 
-func copy_objects(objects: Array[MissionObjectData]) -> void:
+func copy_objects(objects: Array[MissionObject]) -> void:
 	"""Copy objects to clipboard."""
 	clipboard_data.clear()
 	is_cut_operation = false
 	
-	for obj: MissionObjectData in objects:
+	for obj: MissionObject in objects:
 		if obj:
 			clipboard_data.append(obj.duplicate_data())
 	
 	objects_copied.emit(objects)
 
-func cut_objects(objects: Array[MissionObjectData]) -> void:
+func cut_objects(objects: Array[MissionObject]) -> void:
 	"""Cut objects to clipboard."""
 	copy_objects(objects)
 	is_cut_operation = true
 
-func paste_objects(position_offset: Vector3 = Vector3(10, 0, 0)) -> Array[MissionObjectData]:
+func paste_objects(position_offset: Vector3 = Vector3(10, 0, 0)) -> Array[MissionObject]:
 	"""Paste objects from clipboard."""
 	if clipboard_data.is_empty():
 		return []
 	
-	var pasted_objects: Array[MissionObjectData] = []
+	var pasted_objects: Array[MissionObject] = []
 	
-	for obj_data: MissionObjectData in clipboard_data:
-		var new_object: MissionObjectData = obj_data.duplicate_data()
+	for obj_data: MissionObject in clipboard_data:
+		var new_object: MissionObject = obj_data.duplicate_data()
 		
 		# Apply position offset
 		new_object.position += position_offset
@@ -76,8 +76,8 @@ func get_clipboard_summary() -> String:
 		return "Clipboard empty"
 	
 	var type_counts: Dictionary = {}
-	for obj: MissionObjectData in clipboard_data:
-		var type_name: String = MissionObjectData.ObjectType.keys()[obj.object_type]
+	for obj: MissionObject in clipboard_data:
+		var type_name: String = MissionObject.Type.keys()[obj.type]
 		type_counts[type_name] = type_counts.get(type_name, 0) + 1
 	
 	var summary_parts: Array[String] = []

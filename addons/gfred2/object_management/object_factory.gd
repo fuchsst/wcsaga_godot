@@ -4,7 +4,7 @@ extends Node
 ## Factory for creating mission objects in the FRED2 editor plugin.
 ## Handles object creation, templates, and duplication.
 
-signal object_created(object_data: MissionObjectData)
+signal object_created(object_data: MissionObject)
 
 var object_manager: MissionObjectManager
 var object_templates: Dictionary = {}
@@ -26,18 +26,7 @@ func _setup_default_templates() -> void:
 			"respawn": false
 		}
 	}
-	object_templates[MissionObjectData.ObjectType.SHIP] = ship_template
-	
-	# Weapon template
-	var weapon_template: Dictionary = {
-		"object_name": "New Weapon",
-		"properties": {
-			"weapon_type": "laser",
-			"team": "friendly",
-			"lifeleft": 10.0
-		}
-	}
-	object_templates[MissionObjectData.ObjectType.WEAPON] = weapon_template
+	object_templates[MissionObject.Type.SHIP] = ship_template
 	
 	# Cargo template
 	var cargo_template: Dictionary = {
@@ -48,7 +37,7 @@ func _setup_default_templates() -> void:
 			"destructible": true
 		}
 	}
-	object_templates[MissionObjectData.ObjectType.CARGO] = cargo_template
+	object_templates[MissionObject.Type.CARGO] = cargo_template
 	
 	# Waypoint template
 	var waypoint_template: Dictionary = {
@@ -58,11 +47,11 @@ func _setup_default_templates() -> void:
 			"speed": 33.0
 		}
 	}
-	object_templates[MissionObjectData.ObjectType.WAYPOINT] = waypoint_template
+	object_templates[MissionObject.Type.WAYPOINT] = waypoint_template
 
-func create_object(object_type: MissionObjectData.ObjectType, position: Vector3 = Vector3.ZERO) -> MissionObjectData:
+func create_object(object_type: MissionObject.Type, position: Vector3 = Vector3.ZERO) -> MissionObject:
 	"""Create a new mission object of the specified type."""
-	var new_object: MissionObjectData = MissionObjectData.new()
+	var new_object: MissionObject = MissionObject.new()
 	
 	# Set basic properties
 	new_object.object_type = object_type
@@ -84,12 +73,12 @@ func create_object(object_type: MissionObjectData.ObjectType, position: Vector3 
 	
 	return new_object
 
-func duplicate_object(source: MissionObjectData) -> MissionObjectData:
+func duplicate_object(source: MissionObject) -> MissionObject:
 	"""Create a duplicate of an existing object."""
 	if not source:
 		return null
 	
-	var duplicate: MissionObjectData = source.duplicate_data()
+	var duplicate: MissionObject = source.duplicate_data()
 	
 	# Generate new unique identifiers through manager
 	if object_manager:
@@ -101,7 +90,7 @@ func duplicate_object(source: MissionObjectData) -> MissionObjectData:
 	
 	return duplicate
 
-func create_from_template(template_name: String, position: Vector3 = Vector3.ZERO) -> MissionObjectData:
+func create_from_template(template_name: String, position: Vector3 = Vector3.ZERO) -> MissionObject:
 	"""Create an object from a named template."""
 	# This could be extended to support custom templates loaded from files
 	# For now, just use the default templates
@@ -111,13 +100,13 @@ func create_from_template(template_name: String, position: Vector3 = Vector3.ZER
 			return create_object(object_type, position)
 	
 	# Fallback to ship if template not found
-	return create_object(MissionObjectData.ObjectType.SHIP, position)
+	return create_object(MissionObject.Type.SHIP, position)
 
-func get_template(object_type: MissionObjectData.ObjectType) -> Dictionary:
+func get_template(object_type: MissionObject.Type) -> Dictionary:
 	"""Get the template for an object type."""
 	return object_templates.get(object_type, {})
 
-func set_template(object_type: MissionObjectData.ObjectType, template: Dictionary) -> void:
+func set_template(object_type: MissionObject.Type, template: Dictionary) -> void:
 	"""Set a custom template for an object type."""
 	object_templates[object_type] = template
 

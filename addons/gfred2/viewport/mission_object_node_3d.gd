@@ -21,8 +21,8 @@ signal transformation_finished()
 @export var selection_outline_width: float = 0.1
 
 # Object state
-var mission_object: MissionObjectData
-var object_type: MissionObjectData.ObjectType
+var mission_object: MissionObject
+var object_type: MissionObject.Type
 var is_selected: bool = false
 var is_hovered: bool = false
 
@@ -54,7 +54,7 @@ func _ready() -> void:
 		collision_area.mouse_exited.connect(_on_mouse_exited)
 
 ## Sets up the object from mission data.
-func setup_from_mission_object(obj_data: MissionObjectData) -> void:
+func setup_from_mission_object(obj_data: MissionObject) -> void:
 	if not obj_data:
 		push_error("Cannot setup MissionObjectNode3D with null mission object")
 		return

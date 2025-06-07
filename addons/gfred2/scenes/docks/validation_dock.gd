@@ -444,7 +444,7 @@ func _on_validation_started() -> void:
 	"""Handle validation start."""
 	
 	if validation_indicator:
-		validation_indicator.set_validation_status(ValidationIndicator.ValidationStatus.VALIDATING)
+		validation_indicator.set_validation_status(ValidationIndicator.IndicatorState.VALIDATING)
 	
 	if status_label:
 		status_label.text = "Validating mission..."

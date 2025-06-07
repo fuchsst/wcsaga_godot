@@ -6,10 +6,10 @@ extends Node
 ## Handles object creation, lifecycle management, property updates, and integration
 ## with the 3D viewport and mission data Resource systems.
 
-signal object_created(object_data: MissionObjectData)
-signal object_deleted(object_data: MissionObjectData)
-signal object_modified(object_data: MissionObjectData)
-signal selection_changed(selected_objects: Array[MissionObjectData])
+signal object_created(object_data: MissionObject)
+signal object_deleted(object_data: MissionObject)
+signal object_modified(object_data: MissionObject)
+signal selection_changed(selected_objects: Array[MissionObject])
 
 # Core systems
 var mission_data: MissionData
@@ -21,9 +21,9 @@ var object_clipboard: ObjectClipboard
 var object_validator: ObjectValidator
 
 # Object management state
-var all_objects: Array[MissionObjectData] = []
-var selected_objects: Array[MissionObjectData] = []
-var object_nodes: Dictionary = {}  # MissionObjectData -> MissionObjectNode3D mapping
+var all_objects: Array[MissionObject] = []
+var selected_objects: Array[MissionObject] = []
+var object_nodes: Dictionary = {}  # MissionObject -> MissionObjectNode3D mapping
 var next_object_id: int = 1
 
 # Undo/redo integration
@@ -95,14 +95,14 @@ func load_objects_from_mission() -> void:
 	clear_all_objects()
 	
 	# Load objects from mission data Resource
-	for obj: MissionObjectData in mission_data.objects:
+	for obj: MissionObject in mission_data.objects:
 		register_existing_object(obj)
 	
 	# Update UI displays
 	refresh_all_displays()
 
 ## Register an existing object (from Resource load)
-func register_existing_object(obj: MissionObjectData) -> void:
+func register_existing_object(obj: MissionObject) -> void:
 	if obj in all_objects:
 		return
 	
@@ -123,13 +123,13 @@ func register_existing_object(obj: MissionObjectData) -> void:
 		node_3d.transform_changed.connect(_on_object_transform_changed.bind(obj))
 
 ## Create a new mission object Resource
-func create_object(object_type: MissionObjectData.ObjectType, position: Vector3 = Vector3.ZERO) -> MissionObjectData:
+func create_object(object_type: MissionObject.Type, position: Vector3 = Vector3.ZERO) -> MissionObject:
 	if not object_factory:
 		push_error("Object factory not available")
 		return null
 	
 	# Use factory to create object Resource
-	var new_object: MissionObjectData = object_factory.create_object(object_type, position)
+	var new_object: MissionObject = object_factory.create_object(object_type, position)
 	if not new_object:
 		return null
 	
@@ -151,7 +151,7 @@ func create_object(object_type: MissionObjectData.ObjectType, position: Vector3 
 	return new_object
 
 ## Register a newly created object Resource
-func register_new_object(obj: MissionObjectData) -> void:
+func register_new_object(obj: MissionObject) -> void:
 	if obj in all_objects:
 		return
 	
@@ -174,7 +174,7 @@ func register_new_object(obj: MissionObjectData) -> void:
 	object_created.emit(obj)
 
 ## Delete mission object Resource
-func delete_object(obj: MissionObjectData) -> bool:
+func delete_object(obj: MissionObject) -> bool:
 	if not obj or obj not in all_objects:
 		return false
 	
@@ -214,12 +214,12 @@ func delete_object(obj: MissionObjectData) -> bool:
 	return true
 
 ## Duplicate an existing object Resource
-func duplicate_object(obj: MissionObjectData, offset: Vector3 = Vector3(10, 0, 0)) -> MissionObjectData:
+func duplicate_object(obj: MissionObject, offset: Vector3 = Vector3(10, 0, 0)) -> MissionObject:
 	if not obj or not object_factory:
 		return null
 	
 	# Create duplicate through factory
-	var duplicate: MissionObjectData = object_factory.duplicate_object(obj)
+	var duplicate: MissionObject = object_factory.duplicate_object(obj)
 	if not duplicate:
 		return null
 	
@@ -238,11 +238,11 @@ func duplicate_object(obj: MissionObjectData, offset: Vector3 = Vector3(10, 0, 0
 	return duplicate
 
 ## Select objects
-func select_objects(objects: Array[MissionObjectData], add_to_selection: bool = false) -> void:
+func select_objects(objects: Array[MissionObject], add_to_selection: bool = false) -> void:
 	if not add_to_selection:
 		clear_selection()
 	
-	for obj: MissionObjectData in objects:
+	for obj: MissionObject in objects:
 		if obj not in selected_objects:
 			selected_objects.append(obj)
 			
@@ -258,11 +258,11 @@ func select_objects(objects: Array[MissionObjectData], add_to_selection: bool = 
 	selection_changed.emit(selected_objects)
 
 ## Select single object
-func select_object(obj: MissionObjectData, add_to_selection: bool = false) -> void:
+func select_object(obj: MissionObject, add_to_selection: bool = false) -> void:
 	select_objects([obj], add_to_selection)
 
 ## Deselect object
-func deselect_object(obj: MissionObjectData) -> void:
+func deselect_object(obj: MissionObject) -> void:
 	if obj in selected_objects:
 		selected_objects.erase(obj)
 		
@@ -279,7 +279,7 @@ func deselect_object(obj: MissionObjectData) -> void:
 
 ## Clear all selection
 func clear_selection() -> void:
-	for obj: MissionObjectData in selected_objects:
+	for obj: MissionObject in selected_objects:
 		var node_3d: MissionObjectNode3D = object_nodes.get(obj)
 		if node_3d:
 			node_3d.set_selected(false)
@@ -289,11 +289,11 @@ func clear_selection() -> void:
 	selection_changed.emit(selected_objects)
 
 ## Get currently selected objects
-func get_selected_objects() -> Array[MissionObjectData]:
+func get_selected_objects() -> Array[MissionObject]:
 	return selected_objects.duplicate()
 
 ## Update object Resource property
-func set_object_property(obj: MissionObjectData, property: String, value: Variant) -> bool:
+func set_object_property(obj: MissionObject, property: String, value: Variant) -> bool:
 	if not obj or not obj.has_method("set"):
 		return false
 	
@@ -353,8 +353,8 @@ func paste() -> void:
 
 ## Delete selected objects
 func delete_selected() -> void:
-	var objects_to_delete: Array[MissionObjectData] = selected_objects.duplicate()
-	for obj: MissionObjectData in objects_to_delete:
+	var objects_to_delete: Array[MissionObject] = selected_objects.duplicate()
+	for obj: MissionObject in objects_to_delete:
 		delete_object(obj)
 
 ## Select all objects
@@ -362,7 +362,7 @@ func select_all() -> void:
 	select_objects(all_objects.duplicate())
 
 ## Set selection from external source
-func set_selection(objects: Array[MissionObjectData]) -> void:
+func set_selection(objects: Array[MissionObject]) -> void:
 	select_objects(objects, false)
 
 ## Generate unique object ID
@@ -390,40 +390,40 @@ func generate_unique_object_name(base_name: String) -> String:
 
 ## Check if object with ID exists
 func has_object_with_id(id: String) -> bool:
-	for obj: MissionObjectData in all_objects:
+	for obj: MissionObject in all_objects:
 		if obj.object_id == id:
 			return true
 	return false
 
 ## Check if object with name exists
 func has_object_with_name(name: String) -> bool:
-	for obj: MissionObjectData in all_objects:
+	for obj: MissionObject in all_objects:
 		if obj.object_name == name:
 			return true
 	return false
 
 ## Get object by ID
-func get_object_by_id(id: String) -> MissionObjectData:
-	for obj: MissionObjectData in all_objects:
+func get_object_by_id(id: String) -> MissionObject:
+	for obj: MissionObject in all_objects:
 		if obj.object_id == id:
 			return obj
 	return null
 
 ## Get object by name
-func get_object_by_name(name: String) -> MissionObjectData:
-	for obj: MissionObjectData in all_objects:
+func get_object_by_name(name: String) -> MissionObject:
+	for obj: MissionObject in all_objects:
 		if obj.object_name == name:
 			return obj
 	return null
 
 ## Get 3D node for object
-func get_object_node(obj: MissionObjectData) -> MissionObjectNode3D:
+func get_object_node(obj: MissionObject) -> MissionObjectNode3D:
 	return object_nodes.get(obj)
 
 ## Get all objects of specific type
-func get_objects_by_type(object_type: MissionObjectData.ObjectType) -> Array[MissionObjectData]:
-	var result: Array[MissionObjectData] = []
-	for obj: MissionObjectData in all_objects:
+func get_objects_by_type(object_type: MissionObject.Type) -> Array[MissionObject]:
+	var result: Array[MissionObject] = []
+	for obj: MissionObject in all_objects:
 		if obj.object_type == object_type:
 			result.append(obj)
 	return result
@@ -434,7 +434,7 @@ func clear_all_objects() -> void:
 	clear_selection()
 	
 	# Remove all 3D nodes
-	for obj: MissionObjectData in all_objects:
+	for obj: MissionObject in all_objects:
 		var node_3d: MissionObjectNode3D = object_nodes.get(obj)
 		if node_3d and is_instance_valid(node_3d):
 			node_3d.queue_free()
@@ -476,18 +476,18 @@ func update_selection_displays() -> void:
 
 ## Signal handlers
 
-func _on_factory_object_created(obj: MissionObjectData) -> void:
+func _on_factory_object_created(obj: MissionObject) -> void:
 	# Object creation is handled by create_object method
 	pass
 
-func _on_objects_pasted(objects: Array[MissionObjectData]) -> void:
+func _on_objects_pasted(objects: Array[MissionObject]) -> void:
 	# Register all pasted objects
-	for obj: MissionObjectData in objects:
+	for obj: MissionObject in objects:
 		register_new_object(obj)
 
 func _on_viewport_selection_changed(objects: Array[MissionObjectNode3D]) -> void:
 	# Convert 3D nodes back to mission object Resources
-	var mission_objects: Array[MissionObjectData] = []
+	var mission_objects: Array[MissionObject] = []
 	for node_3d: MissionObjectNode3D in objects:
 		if node_3d.mission_object:
 			mission_objects.append(node_3d.mission_object)
@@ -495,7 +495,7 @@ func _on_viewport_selection_changed(objects: Array[MissionObjectNode3D]) -> void
 	# Update selection (without clearing to allow multi-select)
 	select_objects(mission_objects, Input.is_key_pressed(KEY_CTRL))
 
-func _on_hierarchy_selection_changed(objects: Array[MissionObjectData]) -> void:
+func _on_hierarchy_selection_changed(objects: Array[MissionObject]) -> void:
 	# Update selection from hierarchy
 	select_objects(objects, Input.is_key_pressed(KEY_CTRL))
 
@@ -503,7 +503,7 @@ func _on_property_changed(property_name: String, new_value: Variant) -> void:
 	# Update property through proper channel
 	update_object_property(property_name, new_value)
 
-func _on_object_transform_changed(obj: MissionObjectData) -> void:
+func _on_object_transform_changed(obj: MissionObject) -> void:
 	# 3D transform changed, ensure Resource data is synced
 	var node_3d: MissionObjectNode3D = object_nodes.get(obj)
 	if node_3d:
@@ -522,8 +522,8 @@ func get_object_statistics() -> Dictionary:
 	
 	# Count by type
 	var type_counts: Dictionary = {}
-	for obj: MissionObjectData in all_objects:
-		var type_name: String = MissionObjectData.ObjectType.keys()[obj.object_type]
+	for obj: MissionObject in all_objects:
+		var type_name: String = MissionObject.Type.keys()[obj.object_type]
 		type_counts[type_name] = type_counts.get(type_name, 0) + 1
 	stats.type_counts = type_counts
 	

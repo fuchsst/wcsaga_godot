@@ -74,7 +74,7 @@ func _initialize_campaign_variables() -> void:
 ## Calculates initial mission progression state
 func _calculate_initial_progression() -> void:
 	# Find starting missions (missions with no prerequisites)
-	var starting_missions: Array[CampaignMission] = campaign_data.get_starting_missions()
+	var starting_missions: Array[CampaignMissionData] = campaign_data.get_starting_missions()
 	
 	# Unlock starting missions
 	for mission in starting_missions:
@@ -137,7 +137,7 @@ func complete_mission(mission_id: String, success: bool, score: float = 0.0) -> 
 
 ## Processes mission completion effects (branches, variables)
 func _process_mission_completion(mission_id: String, success: bool) -> void:
-	var mission: CampaignMission = campaign_data.get_mission(mission_id)
+	var mission: CampaignMissionData = campaign_data.get_mission(mission_id)
 	if not mission:
 		return
 	
@@ -149,11 +149,11 @@ func _process_mission_completion(mission_id: String, success: bool) -> void:
 		var should_trigger: bool = false
 		
 		match branch.branch_type:
-			CampaignMissionBranch.BranchType.SUCCESS:
+			CampaignMissionDataBranch.BranchType.SUCCESS:
 				should_trigger = success
-			CampaignMissionBranch.BranchType.FAILURE:
+			CampaignMissionDataBranch.BranchType.FAILURE:
 				should_trigger = not success
-			CampaignMissionBranch.BranchType.CONDITION:
+			CampaignMissionDataBranch.BranchType.CONDITION:
 				should_trigger = _evaluate_branch_condition(branch.branch_condition)
 		
 		if should_trigger and not branch.target_mission_id.is_empty():
@@ -185,7 +185,7 @@ func _evaluate_branch_condition(condition: String) -> bool:
 	return true
 
 ## Triggers a mission branch
-func _trigger_mission_branch(branch: CampaignMissionBranch) -> void:
+func _trigger_mission_branch(branch: CampaignMissionDataBranch) -> void:
 	# The branch target should be unlocked
 	if not branch.target_mission_id.is_empty():
 		_unlock_mission(branch.target_mission_id)
@@ -205,7 +205,7 @@ func _update_mission_availability() -> void:
 			_unlock_mission(mission.mission_id)
 
 ## Checks if mission prerequisites are satisfied
-func _are_prerequisites_met(mission: CampaignMission) -> bool:
+func _are_prerequisites_met(mission: CampaignMissionData) -> bool:
 	for prerequisite_id in mission.prerequisite_missions:
 		var prerequisite_state: MissionState = mission_states.get(prerequisite_id)
 		if not prerequisite_state or prerequisite_state.status != MissionState.Status.COMPLETED:
@@ -231,7 +231,7 @@ func _check_campaign_completion() -> void:
 
 ## Sets a campaign variable value
 func set_campaign_variable(variable_name: String, value: Variant) -> void:
-	var variable: CampaignVariable = campaign_data.get_campaign_variable(variable_name)
+	var variable: CampaignData.CampaignVariable = campaign_data.get_campaign_variable(variable_name)
 	if not variable:
 		print("CampaignProgressionManager: Unknown variable: %s" % variable_name)
 		return
@@ -239,16 +239,16 @@ func set_campaign_variable(variable_name: String, value: Variant) -> void:
 	# Type checking
 	var old_value: Variant = campaign_variables.get(variable_name)
 	match variable.variable_type:
-		CampaignVariable.VariableType.INTEGER:
+		CampaignData.CampaignVariable.VariableType.INTEGER:
 			if value is int:
 				campaign_variables[variable_name] = value
-		CampaignVariable.VariableType.FLOAT:
+		CampaignData.CampaignVariable.VariableType.FLOAT:
 			if value is float or value is int:
 				campaign_variables[variable_name] = float(value)
-		CampaignVariable.VariableType.BOOLEAN:
+		CampaignData.CampaignVariable.VariableType.BOOLEAN:
 			if value is bool:
 				campaign_variables[variable_name] = value
-		CampaignVariable.VariableType.STRING:
+		CampaignData.CampaignVariable.VariableType.STRING:
 			campaign_variables[variable_name] = str(value)
 	
 	if campaign_variables.get(variable_name) != old_value:
@@ -265,7 +265,7 @@ func get_all_campaign_variables() -> Dictionary:
 
 ## Skips an optional mission
 func skip_mission(mission_id: String) -> void:
-	var mission: CampaignMission = campaign_data.get_mission(mission_id)
+	var mission: CampaignMissionData = campaign_data.get_mission(mission_id)
 	if not mission or mission.is_required:
 		print("CampaignProgressionManager: Cannot skip required mission: %s" % mission_id)
 		return
@@ -303,7 +303,7 @@ func validate_campaign_progression() -> Array[String]:
 	
 	# Check for unreachable missions
 	var reachable_missions: Array[String] = []
-	var starting_missions: Array[CampaignMission] = campaign_data.get_starting_missions()
+	var starting_missions: Array[CampaignMissionData] = campaign_data.get_starting_missions()
 	
 	for mission in starting_missions:
 		_find_reachable_missions(mission.mission_id, reachable_missions, [])
@@ -333,7 +333,7 @@ func _find_reachable_missions(mission_id: String, reachable: Array[String], visi
 	visited.append(mission_id)
 	reachable.append(mission_id)
 	
-	var mission: CampaignMission = campaign_data.get_mission(mission_id)
+	var mission: CampaignMissionData = campaign_data.get_mission(mission_id)
 	if not mission:
 		return
 	
@@ -343,7 +343,7 @@ func _find_reachable_missions(mission_id: String, reachable: Array[String], visi
 			_find_reachable_missions(branch.target_mission_id, reachable, visited)
 	
 	# Find missions that depend on this one
-	var dependents: Array[CampaignMission] = campaign_data.get_dependent_missions(mission_id)
+	var dependents: Array[CampaignMissionData] = campaign_data.get_dependent_missions(mission_id)
 	for dependent in dependents:
 		_find_reachable_missions(dependent.mission_id, reachable, visited)
 

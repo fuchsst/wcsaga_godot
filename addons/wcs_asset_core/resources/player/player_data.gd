@@ -78,9 +78,15 @@ func _init():
 
 # --- Helper Methods ---
 func get_rank_name() -> String:
-	# Assumes Ranks array/resource is loaded globally (e.g., in GameData singleton)
-	if Engine.has_singleton("GameData") and rank >= 0 and rank < GameData.Ranks.size():
-		return GameData.Ranks[rank].name
+	# TODO: Implement rank system when GameData or rank resources are available
+	# For now, return a basic rank name based on index
+	var rank_names: Array[String] = [
+		"Ensign", "Lieutenant", "Lt. Commander", "Commander", 
+		"Captain", "Commodore", "Rear Admiral", "Vice Admiral", "Admiral"
+	]
+	
+	if rank >= 0 and rank < rank_names.size():
+		return rank_names[rank]
 	return "Unknown Rank"
 
 func get_stat(stat_enum) -> int:

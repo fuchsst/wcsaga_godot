@@ -161,7 +161,7 @@ func load_mission(mission_data: MissionData) -> bool:
 	return true
 
 ## Creates a 3D node representation for a mission object.
-func create_mission_object_node(obj_data: MissionObjectData) -> MissionObjectNode3D:
+func create_mission_object_node(obj_data: MissionObject) -> MissionObjectNode3D:
 	var obj_node: MissionObjectNode3D = MissionObjectNode3D.new()
 	obj_node.setup_from_mission_object(obj_data)
 	

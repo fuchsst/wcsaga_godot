@@ -215,8 +215,11 @@ func _perform_validation() -> void:
 	dependency_graph.clear()
 	
 	# Use the built-in validation from EPIC-002 MissionData
-	var mission_result: MissionValidationResult = mission_data.validate()
-	current_validation_result.overall_result.merge(mission_result)
+	var mission_result = mission_data.validate()
+	if mission_result is MissionValidationResult:
+		current_validation_result.overall_result.merge(mission_result)
+	else:
+		print("Warning: mission_data.validate() returned unexpected type: ", typeof(mission_result))
 	
 	# Validation phases with progress reporting
 	var phases: Array[Dictionary] = [

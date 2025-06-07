@@ -7,7 +7,7 @@ extends VBoxContainer
 signal property_changed(property_name: String, new_value: Variant)
 signal validation_error(property_name: String, error_message: String)
 
-var current_object: MissionObjectData
+var current_object: MissionObject
 var property_fields: Dictionary = {}
 var validation_labels: Dictionary = {}
 
@@ -33,7 +33,7 @@ func _setup_ui() -> void:
 		properties_container.name = "PropertiesContainer"
 		scroll_container.add_child(properties_container)
 
-func edit_object(object_data: MissionObjectData) -> void:
+func edit_object(object_data: MissionObject) -> void:
 	"""Start editing the given mission object."""
 	current_object = object_data
 	_clear_properties()
@@ -59,7 +59,7 @@ func _show_no_selection() -> void:
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	properties_container.add_child(label)
 
-func _build_property_interface(object_data: MissionObjectData) -> void:
+func _build_property_interface(object_data: MissionObject) -> void:
 	"""Build the property editing interface for the object."""
 	# Object header
 	var header: Label = Label.new()
@@ -68,7 +68,7 @@ func _build_property_interface(object_data: MissionObjectData) -> void:
 	properties_container.add_child(header)
 	
 	# Object type
-	_add_readonly_property("Type", MissionObjectData.ObjectType.keys()[object_data.object_type])
+	_add_readonly_property("Type", MissionObject.ObjectType.keys()[object_data.object_type])
 	
 	# Separator
 	var separator: HSeparator = HSeparator.new()
@@ -82,13 +82,13 @@ func _build_property_interface(object_data: MissionObjectData) -> void:
 	
 	# Type-specific properties
 	match object_data.object_type:
-		MissionObjectData.ObjectType.SHIP:
+		MissionObject.ObjectType.SHIP:
 			_add_ship_properties(object_data)
-		MissionObjectData.ObjectType.WEAPON:
+		MissionObject.ObjectType.WEAPON:
 			_add_weapon_properties(object_data)
-		MissionObjectData.ObjectType.CARGO:
+		MissionObject.ObjectType.CARGO:
 			_add_cargo_properties(object_data)
-		MissionObjectData.ObjectType.WAYPOINT:
+		MissionObject.ObjectType.WAYPOINT:
 			_add_waypoint_properties(object_data)
 
 func _add_readonly_property(label_text: String, value: String) -> void:
@@ -183,7 +183,7 @@ func _add_vector3_property(property_name: String, label_text: String, current_va
 	property_fields[property_name] = fields
 	validation_labels[property_name] = validation_label
 
-func _add_ship_properties(object_data: MissionObjectData) -> void:
+func _add_ship_properties(object_data: MissionObject) -> void:
 	"""Add ship-specific properties."""
 	var separator: HSeparator = HSeparator.new()
 	properties_container.add_child(separator)
@@ -197,7 +197,7 @@ func _add_ship_properties(object_data: MissionObjectData) -> void:
 	_add_string_property("ship_class", "Ship Class", object_data.properties.get("ship_class", ""))
 	_add_string_property("ai_goals", "AI Goals", object_data.properties.get("ai_goals", ""))
 
-func _add_weapon_properties(object_data: MissionObjectData) -> void:
+func _add_weapon_properties(object_data: MissionObject) -> void:
 	"""Add weapon-specific properties."""
 	var separator: HSeparator = HSeparator.new()
 	properties_container.add_child(separator)
@@ -209,7 +209,7 @@ func _add_weapon_properties(object_data: MissionObjectData) -> void:
 	
 	_add_string_property("weapon_type", "Weapon Type", object_data.properties.get("weapon_type", ""))
 
-func _add_cargo_properties(object_data: MissionObjectData) -> void:
+func _add_cargo_properties(object_data: MissionObject) -> void:
 	"""Add cargo-specific properties."""
 	var separator: HSeparator = HSeparator.new()
 	properties_container.add_child(separator)
@@ -221,7 +221,7 @@ func _add_cargo_properties(object_data: MissionObjectData) -> void:
 	
 	_add_string_property("cargo_type", "Cargo Type", object_data.properties.get("cargo_type", ""))
 
-func _add_waypoint_properties(object_data: MissionObjectData) -> void:
+func _add_waypoint_properties(object_data: MissionObject) -> void:
 	"""Add waypoint-specific properties."""
 	var separator: HSeparator = HSeparator.new()
 	properties_container.add_child(separator)

@@ -312,11 +312,11 @@ func _configure_node_validation_indicator(indicator: ValidationIndicator, depend
 	
 	if not dependency_info.is_valid:
 		# Create validation result for error display
-		var result: ValidationResult = ValidationResult.new()
+		var result: ValidationResult = ValidationResult.new("", "")
 		result.add_error(dependency_info.error_message)
 		indicator.set_validation_result(result)
 	else:
-		indicator.set_validation_status(ValidationIndicator.ValidationStatus.VALID)
+		indicator.set_validation_status(ValidationIndicator.IndicatorState.VALID)
 
 func _calculate_node_position(node_id: String) -> Vector2:
 	"""Calculate initial position for a graph node.

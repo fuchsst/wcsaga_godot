@@ -4,15 +4,15 @@ extends VBoxContainer
 ## Object hierarchy tree view for mission objects.
 ## Provides hierarchical organization and selection management.
 
-signal object_selected(object_data: MissionObjectData)
-signal object_visibility_changed(object_data: MissionObjectData, visible: bool)
-signal selection_changed(selected_objects: Array[MissionObjectData])
+signal object_selected(object_data: MissionObject)
+signal object_visibility_changed(object_data: MissionObject, visible: bool)
+signal selection_changed(selected_objects: Array[MissionObject])
 
 var mission_data: MissionData
 var tree: Tree
 var search_field: LineEdit
 var object_items: Dictionary = {}
-var selected_objects: Array[MissionObjectData] = []
+var selected_objects: Array[MissionObject] = []
 
 @onready var search_container: HBoxContainer = $SearchContainer
 @onready var tree_container: VBoxContainer = $TreeContainer
@@ -105,21 +105,21 @@ func _rebuild_tree() -> void:
 		for object_data in categories[category_name]:
 			_create_object_item(category_item, object_data)
 
-func _get_category_name(object_type: MissionObjectData.ObjectType) -> String:
+func _get_category_name(object_type: MissionObject.ObjectType) -> String:
 	"""Get display category name for object type."""
 	match object_type:
-		MissionObjectData.ObjectType.SHIP:
+		MissionObject.ObjectType.SHIP:
 			return "Ships"
-		MissionObjectData.ObjectType.WEAPON:
+		MissionObject.ObjectType.WEAPON:
 			return "Weapons"
-		MissionObjectData.ObjectType.CARGO:
+		MissionObject.ObjectType.CARGO:
 			return "Cargo"
-		MissionObjectData.ObjectType.WAYPOINT:
+		MissionObject.ObjectType.WAYPOINT:
 			return "Waypoints"
 		_:
 			return "Other"
 
-func _create_object_item(parent: TreeItem, object_data: MissionObjectData) -> void:
+func _create_object_item(parent: TreeItem, object_data: MissionObject) -> void:
 	"""Create a tree item for an object."""
 	var item: TreeItem = tree.create_item(parent)
 	
@@ -156,7 +156,7 @@ func _on_tree_item_selected() -> void:
 	if not selected_item:
 		return
 	
-	var object_data: MissionObjectData = selected_item.get_metadata(0)
+	var object_data: MissionObject = selected_item.get_metadata(0)
 	if object_data:
 		_update_selection([object_data])
 		object_selected.emit(object_data)
@@ -167,9 +167,9 @@ func _on_tree_multi_selected(item: TreeItem, column: int, selected: bool) -> voi
 	var root: TreeItem = tree.get_root()
 	_collect_selected_items(root, selected_items)
 	
-	var objects: Array[MissionObjectData] = []
+	var objects: Array[MissionObject] = []
 	for tree_item in selected_items:
-		var object_data: MissionObjectData = tree_item.get_metadata(0)
+		var object_data: MissionObject = tree_item.get_metadata(0)
 		if object_data:
 			objects.append(object_data)
 	
@@ -195,7 +195,7 @@ func _on_tree_item_mouse_selected(position: Vector2, mouse_button_index: int) ->
 
 func _on_tree_button_clicked(item: TreeItem, column: int, id: int, mouse_button_index: int) -> void:
 	"""Handle button clicks in tree items."""
-	var object_data: MissionObjectData = item.get_metadata(0)
+	var object_data: MissionObject = item.get_metadata(0)
 	if not object_data:
 		return
 	
@@ -281,7 +281,7 @@ func _apply_search_filter(item: TreeItem, search_text: String) -> void:
 		item.visible = true
 		return
 	
-	var object_data: MissionObjectData = item.get_metadata(0)
+	var object_data: MissionObject = item.get_metadata(0)
 	if not object_data:
 		return
 	
@@ -303,12 +303,12 @@ func _clear_search() -> void:
 	search_field.text = ""
 	_on_search_text_changed("")
 
-func _update_selection(objects: Array[MissionObjectData]) -> void:
+func _update_selection(objects: Array[MissionObject]) -> void:
 	"""Update the current selection."""
 	selected_objects = objects
 	selection_changed.emit(selected_objects)
 
-func select_object(object_data: MissionObjectData) -> void:
+func select_object(object_data: MissionObject) -> void:
 	"""Programmatically select an object in the tree."""
 	var item: TreeItem = object_items.get(object_data)
 	if item:
@@ -316,7 +316,7 @@ func select_object(object_data: MissionObjectData) -> void:
 		item.select(0)
 		_update_selection([object_data])
 
-func select_objects(objects: Array[MissionObjectData]) -> void:
+func select_objects(objects: Array[MissionObject]) -> void:
 	"""Programmatically select multiple objects in the tree."""
 	tree.deselect_all()
 	
@@ -331,7 +331,7 @@ func refresh_hierarchy() -> void:
 	"""Refresh the hierarchy tree."""
 	_rebuild_tree()
 
-func get_selected_objects() -> Array[MissionObjectData]:
+func get_selected_objects() -> Array[MissionObject]:
 	"""Get currently selected objects."""
 	return selected_objects
 

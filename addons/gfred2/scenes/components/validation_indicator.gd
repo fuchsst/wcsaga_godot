@@ -1,5 +1,5 @@
 @tool
-class_name ValidationIndicator
+class_name ValidationIndicatorComponent
 extends Control
 
 ## Visual validation status indicator for GFRED2 mission editor components
@@ -50,7 +50,7 @@ func _ready() -> void:
 	# Initialize visual state
 	_update_visual_state()
 
-func set_validation_result(result: ValidationResult) -> void:
+func set_validation_result(result) -> void:
 	"""Update validation indicator with new validation result.
 	Args:
 		result: ValidationResult to display"""

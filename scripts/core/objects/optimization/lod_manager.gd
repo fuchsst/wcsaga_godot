@@ -67,7 +67,7 @@ class LODObjectData:
 	func _init(obj: Node3D, obj_type: ObjectTypes.Type) -> void:
 		object = obj
 		object_type = obj_type
-		current_frequency = UpdateFrequencies.Frequency.HIGH_FREQUENCY
+		current_frequency = UpdateFrequencies.Frequency.HIGH
 		last_distance = 0.0
 		threat_level = 0
 		is_culled = false
@@ -76,13 +76,13 @@ class LODObjectData:
 	
 	func _calculate_update_interval(frequency: UpdateFrequencies.Frequency) -> float:
 		match frequency:
-			UpdateFrequencies.Frequency.HIGH_FREQUENCY:
+			UpdateFrequencies.Frequency.HIGH:
 				return 1.0 / 60.0  # 60 FPS
-			UpdateFrequencies.Frequency.MEDIUM_FREQUENCY:
+			UpdateFrequencies.Frequency.MEDIUM:
 				return 1.0 / 30.0  # 30 FPS
-			UpdateFrequencies.Frequency.LOW_FREQUENCY:
+			UpdateFrequencies.Frequency.LOW:
 				return 1.0 / 15.0  # 15 FPS
-			UpdateFrequencies.Frequency.MINIMAL_FREQUENCY:
+			UpdateFrequencies.Frequency.MINIMAL:
 				return 1.0 / 5.0   # 5 FPS
 			_:
 				return 1.0 / 60.0  # Default to high frequency
@@ -218,15 +218,15 @@ func _calculate_lod_frequency(lod_data: LODObjectData) -> UpdateFrequencies.Freq
 	
 	# Player importance radius - always high frequency
 	if distance < player_importance_radius:
-		return UpdateFrequencies.Frequency.HIGH_FREQUENCY
+		return UpdateFrequencies.Frequency.HIGH
 	
 	# Weapon importance radius - always high frequency for nearby weapons
 	if lod_data.object_type == ObjectTypes.Type.WEAPON and distance < weapon_importance_radius:
-		return UpdateFrequencies.Frequency.HIGH_FREQUENCY
+		return UpdateFrequencies.Frequency.HIGH
 	
 	# Active combat gets priority regardless of distance (with reasonable limits)
 	if engagement_status == "ACTIVE_COMBAT" and distance < medium_distance_threshold * combat_boost_multiplier:
-		return UpdateFrequencies.Frequency.HIGH_FREQUENCY
+		return UpdateFrequencies.Frequency.HIGH
 	
 	# Threat level modifiers
 	var threat_distance_modifier: float = 1.0
@@ -241,13 +241,13 @@ func _calculate_lod_frequency(lod_data: LODObjectData) -> UpdateFrequencies.Freq
 	var effective_far_threshold: float = far_distance_threshold * threat_distance_modifier
 	
 	if distance < effective_near_threshold:
-		return UpdateFrequencies.Frequency.HIGH_FREQUENCY
+		return UpdateFrequencies.Frequency.HIGH
 	elif distance < effective_medium_threshold:
-		return UpdateFrequencies.Frequency.MEDIUM_FREQUENCY
+		return UpdateFrequencies.Frequency.MEDIUM
 	elif distance < effective_far_threshold:
-		return UpdateFrequencies.Frequency.LOW_FREQUENCY
+		return UpdateFrequencies.Frequency.LOW
 	else:
-		return UpdateFrequencies.Frequency.MINIMAL_FREQUENCY
+		return UpdateFrequencies.Frequency.MINIMAL
 
 ## Check if object should be culled from physics
 func _should_cull_object(lod_data: LODObjectData) -> bool:

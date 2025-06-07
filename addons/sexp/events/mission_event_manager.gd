@@ -272,72 +272,62 @@ func _evaluate_trigger(trigger_id: String) -> void:
 	
 	total_triggers_evaluated += 1
 	
-	try:
-		# Check cooldown
-		if trigger.is_on_cooldown():
-			return
-		
-		# Evaluate condition
-		var condition_result: SexpResult = _evaluate_expression(trigger.condition_expression)
-		
-		if condition_result.is_error():
-			_handle_trigger_error(trigger_id, "Condition evaluation failed", condition_result)
-			return
-		
-		# Check if condition is met
-		var condition_met: bool = false
-		if condition_result.is_boolean():
-			condition_met = condition_result.get_boolean_value()
-		elif condition_result.is_number():
-			condition_met = condition_result.get_number_value() != 0.0
-		else:
-			condition_met = not condition_result.get_string_value().is_empty()
-		
-		if condition_met:
-			_execute_trigger_action(trigger_id, trigger)
+	# Check cooldown
+	if trigger.is_on_cooldown():
+		return
 	
-	except:
-		var error_msg = "Exception during trigger evaluation: %s" % get_stack()
-		_handle_trigger_error(trigger_id, error_msg, SexpResult.create_error(error_msg, SexpResult.ErrorType.RUNTIME_ERROR))
+	# Evaluate condition
+	var condition_result: SexpResult = _evaluate_expression(trigger.condition_expression)
+	
+	if condition_result.is_error():
+		_handle_trigger_error(trigger_id, "Condition evaluation failed", condition_result)
+		return
+	
+	# Check if condition is met
+	var condition_met: bool = false
+	if condition_result.is_boolean():
+		condition_met = condition_result.get_boolean_value()
+	elif condition_result.is_number():
+		condition_met = condition_result.get_number_value() != 0.0
+	else:
+		condition_met = not condition_result.get_string_value().is_empty()
+	
+	if condition_met:
+		_execute_trigger_action(trigger_id, trigger)
 
 func _execute_trigger_action(trigger_id: String, trigger: EventTrigger) -> void:
 	## Execute a trigger's action when condition is met
 	trigger_states[trigger_id] = TriggerState.FIRING
 	
-	try:
-		# Execute action expression
-		var action_result: SexpResult = _evaluate_expression(trigger.action_expression)
-		
-		if action_result.is_error():
-			_handle_trigger_error(trigger_id, "Action execution failed", action_result)
-			return
-		
-		# Handle trigger completion
-		trigger.on_triggered()
-		
-		# Check if trigger should repeat
-		if trigger.repeat_count > 0 or trigger.repeat_count == -1:  # -1 = infinite
-			if trigger.repeat_count > 0:
-				trigger.repeat_count -= 1
-			
-			# Reset for next evaluation
-			trigger_states[trigger_id] = TriggerState.ACTIVE
-		else:
-			# Mark as completed
-			trigger_states[trigger_id] = TriggerState.COMPLETED
-		
-		# Emit mission event
-		mission_event_fired.emit(trigger_id, {
-			"trigger": trigger,
-			"action_result": action_result,
-			"timestamp": Time.get_time_dict_from_system()
-		})
-		
-		_log_debug("Trigger fired: %s" % trigger_id)
+	# Execute action expression
+	var action_result: SexpResult = _evaluate_expression(trigger.action_expression)
 	
-	except:
-		var error_msg = "Exception during action execution: %s" % get_stack()
-		_handle_trigger_error(trigger_id, error_msg, SexpResult.create_error(error_msg, SexpResult.ErrorType.RUNTIME_ERROR))
+	if action_result.is_error():
+		_handle_trigger_error(trigger_id, "Action execution failed", action_result)
+		return
+	
+	# Handle trigger completion
+	trigger.on_triggered()
+	
+	# Check if trigger should repeat
+	if trigger.repeat_count > 0 or trigger.repeat_count == -1:  # -1 = infinite
+		if trigger.repeat_count > 0:
+			trigger.repeat_count -= 1
+		
+		# Reset for next evaluation
+		trigger_states[trigger_id] = TriggerState.ACTIVE
+	else:
+		# Mark as completed
+		trigger_states[trigger_id] = TriggerState.COMPLETED
+	
+	# Emit mission event
+	mission_event_fired.emit(trigger_id, {
+		"trigger": trigger,
+		"action_result": action_result,
+		"timestamp": Time.get_time_dict_from_system()
+	})
+	
+	_log_debug("Trigger fired: %s" % trigger_id)
 
 ## Signal integration and event handling
 

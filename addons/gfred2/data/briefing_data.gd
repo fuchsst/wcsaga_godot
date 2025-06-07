@@ -130,44 +130,7 @@ class BriefingStage extends Resource:
 		
 		return duplicate
 
-class BriefingIconData extends Resource:
-## Data for briefing icons/markers.
-
-	enum IconType {
-		SHIP,
-		TARGET,
-		OBJECTIVE,
-		WAYPOINT,
-		JUMPNODE,
-		CUSTOM
-	}
-
-	@export var icon_type: IconType = IconType.SHIP
-	@export var icon_name: String = ""
-	@export var position: Vector3 = Vector3.ZERO
-	@export var rotation: Vector3 = Vector3.ZERO
-	@export var scale: Vector3 = Vector3.ONE
-	@export var ship_class: String = ""
-	@export var icon_color: Color = Color.WHITE
-	@export var is_visible: bool = true
-	@export var icon_text: String = ""
-
-	func _init() -> void:
-		resource_name = "BriefingIconData"
-
-	## Duplicates icon data
-	func duplicate_icon() -> BriefingIconData:
-		var duplicate: BriefingIconData = BriefingIconData.new()
-		duplicate.icon_type = icon_type
-		duplicate.icon_name = icon_name
-		duplicate.position = position
-		duplicate.rotation = rotation
-		duplicate.scale = scale
-		duplicate.ship_class = ship_class
-		duplicate.icon_color = icon_color
-		duplicate.is_visible = is_visible
-		duplicate.icon_text = icon_text
-		return duplicate
+# Use BriefingIconData from wcs_asset_core addon instead of duplicating it here
 
 class BriefingKeyframe extends Resource:
 ## Animation keyframe for briefing timeline.

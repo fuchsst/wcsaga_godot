@@ -5,17 +5,17 @@ extends Node
 ## Provides real-time validation and error reporting.
 ## Uses addons/wcs_core_asstes core foundation validation patterns for consistency.
 
-signal validation_error(object_data: MissionObjectData, property: String, error: String)
-signal validation_passed(object_data: MissionObjectData, property: String)
+signal validation_error(object_data: MissionObject, property: String, error: String)
+signal validation_passed(object_data: MissionObject, property: String)
 
 var object_manager: MissionObjectManager
 
 func _ready() -> void:
 	name = "ObjectValidator"
 
-func validate_object(object_data: MissionObjectData) -> ValidationResult:
+func validate_object(object_data: MissionObject) -> ValidationResult:
 	"""Validate an entire object and return result using core validation patterns."""
-	var result: ValidationResult = ValidationResult.new("mission_object", "MissionObjectData")
+	var result: ValidationResult = ValidationResult.new("", "")
 	
 	if not object_data:
 		result.add_error("Object data is null")
@@ -26,35 +26,32 @@ func validate_object(object_data: MissionObjectData) -> ValidationResult:
 	_validate_object_name(object_data, result)
 	_validate_position(object_data, result)
 	_validate_rotation(object_data, result)
-	_validate_scale(object_data, result)
 	
 	# Validate type-specific properties
-	match object_data.object_type:
-		MissionObjectData.ObjectType.SHIP:
+	match object_data.type:
+		MissionObject.Type.SHIP:
 			_validate_ship_properties(object_data, result)
-		MissionObjectData.ObjectType.WEAPON:
-			_validate_weapon_properties(object_data, result)
-		MissionObjectData.ObjectType.CARGO:
+		MissionObject.Type.CARGO:
 			_validate_cargo_properties(object_data, result)
-		MissionObjectData.ObjectType.WAYPOINT:
+		MissionObject.Type.WAYPOINT:
 			_validate_waypoint_properties(object_data, result)
 	
 	return result
 
-func validate_object_property(object_data: MissionObjectData, property: String) -> ValidationResult:
+func validate_object_property(object_data: MissionObject, property: String) -> ValidationResult:
 	"""Validate a specific property of an object using core validation patterns."""
-	var result: ValidationResult = ValidationResult.new("mission_object_property", property)
+	var result: ValidationResult = ValidationResult.new("", "")
 	
 	if not object_data:
 		result.add_error("Object data is null")
 		return result
 	
 	match property:
-		"object_id":
-			if not _is_valid_object_id(object_data.object_id):
+		"id":
+			if not _is_valid_object_id(object_data.id):
 				result.add_error("Invalid object ID format")
-		"object_name":
-			if not _is_valid_object_name(object_data.object_name):
+		"name":
+			if not _is_valid_object_name(object_data.name):
 				result.add_error("Object name cannot be empty")
 		"position":
 			if not _is_valid_position(object_data.position):
@@ -62,9 +59,6 @@ func validate_object_property(object_data: MissionObjectData, property: String) 
 		"rotation":
 			if not _is_valid_rotation(object_data.rotation):
 				result.add_error("Invalid rotation values")
-		"scale":
-			if not _is_valid_scale(object_data.scale):
-				result.add_error("Scale values must be positive")
 		_:
 			# Custom property validation
 			var custom_result: ValidationResult = _validate_custom_property(object_data, property)
@@ -82,149 +76,72 @@ func validate_object_property(object_data: MissionObjectData, property: String) 
 	
 	return result
 
-func validate_property_change(object_data: MissionObjectData, property: String, new_value: Variant) -> bool:
+func validate_property_change(object_data: MissionObject, property: String, new_value: Variant) -> bool:
 	"""Validate a property change before it's applied."""
 	if not object_data:
 		return false
 	
 	# Create temporary copy to test validation
-	var temp_object: MissionObjectData = object_data.duplicate_data()
+	var temp_object: MissionObject = object_data.duplicate()
 	temp_object.set(property, new_value)
 	
 	var validation_result: ValidationResult = validate_object_property(temp_object, property)
 	return validation_result.is_valid()
 
-func _validate_object_id(object_data: MissionObjectData, result: ValidationResult) -> void:
+func _validate_object_id(object_data: MissionObject, result: ValidationResult) -> void:
 	"""Validate object ID."""
-	if not _is_valid_object_id(object_data.object_id):
-		result.add_error("Invalid object ID: " + object_data.object_id)
+	if not _is_valid_object_id(object_data.id):
+		result.add_error("Invalid object ID: " + object_data.id)
 
-func _validate_object_name(object_data: MissionObjectData, result: ValidationResult) -> void:
+func _validate_object_name(object_data: MissionObject, result: ValidationResult) -> void:
 	"""Validate object name."""
-	if not _is_valid_object_name(object_data.object_name):
+	if not _is_valid_object_name(object_data.name):
 		result.add_error("Object name cannot be empty")
 
-func _validate_position(object_data: MissionObjectData, result: ValidationResult) -> void:
+func _validate_position(object_data: MissionObject, result: ValidationResult) -> void:
 	"""Validate position."""
 	if not _is_valid_position(object_data.position):
 		result.add_error("Invalid position values")
 
-func _validate_rotation(object_data: MissionObjectData, result: ValidationResult) -> void:
+func _validate_rotation(object_data: MissionObject, result: ValidationResult) -> void:
 	"""Validate rotation."""
 	if not _is_valid_rotation(object_data.rotation):
 		result.add_error("Invalid rotation values")
 
-func _validate_scale(object_data: MissionObjectData, result: ValidationResult) -> void:
-	"""Validate scale."""
-	if not _is_valid_scale(object_data.scale):
-		result.add_error("Scale values must be positive")
+# _validate_scale method removed - scale property not used in MissionObject
 
-func _validate_ship_properties(object_data: MissionObjectData, result: ValidationResult) -> void:
+func _validate_ship_properties(object_data: MissionObject, result: ValidationResult) -> void:
 	"""Validate ship-specific properties."""
-	var ship_class: String = object_data.properties.get("ship_class", "")
-	if ship_class.is_empty():
-		result.add_warning("Ship class not specified")
+	if object_data.team < 0:
+		result.add_error("Ship must have a valid team assignment")
+	
+	if object_data.primary_banks.is_empty() and object_data.secondary_banks.is_empty():
+		result.add_warning("Ship has no weapons configured")
 
-func _validate_weapon_properties(object_data: MissionObjectData, result: ValidationResult) -> void:
+func _validate_weapon_properties(object_data: MissionObject, result: ValidationResult) -> void:
 	"""Validate weapon-specific properties."""
-	var weapon_type: String = object_data.properties.get("weapon_type", "")
-	if weapon_type.is_empty():
-		result.add_warning("Weapon type not specified")
+	# Weapons are handled as part of ship validation
+	pass
 
-func _validate_cargo_properties(object_data: MissionObjectData, result: ValidationResult) -> void:
+func _validate_cargo_properties(object_data: MissionObject, result: ValidationResult) -> void:
 	"""Validate cargo-specific properties."""
-	var cargo_type: String = object_data.properties.get("cargo_type", "")
-	if cargo_type.is_empty():
-		result.add_warning("Cargo type not specified")
+	# Basic cargo validation
+	pass
 
-func _validate_waypoint_properties(object_data: MissionObjectData, result: ValidationResult) -> void:
+func _validate_waypoint_properties(object_data: MissionObject, result: ValidationResult) -> void:
 	"""Validate waypoint-specific properties."""
-	var waypoint_path: String = object_data.properties.get("waypoint_path", "")
-	if waypoint_path.is_empty():
-		result.add_warning("Waypoint path not specified")
+	# Waypoint validation focuses on position
+	pass
 
-func _validate_custom_property(object_data: MissionObjectData, property: String) -> ValidationResult:
+func _validate_custom_property(object_data: MissionObject, property: String) -> ValidationResult:
 	"""Validate custom properties based on object type."""
-	var result: ValidationResult = ValidationResult.new("custom_property", property)
+	var result: ValidationResult = ValidationResult.new("", "")
 	
-	var property_value: Variant = object_data.properties.get(property, null)
-	
-	# Type-specific validation
-	match object_data.object_type:
-		MissionObjectData.ObjectType.SHIP:
-			result = _validate_ship_custom_property(property, property_value)
-		MissionObjectData.ObjectType.WEAPON:
-			result = _validate_weapon_custom_property(property, property_value)
-		MissionObjectData.ObjectType.CARGO:
-			result = _validate_cargo_custom_property(property, property_value)
-		MissionObjectData.ObjectType.WAYPOINT:
-			result = _validate_waypoint_custom_property(property, property_value)
-	
+	# For now, just return valid result since MissionObject doesn't have a properties dict
+	# This method can be extended when custom properties are needed
 	return result
 
-func _validate_ship_custom_property(property: String, value: Variant) -> Dictionary:
-	"""Validate ship custom properties."""
-	var result: Dictionary = {"is_valid": true, "error_message": ""}
-	
-	match property:
-		"ship_class":
-			if not value is String or (value as String).is_empty():
-				result.is_valid = false
-				result.error_message = "Ship class must be a non-empty string"
-		"ai_goals":
-			if not value is String:
-				result.is_valid = false
-				result.error_message = "AI goals must be a string"
-	
-	return result
-
-func _validate_weapon_custom_property(property: String, value: Variant) -> Dictionary:
-	"""Validate weapon custom properties."""
-	var result: Dictionary = {"is_valid": true, "error_message": ""}
-	
-	match property:
-		"weapon_type":
-			if not value is String or (value as String).is_empty():
-				result.is_valid = false
-				result.error_message = "Weapon type must be a non-empty string"
-		"lifeleft":
-			if not value is float or (value as float) < 0:
-				result.is_valid = false
-				result.error_message = "Life left must be a positive number"
-	
-	return result
-
-func _validate_cargo_custom_property(property: String, value: Variant) -> Dictionary:
-	"""Validate cargo custom properties."""
-	var result: Dictionary = {"is_valid": true, "error_message": ""}
-	
-	match property:
-		"cargo_type":
-			if not value is String or (value as String).is_empty():
-				result.is_valid = false
-				result.error_message = "Cargo type must be a non-empty string"
-		"mass":
-			if not value is float or (value as float) <= 0:
-				result.is_valid = false
-				result.error_message = "Mass must be a positive number"
-	
-	return result
-
-func _validate_waypoint_custom_property(property: String, value: Variant) -> Dictionary:
-	"""Validate waypoint custom properties."""
-	var result: Dictionary = {"is_valid": true, "error_message": ""}
-	
-	match property:
-		"waypoint_path":
-			if not value is String or (value as String).is_empty():
-				result.is_valid = false
-				result.error_message = "Waypoint path must be a non-empty string"
-		"speed":
-			if not value is float or (value as float) < 0:
-				result.is_valid = false
-				result.error_message = "Speed must be a positive number"
-	
-	return result
+# Custom property validation methods removed - not needed for current MissionObject structure
 
 func _is_valid_object_id(id: String) -> bool:
 	"""Check if object ID is valid."""
@@ -244,8 +161,4 @@ func _is_valid_rotation(rot: Vector3) -> bool:
 	return not (is_nan(rot.x) or is_nan(rot.y) or is_nan(rot.z) or 
 	           is_inf(rot.x) or is_inf(rot.y) or is_inf(rot.z))
 
-func _is_valid_scale(scale: Vector3) -> bool:
-	"""Check if scale is valid."""
-	return (scale.x > 0 and scale.y > 0 and scale.z > 0 and 
-	        not (is_nan(scale.x) or is_nan(scale.y) or is_nan(scale.z) or 
-	             is_inf(scale.x) or is_inf(scale.y) or is_inf(scale.z)))
+# _is_valid_scale method removed - scale property not used in MissionObject
