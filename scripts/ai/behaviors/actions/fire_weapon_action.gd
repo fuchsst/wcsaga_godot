@@ -237,7 +237,7 @@ func _evaluate_firing_decision(target: Node3D, solution: Dictionary) -> bool:
 
 func _execute_weapon_fire(target: Node3D, solution: Dictionary) -> bool:
 	"""Execute weapon fire with appropriate mode and timing"""
-	var current_time: float = Time.get_time_from_start()
+	var current_time: float = _get_time_in_seconds()
 	
 	# Check refire delay
 	var weapon_specs: Dictionary = weapon_specifications.get(current_weapon_group, {})
@@ -288,7 +288,7 @@ func _execute_single_shot(target: Node3D, solution: Dictionary) -> bool:
 
 func _execute_burst_fire(target: Node3D, solution: Dictionary) -> bool:
 	"""Execute controlled burst fire"""
-	var current_time: float = Time.get_time_from_start()
+	var current_time: float = _get_time_in_seconds()
 	
 	# Check if we're in the middle of a burst
 	if burst_shots_fired > 0 and burst_shots_fired < burst_size:
@@ -314,7 +314,7 @@ func _execute_burst_fire(target: Node3D, solution: Dictionary) -> bool:
 
 func _execute_sustained_fire(target: Node3D, solution: Dictionary) -> bool:
 	"""Execute sustained continuous fire"""
-	var current_time: float = Time.get_time_from_start()
+	var current_time: float = _get_time_in_seconds()
 	
 	# Track continuous fire time
 	if continuous_fire_time == 0.0:
@@ -827,3 +827,7 @@ func set_fire_parameters(mode: FireMode, discipline: FireDiscipline, targeting: 
 	fire_mode = mode
 	fire_discipline = discipline
 	targeting_mode = targeting
+
+func _get_time_in_seconds() -> float:
+	"""Helper to get time in seconds as a float."""
+	return float(Time.get_ticks_msec()) / 1000.0

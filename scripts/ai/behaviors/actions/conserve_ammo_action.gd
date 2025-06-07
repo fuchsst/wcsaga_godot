@@ -131,8 +131,8 @@ func _setup_conservation_thresholds() -> void:
 				ResourceType.COUNTERMEASURES: 0.8
 			}
 
-func execute_wcs_action(delta: float) -> int:
-	var current_time: float = Time.get_time_from_start()
+func execute_wcs_action(_delta: float) -> int:
+	var current_time: float = _get_time_in_seconds()
 	
 	# Update resource levels
 	_update_resource_levels()
@@ -348,7 +348,7 @@ func _trigger_emergency_conservation(reason: String) -> void:
 
 func _log_resource_usage() -> void:
 	"""Log resource usage for analysis"""
-	var current_time: float = Time.get_time_from_start()
+	var current_time: float = _get_time_in_seconds()
 	var target: Node3D = get_current_target()
 	var target_priority: TargetPriority = TargetPriority.STANDARD_PRIORITY
 	
@@ -664,3 +664,7 @@ func reset_conservation_tracking() -> void:
 	resource_usage_history.clear()
 	conservation_effectiveness = 1.0
 	last_conservation_check = 0.0
+
+func _get_time_in_seconds() -> float:
+	"""Helper to get time in seconds as a float."""
+	return float(Time.get_ticks_msec()) / 1000.0
