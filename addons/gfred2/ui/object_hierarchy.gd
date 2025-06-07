@@ -86,7 +86,7 @@ func _rebuild_tree() -> void:
 	
 	# Group objects by type
 	for object_data in mission_data.objects:
-		var category_name: String = _get_category_name(object_data.object_type)
+		var category_name: String = _get_category_name(object_data.type)
 		
 		if category_name not in categories:
 			categories[category_name] = []
@@ -105,17 +105,27 @@ func _rebuild_tree() -> void:
 		for object_data in categories[category_name]:
 			_create_object_item(category_item, object_data)
 
-func _get_category_name(object_type: MissionObject.ObjectType) -> String:
+func _get_category_name(object_type: MissionObject.Type) -> String:
 	"""Get display category name for object type."""
 	match object_type:
-		MissionObject.ObjectType.SHIP:
+		MissionObject.Type.SHIP:
 			return "Ships"
-		MissionObject.ObjectType.WEAPON:
-			return "Weapons"
-		MissionObject.ObjectType.CARGO:
+		MissionObject.Type.WING:
+			return "Wings"
+		MissionObject.Type.CARGO:
 			return "Cargo"
-		MissionObject.ObjectType.WAYPOINT:
+		MissionObject.Type.WAYPOINT:
 			return "Waypoints"
+		MissionObject.Type.JUMP_NODE:
+			return "Jump Nodes"
+		MissionObject.Type.START:
+			return "Player Starts"
+		MissionObject.Type.DEBRIS:
+			return "Debris"
+		MissionObject.Type.NAV_BUOY:
+			return "Nav Buoys"
+		MissionObject.Type.SENTRY_GUN:
+			return "Sentry Guns"
 		_:
 			return "Other"
 
@@ -124,7 +134,7 @@ func _create_object_item(parent: TreeItem, object_data: MissionObject) -> void:
 	var item: TreeItem = tree.create_item(parent)
 	
 	# Object name and icon
-	var display_name: String = object_data.object_name if object_data.object_name else "Unnamed"
+	var display_name: String = object_data.name if object_data.name else "Unnamed"
 	item.set_text(0, display_name)
 	item.set_metadata(0, object_data)
 	
@@ -201,9 +211,11 @@ func _on_tree_button_clicked(item: TreeItem, column: int, id: int, mouse_button_
 	
 	match id:
 		0: # Visibility toggle
-			var current_visible: bool = object_data.properties.get("visible", true)
+			# For now, just toggle a simple flag - later integrate with proper visibility system
+			var current_visible: bool = true  # Default visible
+			if object_data.has_method("is_visible"):
+				current_visible = object_data.is_visible()
 			var new_visible: bool = not current_visible
-			object_data.properties["visible"] = new_visible
 			
 			# Update button icon
 			item.set_button(0, 0, _get_visibility_icon(new_visible))
@@ -288,13 +300,10 @@ func _apply_search_filter(item: TreeItem, search_text: String) -> void:
 	var item_text: String = item.get_text(0).to_lower()
 	var matches: bool = item_text.contains(search_text)
 	
-	# Also check object properties for matches
+	# Also check object ID for matches
 	if not matches:
-		for key in object_data.properties:
-			var value: String = str(object_data.properties[key]).to_lower()
-			if value.contains(search_text):
-				matches = true
-				break
+		var id_text: String = object_data.id.to_lower()
+		matches = id_text.contains(search_text)
 	
 	item.visible = matches
 

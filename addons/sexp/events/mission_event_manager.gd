@@ -371,7 +371,7 @@ func _on_trigger_signal_received(trigger_id: String, signal_info: Dictionary) ->
 		# Force immediate evaluation for signal-triggered events
 		_evaluate_trigger(trigger_id)
 
-func _on_variable_changed(scope: SexpVariableManager.VariableScope, name: String, old_value: SexpResult, new_value: SexpResult) -> void:
+func _on_variable_changed(scope: int, name: String, old_value: SexpResult, new_value: SexpResult) -> void:
 	## Handle variable changes that might trigger reactive events
 	# Find triggers that depend on this variable
 	for trigger_id in active_triggers:

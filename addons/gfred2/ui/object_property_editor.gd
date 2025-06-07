@@ -63,32 +63,31 @@ func _build_property_interface(object_data: MissionObject) -> void:
 	"""Build the property editing interface for the object."""
 	# Object header
 	var header: Label = Label.new()
-	header.text = object_data.object_name if object_data.object_name else "Unnamed Object"
+	header.text = object_data.name if object_data.name else "Unnamed Object"
 	header.add_theme_font_size_override("font_size", 16)
 	properties_container.add_child(header)
 	
 	# Object type
-	_add_readonly_property("Type", MissionObject.ObjectType.keys()[object_data.object_type])
+	_add_readonly_property("Type", MissionObject.Type.keys()[object_data.type])
 	
 	# Separator
 	var separator: HSeparator = HSeparator.new()
 	properties_container.add_child(separator)
 	
 	# Basic properties
-	_add_string_property("object_name", "Name", object_data.object_name)
+	_add_string_property("name", "Name", object_data.name)
 	_add_vector3_property("position", "Position", object_data.position)
 	_add_vector3_property("rotation", "Rotation", object_data.rotation)
-	_add_vector3_property("scale", "Scale", object_data.scale)
 	
 	# Type-specific properties
-	match object_data.object_type:
-		MissionObject.ObjectType.SHIP:
+	match object_data.type:
+		MissionObject.Type.SHIP:
 			_add_ship_properties(object_data)
-		MissionObject.ObjectType.WEAPON:
-			_add_weapon_properties(object_data)
-		MissionObject.ObjectType.CARGO:
+		MissionObject.Type.WING:
+			_add_ship_properties(object_data)  # Wings use ship properties
+		MissionObject.Type.CARGO:
 			_add_cargo_properties(object_data)
-		MissionObject.ObjectType.WAYPOINT:
+		MissionObject.Type.WAYPOINT:
 			_add_waypoint_properties(object_data)
 
 func _add_readonly_property(label_text: String, value: String) -> void:
@@ -194,8 +193,8 @@ func _add_ship_properties(object_data: MissionObject) -> void:
 	properties_container.add_child(header)
 	
 	# Add ship-specific properties here
-	_add_string_property("ship_class", "Ship Class", object_data.properties.get("ship_class", ""))
-	_add_string_property("ai_goals", "AI Goals", object_data.properties.get("ai_goals", ""))
+	_add_readonly_property("Team", str(object_data.team))
+	_add_readonly_property("AI Goals", str(object_data.ai_goals.size()) + " goals")
 
 func _add_weapon_properties(object_data: MissionObject) -> void:
 	"""Add weapon-specific properties."""
@@ -207,7 +206,8 @@ func _add_weapon_properties(object_data: MissionObject) -> void:
 	header.add_theme_font_size_override("font_size", 14)
 	properties_container.add_child(header)
 	
-	_add_string_property("weapon_type", "Weapon Type", object_data.properties.get("weapon_type", ""))
+	_add_readonly_property("Primary Banks", str(object_data.primary_banks.size()))
+	_add_readonly_property("Secondary Banks", str(object_data.secondary_banks.size()))
 
 func _add_cargo_properties(object_data: MissionObject) -> void:
 	"""Add cargo-specific properties."""
@@ -219,7 +219,8 @@ func _add_cargo_properties(object_data: MissionObject) -> void:
 	header.add_theme_font_size_override("font_size", 14)
 	properties_container.add_child(header)
 	
-	_add_string_property("cargo_type", "Cargo Type", object_data.properties.get("cargo_type", ""))
+	_add_readonly_property("Scannable", str(object_data.scannable))
+	_add_readonly_property("Cargo Known", str(object_data.cargo_known))
 
 func _add_waypoint_properties(object_data: MissionObject) -> void:
 	"""Add waypoint-specific properties."""
@@ -231,7 +232,7 @@ func _add_waypoint_properties(object_data: MissionObject) -> void:
 	header.add_theme_font_size_override("font_size", 14)
 	properties_container.add_child(header)
 	
-	_add_string_property("waypoint_path", "Waypoint Path", object_data.properties.get("waypoint_path", ""))
+	_add_readonly_property("Position", str(object_data.position))
 
 func _on_string_property_changed(property_name: String, new_value: String) -> void:
 	"""Handle string property change."""
@@ -240,10 +241,12 @@ func _on_string_property_changed(property_name: String, new_value: String) -> vo
 	
 	# Update the object data
 	match property_name:
-		"object_name":
-			current_object.object_name = new_value
+		"name":
+			current_object.name = new_value
 		_:
-			current_object.properties[property_name] = new_value
+			# For custom properties that might be added later
+			if current_object.has_method("set_property"):
+				current_object.set_property(property_name, new_value)
 	
 	_validate_object_property(property_name)
 	property_changed.emit(property_name, new_value)
@@ -265,10 +268,10 @@ func _on_vector3_property_changed(property_name: String, fields: Array[SpinBox],
 			current_object.position = new_vector
 		"rotation":
 			current_object.rotation = new_vector
-		"scale":
-			current_object.scale = new_vector
 		_:
-			current_object.properties[property_name] = new_vector
+			# For custom properties that might be added later
+			if current_object.has_method("set_property"):
+				current_object.set_property(property_name, new_vector)
 	
 	_validate_object_property(property_name)
 	property_changed.emit(property_name, new_vector)
@@ -284,17 +287,18 @@ func _validate_object_property(property_name: String) -> void:
 	
 	# Get validation result from ObjectValidator
 	var validator: ObjectValidator = ObjectValidator.new()
-	var validation_result: Dictionary = validator.validate_object_property(
+	var validation_result: ValidationResult = validator.validate_object_property(
 		current_object, 
 		property_name
 	)
 	
-	if validation_result.is_valid:
+	if validation_result.is_valid():
 		validation_label.visible = false
 	else:
-		validation_label.text = validation_result.error_message
+		var errors: Array[String] = validation_result.get_errors()
+		validation_label.text = errors[0] if not errors.is_empty() else "Validation error"
 		validation_label.visible = true
-		validation_error.emit(property_name, validation_result.error_message)
+		validation_error.emit(property_name, validation_label.text)
 
 func refresh_properties() -> void:
 	"""Refresh the property display with current object data."""

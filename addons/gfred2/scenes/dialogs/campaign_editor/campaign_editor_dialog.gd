@@ -11,7 +11,7 @@ signal campaign_validated(is_valid: bool, errors: Array[String])
 
 # Campaign data being edited
 var campaign_data: CampaignData = null
-var selected_mission: CampaignMission = null
+var selected_mission: CampaignMissionData = null
 var is_modified: bool = false
 
 # UI component references
@@ -145,13 +145,13 @@ func _update_mission_list() -> void:
 	
 	# Create mission list items
 	for i in range(campaign_data.missions.size()):
-		var mission: CampaignMission = campaign_data.missions[i]
+		var mission: CampaignMissionData = campaign_data.missions[i]
 		var mission_item: Control = _create_mission_list_item(mission, i)
 		mission_list.add_child(mission_item)
 		mission_list_items.append(mission_item)
 
 ## Creates a mission list item
-func _create_mission_list_item(mission: CampaignMission, index: int) -> Control:
+func _create_mission_list_item(mission: CampaignMissionData, index: int) -> Control:
 	var item: PanelContainer = PanelContainer.new()
 	item.custom_minimum_size = Vector2(0, 40)
 	
@@ -222,7 +222,7 @@ func _setup_variable_manager() -> void:
 		variable_manager.setup_variable_manager(campaign_data)
 
 ## Selects a mission
-func _select_mission(mission: CampaignMission) -> void:
+func _select_mission(mission: CampaignMissionData) -> void:
 	selected_mission = mission
 	
 	# Update visual selection
@@ -243,7 +243,7 @@ func _select_mission(mission: CampaignMission) -> void:
 func _update_mission_selection_visual() -> void:
 	for i in range(mission_list_items.size()):
 		var item: Control = mission_list_items[i]
-		var mission: CampaignMission = campaign_data.missions[i]
+		var mission: CampaignMissionData = campaign_data.missions[i]
 		var style: StyleBoxFlat = StyleBoxFlat.new()
 		
 		if mission == selected_mission:
@@ -300,7 +300,7 @@ func _mark_modified() -> void:
 ## Signal Handlers
 
 func _on_add_mission_pressed() -> void:
-	var new_mission: CampaignMission = CampaignMission.new()
+	var new_mission: CampaignMissionData = CampaignMissionData.new()
 	new_mission.mission_name = "New Mission"
 	new_mission.mission_filename = "new_mission.mission"
 	new_mission.position = Vector2(100, 100)  # Default position
@@ -318,7 +318,7 @@ func _on_remove_mission_pressed() -> void:
 		return
 	
 	# Confirm removal if mission has dependencies
-	var dependents: Array[CampaignMission] = campaign_data.get_dependent_missions(selected_mission.mission_id)
+	var dependents: Array[CampaignMissionData] = campaign_data.get_dependent_missions(selected_mission.mission_id)
 	if not dependents.is_empty():
 		var dependent_names: Array[String] = []
 		for dep in dependents:
@@ -339,7 +339,7 @@ func _on_edit_mission_pressed() -> void:
 	if selected_mission:
 		mission_editor_requested.emit(selected_mission.mission_filename)
 
-func _on_mission_item_selected(mission: CampaignMission) -> void:
+func _on_mission_item_selected(mission: CampaignMissionData) -> void:
 	_select_mission(mission)
 
 func _on_zoom_in_pressed() -> void:
@@ -394,24 +394,24 @@ func _on_test_campaign_pressed() -> void:
 	_run_campaign_tests()
 
 func _on_mission_flow_selected(mission_id: String) -> void:
-	var mission: CampaignMission = campaign_data.get_mission(mission_id)
+	var mission: CampaignMissionData = campaign_data.get_mission(mission_id)
 	if mission:
 		_select_mission(mission)
 
 func _on_mission_flow_moved(mission_id: String, new_position: Vector2) -> void:
-	var mission: CampaignMission = campaign_data.get_mission(mission_id)
+	var mission: CampaignMissionData = campaign_data.get_mission(mission_id)
 	if mission:
 		mission.position = new_position
 		_mark_modified()
 
 func _on_connection_created(from_mission_id: String, to_mission_id: String) -> void:
-	var to_mission: CampaignMission = campaign_data.get_mission(to_mission_id)
+	var to_mission: CampaignMissionData = campaign_data.get_mission(to_mission_id)
 	if to_mission:
 		to_mission.add_prerequisite(from_mission_id)
 		_mark_modified()
 
 func _on_connection_removed(from_mission_id: String, to_mission_id: String) -> void:
-	var to_mission: CampaignMission = campaign_data.get_mission(to_mission_id)
+	var to_mission: CampaignMissionData = campaign_data.get_mission(to_mission_id)
 	if to_mission:
 		to_mission.remove_prerequisite(from_mission_id)
 		_mark_modified()
@@ -439,7 +439,7 @@ func _on_prerequisite_removed(mission_id: String) -> void:
 		_update_flow_diagram()
 		_mark_modified()
 
-func _on_branch_added(branch: CampaignMissionBranch) -> void:
+func _on_branch_added(branch: CampaignMissionDataBranch) -> void:
 	if selected_mission:
 		selected_mission.add_mission_branch(branch)
 		_update_flow_diagram()
@@ -497,7 +497,7 @@ func get_campaign_data() -> CampaignData:
 	return campaign_data
 
 ## Gets the currently selected mission
-func get_selected_mission() -> CampaignMission:
+func get_selected_mission() -> CampaignMissionData:
 	return selected_mission
 
 ## Checks if campaign has been modified

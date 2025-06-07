@@ -22,7 +22,7 @@ func test_campaign_data_mission_management():
 	campaign_data.campaign_name = "Test Campaign"
 	
 	# Create test mission
-	var mission: CampaignMission = CampaignMission.new()
+	var mission: CampaignMissionData = CampaignMissionData.new()
 	mission.mission_name = "Test Mission"
 	mission.mission_filename = "test_mission.mission"
 	mission.mission_id = "test_mission_1"
@@ -36,7 +36,7 @@ func test_campaign_data_mission_management():
 	assert_that(campaign_data.get_mission_at_index(0)).is_equal(mission)
 	
 	# Add another mission
-	var mission2: CampaignMission = CampaignMission.new()
+	var mission2: CampaignMissionData = CampaignMissionData.new()
 	mission2.mission_name = "Test Mission 2"
 	mission2.mission_filename = "test_mission_2.mission"
 	mission2.mission_id = "test_mission_2"
@@ -98,7 +98,7 @@ func test_campaign_data_validation():
 	
 	# Add name and mission
 	campaign_data.campaign_name = "Valid Campaign"
-	var mission: CampaignMission = CampaignMission.new()
+	var mission: CampaignMissionData = CampaignMissionData.new()
 	mission.mission_name = "Valid Mission"
 	mission.mission_filename = "valid.mission"
 	mission.mission_id = "valid_mission"
@@ -112,7 +112,7 @@ func test_campaign_data_validation():
 func test_campaign_mission_data():
 	"""Test campaign mission data structure."""
 	
-	var mission: CampaignMission = CampaignMission.new()
+	var mission: CampaignMissionData = CampaignMissionData.new()
 	mission.mission_name = "Test Mission"
 	mission.mission_filename = "test.mission"
 	mission.mission_description = "A test mission"
@@ -132,7 +132,7 @@ func test_campaign_mission_data():
 func test_campaign_mission_prerequisites():
 	"""Test campaign mission prerequisite management."""
 	
-	var mission: CampaignMission = CampaignMission.new()
+	var mission: CampaignMissionData = CampaignMissionData.new()
 	mission.mission_id = "test_mission"
 	
 	# Add prerequisites
@@ -152,12 +152,12 @@ func test_campaign_mission_prerequisites():
 func test_campaign_mission_branches():
 	"""Test campaign mission branch management."""
 	
-	var mission: CampaignMission = CampaignMission.new()
+	var mission: CampaignMissionData = CampaignMissionData.new()
 	mission.mission_id = "test_mission"
 	
 	# Create test branch
-	var branch: CampaignMissionBranch = CampaignMissionBranch.new()
-	branch.branch_type = CampaignMissionBranch.BranchType.SUCCESS
+	var branch: CampaignMissionDataBranch = CampaignMissionDataBranch.new()
+	branch.branch_type = CampaignMissionDataBranch.BranchType.SUCCESS
 	branch.target_mission_id = "next_mission"
 	branch.branch_description = "Success branch"
 	
@@ -168,8 +168,8 @@ func test_campaign_mission_branches():
 	assert_that(mission.mission_branches[0]).is_equal(branch)
 	
 	# Add another branch
-	var branch2: CampaignMissionBranch = CampaignMissionBranch.new()
-	branch2.branch_type = CampaignMissionBranch.BranchType.FAILURE
+	var branch2: CampaignMissionDataBranch = CampaignMissionDataBranch.new()
+	branch2.branch_type = CampaignMissionDataBranch.BranchType.FAILURE
 	branch2.target_mission_id = "failure_mission"
 	mission.add_mission_branch(branch2)
 	
@@ -183,14 +183,14 @@ func test_campaign_mission_branches():
 func test_campaign_mission_branch_data():
 	"""Test campaign mission branch data structure."""
 	
-	var branch: CampaignMissionBranch = CampaignMissionBranch.new()
-	branch.branch_type = CampaignMissionBranch.BranchType.CONDITION
+	var branch: CampaignMissionDataBranch = CampaignMissionDataBranch.new()
+	branch.branch_type = CampaignMissionDataBranch.BranchType.CONDITION
 	branch.target_mission_id = "conditional_mission"
 	branch.branch_condition = "(> score 80)"
 	branch.branch_description = "High score branch"
 	branch.is_enabled = true
 	
-	assert_that(branch.branch_type).is_equal(CampaignMissionBranch.BranchType.CONDITION)
+	assert_that(branch.branch_type).is_equal(CampaignMissionDataBranch.BranchType.CONDITION)
 	assert_that(branch.target_mission_id).is_equal("conditional_mission")
 	assert_that(branch.branch_condition).is_equal("(> score 80)")
 	assert_that(branch.branch_description).is_equal("High score branch")
@@ -369,7 +369,7 @@ func test_mission_details_panel_setup():
 	add_child(details_panel)
 	
 	var campaign_data: CampaignData = _create_test_campaign_data()
-	var mission: CampaignMission = campaign_data.missions[0]
+	var mission: CampaignMissionData = campaign_data.missions[0]
 	
 	# Setup details panel
 	details_panel.setup_mission_details(mission, campaign_data)
@@ -523,7 +523,7 @@ func _create_test_campaign_data() -> CampaignData:
 	
 	# Add test missions
 	for i in range(3):
-		var mission: CampaignMission = CampaignMission.new()
+		var mission: CampaignMissionData = CampaignMissionData.new()
 		mission.mission_id = "mission_%d" % (i + 1)
 		mission.mission_name = "Mission %d" % (i + 1)
 		mission.mission_filename = "mission_%d.mission" % (i + 1)
@@ -538,8 +538,8 @@ func _create_test_campaign_data() -> CampaignData:
 		
 		# Add test branches
 		if i < 2:  # Add branch to next mission
-			var branch: CampaignMissionBranch = CampaignMissionBranch.new()
-			branch.branch_type = CampaignMissionBranch.BranchType.SUCCESS
+			var branch: CampaignMissionDataBranch = CampaignMissionDataBranch.new()
+			branch.branch_type = CampaignMissionDataBranch.BranchType.SUCCESS
 			branch.target_mission_id = "mission_%d" % (i + 2)
 			branch.branch_description = "Success branch to mission %d" % (i + 2)
 			mission.add_mission_branch(branch)
@@ -575,7 +575,7 @@ func _create_large_campaign_data() -> CampaignData:
 	
 	# Create 50 missions with complex dependencies
 	for i in range(50):
-		var mission: CampaignMission = CampaignMission.new()
+		var mission: CampaignMissionData = CampaignMissionData.new()
 		mission.mission_id = "large_mission_%d" % (i + 1)
 		mission.mission_name = "Large Mission %d" % (i + 1)
 		mission.mission_filename = "large_mission_%d.mission" % (i + 1)
@@ -594,14 +594,14 @@ func _create_large_campaign_data() -> CampaignData:
 		# Add multiple branches
 		for k in range(3):
 			if i + k + 1 < 50:
-				var branch: CampaignMissionBranch = CampaignMissionBranch.new()
+				var branch: CampaignMissionDataBranch = CampaignMissionDataBranch.new()
 				match k:
 					0:
-						branch.branch_type = CampaignMissionBranch.BranchType.SUCCESS
+						branch.branch_type = CampaignMissionDataBranch.BranchType.SUCCESS
 					1:
-						branch.branch_type = CampaignMissionBranch.BranchType.FAILURE
+						branch.branch_type = CampaignMissionDataBranch.BranchType.FAILURE
 					2:
-						branch.branch_type = CampaignMissionBranch.BranchType.CONDITION
+						branch.branch_type = CampaignMissionDataBranch.BranchType.CONDITION
 						branch.branch_condition = "(> score %d)" % (i * 10)
 				
 				branch.target_mission_id = "large_mission_%d" % (i + k + 2)

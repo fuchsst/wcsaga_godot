@@ -13,16 +13,16 @@ signal layout_changed()
 
 # Campaign data and state
 var campaign_data: CampaignData = null
-var mission_nodes: Dictionary = {}  # mission_id -> CampaignMissionNode
+var mission_nodes: Dictionary = {}  # mission_id -> CampaignMissionDataNode
 var connection_lines: Array[CampaignConnectionLine] = []
 var selected_mission_id: String = ""
 
 # Interaction state
 var is_dragging: bool = false
 var drag_start_position: Vector2 = Vector2.ZERO
-var dragging_mission: CampaignMissionNode = null
+var dragging_mission: CampaignMissionDataNode = null
 var is_connecting: bool = false
-var connection_start_mission: CampaignMissionNode = null
+var connection_start_mission: CampaignMissionDataNode = null
 
 # Visual settings
 var node_size: Vector2 = Vector2(120, 80)
@@ -102,7 +102,7 @@ func _create_mission_nodes() -> void:
 		return
 	
 	for mission in campaign_data.missions:
-		var node: CampaignMissionNode = CampaignMissionNode.new()
+		var node: CampaignMissionDataNode = CampaignMissionDataNode.new()
 		node.setup_mission_node(mission)
 		node.size = node_size
 		node.position = mission.position
@@ -122,8 +122,8 @@ func _create_connection_lines() -> void:
 	
 	for mission in campaign_data.missions:
 		for prerequisite_id in mission.prerequisite_missions:
-			var from_node: CampaignMissionNode = mission_nodes.get(prerequisite_id)
-			var to_node: CampaignMissionNode = mission_nodes.get(mission.mission_id)
+			var from_node: CampaignMissionDataNode = mission_nodes.get(prerequisite_id)
+			var to_node: CampaignMissionDataNode = mission_nodes.get(mission.mission_id)
 			
 			if from_node and to_node:
 				var connection: CampaignConnectionLine = CampaignConnectionLine.new()
@@ -133,8 +133,8 @@ func _create_connection_lines() -> void:
 		# Create connections for mission branches
 		for branch in mission.mission_branches:
 			if not branch.target_mission_id.is_empty():
-				var from_node: CampaignMissionNode = mission_nodes.get(mission.mission_id)
-				var to_node: CampaignMissionNode = mission_nodes.get(branch.target_mission_id)
+				var from_node: CampaignMissionDataNode = mission_nodes.get(mission.mission_id)
+				var to_node: CampaignMissionDataNode = mission_nodes.get(branch.target_mission_id)
 				
 				if from_node and to_node:
 					var connection: CampaignConnectionLine = CampaignConnectionLine.new()
@@ -164,7 +164,7 @@ func _draw_grid() -> void:
 ## Draws mission nodes
 func _draw_mission_nodes() -> void:
 	for mission_id in mission_nodes:
-		var node: CampaignMissionNode = mission_nodes[mission_id]
+		var node: CampaignMissionDataNode = mission_nodes[mission_id]
 		var is_selected: bool = mission_id == selected_mission_id
 		
 		# Transform node position
@@ -297,7 +297,7 @@ func _handle_mouse_button(event: InputEventMouseButton) -> void:
 ## Handles left mouse click
 func _handle_left_click(position: Vector2) -> void:
 	var world_pos: Vector2 = _screen_to_world(position)
-	var clicked_mission: CampaignMissionNode = _get_mission_at_position(world_pos)
+	var clicked_mission: CampaignMissionDataNode = _get_mission_at_position(world_pos)
 	
 	if clicked_mission:
 		if is_connecting:
@@ -324,7 +324,7 @@ func _handle_left_release(position: Vector2) -> void:
 ## Handles right mouse click
 func _handle_right_click(position: Vector2) -> void:
 	var world_pos: Vector2 = _screen_to_world(position)
-	var clicked_mission: CampaignMissionNode = _get_mission_at_position(world_pos)
+	var clicked_mission: CampaignMissionDataNode = _get_mission_at_position(world_pos)
 	
 	if clicked_mission:
 		# Start connecting mode
@@ -358,16 +358,16 @@ func _handle_key_input(event: InputEventKey) -> void:
 				pass
 
 ## Gets mission node at world position
-func _get_mission_at_position(world_pos: Vector2) -> CampaignMissionNode:
+func _get_mission_at_position(world_pos: Vector2) -> CampaignMissionDataNode:
 	for mission_id in mission_nodes:
-		var node: CampaignMissionNode = mission_nodes[mission_id]
+		var node: CampaignMissionDataNode = mission_nodes[mission_id]
 		var rect: Rect2 = Rect2(node.position, node_size)
 		if rect.has_point(world_pos):
 			return node
 	return null
 
 ## Starts dragging a mission node
-func _start_dragging_mission(mission_node: CampaignMissionNode, mouse_pos: Vector2) -> void:
+func _start_dragging_mission(mission_node: CampaignMissionDataNode, mouse_pos: Vector2) -> void:
 	is_dragging = true
 	dragging_mission = mission_node
 	drag_start_position = mouse_pos
@@ -379,7 +379,7 @@ func _stop_dragging_mission() -> void:
 	drag_start_position = Vector2.ZERO
 
 ## Starts connecting mode
-func _start_connecting(mission_node: CampaignMissionNode) -> void:
+func _start_connecting(mission_node: CampaignMissionDataNode) -> void:
 	is_connecting = true
 	connection_start_mission = mission_node
 
@@ -390,7 +390,7 @@ func _stop_connecting() -> void:
 	queue_redraw()
 
 ## Selects a mission node
-func _select_mission_node(mission_node: CampaignMissionNode) -> void:
+func _select_mission_node(mission_node: CampaignMissionDataNode) -> void:
 	selected_mission_id = mission_node.mission_data.mission_id
 	queue_redraw()
 	mission_selected.emit(selected_mission_id)
@@ -401,7 +401,7 @@ func _clear_selection() -> void:
 	queue_redraw()
 
 ## Snaps mission position to grid
-func _snap_to_grid(mission_node: CampaignMissionNode) -> void:
+func _snap_to_grid(mission_node: CampaignMissionDataNode) -> void:
 	if show_grid:
 		mission_node.position.x = round(mission_node.position.x / grid_size) * grid_size
 		mission_node.position.y = round(mission_node.position.y / grid_size) * grid_size
@@ -429,7 +429,7 @@ func _auto_fit_diagram() -> void:
 	var max_pos: Vector2 = Vector2(-INF, -INF)
 	
 	for mission_id in mission_nodes:
-		var node: CampaignMissionNode = mission_nodes[mission_id]
+		var node: CampaignMissionDataNode = mission_nodes[mission_id]
 		min_pos = min_pos.min(node.position)
 		max_pos = max_pos.max(node.position + node_size)
 	
@@ -448,16 +448,16 @@ func _auto_fit_diagram() -> void:
 
 ## Signal Handlers
 
-func _on_mission_node_selected(mission_node: CampaignMissionNode) -> void:
+func _on_mission_node_selected(mission_node: CampaignMissionDataNode) -> void:
 	_select_mission_node(mission_node)
 
-func _on_mission_node_dragged(mission_node: CampaignMissionNode, delta: Vector2) -> void:
+func _on_mission_node_dragged(mission_node: CampaignMissionDataNode, delta: Vector2) -> void:
 	mission_node.position += delta / zoom_level
 	_snap_to_grid(mission_node)
 	queue_redraw()
 	mission_moved.emit(mission_node.mission_data.mission_id, mission_node.position)
 
-func _on_connection_requested(mission_node: CampaignMissionNode) -> void:
+func _on_connection_requested(mission_node: CampaignMissionDataNode) -> void:
 	_start_connecting(mission_node)
 
 ## Public API
@@ -485,7 +485,7 @@ func auto_layout_missions() -> void:
 		return
 	
 	# Simple hierarchical layout
-	var starting_missions: Array[CampaignMission] = campaign_data.get_starting_missions()
+	var starting_missions: Array[CampaignMissionData] = campaign_data.get_starting_missions()
 	var positioned: Dictionary = {}
 	var current_y: float = 0.0
 	
@@ -497,7 +497,7 @@ func auto_layout_missions() -> void:
 	layout_changed.emit()
 
 ## Recursively layouts mission tree
-func _layout_mission_tree(mission: CampaignMission, position: Vector2, positioned: Dictionary, depth: int) -> void:
+func _layout_mission_tree(mission: CampaignMissionData, position: Vector2, positioned: Dictionary, depth: int) -> void:
 	if positioned.has(mission.mission_id):
 		return
 	
@@ -508,7 +508,7 @@ func _layout_mission_tree(mission: CampaignMission, position: Vector2, positione
 	positioned[mission.mission_id] = true
 	
 	# Layout dependent missions
-	var dependents: Array[CampaignMission] = campaign_data.get_dependent_missions(mission.mission_id)
+	var dependents: Array[CampaignMissionData] = campaign_data.get_dependent_missions(mission.mission_id)
 	var child_y: float = position.y
 	
 	for dependent in dependents:
@@ -517,18 +517,18 @@ func _layout_mission_tree(mission: CampaignMission, position: Vector2, positione
 			_layout_mission_tree(dependent, child_pos, positioned, depth + 1)
 			child_y += node_spacing.y
 
-class_name CampaignMissionNode
+class_name CampaignMissionDataNode
 extends Control
 
 ## Individual mission node in the campaign flow diagram.
 
-signal mission_selected(mission_node: CampaignMissionNode)
-signal mission_dragged(mission_node: CampaignMissionNode, delta: Vector2)
-signal connection_requested(mission_node: CampaignMissionNode)
+signal mission_selected(mission_node: CampaignMissionDataNode)
+signal mission_dragged(mission_node: CampaignMissionDataNode, delta: Vector2)
+signal connection_requested(mission_node: CampaignMissionDataNode)
 
-var mission_data: CampaignMission = null
+var mission_data: CampaignMissionData = null
 
-func setup_mission_node(mission: CampaignMission) -> void:
+func setup_mission_node(mission: CampaignMissionData) -> void:
 	mission_data = mission
 	name = "MissionNode_%s" % mission.mission_id
 
@@ -543,13 +543,13 @@ enum ConnectionType {
 }
 
 var connection_type: ConnectionType = ConnectionType.PREREQUISITE
-var from_node: CampaignMissionNode = null
-var to_node: CampaignMissionNode = null
+var from_node: CampaignMissionDataNode = null
+var to_node: CampaignMissionDataNode = null
 var from_mission_id: String = ""
 var to_mission_id: String = ""
-var branch_info: CampaignMissionBranch = null
+var branch_info: CampaignMissionDataBranch = null
 
-func setup_connection(from: CampaignMissionNode, to: CampaignMissionNode, from_id: String, to_id: String) -> void:
+func setup_connection(from: CampaignMissionDataNode, to: CampaignMissionDataNode, from_id: String, to_id: String) -> void:
 	from_node = from
 	to_node = to
 	from_mission_id = from_id

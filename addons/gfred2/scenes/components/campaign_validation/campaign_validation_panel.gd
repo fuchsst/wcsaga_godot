@@ -350,8 +350,8 @@ func _validate_variable_references() -> Array[String]:
 	# Check for undefined variable references in branch conditions
 	for mission in campaign_data.missions:
 		for i in range(mission.mission_branches.size()):
-			var branch: CampaignMissionBranch = mission.mission_branches[i]
-			if branch.branch_type == CampaignMissionBranch.BranchType.CONDITION:
+			var branch: CampaignMissionDataBranch = mission.mission_branches[i]
+			if branch.branch_type == CampaignMissionDataBranch.BranchType.CONDITION:
 				var undefined_vars: Array[String] = _find_undefined_variables(branch.branch_condition)
 				for var_name in undefined_vars:
 					errors.append("Mission '%s' branch %d references undefined variable '%s'" % [mission.mission_name, i + 1, var_name])

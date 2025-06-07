@@ -135,7 +135,7 @@ func _generate_wcs_campaign_content() -> String:
 	content += "\n"
 	
 	for i in range(campaign_data.missions.size()):
-		var mission: CampaignMission = campaign_data.missions[i]
+		var mission: CampaignMissionData = campaign_data.missions[i]
 		content += _generate_wcs_mission_entry(mission, i)
 		content += "\n"
 	
@@ -149,7 +149,7 @@ func _generate_wcs_campaign_content() -> String:
 	return content
 
 ## Generates WCS mission entry
-func _generate_wcs_mission_entry(mission: CampaignMission, index: int) -> String:
+func _generate_wcs_mission_entry(mission: CampaignMissionData, index: int) -> String:
 	var entry: String = ""
 	
 	entry += "$Mission: %s\n" % mission.mission_filename
@@ -168,7 +168,7 @@ func _generate_wcs_mission_entry(mission: CampaignMission, index: int) -> String
 	if not mission.prerequisite_missions.is_empty():
 		entry += "+Prerequisites: ( "
 		for prereq_id in mission.prerequisite_missions:
-			var prereq_mission: CampaignMission = campaign_data.get_mission(prereq_id)
+			var prereq_mission: CampaignMissionData = campaign_data.get_mission(prereq_id)
 			if prereq_mission:
 				var prereq_index: int = campaign_data.missions.find(prereq_mission)
 				entry += "%d " % prereq_index
@@ -188,20 +188,20 @@ func _generate_wcs_mission_entry(mission: CampaignMission, index: int) -> String
 	return entry
 
 ## Generates WCS mission branch entry
-func _generate_wcs_mission_branch(branch: CampaignMissionBranch) -> String:
+func _generate_wcs_mission_branch(branch: CampaignMissionDataBranch) -> String:
 	var branch_entry: String = ""
 	
 	match branch.branch_type:
-		CampaignMissionBranch.BranchType.SUCCESS:
+		CampaignMissionDataBranch.BranchType.SUCCESS:
 			branch_entry += "+Success: "
-		CampaignMissionBranch.BranchType.FAILURE:
+		CampaignMissionDataBranch.BranchType.FAILURE:
 			branch_entry += "+Failure: "
-		CampaignMissionBranch.BranchType.CONDITION:
+		CampaignMissionDataBranch.BranchType.CONDITION:
 			branch_entry += "+Formula: %s\n+Success: " % branch.branch_condition
 	
 	# Find target mission index
 	if not branch.target_mission_id.is_empty():
-		var target_mission: CampaignMission = campaign_data.get_mission(branch.target_mission_id)
+		var target_mission: CampaignMissionData = campaign_data.get_mission(branch.target_mission_id)
 		if target_mission:
 			var target_index: int = campaign_data.missions.find(target_mission)
 			branch_entry += "%d\n" % target_index
@@ -268,7 +268,7 @@ func _export_mission_files() -> Error:
 	
 	# Export each mission file
 	for i in range(campaign_data.missions.size()):
-		var mission: CampaignMission = campaign_data.missions[i]
+		var mission: CampaignMissionData = campaign_data.missions[i]
 		var progress: float = 0.8 + (0.2 * float(i) / float(campaign_data.missions.size()))
 		_update_export_progress(progress, "Exporting mission: %s" % mission.mission_name)
 		
@@ -282,7 +282,7 @@ func _export_mission_files() -> Error:
 	return OK
 
 ## Exports a single mission file
-func _export_single_mission(mission: CampaignMission, missions_dir: String) -> Error:
+func _export_single_mission(mission: CampaignMissionData, missions_dir: String) -> Error:
 	# TODO: Implement mission file export using EPIC-003 conversion tools
 	# This would involve:
 	# 1. Loading the Godot mission data
@@ -399,13 +399,13 @@ func _convert_campaign_to_json() -> Dictionary:
 	return json_data
 
 ## Converts branch type enum to string
-func _branch_type_to_string(type: CampaignMissionBranch.BranchType) -> String:
+func _branch_type_to_string(type: CampaignMissionDataBranch.BranchType) -> String:
 	match type:
-		CampaignMissionBranch.BranchType.SUCCESS:
+		CampaignMissionDataBranch.BranchType.SUCCESS:
 			return "success"
-		CampaignMissionBranch.BranchType.FAILURE:
+		CampaignMissionDataBranch.BranchType.FAILURE:
 			return "failure"
-		CampaignMissionBranch.BranchType.CONDITION:
+		CampaignMissionDataBranch.BranchType.CONDITION:
 			return "condition"
 	return "unknown"
 

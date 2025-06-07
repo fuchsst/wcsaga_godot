@@ -8,12 +8,12 @@ extends Control
 signal mission_property_changed(property_name: String, new_value: Variant)
 signal prerequisite_added(mission_id: String)
 signal prerequisite_removed(mission_id: String)
-signal branch_added(branch: CampaignMissionBranch)
+signal branch_added(branch: CampaignMissionDataBranch)
 signal branch_removed(branch_index: int)
 signal branch_modified(branch_index: int, property: String, new_value: Variant)
 
 # Mission data being edited
-var mission_data: CampaignMission = null
+var mission_data: CampaignMissionData = null
 var campaign_data: CampaignData = null
 
 # UI component references
@@ -64,7 +64,7 @@ func _ready() -> void:
 	print("MissionDetailsPanel: Mission details panel initialized")
 
 ## Sets up the mission details panel with data
-func setup_mission_details(target_mission: CampaignMission, target_campaign: CampaignData) -> void:
+func setup_mission_details(target_mission: CampaignMissionData, target_campaign: CampaignData) -> void:
 	mission_data = target_mission
 	campaign_data = target_campaign
 	
@@ -191,13 +191,13 @@ func _update_branches_list() -> void:
 	
 	# Create branch list items
 	for i in range(mission_data.mission_branches.size()):
-		var branch: CampaignMissionBranch = mission_data.mission_branches[i]
+		var branch: CampaignMissionDataBranch = mission_data.mission_branches[i]
 		var branch_item: Control = _create_branch_list_item(branch, i)
 		branches_list.add_child(branch_item)
 		branch_list_items.append(branch_item)
 
 ## Creates a mission branch list item
-func _create_branch_list_item(branch: CampaignMissionBranch, index: int) -> Control:
+func _create_branch_list_item(branch: CampaignMissionDataBranch, index: int) -> Control:
 	var item: PanelContainer = PanelContainer.new()
 	item.custom_minimum_size = Vector2(0, 60)
 	
@@ -227,13 +227,13 @@ func _create_branch_list_item(branch: CampaignMissionBranch, index: int) -> Cont
 	# Branch type
 	var type_label: Label = Label.new()
 	match branch.branch_type:
-		CampaignMissionBranch.BranchType.SUCCESS:
+		CampaignMissionDataBranch.BranchType.SUCCESS:
 			type_label.text = "SUCCESS"
 			type_label.add_theme_color_override("font_color", Color.GREEN)
-		CampaignMissionBranch.BranchType.FAILURE:
+		CampaignMissionDataBranch.BranchType.FAILURE:
 			type_label.text = "FAILURE"
 			type_label.add_theme_color_override("font_color", Color.RED)
-		CampaignMissionBranch.BranchType.CONDITION:
+		CampaignMissionDataBranch.BranchType.CONDITION:
 			type_label.text = "CONDITION"
 			type_label.add_theme_color_override("font_color", Color.YELLOW)
 	
@@ -247,7 +247,7 @@ func _create_branch_list_item(branch: CampaignMissionBranch, index: int) -> Cont
 	header.add_child(target_label)
 	
 	# Branch condition (if applicable)
-	if branch.branch_type == CampaignMissionBranch.BranchType.CONDITION and not branch.branch_condition.is_empty():
+	if branch.branch_type == CampaignMissionDataBranch.BranchType.CONDITION and not branch.branch_condition.is_empty():
 		var condition_label: Label = Label.new()
 		condition_label.text = "Condition: %s" % branch.branch_condition
 		condition_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.8, 1))
@@ -300,7 +300,7 @@ func _get_mission_name_by_id(mission_id: String) -> String:
 	if not campaign_data:
 		return mission_id
 	
-	var mission: CampaignMission = campaign_data.get_mission(mission_id)
+	var mission: CampaignMissionData = campaign_data.get_mission(mission_id)
 	if mission:
 		return mission.mission_name
 	return mission_id
@@ -329,7 +329,7 @@ func _show_mission_selection_dialog(callback: Callable) -> void:
 	
 	# TODO: Create proper mission selection dialog
 	# For now, use the first available mission as example
-	var available_missions: Array[CampaignMission] = []
+	var available_missions: Array[CampaignMissionData] = []
 	for mission in campaign_data.missions:
 		if mission != mission_data and not mission_data.prerequisite_missions.has(mission.mission_id):
 			available_missions.append(mission)
@@ -407,8 +407,8 @@ func _on_add_branch_pressed() -> void:
 func _show_branch_creation_dialog() -> void:
 	# TODO: Create proper branch creation dialog
 	# For now, create a simple success branch
-	var new_branch: CampaignMissionBranch = CampaignMissionBranch.new()
-	new_branch.branch_type = CampaignMissionBranch.BranchType.SUCCESS
+	var new_branch: CampaignMissionDataBranch = CampaignMissionDataBranch.new()
+	new_branch.branch_type = CampaignMissionDataBranch.BranchType.SUCCESS
 	new_branch.target_mission_id = ""  # Will be set by user
 	new_branch.branch_description = "Success branch"
 	
@@ -452,7 +452,7 @@ func _on_edit_briefing_pressed() -> void:
 ## Public API
 
 ## Gets the current mission data
-func get_mission_data() -> CampaignMission:
+func get_mission_data() -> CampaignMissionData:
 	return mission_data
 
 ## Gets the selected prerequisite mission ID
@@ -464,7 +464,7 @@ func get_selected_branch_index() -> int:
 	return selected_branch_index
 
 ## Gets the selected branch
-func get_selected_branch() -> CampaignMissionBranch:
+func get_selected_branch() -> CampaignMissionDataBranch:
 	if mission_data and selected_branch_index >= 0 and selected_branch_index < mission_data.mission_branches.size():
 		return mission_data.mission_branches[selected_branch_index]
 	return null
