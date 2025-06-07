@@ -3,7 +3,7 @@
 ## Package Purpose
 This package implements the AI & Behavior Systems for the WCS-Godot conversion project (EPIC-010). It provides intelligent AI behavior for ships, formation flying, combat tactics, and autopilot systems using modern behavior tree architecture while maintaining WCS's tactical depth and authenticity.
 
-## Implementation Status: Navigation, Collision, Formation, Autopilot & Target Selection Complete (AI-001 through AI-009)
+## Implementation Status: Navigation, Collision, Formation, Autopilot, Target Selection & Combat Maneuvers Complete (AI-001 through AI-010)
 - ✅ **LimboAI Integration Setup**: Framework prepared for LimboAI addon integration (AI-001)
 - ✅ **WCS Behavior Tree Base Classes**: Custom action and condition node base classes (AI-001)
 - ✅ **AI Agent Framework**: Core WCSAIAgent class with performance monitoring (AI-001)
@@ -15,7 +15,8 @@ This package implements the AI & Behavior Systems for the WCS-Godot conversion p
 - ✅ **Formation System**: Complete formation flying with 6 formation types and collision integration (AI-007)
 - ✅ **Autopilot System**: Player assistance and automation with safety monitoring and UI integration (AI-008)
 - ✅ **Target Selection & Prioritization**: Multi-factor threat assessment, tactical doctrine, formation coordination, and mission integration (AI-009)
-- ✅ **Integration Testing**: Complete test suite for AI foundation, navigation, collision, formation, autopilot, and target selection components
+- ✅ **Combat Maneuvers & Attack Patterns**: Sophisticated combat maneuvers, attack patterns, skill-based variations, and weapon integration (AI-010)
+- ✅ **Integration Testing**: Complete test suite for AI foundation, navigation, collision, formation, autopilot, target selection, and combat maneuver components
 
 ## Key Classes
 
@@ -156,6 +157,54 @@ This package implements the AI & Behavior Systems for the WCS-Godot conversion p
 - **Type**: Node class
 - **Responsibility**: Mission-driven targeting, SEXP integration, priority management
 - **Key Features**: 7 target types, 5 priority levels, SEXP commands, escort/protection logic
+
+### AttackRunAction
+- **Purpose**: Sophisticated attack run maneuver execution
+- **Type**: WCSBTAction
+- **Responsibility**: Multi-phase attack runs with approach, attack, and breakaway sequences
+- **Key Features**: 5 attack run types, 4 phases, skill-based variations, weapon firing integration
+
+### StrafePassAction
+- **Purpose**: High-speed lateral strafing attack maneuvers
+- **Type**: WCSBTAction
+- **Responsibility**: Continuous fire lateral attacks with dynamic positioning
+- **Key Features**: 4 strafe directions, 4 phases, continuous fire, optimal range maintenance
+
+### PursuitAttackAction
+- **Purpose**: Sustained pursuit and engagement tactics
+- **Type**: WCSBTAction
+- **Responsibility**: Persistent target engagement with adaptive positioning
+- **Key Features**: 4 pursuit modes, 4 states, energy management, repositioning logic
+
+### AttackPatternManager
+- **Purpose**: Central coordination of combat attack patterns and transitions
+- **Type**: Node class
+- **Responsibility**: Pattern selection, effectiveness tracking, transition management
+- **Key Features**: 6 attack patterns, effectiveness tracking, skill-based selection, pattern transitions
+
+### ManeuverCalculator
+- **Purpose**: Advanced maneuver calculation algorithms for combat situations
+- **Type**: RefCounted utility class
+- **Responsibility**: Mathematical calculations for intercepts, approaches, evasions, and firing solutions
+- **Key Features**: Intercept calculations, attack approaches, evasive maneuvers, weapon firing solutions
+
+### CombatSkillSystem
+- **Purpose**: AI combat skill progression and variation management
+- **Type**: Node class
+- **Responsibility**: Skill tracking, learning, performance analysis, and combat variation application
+- **Key Features**: 5 skill categories, learning system, performance tracking, skill-based variations
+
+### WeaponFiringIntegration
+- **Purpose**: Integration between combat maneuvers and weapon systems
+- **Type**: Node class
+- **Responsibility**: Firing solution calculation, weapon timing, ammo/heat management
+- **Key Features**: 5 fire modes, maneuver integration, heat management, timing optimization
+
+### TargetSpecificTactics
+- **Purpose**: Target-specific combat tactics and engagement planning
+- **Type**: Node class
+- **Responsibility**: Target analysis, tactical approach selection, combat plan creation
+- **Key Features**: 13 target types, tactical approaches, engagement parameters, combat plans
 
 ## Usage Examples
 
@@ -340,6 +389,193 @@ mission_integration.process_sexp_target_command("set-target-priority", enemy_ace
 if mission_integration.is_mission_priority_target(target):
     var priority_bonus: float = mission_integration.get_target_mission_priority(target)
     print("Mission priority bonus: ", priority_bonus)
+```
+
+### Combat Maneuvers and Attack Patterns
+```gdscript
+# Create attack pattern manager for AI ship
+var pattern_manager: AttackPatternManager = AttackPatternManager.new()
+pattern_manager._ready()
+
+# Create target-specific tactics analyzer
+var target_tactics: TargetSpecificTactics = TargetSpecificTactics.new()
+target_tactics._ready()
+
+# Analyze target and create combat plan
+var target_analysis: Dictionary = target_tactics.analyze_target(enemy_ship, {
+	"skill_level": 0.7,
+	"distance": 800.0,
+	"formation_available": true
+})
+
+var combat_plan: Dictionary = target_tactics.create_target_specific_combat_plan(
+	ai_ship, enemy_ship, {"skill_level": 0.7}
+)
+
+# Select and execute attack pattern
+var context: Dictionary = {
+	"skill_level": 0.7,
+	"distance": 600.0,
+	"target_type": "fighter",
+	"energy_level": 0.8
+}
+
+var selected_pattern: AttackPatternManager.AttackPattern = pattern_manager.select_attack_pattern(
+	ai_ship, enemy_ship, context
+)
+
+var attack_action: WCSBTAction = pattern_manager.execute_pattern(
+	selected_pattern, ai_ship, enemy_ship, context
+)
+```
+
+### Advanced Attack Run Execution
+```gdscript
+# Create and configure attack run action
+var attack_run: AttackRunAction = AttackRunAction.new()
+attack_run.ai_agent = ai_ship
+attack_run.ship_controller = ai_ship.get_ship_controller()
+
+# Configure attack run parameters
+attack_run.set_attack_parameters(
+	AttackRunAction.AttackRunType.HIGH_ANGLE,
+	1800.0,  # approach_distance
+	700.0,   # firing_distance
+	300.0    # breakaway_distance
+)
+
+# Monitor attack run progress
+attack_run.attack_run_started.connect(func(target: Node3D, run_type: AttackRunAction.AttackRunType):
+	print("Starting ", AttackRunAction.AttackRunType.keys()[run_type], " attack run on ", target.name)
+)
+
+attack_run.attack_run_completed.connect(func(target: Node3D, success: bool, damage: float):
+	print("Attack run completed - Success: ", success, " Damage: ", damage)
+)
+
+# Execute attack run
+attack_run._setup()
+var result: int = attack_run.execute_wcs_action(delta)
+```
+
+### Strafe Pass Maneuvers
+```gdscript
+# Create strafe pass action
+var strafe_pass: StrafePassAction = StrafePassAction.new()
+strafe_pass.ai_agent = ai_ship
+strafe_pass.ship_controller = ai_ship.get_ship_controller()
+
+# Configure strafe parameters
+strafe_pass.set_strafe_parameters(
+	StrafePassAction.StrafeDirection.LEFT,
+	1400.0,  # strafe_distance
+	550.0,   # optimal_range
+	1.3      # speed_modifier
+)
+
+# Enable continuous fire during strafe
+strafe_pass.continuous_fire = true
+strafe_pass.firing_time_window = 4.0
+
+# Monitor strafe progress
+strafe_pass.strafe_pass_started.connect(func(target: Node3D, direction: StrafePassAction.StrafeDirection):
+	print("Starting strafe pass: ", StrafePassAction.StrafeDirection.keys()[direction])
+)
+
+# Execute strafe pass
+strafe_pass._setup()
+var strafe_result: int = strafe_pass.execute_wcs_action(delta)
+```
+
+### Pursuit Attack Engagement
+```gdscript
+# Create pursuit attack action
+var pursuit: PursuitAttackAction = PursuitAttackAction.new()
+pursuit.ai_agent = ai_ship
+pursuit.ship_controller = ai_ship.get_ship_controller()
+
+# Configure pursuit mode based on situation
+var damage_level: float = ai_ship.get_damage_level()
+if damage_level > 0.4:
+	pursuit.pursuit_mode = PursuitAttackAction.PursuitMode.CAUTIOUS
+else:
+	pursuit.pursuit_mode = PursuitAttackAction.PursuitMode.AGGRESSIVE
+
+# Set pursuit parameters
+pursuit.set_pursuit_parameters(
+	pursuit.pursuit_mode,
+	400.0,  # optimal_distance
+	150.0,  # minimum_distance
+	1200.0  # maximum_distance
+)
+
+# Enable energy management
+pursuit.energy_management = true
+
+# Monitor pursuit states
+pursuit.pursuit_state_changed.connect(func(old_state: PursuitAttackAction.PursuitState, new_state: PursuitAttackAction.PursuitState):
+	print("Pursuit state changed: ", PursuitAttackAction.PursuitState.keys()[old_state], " -> ", PursuitAttackAction.PursuitState.keys()[new_state])
+)
+
+# Execute pursuit
+pursuit._setup()
+var pursuit_result: int = pursuit.execute_wcs_action(delta)
+```
+
+### Combat Skill System Integration
+```gdscript
+# Create combat skill system for AI pilot
+var skill_system: CombatSkillSystem = CombatSkillSystem.new()
+skill_system.base_skill_level = 0.6
+skill_system.learning_enabled = true
+skill_system._ready()
+
+# Apply skill variations to maneuver parameters
+var base_params: Dictionary = {
+	"precision": 1.0,
+	"speed_modifier": 1.0,
+	"randomization": 0.2
+}
+
+var skilled_params: Dictionary = skill_system.apply_maneuver_skill_variations(base_params)
+
+# Record combat performance for learning
+skill_system.record_performance("attack_run", true, {"difficulty": 1.2})
+skill_system.record_performance("weapon_fire", true, {"distance": 500.0})
+
+# Get skill breakdown
+var skill_summary: Dictionary = skill_system.get_performance_summary()
+print("Overall skill: ", skill_summary.get("overall_skill"))
+print("Skill tier: ", CombatSkillSystem.SkillLevel.keys()[skill_summary.get("skill_tier")])
+```
+
+### Weapon Firing Integration
+```gdscript
+# Create weapon firing integration system
+var weapon_integration: WeaponFiringIntegration = WeaponFiringIntegration.new()
+weapon_integration._ready()
+
+# Calculate integrated firing solution
+var maneuver_data: Dictionary = {
+	"maneuver_type": "strafe_pass",
+	"phase": "strafing",
+	"distance_to_target": 500.0,
+	"velocity": Vector3(120, 0, 50)
+}
+
+var firing_solution: Dictionary = weapon_integration.calculate_integrated_firing_solution(
+	ai_ship, enemy_ship, maneuver_data, 0  # weapon_group
+)
+
+# Execute weapon fire with maneuver coordination
+var fire_success: bool = weapon_integration.execute_weapon_fire(
+	ai_ship, enemy_ship, 0, WeaponFiringIntegration.FireMode.BURST_FIRE
+)
+
+# Monitor weapon status
+var weapon_status: Dictionary = weapon_integration.get_weapon_status()
+print("Heat level: ", weapon_status.get("weapon_groups", {}).get(0, {}).get("heat", 0.0))
+print("Ammo remaining: ", weapon_status.get("ammo_management", {}).get(0, {}).get("current", 0))
 ```
 
 ### Dynamic Target Switching
