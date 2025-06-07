@@ -17,15 +17,15 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-Scenes="*res://addons/scene_manager/scenes.gd"
-Signal_Debugger="*res://addons/SignalVisualizer/Debugger/SignalDebugger.gd"
+# Scenes="*res://addons/scene_manager/scenes.gd"
+# Signal_Debugger="*res://addons/SignalVisualizer/Debugger/SignalDebugger.gd"
 GameStateManager="*res://autoload/game_state_manager.gd"
 PhysicsManager="*res://autoload/physics_manager.gd"
 InputManager="*res://autoload/input_manager.gd"
 ConfigurationManager="*res://autoload/configuration_manager.gd"
 SaveGameManager="*res://autoload/SaveGameManager.gd"
 ObjectManager="*res://autoload/object_manager.gd"
-SceneManager="*res://addons/scene_manager/SceneManager.tscn"
+# SceneManager="*res://addons/scene_manager/SceneManager.tscn"
 VPResourceManager="*res://autoload/vp_resource_manager.gd"
 GraphicsRenderingEngine="*res://scripts/graphics/core/graphics_rendering_engine.gd"
 WCSAssetLoader="*res://addons/wcs_asset_core/loaders/asset_loader.gd"
@@ -33,6 +33,8 @@ WCSAssetRegistry="*res://addons/wcs_asset_core/loaders/registry_manager.gd"
 WCSAssetValidator="*res://addons/wcs_asset_core/loaders/validation_manager.gd"
 WCSConstants="*res://scripts/core/foundation/wcs_constants.gd"
 WCSPaths="*res://scripts/core/foundation/wcs_paths.gd"
+# AIManager="*res://scripts/ai/core/ai_manager.gd"
+# SexpManager="*res://addons/sexp/core/sexp_manager.gd"
 
 [display]
 
@@ -42,7 +44,7 @@ window/stretch/mode="canvas_items"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/gdUnit4/plugin.cfg", "res://addons/wcs_asset_core/plugin.cfg")
+enabled=PackedStringArray("res://addons/gdUnit4/plugin.cfg", "res://addons/limboai/plugin.cfg", "res://addons/sexp/plugin.cfg", "res://addons/wcs_asset_core/plugin.cfg")
 
 [input]
 
