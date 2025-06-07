@@ -63,7 +63,7 @@ func validate_syntax(expression_text: String) -> bool:
 		push_error("SEXP system not initialized")
 		return false
 	
-	var result: SexpParser.ValidationResult = _parser.validate_syntax(expression_text)
+	var result: SexpParser.SexpValidationResult = _parser.validate_syntax(expression_text)
 	return result.is_valid
 
 ## Get detailed validation results
@@ -71,7 +71,7 @@ func get_validation_errors(expression_text: String) -> Array[String]:
 	if not _is_initialized:
 		return ["SEXP system not initialized"]
 	
-	var result: SexpParser.ValidationResult = _parser.validate_syntax(expression_text)
+	var result: SexpParser.SexpValidationResult = _parser.validate_syntax(expression_text)
 	return result.errors
 
 ## Tokenize SEXP text for syntax highlighting or analysis

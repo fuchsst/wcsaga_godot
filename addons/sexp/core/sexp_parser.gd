@@ -29,7 +29,7 @@ class ParseResult extends RefCounted:
 		warnings.append(warning_msg)
 
 ## Validation result for syntax checking
-class ValidationResult extends RefCounted:
+class SexpValidationResult extends RefCounted:
 
 	var is_valid: bool = true
 	var errors: Array[String] = []
@@ -105,8 +105,8 @@ class ValidationResult extends RefCounted:
 		return result
 
 	## Validate syntax without building full expression tree
-	func validate_syntax(expression_text: String) -> ValidationResult:
-		var result := ValidationResult.new()
+	func validate_syntax(expression_text: String) -> SexpValidationResult:
+		var result := SexpValidationResult.new()
 		
 		# Quick tokenization check
 		var tokenizer := SexpTokenizer.new()

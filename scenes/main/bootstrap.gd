@@ -21,12 +21,13 @@ func _ready() -> void:
 	await get_tree().create_timer(2.0).timeout
 	
 	# Start the game by transitioning to the intro scene
-	if SceneManager:
-		# Use proper SceneManager API with valid parameter count
-		SceneManager.change_scene("intro")
-	else:
-		# Fallback if SceneManager is not available
-		print("Bootstrap: SceneManager not available, staying in bootstrap")
+	# Note: SceneManager temporarily disabled
+	#if SceneManager:
+	#	# Use proper SceneManager API with valid parameter count
+	#	SceneManager.change_scene("intro")
+	#else:
+	# Fallback if SceneManager is not available
+	print("Bootstrap: SceneManager not available, staying in bootstrap")
 
 func _test_core_managers() -> void:
 	print("Bootstrap: Testing core managers...")

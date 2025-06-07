@@ -302,7 +302,7 @@ func get_formation_info(formation_id: String) -> Dictionary:
 
 # AI Lifecycle Management
 func spawn_ai_agent(ship_controller: Node, personality_resource: Resource = null) -> Node:
-	var ai_agent_script = preload("res://scripts/ai/core/wcs_ai_agent.gd")
+	var ai_agent_script = load("res://scripts/ai/core/wcs_ai_agent.gd")
 	var ai_agent: Node = ai_agent_script.new()
 	ship_controller.add_child(ai_agent)
 	
