@@ -112,12 +112,13 @@ func execute_evasive_maneuvers(threat_direction: Vector3, pattern: String = "bar
 	current_movement_mode = MovementMode.EVASIVE
 	
 	var evasion_vector: Vector3 = calculate_evasion_vector(threat_direction, pattern)
-	set_movement_target(global_position + evasion_vector, MovementMode.EVASIVE)
+	var ship_position: Vector3 = get_ship_position()
+	set_movement_target(ship_position + evasion_vector, MovementMode.EVASIVE)
 	
 	evasive_maneuvers_started.emit(pattern)
 
 func stop_movement() -> void:
-	current_movement_target = global_position
+	current_movement_target = get_ship_position()
 	if ship_controller and ship_controller.has_method("stop"):
 		ship_controller.stop()
 
@@ -133,8 +134,9 @@ func face_target(target: Node3D) -> void:
 		set_facing_target(target.global_position)
 
 func face_movement_direction() -> void:
-	var movement_direction: Vector3 = (current_movement_target - global_position).normalized()
-	set_facing_target(global_position + movement_direction * 1000.0)
+	var ship_position: Vector3 = get_ship_position()
+	var movement_direction: Vector3 = (current_movement_target - ship_position).normalized()
+	set_facing_target(ship_position + movement_direction * 1000.0)
 
 # Weapon Control Interface
 func fire_weapons(weapon_system: WeaponSystem = WeaponSystem.PRIMARY, target: Node3D = null) -> bool:
@@ -171,7 +173,8 @@ func can_fire_at_target(target: Node3D, weapon_system: WeaponSystem = WeaponSyst
 	if not target or not ship_controller:
 		return false
 	
-	var distance: float = global_position.distance_to(target.global_position)
+	var ship_position: Vector3 = get_ship_position()
+	var distance: float = ship_position.distance_to(target.global_position)
 	var weapon_range: float = get_weapon_range(weapon_system)
 	
 	return distance <= weapon_range and is_facing_target(target, 0.2)  # 0.2 radian tolerance
@@ -197,7 +200,7 @@ func get_weapon_range(weapon_system: WeaponSystem) -> float:
 func get_ship_position() -> Vector3:
 	if ship_controller and ship_controller.has_method("get_global_position"):
 		return ship_controller.get_global_position()
-	return global_position
+	return get_parent().global_position if get_parent() is Node3D else Vector3.ZERO
 
 func get_ship_velocity() -> Vector3:
 	if ship_controller and ship_controller.has_method("get_velocity"):
@@ -268,7 +271,8 @@ func is_facing_target(target: Node3D, tolerance: float = 0.1) -> bool:
 	if not target:
 		return false
 	
-	var direction_to_target: Vector3 = (target.global_position - global_position).normalized()
+	var ship_position: Vector3 = get_ship_position()
+	var direction_to_target: Vector3 = (target.global_position - ship_position).normalized()
 	var forward_vector: Vector3 = get_ship_forward_vector()
 	var angle: float = forward_vector.angle_to(direction_to_target)
 	
@@ -277,11 +281,13 @@ func is_facing_target(target: Node3D, tolerance: float = 0.1) -> bool:
 func distance_to_target(target: Node3D) -> float:
 	if not target:
 		return INF
-	return global_position.distance_to(target.global_position)
+	var ship_position: Vector3 = get_ship_position()
+	return ship_position.distance_to(target.global_position)
 
 func is_at_position(position: Vector3, tolerance: float = -1.0) -> bool:
 	var actual_tolerance: float = tolerance if tolerance > 0 else movement_precision
-	return global_position.distance_to(position) <= actual_tolerance
+	var ship_position: Vector3 = get_ship_position()
+	return ship_position.distance_to(position) <= actual_tolerance
 
 # AI Control Management
 func enable_ai_control() -> void:
@@ -328,7 +334,8 @@ func _update_movement_execution(delta: float) -> void:
 
 func _update_facing_execution(delta: float) -> void:
 	# Auto-face movement direction if no specific facing target
-	if current_facing_target == Vector3.ZERO and current_movement_target != global_position:
+	var ship_position: Vector3 = get_ship_position()
+	if current_facing_target == Vector3.ZERO and current_movement_target != ship_position:
 		face_movement_direction()
 
 func _calculate_formation_offset() -> Vector3:
