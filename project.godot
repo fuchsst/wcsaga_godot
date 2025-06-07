@@ -36,6 +36,7 @@ WCSPaths="*res://scripts/core/foundation/wcs_paths.gd"
 AIManager="*res://scripts/ai/core/ai_manager.gd"
 #SexpManager="*res://addons/sexp/core/sexp_manager.gd"
 SexpManager="*res://addons/sexp/core/sexp_manager.gd"
+SceneManager="*res://addons/scene_manager/SceneManager.tscn"
 
 [display]
 
@@ -45,7 +46,7 @@ window/stretch/mode="canvas_items"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/sexp/plugin.cfg", "res://addons/wcs_asset_core/plugin.cfg", "res://addons/gdUnit4/plugin.cfg")
+enabled=PackedStringArray("res://addons/gdUnit4/plugin.cfg", "res://addons/scene_manager/plugin.cfg", "res://addons/sexp/plugin.cfg", "res://addons/wcs_asset_core/plugin.cfg")
 
 [input]
 
