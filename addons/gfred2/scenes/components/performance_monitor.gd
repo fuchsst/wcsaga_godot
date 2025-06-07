@@ -1,5 +1,5 @@
 @tool
-class_name PerformanceMonitor
+class_name GFRED2PerformanceMonitor
 extends Node
 
 ## Real-time performance monitoring component for GFRED2.

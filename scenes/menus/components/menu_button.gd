@@ -1,12 +1,12 @@
-class_name MenuButton
+class_name WCSMenuButton
 extends Button
 
 ## WCS-styled menu button with enhanced interaction states and accessibility.
 ## Provides consistent button behavior across the menu system with military aesthetic.
 ## Integrates with UIThemeManager for responsive design and theme consistency.
 
-signal button_focused(button: MenuButton)
-signal button_activated(button: MenuButton)
+signal button_focused(button: WCSMenuButton)
+signal button_activated(button: WCSMenuButton)
 signal hover_sound_requested()
 signal click_sound_requested()
 
@@ -322,7 +322,7 @@ func set_button_text(new_text: String) -> void:
 	if not tooltip_text:
 		tooltip_text = new_text
 
-func set_button_icon(new_icon: Texture2D) -> void:
+func set_menu_button_icon(new_icon: Texture2D) -> void:
 	"""Set button icon."""
 	button_icon = new_icon
 	icon = new_icon

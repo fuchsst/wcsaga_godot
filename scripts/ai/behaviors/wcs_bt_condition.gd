@@ -127,3 +127,24 @@ func is_formation_leader() -> bool:
 	if ai_agent and ai_agent.has_method("is_formation_leader"):
 		return ai_agent.is_formation_leader()
 	return false
+
+# Time and process helper methods
+func get_process_delta_time() -> float:
+	"""Get the current frame delta time."""
+	# Since we don't have direct access to delta in a Node, use a reasonable default
+	# In actual implementation, this would be passed from the behavior tree tick
+	return 1.0 / 60.0  # Assume 60 FPS
+
+func get_time_from_start() -> float:
+	"""Get time elapsed since condition evaluation started in seconds."""
+	if performance_start_time > 0:
+		return (Time.get_ticks_usec() - performance_start_time) / 1000000.0
+	return 0.0
+
+func get_time_ticks_msec() -> int:
+	"""Get current time in milliseconds."""
+	return Time.get_ticks_msec()
+
+func get_time_ticks_usec() -> int:
+	"""Get current time in microseconds."""
+	return Time.get_ticks_usec()

@@ -1,4 +1,4 @@
-class_name PerformanceMonitor
+class_name ObjectPerformanceMonitor
 extends Node
 
 ## Performance monitoring and automatic optimization system for physics step integration.
