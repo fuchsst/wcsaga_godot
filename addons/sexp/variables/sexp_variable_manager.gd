@@ -73,12 +73,12 @@ func set_variable(scope: VariableScope, name: String, value: SexpResult) -> bool
 	
 	var variable_dict: Dictionary = _get_scope_dictionary(scope)
 	var old_variable: SexpVariable = variable_dict.get(name, null)
-	var old_value: SexpResult = old_variable.value if old_variable != null else null
+	var old_value: SexpResult = old_variable.get_value_safe() if old_variable else null
 	
 	# Create new variable
 	var new_variable: SexpVariable = SexpVariable.new()
 	new_variable.name = name
-	new_variable.value = value
+	new_variable.set_value(value, false)  # Skip validation during creation
 	new_variable.scope = scope
 	new_variable.created_time = Time.get_unix_time_from_system()
 	new_variable.modified_time = new_variable.created_time
@@ -128,7 +128,7 @@ func get_variable(scope: VariableScope, name: String) -> SexpResult:
 				var variable: SexpVariable = cached.variable
 				variable.last_accessed = Time.get_unix_time_from_system()
 				variable.access_count += 1
-				return variable.value
+				return variable.get_value_safe()
 	
 	_access_stats.cache_misses += 1
 	
@@ -144,9 +144,9 @@ func get_variable(scope: VariableScope, name: String) -> SexpResult:
 		if _cache_enabled:
 			_update_cache(name, scope, variable)
 		
-		return variable.value
+		return variable.get_value_safe()
 	
-	return SexpResult.create_error("Variable '%s' not found in scope %s" % [name, _scope_to_string(scope)], SexpResult.ErrorType.VARIABLE_NOT_FOUND)
+	return SexpResult.create_error("Variable '%s' not found in scope %s" % [name, _scope_to_string(scope)], SexpResult.ErrorType.UNDEFINED_VARIABLE)
 
 func has_variable(scope: VariableScope, name: String) -> bool:
 	## Check if a variable exists in the given scope
@@ -248,7 +248,7 @@ func get_variable_count(scope: VariableScope) -> int:
 
 ## Type conversion and validation (WCS compatibility)
 
-func convert_value_to_type(value: SexpResult, target_type: SexpResult.ResultType) -> SexpResult:
+func convert_value_to_type(value: SexpResult, target_type: SexpResult.Type) -> SexpResult:
 	## Convert a value to the target type using WCS semantics
 	
 	if value == null:
@@ -261,13 +261,13 @@ func convert_value_to_type(value: SexpResult, target_type: SexpResult.ResultType
 		return value  # Already correct type
 	
 	match target_type:
-		SexpResult.ResultType.NUMBER:
+		SexpResult.Type.NUMBER:
 			return _convert_to_number(value)
-		SexpResult.ResultType.STRING:
+		SexpResult.Type.STRING:
 			return _convert_to_string(value)
-		SexpResult.ResultType.BOOLEAN:
+		SexpResult.Type.BOOLEAN:
 			return _convert_to_boolean(value)
-		SexpResult.ResultType.OBJECT_REFERENCE:
+		SexpResult.Type.OBJECT_REFERENCE:
 			return SexpResult.create_error("Cannot convert to object reference", SexpResult.ErrorType.TYPE_MISMATCH)
 		_:
 			return SexpResult.create_error("Unsupported target type", SexpResult.ErrorType.TYPE_MISMATCH)
@@ -475,16 +475,16 @@ func _load_global_variables() -> void:
 func _convert_to_number(value: SexpResult) -> SexpResult:
 	## Convert value to number using WCS semantics
 	match value.result_type:
-		SexpResult.ResultType.NUMBER:
+		SexpResult.Type.NUMBER:
 			return value
-		SexpResult.ResultType.STRING:
+		SexpResult.Type.STRING:
 			var str_val: String = value.get_string_value()
 			var num_val: float = str_val.to_float()
 			# WCS uses atoi() equivalent - only parse until first non-digit
 			if str_val.is_empty():
 				num_val = 0.0
 			return SexpResult.create_number(num_val)
-		SexpResult.ResultType.BOOLEAN:
+		SexpResult.Type.BOOLEAN:
 			return SexpResult.create_number(1.0 if value.get_boolean_value() else 0.0)
 		_:
 			return SexpResult.create_error("Cannot convert to number", SexpResult.ErrorType.TYPE_MISMATCH)
@@ -492,14 +492,14 @@ func _convert_to_number(value: SexpResult) -> SexpResult:
 func _convert_to_string(value: SexpResult) -> SexpResult:
 	## Convert value to string
 	match value.result_type:
-		SexpResult.ResultType.STRING:
+		SexpResult.Type.STRING:
 			return value
-		SexpResult.ResultType.NUMBER:
+		SexpResult.Type.NUMBER:
 			var num: float = value.get_number_value()
 			return SexpResult.create_string(str(num))
-		SexpResult.ResultType.BOOLEAN:
+		SexpResult.Type.BOOLEAN:
 			return SexpResult.create_string("true" if value.get_boolean_value() else "false")
-		SexpResult.ResultType.OBJECT_REFERENCE:
+		SexpResult.Type.OBJECT_REFERENCE:
 			var obj = value.get_object_reference()
 			return SexpResult.create_string(str(obj) if obj != null else "null")
 		_:
@@ -508,11 +508,11 @@ func _convert_to_string(value: SexpResult) -> SexpResult:
 func _convert_to_boolean(value: SexpResult) -> SexpResult:
 	## Convert value to boolean using WCS semantics
 	match value.result_type:
-		SexpResult.ResultType.BOOLEAN:
+		SexpResult.Type.BOOLEAN:
 			return value
-		SexpResult.ResultType.NUMBER:
+		SexpResult.Type.NUMBER:
 			return SexpResult.create_boolean(value.get_number_value() != 0.0)
-		SexpResult.ResultType.STRING:
+		SexpResult.Type.STRING:
 			var str_val: String = value.get_string_value()
 			return SexpResult.create_boolean(not str_val.is_empty() and str_val.to_float() != 0.0)
 		_:

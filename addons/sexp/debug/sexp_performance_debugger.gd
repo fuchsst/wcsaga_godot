@@ -549,3 +549,30 @@ func configure_alerts(
 	}
 	
 	_log_debug("Alert thresholds configured: %s" % alert_thresholds)
+
+func _analyze_memory_usage() -> Dictionary:
+	## Analyze memory usage patterns for optimization recommendations
+	var memory_analysis: Dictionary = {
+		"current_usage_mb": 0.0,
+		"peak_usage_mb": 0.0,
+		"cache_overhead_mb": 0.0,
+		"recommendations": []
+	}
+	
+	# Get basic memory information (simplified implementation)
+	var current_memory: float = Performance.get_monitor(Performance.MEMORY_STATIC) / 1024.0 / 1024.0
+	memory_analysis.current_usage_mb = current_memory
+	memory_analysis.peak_usage_mb = max(current_memory, memory_analysis.peak_usage_mb)
+	
+	# Estimate cache overhead based on profiling data size
+	if profiling_data.size() > 0:
+		memory_analysis.cache_overhead_mb = profiling_data.size() * 0.001  # Rough estimate
+	
+	# Generate recommendations
+	if memory_analysis.current_usage_mb > alert_thresholds.get("high_memory_usage_mb", 150.0):
+		memory_analysis.recommendations.append("High memory usage detected - consider reducing cache size")
+	
+	if memory_analysis.cache_overhead_mb > 10.0:
+		memory_analysis.recommendations.append("Large profiling data cache - consider periodic cleanup")
+	
+	return memory_analysis

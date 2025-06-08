@@ -9,11 +9,11 @@ extends RefCounted
 
 signal debug_session_started(session_id: String)
 signal debug_session_ended(session_id: String, summary: Dictionary)
-signal breakpoint_hit(breakpoint: SexpBreakpoint, context: SexpDebugContext)
+signal breakpoint_hit(bp: Dictionary, context: Dictionary)
 signal step_completed(step_info: Dictionary)
 signal variable_changed(variable_name: String, old_value: SexpResult, new_value: SexpResult)
-signal evaluation_paused(reason: String, context: SexpDebugContext)
-signal evaluation_resumed(context: SexpDebugContext)
+signal evaluation_paused(reason: String, context: Dictionary)
+signal evaluation_resumed(context: Dictionary)
 
 const SexpEvaluator = preload("res://addons/sexp/core/sexp_evaluator.gd")
 const SexpExpression = preload("res://addons/sexp/core/sexp_expression.gd")
@@ -52,15 +52,15 @@ var _execution_state: ExecutionState = ExecutionState.STOPPED
 var _current_debug_mode: DebugMode = DebugMode.DISABLED
 
 # Breakpoints and execution control
-var _breakpoints: Array[SexpBreakpoint] = []
-var _call_stack: Array[SexpDebugFrame] = []
+var _breakpoints: Array = []
+var _call_stack: Array = []
 var _step_target_depth: int = -1
 var _run_to_position: int = -1
 
 # Debug context and state
 var _debug_contexts: Dictionary = {}  # context_id -> SexpDebugContext
-var _variable_watches: Array[SexpVariableWatch] = []
-var _execution_history: Array[Dictionary] = []
+var _variable_watches: Array = []
+var _execution_history: Array = []
 var _max_history_size: int = 1000
 
 # Performance and statistics
@@ -82,7 +82,7 @@ func _init(evaluator: SexpEvaluator = null) -> void:
 	print("SexpDebugEvaluator: Initialized with evaluator integration")
 
 func _initialize_debug_statistics() -> void:
-	"""Initialize debug statistics tracking"""
+	## Initialize debug statistics tracking
 	_debug_statistics = {
 		"total_debug_sessions": 0,
 		"total_steps": 0,
@@ -94,7 +94,7 @@ func _initialize_debug_statistics() -> void:
 ## Debug session management
 
 func start_debug_session(session_name: String = "", mode: DebugMode = DebugMode.STEP_OVER) -> String:
-	"""Start a new debugging session"""
+	## Start a new debugging session
 	if _execution_state != ExecutionState.STOPPED:
 		end_debug_session()
 	
@@ -118,7 +118,7 @@ func start_debug_session(session_name: String = "", mode: DebugMode = DebugMode.
 	return _debug_session_id
 
 func end_debug_session() -> Dictionary:
-	"""End current debugging session"""
+	## End current debugging session
 	if _execution_state == ExecutionState.STOPPED:
 		return {}
 	
@@ -139,11 +139,11 @@ func end_debug_session() -> Dictionary:
 	return session_summary
 
 func _generate_session_id() -> String:
-	"""Generate unique session ID"""
+	## Generate unique session ID
 	return "debug_session_%d" % Time.get_unix_time_from_system()
 
 func _generate_session_summary() -> Dictionary:
-	"""Generate debug session summary"""
+	## Generate debug session summary
 	return {
 		"session_id": _debug_session_id,
 		"total_steps": _step_count,
@@ -156,7 +156,7 @@ func _generate_session_summary() -> Dictionary:
 ## Debug execution control
 
 func debug_evaluate_expression(expression: SexpExpression, context: SexpEvaluationContext = null) -> SexpResult:
-	"""Evaluate expression with debugging support"""
+	## Evaluate expression with debugging support
 	if _current_debug_mode == DebugMode.DISABLED:
 		return _evaluator.evaluate_expression(expression, context)
 	
@@ -172,7 +172,7 @@ func debug_evaluate_expression(expression: SexpExpression, context: SexpEvaluati
 	return result
 
 func _debug_evaluate_internal(expression: SexpExpression, context: SexpEvaluationContext, debug_context: SexpDebugContext) -> SexpResult:
-	"""Internal debug evaluation with step control"""
+	## Internal debug evaluation with step control
 	
 	# Check for breakpoints
 	if _should_break_at_expression(expression, debug_context):
@@ -183,11 +183,15 @@ func _debug_evaluate_internal(expression: SexpExpression, context: SexpEvaluatio
 		_handle_step(expression, debug_context)
 	
 	# Create debug frame for call stack
-	var frame = SexpDebugFrame.new()
-	frame.expression = expression
-	frame.context = context
-	frame.debug_context = debug_context
-	frame.entry_time = Time.get_ticks_msec() / 1000.0
+	var frame = {
+		"expression": expression,
+		"context": context,
+		"debug_context": debug_context,
+		"entry_time": Time.get_ticks_msec() / 1000.0,
+		"exit_time": 0.0,
+		"result": null,
+		"execution_time": 0.0
+	}
 	
 	_call_stack.append(frame)
 	
@@ -198,9 +202,9 @@ func _debug_evaluate_internal(expression: SexpExpression, context: SexpEvaluatio
 	var result = _evaluator.evaluate_expression(expression, context)
 	
 	# Update debug frame
-	frame.exit_time = Time.get_ticks_msec() / 1000.0
-	frame.result = result
-	frame.execution_time = frame.exit_time - frame.entry_time
+	frame["exit_time"] = Time.get_ticks_msec() / 1000.0
+	frame["result"] = result
+	frame["execution_time"] = frame["exit_time"] - frame["entry_time"]
 	
 	# Check for variable changes
 	_check_variable_changes_after(context, debug_context)
@@ -214,7 +218,7 @@ func _debug_evaluate_internal(expression: SexpExpression, context: SexpEvaluatio
 	return result
 
 func step_over() -> bool:
-	"""Step over current expression"""
+	## Step over current expression
 	if _execution_state != ExecutionState.PAUSED:
 		return false
 	
@@ -228,7 +232,7 @@ func step_over() -> bool:
 	return true
 
 func step_into() -> bool:
-	"""Step into function calls"""
+	## Step into function calls
 	if _execution_state != ExecutionState.PAUSED:
 		return false
 	
@@ -242,7 +246,7 @@ func step_into() -> bool:
 	return true
 
 func step_out() -> bool:
-	"""Step out of current function"""
+	## Step out of current function
 	if _execution_state != ExecutionState.PAUSED:
 		return false
 	
@@ -256,7 +260,7 @@ func step_out() -> bool:
 	return true
 
 func continue_execution() -> bool:
-	"""Continue execution until next breakpoint"""
+	## Continue execution until next breakpoint
 	if _execution_state != ExecutionState.PAUSED:
 		return false
 	
@@ -268,7 +272,7 @@ func continue_execution() -> bool:
 	return true
 
 func pause_execution() -> bool:
-	"""Pause execution at next opportunity"""
+	## Pause execution at next opportunity
 	if _execution_state != ExecutionState.RUNNING:
 		return false
 	
@@ -278,7 +282,7 @@ func pause_execution() -> bool:
 	return true
 
 func run_to_cursor(position: int) -> bool:
-	"""Run to specific position in expression"""
+	## Run to specific position in expression
 	if _execution_state != ExecutionState.PAUSED:
 		return false
 	
@@ -290,22 +294,22 @@ func run_to_cursor(position: int) -> bool:
 
 ## Breakpoint management
 
-func add_breakpoint(breakpoint: SexpBreakpoint) -> bool:
-	"""Add a breakpoint"""
-	if _find_breakpoint(breakpoint.id) != null:
+func add_breakpoint(bp: SexpBreakpoint) -> bool:
+	## Add a breakpoint
+	if _find_breakpoint(bp.id) != null:
 		return false  # Breakpoint already exists
 	
-	breakpoint.id = _generate_breakpoint_id() if breakpoint.id.is_empty() else breakpoint.id
-	breakpoint.enabled = true
-	breakpoint.hit_count = 0
+	bp.id = _generate_breakpoint_id() if bp.id.is_empty() else bp.id
+	bp.enabled = true
+	bp.hit_count = 0
 	
-	_breakpoints.append(breakpoint)
-	print("SexpDebugEvaluator: Breakpoint added: %s" % breakpoint.to_string())
+	_breakpoints.append(bp)
+	print("SexpDebugEvaluator: Breakpoint added: %s" % bp.to_string())
 	
 	return true
 
 func remove_breakpoint(breakpoint_id: String) -> bool:
-	"""Remove a breakpoint"""
+	## Remove a breakpoint
 	for i in range(_breakpoints.size()):
 		if _breakpoints[i].id == breakpoint_id:
 			_breakpoints.remove_at(i)
@@ -315,39 +319,39 @@ func remove_breakpoint(breakpoint_id: String) -> bool:
 	return false
 
 func enable_breakpoint(breakpoint_id: String, enabled: bool = true) -> bool:
-	"""Enable or disable a breakpoint"""
-	var breakpoint = _find_breakpoint(breakpoint_id)
-	if breakpoint:
-		breakpoint.enabled = enabled
+	## Enable or disable a breakpoint
+	var bp = _find_breakpoint(breakpoint_id)
+	if bp:
+		bp.enabled = enabled
 		return true
 	
 	return false
 
 func clear_all_breakpoints() -> void:
-	"""Clear all breakpoints"""
+	## Clear all breakpoints
 	_breakpoints.clear()
 	print("SexpDebugEvaluator: All breakpoints cleared")
 
-func get_breakpoints() -> Array[SexpBreakpoint]:
-	"""Get all breakpoints"""
+func get_breakpoints() -> Array:
+	## Get all breakpoints
 	return _breakpoints.duplicate()
 
-func _find_breakpoint(breakpoint_id: String) -> SexpBreakpoint:
-	"""Find breakpoint by ID"""
-	for breakpoint in _breakpoints:
-		if breakpoint.id == breakpoint_id:
-			return breakpoint
+func _find_breakpoint(breakpoint_id: String):
+	## Find breakpoint by ID
+	for bp in _breakpoints:
+		if bp.id == breakpoint_id:
+			return bp
 	
 	return null
 
 func _generate_breakpoint_id() -> String:
-	"""Generate unique breakpoint ID"""
+	## Generate unique breakpoint ID
 	return "bp_%d" % Time.get_unix_time_from_system()
 
 ## Variable watching
 
 func add_variable_watch(variable_name: String, watch_type: int = 0) -> String:
-	"""Add variable watch"""
+	## Add variable watch
 	var watch = SexpVariableWatch.new()
 	watch.id = "watch_%d" % Time.get_unix_time_from_system()
 	watch.variable_name = variable_name
@@ -360,7 +364,7 @@ func add_variable_watch(variable_name: String, watch_type: int = 0) -> String:
 	return watch.id
 
 func remove_variable_watch(watch_id: String) -> bool:
-	"""Remove variable watch"""
+	## Remove variable watch
 	for i in range(_variable_watches.size()):
 		if _variable_watches[i].id == watch_id:
 			_variable_watches.remove_at(i)
@@ -370,37 +374,37 @@ func remove_variable_watch(watch_id: String) -> bool:
 	return false
 
 func get_variable_watches() -> Array[SexpVariableWatch]:
-	"""Get all variable watches"""
+	## Get all variable watches
 	return _variable_watches.duplicate()
 
 ## Debug condition checking
 
 func _should_break_at_expression(expression: SexpExpression, debug_context: SexpDebugContext) -> bool:
-	"""Check if should break at expression"""
+	## Check if should break at expression
 	if _execution_state != ExecutionState.RUNNING and _execution_state != ExecutionState.STEPPING:
 		return false
 	
 	# Check expression breakpoints
-	for breakpoint in _breakpoints:
-		if not breakpoint.enabled:
+	for bp in _breakpoints:
+		if not bp.enabled:
 			continue
 		
-		if breakpoint.breakpoint_type == BreakpointType.EXPRESSION:
-			if _expression_matches_breakpoint(expression, breakpoint):
+		if bp.breakpoint_type == BreakpointType.EXPRESSION:
+			if _expression_matches_breakpoint(expression, bp):
 				return true
 		
-		elif breakpoint.breakpoint_type == BreakpointType.FUNCTION_CALL:
-			if expression.is_function_call() and expression.function_name == breakpoint.function_name:
+		elif bp.breakpoint_type == BreakpointType.FUNCTION_CALL:
+			if expression.is_function_call() and expression.function_name == bp.function_name:
 				return true
 		
-		elif breakpoint.breakpoint_type == BreakpointType.CONDITION:
-			if _evaluate_breakpoint_condition(breakpoint, debug_context):
+		elif bp.breakpoint_type == BreakpointType.CONDITION:
+			if _evaluate_breakpoint_condition(bp, debug_context):
 				return true
 	
 	return false
 
 func _should_step_at_expression(expression: SexpExpression, debug_context: SexpDebugContext) -> bool:
-	"""Check if should step at expression"""
+	## Check if should step at expression
 	if _execution_state != ExecutionState.STEPPING:
 		return false
 	
@@ -419,26 +423,26 @@ func _should_step_at_expression(expression: SexpExpression, debug_context: SexpD
 	
 	return false
 
-func _expression_matches_breakpoint(expression: SexpExpression, breakpoint: SexpBreakpoint) -> bool:
-	"""Check if expression matches breakpoint criteria"""
-	if breakpoint.expression_pattern.is_empty():
+func _expression_matches_breakpoint(expression: SexpExpression, bp: SexpBreakpoint) -> bool:
+	## Check if expression matches breakpoint criteria
+	if bp.expression_pattern.is_empty():
 		return false
 	
 	var expr_string = expression.to_sexp_string()
 	
 	# Simple pattern matching (could be enhanced with regex)
-	if breakpoint.use_regex:
+	if bp.use_regex:
 		var regex = RegEx.new()
-		if regex.compile(breakpoint.expression_pattern) == OK:
+		if regex.compile(bp.expression_pattern) == OK:
 			return regex.search(expr_string) != null
 	else:
-		return expr_string.contains(breakpoint.expression_pattern)
+		return expr_string.contains(bp.expression_pattern)
 	
 	return false
 
-func _evaluate_breakpoint_condition(breakpoint: SexpBreakpoint, debug_context: SexpDebugContext) -> bool:
-	"""Evaluate breakpoint condition"""
-	if breakpoint.condition.is_empty():
+func _evaluate_breakpoint_condition(bp: SexpBreakpoint, debug_context: SexpDebugContext) -> bool:
+	## Evaluate breakpoint condition
+	if bp.condition.is_empty():
 		return false
 	
 	# Parse and evaluate the condition (simplified)
@@ -446,31 +450,31 @@ func _evaluate_breakpoint_condition(breakpoint: SexpBreakpoint, debug_context: S
 	return false  # Placeholder
 
 func _get_expression_position(expression: SexpExpression) -> int:
-	"""Get position of expression in source text"""
+	## Get position of expression in source text
 	# This would need source position tracking in the parser
 	return 0  # Placeholder
 
 ## Debug event handlers
 
 func _handle_breakpoint_hit(expression: SexpExpression, debug_context: SexpDebugContext) -> void:
-	"""Handle breakpoint hit"""
-	var breakpoint = _find_matching_breakpoint(expression, debug_context)
-	if not breakpoint:
+	## Handle breakpoint hit
+	var bp = _find_matching_breakpoint(expression, debug_context)
+	if not bp:
 		return
 	
-	breakpoint.hit_count += 1
+	bp.hit_count += 1
 	_breakpoint_hits += 1
 	_debug_statistics["total_breakpoint_hits"] += 1
 	
 	_execution_state = ExecutionState.PAUSED
 	
-	breakpoint_hit.emit(breakpoint, debug_context)
+	breakpoint_hit.emit(bp, debug_context)
 	evaluation_paused.emit("breakpoint", debug_context)
 	
-	print("SexpDebugEvaluator: Breakpoint hit: %s" % breakpoint.to_string())
+	print("SexpDebugEvaluator: Breakpoint hit: %s" % bp.to_string())
 
 func _handle_step(expression: SexpExpression, debug_context: SexpDebugContext) -> void:
-	"""Handle step execution"""
+	## Handle step execution
 	_execution_state = ExecutionState.PAUSED
 	
 	var step_info = {
@@ -484,60 +488,62 @@ func _handle_step(expression: SexpExpression, debug_context: SexpDebugContext) -
 	evaluation_paused.emit("step", debug_context)
 
 func _find_matching_breakpoint(expression: SexpExpression, debug_context: SexpDebugContext) -> SexpBreakpoint:
-	"""Find breakpoint that matches current expression"""
-	for breakpoint in _breakpoints:
-		if not breakpoint.enabled:
+	## Find breakpoint that matches current expression
+	for bp in _breakpoints:
+		if not bp.enabled:
 			continue
 		
-		if _expression_matches_breakpoint(expression, breakpoint):
-			return breakpoint
+		if _expression_matches_breakpoint(expression, bp):
+			return bp
 	
 	return null
 
 ## Variable state tracking
 
 func _capture_variable_state_before(context: SexpEvaluationContext, debug_context: SexpDebugContext) -> void:
-	"""Capture variable state before evaluation"""
+	## Capture variable state before evaluation
 	if not context:
 		return
 	
-	debug_context.variable_state_before.clear()
+	debug_context["variable_state_before"] = {}
 	
 	for watch in _variable_watches:
-		if not watch.enabled:
+		if not watch.get("enabled", false):
 			continue
 		
-		var value = context.get_variable(watch.variable_name)
+		var value = context.get_variable(watch.get("variable_name", ""))
 		if value and not value.is_error():
-			debug_context.variable_state_before[watch.variable_name] = value
+			debug_context["variable_state_before"][watch.get("variable_name", "")] = value
 
 func _check_variable_changes_after(context: SexpEvaluationContext, debug_context: SexpDebugContext) -> void:
-	"""Check for variable changes after evaluation"""
+	## Check for variable changes after evaluation
 	if not context:
 		return
 	
 	for watch in _variable_watches:
-		if not watch.enabled:
+		if not watch.get("enabled", false):
 			continue
 		
-		var old_value = debug_context.variable_state_before.get(watch.variable_name)
-		var new_value = context.get_variable(watch.variable_name)
+		var variable_state_before = debug_context.variable_state_before
+		var variable_name = watch.get("variable_name", "")
+		var old_value = variable_state_before.get(variable_name)
+		var new_value = context.get_variable(watch.get("variable_name", ""))
 		
 		if old_value and new_value and not new_value.is_error():
 			if not old_value.equals(new_value):
-				variable_changed.emit(watch.variable_name, old_value, new_value)
+				variable_changed.emit(watch.get("variable_name", ""), old_value, new_value)
 				
 				# Check for variable write breakpoints
-				for breakpoint in _breakpoints:
-					if (breakpoint.enabled and 
-						breakpoint.breakpoint_type == BreakpointType.VARIABLE_WRITE and
-						breakpoint.variable_name == watch.variable_name):
+				for bp in _breakpoints:
+					if (bp.enabled and 
+						bp.breakpoint_type == BreakpointType.VARIABLE_WRITE and
+						bp.variable_name == watch.get("variable_name", "")):
 						_handle_breakpoint_hit(null, debug_context)
 
 ## Debug context management
 
 func _create_debug_context(expression: SexpExpression, context: SexpEvaluationContext) -> SexpDebugContext:
-	"""Create debug context for expression"""
+	## Create debug context for expression
 	var debug_context = SexpDebugContext.new()
 	debug_context.context_id = "debug_%d" % Time.get_unix_time_from_system()
 	debug_context.expression = expression
@@ -548,7 +554,7 @@ func _create_debug_context(expression: SexpExpression, context: SexpEvaluationCo
 	return debug_context
 
 func _get_current_debug_context() -> SexpDebugContext:
-	"""Get current debug context"""
+	## Get current debug context
 	if _call_stack.is_empty():
 		return null
 	
@@ -557,7 +563,7 @@ func _get_current_debug_context() -> SexpDebugContext:
 ## Signal handlers
 
 func _on_evaluation_started(expression: SexpExpression) -> void:
-	"""Handle evaluation started"""
+	## Handle evaluation started
 	if _current_debug_mode == DebugMode.DISABLED:
 		return
 	
@@ -574,7 +580,7 @@ func _on_evaluation_started(expression: SexpExpression) -> void:
 		_execution_history = _execution_history.slice(-_max_history_size)
 
 func _on_evaluation_completed(expression: SexpExpression, result: SexpResult, time_ms: float) -> void:
-	"""Handle evaluation completed"""
+	## Handle evaluation completed
 	if _current_debug_mode == DebugMode.DISABLED:
 		return
 	
@@ -591,7 +597,7 @@ func _on_evaluation_completed(expression: SexpExpression, result: SexpResult, ti
 	_execution_history.append(history_entry)
 
 func _on_evaluation_failed(expression: SexpExpression, error: SexpResult) -> void:
-	"""Handle evaluation failed"""
+	## Handle evaluation failed
 	if _current_debug_mode == DebugMode.DISABLED:
 		return
 	
@@ -601,42 +607,42 @@ func _on_evaluation_failed(expression: SexpExpression, error: SexpResult) -> voi
 		evaluation_paused.emit("error", _get_current_debug_context())
 
 func _on_function_called(function_name: String, args: Array, result: SexpResult) -> void:
-	"""Handle function called"""
+	## Handle function called
 	if _current_debug_mode == DebugMode.DISABLED:
 		return
 	
 	# Check for function call breakpoints
-	for breakpoint in _breakpoints:
-		if (breakpoint.enabled and 
-			breakpoint.breakpoint_type == BreakpointType.FUNCTION_CALL and
-			breakpoint.function_name == function_name):
+	for bp in _breakpoints:
+		if (bp.enabled and 
+			bp.breakpoint_type == BreakpointType.FUNCTION_CALL and
+			bp.function_name == function_name):
 			_handle_breakpoint_hit(null, _get_current_debug_context())
 
 ## Public API
 
 func get_current_execution_state() -> ExecutionState:
-	"""Get current execution state"""
+	## Get current execution state
 	return _execution_state
 
 func get_current_debug_mode() -> DebugMode:
-	"""Get current debug mode"""
+	## Get current debug mode
 	return _current_debug_mode
 
 func get_call_stack() -> Array[SexpDebugFrame]:
-	"""Get current call stack"""
+	## Get current call stack
 	return _call_stack.duplicate()
 
 func get_execution_history(limit: int = 100) -> Array[Dictionary]:
-	"""Get execution history"""
+	## Get execution history
 	var history_limit = min(limit, _execution_history.size())
 	return _execution_history.slice(-history_limit)
 
 func get_debug_statistics() -> Dictionary:
-	"""Get debug statistics"""
+	## Get debug statistics
 	return _debug_statistics.duplicate()
 
 func is_debugging_active() -> bool:
-	"""Check if debugging is currently active"""
+	## Check if debugging is currently active
 	return _current_debug_mode != DebugMode.DISABLED and not _debug_session_id.is_empty()
 
 ## Debug data classes

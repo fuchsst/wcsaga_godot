@@ -219,14 +219,13 @@ func evaluate_expression(expression: SexpExpression, context: SexpEvaluationCont
 	
 	var result: SexpResult
 	
-	try:
-		# Check cache first (only for cacheable expressions)
-		var cache_key: String = _get_cache_key(expression)
-		var cached_result: SexpResult = null
-		
-		if _is_cacheable(expression):
-			var context_hash: int = _get_context_hash(current_context)
-			cached_result = expression_cache.get_cached_result(cache_key, context_hash)
+	# Check cache first (only for cacheable expressions)
+	var cache_key: String = _get_cache_key(expression)
+	var cached_result: SexpResult = null
+	
+	if _is_cacheable(expression):
+		var context_hash: int = _get_context_hash(current_context)
+		cached_result = expression_cache.get_cached_result(cache_key, context_hash)
 		
 		if cached_result != null:
 			result = cached_result
@@ -272,17 +271,24 @@ func evaluate_expression(expression: SexpExpression, context: SexpEvaluationCont
 			result.set_evaluation_time(evaluation_time)
 		
 		evaluation_completed.emit(expression, result, evaluation_time)
+	else:
+		# Perform evaluation without cache
+		result = _evaluate_expression_internal(expression)
 		
-	except error:
-		result = SexpResult.create_error("Evaluation failed: %s" % error)
-		evaluation_failed.emit(expression, result)
+		# Update performance statistics
+		var evaluation_time: float = Time.get_ticks_msec() - start_time
+		_update_performance_stats(evaluation_time)
+		
+		if not result.evaluation_time_ms > 0:
+			result.set_evaluation_time(evaluation_time)
+		
+		evaluation_completed.emit(expression, result, evaluation_time)
 	
-	finally:
-		# Restore previous context
-		current_context = previous_context
-		# Increment evaluation counter in context
-		if current_context != null:
-			current_context.total_evaluations += 1
+	# Restore previous context
+	current_context = previous_context
+	# Increment evaluation counter in context
+	if current_context != null:
+		current_context.total_evaluations += 1
 	
 	return result
 
@@ -376,54 +382,44 @@ func _evaluate_function_call(expression: SexpExpression) -> SexpResult:
 	if performance_monitor:
 		performance_monitor.push_call_context(function_name)
 	
-	try:
-		var result: SexpResult = callable.call(evaluated_args)
-		function_called.emit(function_name, evaluated_args, result)
-		
-		# Update function timing statistics
-		var call_time: float = Time.get_ticks_msec() - call_start_time
-		function_info["total_time_ms"] += call_time
-		
-		# Track with performance monitor
-		if performance_monitor:
-			var context_id = current_context.context_id if current_context else ""
-			performance_monitor.track_function_call(
-				function_name,
-				call_time,
-				evaluated_args.size(),
-				result.result_type,
-				false,  # Function calls are not cached at this level
-				context_id,
-				execution_stack.size()
-			)
-		
-		# Analyze with performance hints system
-		if performance_hints:
-			performance_hints.analyze_expression_performance(
-				expression.to_sexp_string(),
-				function_name,
-				call_time,
-				false,  # Function calls are generally not cached at this level
-				evaluated_args
-			)
-		
-		return result
-		
-	except error:
-		return SexpResult.create_contextual_error(
-			"Function execution failed: %s" % error,
-			"In function '%s'" % function_name,
-			-1, -1, -1,
-			"Check function arguments and implementation",
-			SexpResult.ErrorType.RUNTIME_ERROR
+	var result: SexpResult = callable.call(evaluated_args)
+	function_called.emit(function_name, evaluated_args, result)
+	
+	# Update function timing statistics
+	var call_time: float = Time.get_ticks_msec() - call_start_time
+	function_info["total_time_ms"] += call_time
+	
+	# Track with performance monitor
+	if performance_monitor:
+		var context_id = current_context.context_id if current_context else ""
+		performance_monitor.track_function_call(
+			function_name,
+			call_time,
+			evaluated_args.size(),
+			result.result_type,
+			false,  # Function calls are not cached at this level
+			context_id,
+			execution_stack.size()
 		)
 	
-	finally:
-		if debug_mode:
-			_pop_execution_frame()
-		
-		if performance_monitor:
-			performance_monitor.pop_call_context()
+	# Analyze with performance hints system
+	if performance_hints:
+		performance_hints.analyze_expression_performance(
+			expression.to_sexp_string(),
+			function_name,
+			call_time,
+			false,  # Function calls are generally not cached at this level
+			evaluated_args
+		)
+	
+	# Cleanup (formerly in finally block)
+	if debug_mode:
+		_pop_execution_frame()
+	
+	if performance_monitor:
+		performance_monitor.pop_call_context()
+	
+	return result
 
 ## Evaluate identifier (constants, symbols)
 func _evaluate_identifier(identifier: String) -> SexpResult:

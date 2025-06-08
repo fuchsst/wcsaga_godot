@@ -23,12 +23,12 @@ func _init():
 	is_cacheable = true
 	minimum_args = 0  # + with no args returns 0
 	maximum_args = -1  # unlimited arguments
-	supported_argument_types = [SexpResult.ResultType.NUMBER]
+	supported_argument_types = [SexpResult.Type.NUMBER]
 	
 	# Setup argument validator
 	argument_validator = SexpArgumentValidator.new()
 	argument_validator.require_min_count(0)
-	argument_validator.allow_types([SexpResult.ResultType.NUMBER])
+	argument_validator.allow_types([SexpResult.Type.NUMBER])
 
 ## Execute the addition function
 func _execute_implementation(args: Array[SexpResult]) -> SexpResult:
@@ -93,12 +93,12 @@ static func create_metadata() -> SexpFunctionMetadata:
 	metadata.detailed_description = "Performs arithmetic addition on all provided numeric arguments. Returns 0 if no arguments are provided (mathematical identity element). Supports both integer and floating-point numbers."
 	
 	# Arguments
-	metadata.add_argument("number1", SexpResult.ResultType.NUMBER, "First number to add", true, "0")
-	metadata.add_argument("number2", SexpResult.ResultType.NUMBER, "Second number to add", true)
-	metadata.add_argument("...", SexpResult.ResultType.NUMBER, "Additional numbers to add", true)
+	metadata.add_argument("number1", SexpResult.Type.NUMBER, "First number to add", true, "0")
+	metadata.add_argument("number2", SexpResult.Type.NUMBER, "Second number to add", true)
+	metadata.add_argument("...", SexpResult.Type.NUMBER, "Additional numbers to add", true)
 	
 	# Return information
-	metadata.set_return_info(SexpResult.ResultType.NUMBER, "Sum of all input numbers")
+	metadata.set_return_info(SexpResult.Type.NUMBER, "Sum of all input numbers")
 	
 	# Usage examples
 	metadata.add_example("(+ 2 3)", "Simple addition of two numbers", "5")

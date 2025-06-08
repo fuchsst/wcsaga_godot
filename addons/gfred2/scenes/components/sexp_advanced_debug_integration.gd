@@ -1,5 +1,5 @@
 @tool
-class_name SexpAdvancedDebugIntegration
+class_name SexpAdvancedDebugComponent
 extends Node
 
 ## Advanced SEXP debugging integration for GFRED2-006B
@@ -353,10 +353,9 @@ func evaluate_expression_preview(expression: String) -> Dictionary:
 	var result: Variant = null
 	var evaluation_error: String = ""
 	
-	try:
-		result = sexp_manager.evaluate_expression(expression, preview_context)
-	except:
-		evaluation_error = "Evaluation failed: " + str(get_last_error())
+	result = sexp_manager.evaluate_expression(expression, preview_context)
+	if result and result.is_error():
+		evaluation_error = "Evaluation failed: " + result.get_error_message()
 	
 	var execution_time: int = Time.get_ticks_msec() - start_time
 	

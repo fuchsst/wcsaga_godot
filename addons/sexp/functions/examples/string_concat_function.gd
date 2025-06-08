@@ -74,10 +74,10 @@ func _execute_implementation(args: Array[SexpResult]) -> SexpResult:
 ## Convert SEXP result to string
 func _convert_to_string(arg: SexpResult) -> String:
 	match arg.result_type:
-		SexpResult.ResultType.STRING:
+		SexpResult.Type.STRING:
 			return arg.get_string_value()
 		
-		SexpResult.ResultType.NUMBER:
+		SexpResult.Type.NUMBER:
 			var num_value: float = arg.get_number_value()
 			# Format nicely for integers
 			if num_value == floor(num_value):
@@ -85,20 +85,20 @@ func _convert_to_string(arg: SexpResult) -> String:
 			else:
 				return str(num_value)
 		
-		SexpResult.ResultType.BOOLEAN:
+		SexpResult.Type.BOOLEAN:
 			return "true" if arg.get_boolean_value() else "false"
 		
-		SexpResult.ResultType.VOID:
+		SexpResult.Type.VOID:
 			return ""  # Void converts to empty string
 		
-		SexpResult.ResultType.OBJECT_REFERENCE:
+		SexpResult.Type.OBJECT_REFERENCE:
 			var obj = arg.get_object_value()
 			if obj != null:
 				return str(obj)
 			else:
 				return "null"
 		
-		SexpResult.ResultType.ERROR:
+		SexpResult.Type.ERROR:
 			return "[ERROR: %s]" % arg.error_message
 		
 		_:
@@ -107,8 +107,8 @@ func _convert_to_string(arg: SexpResult) -> String:
 ## Check if empty string is valid for the argument type
 func _is_empty_valid(arg: SexpResult) -> bool:
 	return arg.result_type in [
-		SexpResult.ResultType.STRING,
-		SexpResult.ResultType.VOID
+		SexpResult.Type.STRING,
+		SexpResult.Type.VOID
 	]
 
 ## Custom validation for string operations
@@ -128,7 +128,7 @@ func _validate_custom(args: Array[SexpResult]) -> SexpResult:
 			)
 		
 		# Check for problematic object references
-		if arg.result_type == SexpResult.ResultType.OBJECT_REFERENCE:
+		if arg.result_type == SexpResult.Type.OBJECT_REFERENCE:
 			var obj = arg.get_object_value()
 			if obj != null and not obj.has_method("_to_string"):
 				# This is just a warning - we'll still convert it
@@ -157,12 +157,12 @@ static func create_metadata() -> SexpFunctionMetadata:
 	metadata.detailed_description = "Converts all arguments to their string representations and concatenates them into a single string. Supports automatic type conversion: numbers become numeric strings, booleans become 'true'/'false', void becomes empty string, and objects use their string representation."
 	
 	# Arguments
-	metadata.add_argument("value1", SexpResult.ResultType.VOID, "First value to concatenate (any type)", true, "\"\"")
-	metadata.add_argument("value2", SexpResult.ResultType.VOID, "Second value to concatenate (any type)", true)
-	metadata.add_argument("...", SexpResult.ResultType.VOID, "Additional values to concatenate", true)
+	metadata.add_argument("value1", SexpResult.Type.VOID, "First value to concatenate (any type)", true, "\"\"")
+	metadata.add_argument("value2", SexpResult.Type.VOID, "Second value to concatenate (any type)", true)
+	metadata.add_argument("...", SexpResult.Type.VOID, "Additional values to concatenate", true)
 	
 	# Return information
-	metadata.set_return_info(SexpResult.ResultType.STRING, "Concatenated string of all arguments")
+	metadata.set_return_info(SexpResult.Type.STRING, "Concatenated string of all arguments")
 	
 	# Usage examples
 	metadata.add_example("(string-concat \"Hello\" \" \" \"World\")", "Simple string concatenation", "\"Hello World\"")

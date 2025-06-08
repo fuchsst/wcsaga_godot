@@ -14,7 +14,7 @@ const SexpResult = preload("res://addons/sexp/core/sexp_result.gd")
 @export var scope: SexpVariableManager.VariableScope = SexpVariableManager.VariableScope.LOCAL
 
 ## Variable value (core data)
-@export var value: SexpResult = null
+var value: SexpResult = null
 
 ## Metadata tracking
 @export var created_time: float = 0.0
@@ -24,7 +24,7 @@ const SexpResult = preload("res://addons/sexp/core/sexp_result.gd")
 
 ## Type constraints and validation
 @export var type_locked: bool = false
-@export var allowed_types: Array[SexpResult.ResultType] = []
+@export var allowed_types: Array[SexpResult.Type] = []
 @export var read_only: bool = false
 
 ## Description and documentation
@@ -64,8 +64,8 @@ func set_value(new_value: SexpResult, validate: bool = true) -> bool:
 		if value.result_type != new_value.result_type:
 			push_error("Cannot change type of type-locked variable %s from %s to %s" % [
 				name, 
-				SexpResult.ResultType.keys()[value.result_type],
-				SexpResult.ResultType.keys()[new_value.result_type]
+				SexpResult.Type.keys()[value.result_type],
+				SexpResult.Type.keys()[new_value.result_type]
 			])
 			return false
 	
@@ -95,20 +95,20 @@ func unlock_type() -> void:
 	## Unlock the variable type (allow type changes)
 	type_locked = false
 
-func set_allowed_types(types: Array[SexpResult.ResultType]) -> void:
+func set_allowed_types(types: Array[SexpResult.Type]) -> void:
 	## Set the allowed types for this variable
 	allowed_types = types.duplicate()
 
-func add_allowed_type(type: SexpResult.ResultType) -> void:
+func add_allowed_type(type: SexpResult.Type) -> void:
 	## Add an allowed type
 	if not allowed_types.has(type):
 		allowed_types.append(type)
 
-func remove_allowed_type(type: SexpResult.ResultType) -> void:
+func remove_allowed_type(type: SexpResult.Type) -> void:
 	## Remove an allowed type
 	allowed_types.erase(type)
 
-func is_type_allowed(type: SexpResult.ResultType) -> bool:
+func is_type_allowed(type: SexpResult.Type) -> bool:
 	## Check if a type is allowed for this variable
 	return allowed_types.is_empty() or allowed_types.has(type)
 
@@ -192,7 +192,7 @@ func get_type_string() -> String:
 	## Get the variable type as a string
 	if value == null:
 		return "null"
-	return SexpResult.ResultType.keys()[value.result_type].to_lower()
+	return SexpResult.Type.keys()[value.result_type].to_lower()
 
 ## Conversion with validation
 
@@ -336,16 +336,16 @@ func _validate_value(new_value: SexpResult) -> bool:
 	# Check allowed types
 	if not is_type_allowed(new_value.result_type):
 		push_error("Type %s not allowed for variable %s" % [
-			SexpResult.ResultType.keys()[new_value.result_type],
+			SexpResult.Type.keys()[new_value.result_type],
 			name
 		])
 		return false
 	
 	# Type-specific validation
 	match new_value.result_type:
-		SexpResult.ResultType.NUMBER:
+		SexpResult.Type.NUMBER:
 			return _validate_number_value(new_value.get_number_value())
-		SexpResult.ResultType.STRING:
+		SexpResult.Type.STRING:
 			return _validate_string_value(new_value.get_string_value())
 		_:
 			return true  # Other types have no additional constraints
@@ -391,16 +391,16 @@ func _value_to_string() -> String:
 		return "ERROR: %s" % value.get_error_message()
 	
 	match value.result_type:
-		SexpResult.ResultType.NUMBER:
+		SexpResult.Type.NUMBER:
 			return str(value.get_number_value())
-		SexpResult.ResultType.STRING:
+		SexpResult.Type.STRING:
 			return "\"%s\"" % value.get_string_value()
-		SexpResult.ResultType.BOOLEAN:
+		SexpResult.Type.BOOLEAN:
 			return "true" if value.get_boolean_value() else "false"
-		SexpResult.ResultType.OBJECT_REFERENCE:
+		SexpResult.Type.OBJECT_REFERENCE:
 			var obj = value.get_object_reference()
 			return "[Object:%s]" % str(obj) if obj != null else "[Object:null]"
-		SexpResult.ResultType.VOID:
+		SexpResult.Type.VOID:
 			return "void"
 		_:
 			return "unknown"
@@ -413,28 +413,28 @@ func _get_constraints_info() -> Dictionary:
 		"allowed_string_values": allowed_string_values if not allowed_string_values.is_empty() else null
 	}
 
-func _types_to_strings(types: Array[SexpResult.ResultType]) -> Array[String]:
+func _types_to_strings(types: Array[SexpResult.Type]) -> Array[String]:
 	## Convert type array to string array
 	var type_strings: Array[String] = []
 	for type in types:
-		type_strings.append(SexpResult.ResultType.keys()[type].to_lower())
+		type_strings.append(SexpResult.Type.keys()[type].to_lower())
 	return type_strings
 
 ## Serialization helpers
 
-func _serialize_types(types: Array[SexpResult.ResultType]) -> Array[int]:
+func _serialize_types(types: Array[SexpResult.Type]) -> Array[int]:
 	## Serialize types array to integers
 	var serialized: Array[int] = []
 	for type in types:
 		serialized.append(int(type))
 	return serialized
 
-func _deserialize_types(serialized: Array) -> Array[SexpResult.ResultType]:
+func _deserialize_types(serialized: Array) -> Array[SexpResult.Type]:
 	## Deserialize types array from integers
-	var types: Array[SexpResult.ResultType] = []
+	var types: Array[SexpResult.Type] = []
 	for type_int in serialized:
-		if type_int >= 0 and type_int < SexpResult.ResultType.size():
-			types.append(SexpResult.ResultType(type_int))
+		if type_int >= 0 and type_int < SexpResult.Type.size():
+			types.append(type_int as SexpResult.Type)
 	return types
 
 func _serialize_sexp_result(result: SexpResult) -> Dictionary:
@@ -447,20 +447,20 @@ func _serialize_sexp_result(result: SexpResult) -> Dictionary:
 	}
 	
 	match result.result_type:
-		SexpResult.ResultType.NUMBER:
+		SexpResult.Type.NUMBER:
 			data["value"] = result.get_number_value()
-		SexpResult.ResultType.STRING:
+		SexpResult.Type.STRING:
 			data["value"] = result.get_string_value()
-		SexpResult.ResultType.BOOLEAN:
+		SexpResult.Type.BOOLEAN:
 			data["value"] = result.get_boolean_value()
-		SexpResult.ResultType.ERROR:
+		SexpResult.Type.ERROR:
 			data["message"] = result.get_error_message()
 			data["error_type"] = int(result.error_type)
-		SexpResult.ResultType.VOID:
+		SexpResult.Type.VOID:
 			pass  # No additional data
-		SexpResult.ResultType.OBJECT_REFERENCE:
+		SexpResult.Type.OBJECT_REFERENCE:
 			# Object references cannot be serialized
-			data["type"] = int(SexpResult.ResultType.ERROR)
+			data["type"] = int(SexpResult.Type.ERROR)
 			data["message"] = "Object reference cannot be serialized"
 			data["error_type"] = int(SexpResult.ErrorType.SERIALIZATION_ERROR)
 	
@@ -475,19 +475,19 @@ func _deserialize_sexp_result(data: Dictionary) -> SexpResult:
 	if type_val == "null":
 		return null
 	
-	var result_type: SexpResult.ResultType = SexpResult.ResultType(int(type_val))
+	var result_type: SexpResult.Type = int(type_val) as SexpResult.Type
 	
 	match result_type:
-		SexpResult.ResultType.NUMBER:
+		SexpResult.Type.NUMBER:
 			return SexpResult.create_number(data.get("value", 0.0))
-		SexpResult.ResultType.STRING:
+		SexpResult.Type.STRING:
 			return SexpResult.create_string(data.get("value", ""))
-		SexpResult.ResultType.BOOLEAN:
+		SexpResult.Type.BOOLEAN:
 			return SexpResult.create_boolean(data.get("value", false))
-		SexpResult.ResultType.ERROR:
-			var error_type: SexpResult.ErrorType = SexpResult.ErrorType(data.get("error_type", 0))
+		SexpResult.Type.ERROR:
+			var error_type: SexpResult.ErrorType = data.get("error_type", 0) as SexpResult.ErrorType
 			return SexpResult.create_error(data.get("message", "Unknown error"), error_type)
-		SexpResult.ResultType.VOID:
+		SexpResult.Type.VOID:
 			return SexpResult.create_void()
 		_:
 			return SexpResult.create_error("Unknown result type in deserialization", SexpResult.ErrorType.SERIALIZATION_ERROR)
@@ -497,13 +497,13 @@ func _deserialize_sexp_result(data: Dictionary) -> SexpResult:
 func _convert_value_to_number(val: SexpResult) -> SexpResult:
 	## Convert value to number using WCS semantics
 	match val.result_type:
-		SexpResult.ResultType.NUMBER:
+		SexpResult.Type.NUMBER:
 			return val
-		SexpResult.ResultType.STRING:
+		SexpResult.Type.STRING:
 			var str_val: String = val.get_string_value()
 			var num_val: float = str_val.to_float()
 			return SexpResult.create_number(num_val)
-		SexpResult.ResultType.BOOLEAN:
+		SexpResult.Type.BOOLEAN:
 			return SexpResult.create_number(1.0 if val.get_boolean_value() else 0.0)
 		_:
 			return SexpResult.create_error("Cannot convert to number", SexpResult.ErrorType.TYPE_MISMATCH)
@@ -511,13 +511,13 @@ func _convert_value_to_number(val: SexpResult) -> SexpResult:
 func _convert_value_to_string(val: SexpResult) -> SexpResult:
 	## Convert value to string
 	match val.result_type:
-		SexpResult.ResultType.STRING:
+		SexpResult.Type.STRING:
 			return val
-		SexpResult.ResultType.NUMBER:
+		SexpResult.Type.NUMBER:
 			return SexpResult.create_string(str(val.get_number_value()))
-		SexpResult.ResultType.BOOLEAN:
+		SexpResult.Type.BOOLEAN:
 			return SexpResult.create_string("true" if val.get_boolean_value() else "false")
-		SexpResult.ResultType.OBJECT_REFERENCE:
+		SexpResult.Type.OBJECT_REFERENCE:
 			var obj = val.get_object_reference()
 			return SexpResult.create_string(str(obj) if obj != null else "null")
 		_:
@@ -526,11 +526,11 @@ func _convert_value_to_string(val: SexpResult) -> SexpResult:
 func _convert_value_to_boolean(val: SexpResult) -> SexpResult:
 	## Convert value to boolean using WCS semantics
 	match val.result_type:
-		SexpResult.ResultType.BOOLEAN:
+		SexpResult.Type.BOOLEAN:
 			return val
-		SexpResult.ResultType.NUMBER:
+		SexpResult.Type.NUMBER:
 			return SexpResult.create_boolean(val.get_number_value() != 0.0)
-		SexpResult.ResultType.STRING:
+		SexpResult.Type.STRING:
 			var str_val: String = val.get_string_value()
 			return SexpResult.create_boolean(not str_val.is_empty() and str_val.to_float() != 0.0)
 		_:

@@ -1,11 +1,17 @@
-class_name SexpVariableManager
+class_name SexpVariableManagerUI
 extends VBoxContainer
 
-## SEXP Variable Manager with EPIC-004 Integration
+## SEXP Variable Manager UI with EPIC-004 Integration
 ##
-## Provides comprehensive variable management for SEXP expressions using the
+## Provides comprehensive variable management UI for SEXP expressions using the
 ## EPIC-004 variable system. Supports creating, editing, deleting, and monitoring
 ## variables used in mission scripting.
+##
+## This component is fully integrated with the SEXP addon system and provides:
+## - Real-time synchronization with SexpVariableManager
+## - Proper SexpResult type handling for all variable operations
+## - Signal-based reactive updates from the SEXP addon
+## - Support for LOCAL, CAMPAIGN, and GLOBAL variable scopes
 
 signal variable_created(var_name: String, value: Variant, var_type: String)
 signal variable_updated(var_name: String, old_value: Variant, new_value: Variant)
@@ -13,7 +19,7 @@ signal variable_deleted(var_name: String)
 signal variable_selected(var_name: String, var_data: Dictionary)
 
 # SEXP addon variable system integration
-var variable_manager: SexpVariableManager_Core
+var sexp_variable_manager: SexpVariableManager
 var variable_registry: Dictionary = {}
 
 # UI components
@@ -75,17 +81,34 @@ func _ready() -> void:
 ## Initialize SEXP addon variable system
 func _initialize_variable_system() -> void:
 	"""Initialize connection to SEXP addon variable management system"""
-	variable_manager = SexpVariableManager_Core.new()
+	sexp_variable_manager = SexpVariableManager.new()
 	
 	# Connect variable system signals
-	variable_manager.variable_added.connect(_on_variable_added)
-	variable_manager.variable_removed.connect(_on_variable_removed)
-	variable_manager.variable_value_changed.connect(_on_variable_changed)
+	sexp_variable_manager.variable_changed.connect(_on_variable_changed)
+	sexp_variable_manager.variable_added.connect(_on_variable_added)
+	sexp_variable_manager.variable_removed.connect(_on_variable_removed)
+	sexp_variable_manager.scope_cleared.connect(_on_scope_cleared)
 	
 	# Load existing variables from SEXP addon system
-	var existing_variables: Dictionary = variable_manager.get_all_variables()
-	for var_name in existing_variables:
-		variable_registry[var_name] = existing_variables[var_name]
+	_refresh_variable_registry()
+
+func _refresh_variable_registry() -> void:
+	"""Refresh the variable registry from SEXP addon variable manager"""
+	variable_registry.clear()
+	
+	# Get variables from all scopes
+	for scope in [SexpVariableManager.VariableScope.LOCAL, SexpVariableManager.VariableScope.CAMPAIGN, SexpVariableManager.VariableScope.GLOBAL]:
+		var scope_variables = sexp_variable_manager.get_scope_variables(scope)
+		for var_name in scope_variables:
+			var variable: SexpVariable = scope_variables[var_name]
+			variable_registry[var_name] = {
+				"name": variable.name,
+				"value": variable.value,
+				"scope": scope,
+				"type": variable.value.get_type_name() if variable.value else "unknown",
+				"created_time": variable.created_time,
+				"modified_time": variable.modified_time
+			}
 
 func _setup_ui() -> void:
 	"""Setup the variable manager UI"""
@@ -455,7 +478,7 @@ func _update_info_panel() -> void:
 		usage_text += "[b]Description:[/b]\n%s\n\n" % var_data.description
 	
 	# Get usage statistics from SEXP addon
-	var usage_stats: Dictionary = variable_manager.get_variable_usage_stats(selected_variable)
+	var usage_stats: Dictionary = {} # TODO: Add usage stats to SEXP variable manager
 	if not usage_stats.is_empty():
 		usage_text += "[b]Usage Statistics:[/b]\n"
 		usage_text += "• References: %d\n" % usage_stats.get("reference_count", 0)
@@ -470,7 +493,18 @@ func create_variable(var_name: String, var_type: String, initial_value: Variant,
 		return false
 	
 	# Create variable in SEXP addon system
-	var success: bool = variable_manager.create_variable(var_name, var_type, initial_value, description)
+	# Create variable using SEXP addon with proper SexpResult value
+	var sexp_value: SexpResult
+	if initial_value is String:
+		sexp_value = SexpResult.create_string(initial_value)
+	elif initial_value is float or initial_value is int:
+		sexp_value = SexpResult.create_number(float(initial_value))
+	elif initial_value is bool:
+		sexp_value = SexpResult.create_boolean(initial_value)
+	else:
+		sexp_value = SexpResult.create_string(str(initial_value))
+	
+	var success: bool = sexp_variable_manager.set_variable(SexpVariableManager.VariableScope.LOCAL, var_name, sexp_value)
 	
 	if success:
 		# Add to local registry
@@ -495,7 +529,18 @@ func update_variable(var_name: String, new_value: Variant) -> bool:
 		return false
 	
 	var old_value: Variant = variable_registry[var_name].get("value")
-	var success: bool = variable_manager.set_variable_value(var_name, new_value)
+	# Update variable using SEXP addon with proper SexpResult value
+	var sexp_value: SexpResult
+	if new_value is String:
+		sexp_value = SexpResult.create_string(new_value)
+	elif new_value is float or new_value is int:
+		sexp_value = SexpResult.create_number(float(new_value))
+	elif new_value is bool:
+		sexp_value = SexpResult.create_boolean(new_value)
+	else:
+		sexp_value = SexpResult.create_string(str(new_value))
+	
+	var success: bool = sexp_variable_manager.set_variable(SexpVariableManager.VariableScope.LOCAL, var_name, sexp_value)
 	
 	if success:
 		variable_registry[var_name]["value"] = new_value
@@ -513,7 +558,8 @@ func delete_variable(var_name: String) -> bool:
 	if var_name not in variable_registry:
 		return false
 	
-	var success: bool = variable_manager.remove_variable(var_name)
+	# Remove variable using SEXP addon
+	var success: bool = sexp_variable_manager.remove_variable(SexpVariableManager.VariableScope.LOCAL, var_name)
 	
 	if success:
 		variable_registry.erase(var_name)
@@ -633,25 +679,52 @@ func _on_variable_activated() -> void:
 		_on_edit_button_pressed()
 
 # SEXP addon system signal handlers
-func _on_variable_added(var_name: String, var_data: Dictionary) -> void:
+func _on_variable_added(scope: SexpVariableManager.VariableScope, var_name: String, value: SexpResult) -> void:
 	"""Handle variable addition from SEXP addon system"""
-	variable_registry[var_name] = var_data
+	variable_registry[var_name] = {
+		"name": var_name,
+		"value": value,
+		"scope": scope,
+		"type": value.get_type_name(),
+		"created_time": Time.get_unix_time_from_system(),
+		"modified_time": Time.get_unix_time_from_system()
+	}
 	_refresh_variables()
+	variable_created.emit(var_name, value.get_value(), value.get_type_name())
 
-func _on_variable_removed(var_name: String) -> void:
+func _on_variable_removed(scope: SexpVariableManager.VariableScope, var_name: String) -> void:
 	"""Handle variable removal from SEXP addon system"""
 	if var_name in variable_registry:
 		variable_registry.erase(var_name)
 		_refresh_variables()
+		variable_deleted.emit(var_name)
 
-func _on_variable_changed(var_name: String, old_value: Variant, new_value: Variant) -> void:
+func _on_variable_changed(scope: SexpVariableManager.VariableScope, var_name: String, old_value: SexpResult, new_value: SexpResult) -> void:
 	"""Handle variable value change from SEXP addon system"""
 	if var_name in variable_registry:
 		variable_registry[var_name]["value"] = new_value
+		variable_registry[var_name]["type"] = new_value.get_type_name()
+		variable_registry[var_name]["modified_time"] = Time.get_unix_time_from_system()
 		_refresh_variables()
 		
 		if selected_variable == var_name:
 			_update_info_panel()
+		
+		variable_updated.emit(var_name, old_value.get_value(), new_value.get_value())
+
+func _on_scope_cleared(scope: SexpVariableManager.VariableScope) -> void:
+	"""Handle scope clearing from SEXP addon system"""
+	# Remove variables from this scope from our registry
+	var to_remove: Array[String] = []
+	for var_name in variable_registry:
+		if variable_registry[var_name]["scope"] == scope:
+			to_remove.append(var_name)
+	
+	for var_name in to_remove:
+		variable_registry.erase(var_name)
+		variable_deleted.emit(var_name)
+	
+	_refresh_variables()
 
 # Dialog methods (placeholders)
 func _show_create_dialog() -> void:
@@ -677,7 +750,7 @@ func get_manager_statistics() -> Dictionary:
 		"selected_variable": selected_variable,
 		"current_filter": current_filter,
 		"search_query": search_query,
-		"sexp_addon_integration": variable_manager != null
+		"sexp_addon_integration": sexp_variable_manager != null
 	}
 	
 	# Count by type
@@ -689,47 +762,3 @@ func get_manager_statistics() -> Dictionary:
 		stats.by_type[var_type] += 1
 	
 	return stats
-
-# Placeholder class for SEXP addon integration
-class SexpVariableManager_Core extends RefCounted:
-	signal variable_added(var_name: String, var_data: Dictionary)
-	signal variable_removed(var_name: String)
-	signal variable_value_changed(var_name: String, old_value: Variant, new_value: Variant)
-	
-	var variables: Dictionary = {}
-	
-	func create_variable(var_name: String, var_type: String, initial_value: Variant, description: String = "") -> bool:
-		if var_name in variables:
-			return false
-		
-		variables[var_name] = {
-			"type": var_type,
-			"value": initial_value,
-			"description": description
-		}
-		
-		variable_added.emit(var_name, variables[var_name])
-		return true
-	
-	func remove_variable(var_name: String) -> bool:
-		if var_name not in variables:
-			return false
-		
-		variables.erase(var_name)
-		variable_removed.emit(var_name)
-		return true
-	
-	func set_variable_value(var_name: String, new_value: Variant) -> bool:
-		if var_name not in variables:
-			return false
-		
-		var old_value: Variant = variables[var_name].value
-		variables[var_name].value = new_value
-		variable_value_changed.emit(var_name, old_value, new_value)
-		return true
-	
-	func get_all_variables() -> Dictionary:
-		return variables.duplicate()
-	
-	func get_variable_usage_stats(var_name: String) -> Dictionary:
-		return {"reference_count": 0, "last_modified": "Unknown", "created": "Unknown"}

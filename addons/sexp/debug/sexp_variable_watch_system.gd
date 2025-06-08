@@ -45,7 +45,7 @@ var _watch_id_counter: int = 0
 var _active_contexts: Dictionary = {}  # context_id -> SexpEvaluationContext
 
 # Change tracking
-var _variable_history: Dictionary = {}  # variable_name -> Array[VariableChange]
+var _variable_history: Dictionary = {}  # variable_name -> Array[SexpVariableChange]
 var _max_history_per_variable: int = 100
 var _change_statistics: Dictionary = {}
 
@@ -266,7 +266,7 @@ func _process_variable_change(watch: SexpVariableWatch, old_value: SexpResult, n
 func _record_variable_change(variable_name: String, old_value: SexpResult, new_value: SexpResult, 
 							context: SexpEvaluationContext) -> void:
 	"""Record variable change in history"""
-	var change = VariableChange.new()
+	var change = SexpVariableChange.new()
 	change.timestamp = Time.get_ticks_msec() / 1000.0
 	change.variable_name = variable_name
 	change.old_value = old_value
@@ -435,7 +435,7 @@ func stop_periodic_updates() -> void:
 
 ## Variable history and analysis
 
-func get_variable_history(variable_name: String, limit: int = 50) -> Array[VariableChange]:
+func get_variable_history(variable_name: String, limit: int = 50) -> Array[SexpVariableChange]:
 	"""Get change history for variable"""
 	if variable_name not in _variable_history:
 		return []
@@ -723,7 +723,7 @@ class SexpVariableWatch:
 			"last_update_time": last_update_time
 		}
 
-class VariableChange:
+class SexpVariableChange:
 	extends RefCounted
 	
 	var timestamp: float = 0.0

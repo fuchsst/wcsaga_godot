@@ -15,7 +15,7 @@ func _init():
 	function_signature = "(+ number1 number2 ...)"
 	minimum_args = 0  # WCS allows empty addition (returns 0)
 	maximum_args = -1  # unlimited
-	supported_argument_types = [SexpResult.ResultType.NUMBER]
+	supported_argument_types = [SexpResult.Type.NUMBER]
 	wcs_compatibility_notes = "Enhanced with floating-point support, WCS used integers only"
 
 func _execute_implementation(args: Array[SexpResult]) -> SexpResult:
@@ -62,10 +62,10 @@ func _execute_implementation(args: Array[SexpResult]) -> SexpResult:
 func _convert_to_number(result: SexpResult, arg_index: int) -> SexpResult:
 	## Convert SEXP result to number following WCS semantics
 	match result.result_type:
-		SexpResult.ResultType.NUMBER:
+		SexpResult.Type.NUMBER:
 			return result
 		
-		SexpResult.ResultType.STRING:
+		SexpResult.Type.STRING:
 			var str_val: String = result.get_string_value()
 			# WCS uses atoi() conversion - we'll be more robust
 			if str_val.is_empty():
@@ -79,15 +79,15 @@ func _convert_to_number(result: SexpResult, arg_index: int) -> SexpResult:
 				# Non-numeric strings: WCS would use atoi() which returns 0
 				return SexpResult.create_number(0.0)
 		
-		SexpResult.ResultType.BOOLEAN:
+		SexpResult.Type.BOOLEAN:
 			# WCS treats booleans as numbers: true=1, false=0
 			return SexpResult.create_number(1.0 if result.get_boolean_value() else 0.0)
 		
-		SexpResult.ResultType.OBJECT_REFERENCE:
+		SexpResult.Type.OBJECT_REFERENCE:
 			var error_msg: String = "Cannot convert object reference to number (argument %d)" % arg_index
 			return SexpResult.create_error(error_msg, SexpResult.ErrorType.TYPE_MISMATCH)
 		
-		SexpResult.ResultType.VOID:
+		SexpResult.Type.VOID:
 			# Void values treated as 0
 			return SexpResult.create_number(0.0)
 		

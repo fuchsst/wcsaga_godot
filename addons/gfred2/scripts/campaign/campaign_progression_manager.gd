@@ -231,24 +231,24 @@ func _check_campaign_completion() -> void:
 
 ## Sets a campaign variable value
 func set_campaign_variable(variable_name: String, value: Variant) -> void:
-	var variable: CampaignData.CampaignVariable = campaign_data.get_campaign_variable(variable_name)
+	var variable: SexpVariableData = campaign_data.get_campaign_variable(variable_name)
 	if not variable:
 		print("CampaignProgressionManager: Unknown variable: %s" % variable_name)
 		return
 	
 	# Type checking
 	var old_value: Variant = campaign_variables.get(variable_name)
-	match variable.variable_type:
-		CampaignData.CampaignVariable.VariableType.INTEGER:
+	match variable.type:
+		"number":
 			if value is int:
 				campaign_variables[variable_name] = value
-		CampaignData.CampaignVariable.VariableType.FLOAT:
+		"float":
 			if value is float or value is int:
 				campaign_variables[variable_name] = float(value)
-		CampaignData.CampaignVariable.VariableType.BOOLEAN:
+		"boolean":
 			if value is bool:
 				campaign_variables[variable_name] = value
-		CampaignData.CampaignVariable.VariableType.STRING:
+		"string":
 			campaign_variables[variable_name] = str(value)
 	
 	if campaign_variables.get(variable_name) != old_value:

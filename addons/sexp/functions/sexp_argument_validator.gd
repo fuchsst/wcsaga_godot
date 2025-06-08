@@ -44,34 +44,34 @@ func _init():
 func _setup_default_coercion_rules() -> void:
 	type_coercion_rules = {
 		# Number coercions
-		SexpResult.ResultType.STRING: {
-			SexpResult.ResultType.NUMBER: func(value: String) -> float:
+		SexpResult.Type.STRING: {
+			SexpResult.Type.NUMBER: func(value: String) -> float:
 				if value.is_valid_float():
 					return value.to_float()
 				return NAN
 		},
-		SexpResult.ResultType.BOOLEAN: {
-			SexpResult.ResultType.NUMBER: func(value: bool) -> float:
+		SexpResult.Type.BOOLEAN: {
+			SexpResult.Type.NUMBER: func(value: bool) -> float:
 				return 1.0 if value else 0.0
 		},
 		
 		# String coercions
-		SexpResult.ResultType.NUMBER: {
-			SexpResult.ResultType.STRING: func(value: float) -> String:
+		SexpResult.Type.NUMBER: {
+			SexpResult.Type.STRING: func(value: float) -> String:
 				return str(value)
 		},
-		SexpResult.ResultType.BOOLEAN: {
-			SexpResult.ResultType.STRING: func(value: bool) -> String:
+		SexpResult.Type.BOOLEAN: {
+			SexpResult.Type.STRING: func(value: bool) -> String:
 				return "true" if value else "false"
 		},
 		
 		# Boolean coercions
-		SexpResult.ResultType.NUMBER: {
-			SexpResult.ResultType.BOOLEAN: func(value: float) -> bool:
+		SexpResult.Type.NUMBER: {
+			SexpResult.Type.BOOLEAN: func(value: float) -> bool:
 				return value != 0.0
 		},
-		SexpResult.ResultType.STRING: {
-			SexpResult.ResultType.BOOLEAN: func(value: String) -> bool:
+		SexpResult.Type.STRING: {
+			SexpResult.Type.BOOLEAN: func(value: String) -> bool:
 				var lower: String = value.to_lower()
 				return lower == "true" or lower == "1" or lower == "yes"
 		}
@@ -101,11 +101,11 @@ func require_count_range(min_count: int, max_count: int) -> void:
 	add_rule(ValidationRule.RANGE_COUNT, {"min_count": min_count, "max_count": max_count})
 
 ## Add required types rule
-func require_types(types: Array[SexpResult.ResultType]) -> void:
+func require_types(types: Array[SexpResult.Type]) -> void:
 	add_rule(ValidationRule.REQUIRED_TYPES, {"types": types})
 
 ## Add allowed types rule
-func allow_types(types: Array[SexpResult.ResultType]) -> void:
+func allow_types(types: Array[SexpResult.Type]) -> void:
 	add_rule(ValidationRule.ALLOWED_TYPES, {"types": types})
 
 ## Add numeric range rule for specific argument
@@ -264,10 +264,10 @@ func _validate_count_range(args: Array[SexpResult], min_count: int, max_count: i
 	return SexpResult.create_void()
 
 ## Validate required argument types (position-specific)
-func _validate_required_types(args: Array[SexpResult], required_types: Array[SexpResult.ResultType], function_name: String) -> SexpResult:
+func _validate_required_types(args: Array[SexpResult], required_types: Array[SexpResult.Type], function_name: String) -> SexpResult:
 	for i in range(min(args.size(), required_types.size())):
 		var arg: SexpResult = args[i]
-		var required_type: SexpResult.ResultType = required_types[i]
+		var required_type: SexpResult.Type = required_types[i]
 		
 		if arg.result_type != required_type:
 			var suggestion: String = ""
@@ -289,7 +289,7 @@ func _validate_required_types(args: Array[SexpResult], required_types: Array[Sex
 	return SexpResult.create_void()
 
 ## Validate allowed argument types (any argument can be any allowed type)
-func _validate_allowed_types(args: Array[SexpResult], allowed_types: Array[SexpResult.ResultType], function_name: String) -> SexpResult:
+func _validate_allowed_types(args: Array[SexpResult], allowed_types: Array[SexpResult.Type], function_name: String) -> SexpResult:
 	for i in range(args.size()):
 		var arg: SexpResult = args[i]
 		
@@ -456,19 +456,19 @@ func _apply_type_coercion(args: Array[SexpResult]) -> SexpResult:
 	return SexpResult.create_void()
 
 ## Generate type conversion suggestion
-func _generate_type_conversion_suggestion(from_type: SexpResult.ResultType, to_type: SexpResult.ResultType) -> String:
+func _generate_type_conversion_suggestion(from_type: SexpResult.Type, to_type: SexpResult.Type) -> String:
 	var from_name: String = SexpResult.get_type_name(from_type)
 	var to_name: String = SexpResult.get_type_name(to_type)
 	
 	# Provide specific conversion suggestions
 	match [from_type, to_type]:
-		[SexpResult.ResultType.STRING, SexpResult.ResultType.NUMBER]:
+		[SexpResult.Type.STRING, SexpResult.Type.NUMBER]:
 			return "Use (string-to-number \"%s\") or ensure string contains valid number" % from_name
-		[SexpResult.ResultType.NUMBER, SexpResult.ResultType.STRING]:
+		[SexpResult.Type.NUMBER, SexpResult.Type.STRING]:
 			return "Use (number-to-string %s) to convert number to string" % from_name
-		[SexpResult.ResultType.BOOLEAN, SexpResult.ResultType.NUMBER]:
+		[SexpResult.Type.BOOLEAN, SexpResult.Type.NUMBER]:
 			return "Use (if %s 1 0) to convert boolean to number" % from_name
-		[SexpResult.ResultType.NUMBER, SexpResult.ResultType.BOOLEAN]:
+		[SexpResult.Type.NUMBER, SexpResult.Type.BOOLEAN]:
 			return "Use (!= %s 0) to convert number to boolean" % from_name
 		_:
 			return "Convert %s to %s" % [from_name, to_name]
@@ -477,25 +477,25 @@ func _generate_type_conversion_suggestion(from_type: SexpResult.ResultType, to_t
 static func create_arithmetic_validator() -> SexpArgumentValidator:
 	var validator: SexpArgumentValidator = SexpArgumentValidator.new()
 	validator.require_min_count(1)
-	validator.allow_types([SexpResult.ResultType.NUMBER])
+	validator.allow_types([SexpResult.Type.NUMBER])
 	return validator
 
 static func create_comparison_validator() -> SexpArgumentValidator:
 	var validator: SexpArgumentValidator = SexpArgumentValidator.new()
 	validator.require_exact_count(2)
-	validator.allow_types([SexpResult.ResultType.NUMBER, SexpResult.ResultType.STRING, SexpResult.ResultType.BOOLEAN])
+	validator.allow_types([SexpResult.Type.NUMBER, SexpResult.Type.STRING, SexpResult.Type.BOOLEAN])
 	return validator
 
 static func create_logical_validator() -> SexpArgumentValidator:
 	var validator: SexpArgumentValidator = SexpArgumentValidator.new()
 	validator.require_min_count(1)
-	validator.allow_types([SexpResult.ResultType.BOOLEAN])
+	validator.allow_types([SexpResult.Type.BOOLEAN])
 	return validator
 
 static func create_string_validator() -> SexpArgumentValidator:
 	var validator: SexpArgumentValidator = SexpArgumentValidator.new()
 	validator.require_min_count(1)
-	validator.allow_types([SexpResult.ResultType.STRING])
+	validator.allow_types([SexpResult.Type.STRING])
 	return validator
 
 ## Clear all validation rules

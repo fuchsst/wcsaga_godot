@@ -18,7 +18,7 @@ class TestFunction extends BaseSexpFunction:
 		function_signature = "(test-func arg1 arg2)"
 		minimum_args = 1
 		maximum_args = 2
-		supported_argument_types = [SexpResult.ResultType.NUMBER, SexpResult.ResultType.STRING]
+		supported_argument_types = [SexpResult.Type.NUMBER, SexpResult.Type.STRING]
 	
 	func _execute_implementation(args: Array[SexpResult]) -> SexpResult:
 		if execution_delay_ms > 0:
@@ -144,9 +144,9 @@ func test_can_handle_arg_count():
 
 ## Test argument type checking
 func test_can_handle_arg_types():
-	var number_types: Array[SexpResult.ResultType] = [SexpResult.ResultType.NUMBER]
-	var string_types: Array[SexpResult.ResultType] = [SexpResult.ResultType.STRING]
-	var boolean_types: Array[SexpResult.ResultType] = [SexpResult.ResultType.BOOLEAN]
+	var number_types: Array[SexpResult.Type] = [SexpResult.Type.NUMBER]
+	var string_types: Array[SexpResult.Type] = [SexpResult.Type.STRING]
+	var boolean_types: Array[SexpResult.Type] = [SexpResult.Type.BOOLEAN]
 	
 	assert_true(test_function.can_handle_arg_types(number_types), "Should handle number types")
 	assert_true(test_function.can_handle_arg_types(string_types), "Should handle string types")

@@ -23,6 +23,11 @@ const SexpResult = preload("res://addons/sexp/core/sexp_result.gd")
 ## Object reference system for reliable ship tracking
 var _object_ref_system: ObjectReferenceSystem
 
+## Ship state tracking
+var _ship_destroyed: Dictionary = {}    ## Track destroyed ships
+var _ship_departed: Dictionary = {}     ## Track departed ships
+var _ship_subsystem_status: Dictionary = {}  ## Track subsystem status
+
 ## Ship lookup and reference management
 static var _instance: ShipSystemInterface = null
 

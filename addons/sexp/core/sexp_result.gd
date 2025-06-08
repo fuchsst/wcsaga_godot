@@ -11,6 +11,7 @@ enum Type {
 	STRING,           ## String result
 	BOOLEAN,          ## Boolean result (true/false)
 	OBJECT_REFERENCE, ## Reference to game object (ship, weapon, etc.)
+	VARIABLE_REFERENCE, ## Reference to a variable (for compatibility)
 	ERROR,            ## Error result with context information
 	VOID              ## No return value (for actions/commands)
 }
@@ -30,7 +31,8 @@ enum ErrorType {
 	DIVISION_BY_ZERO,         ## Mathematical division by zero
 	INDEX_OUT_OF_BOUNDS,      ## Array/collection access error
 	PERMISSION_DENIED,        ## Operation not allowed in current context
-	RESOURCE_EXHAUSTED        ## System resource limitation
+	RESOURCE_EXHAUSTED,       ## System resource limitation
+	SERIALIZATION_ERROR       ## Error during serialization/deserialization
 }
 
 ## Result type and value
@@ -52,6 +54,10 @@ var error_column: int = -1            ## Column number in source
 ## Performance tracking
 var evaluation_time_ms: float = 0.0   ## Time taken to evaluate
 var cache_hit: bool = false           ## Whether result came from cache
+
+## Special constants for WCS compatibility
+const SEXP_NAN: float = NAN           ## Not a Number constant  
+const SEXP_NAN_FOREVER: float = INF   ## Infinite/forever constant
 
 ## Initialize result
 func _init() -> void:
@@ -148,15 +154,6 @@ func to_number() -> SexpResult:
 		_:
 			return _create_type_error("Cannot convert %s to number" % Type.keys()[result_type])
 	
-	return new_result
-
-func to_string() -> SexpResult:
-	if result_type == Type.STRING:
-		return self
-	
-	var new_result := SexpResult.new()
-	new_result.result_type = Type.STRING
-	new_result.value = str(value)
 	return new_result
 
 func to_boolean() -> SexpResult:
@@ -341,3 +338,29 @@ func validate_not_null() -> SexpResult:
 	if result_type == Type.OBJECT_REFERENCE and value == null:
 		return create_error("Object reference is null", ErrorType.OBJECT_NOT_FOUND)
 	return self
+
+## Additional methods for WCS compatibility
+
+func get_type_name() -> String:
+	## Get the type name as a string for debugging and serialization
+	return Type.keys()[result_type].to_lower()
+
+func get_value() -> Variant:
+	## Get the raw value of the result
+	return value
+
+func get_object_reference() -> Variant:
+	## Get object reference value (alias for get_object_value for compatibility)
+	return get_object_value()
+
+func get_error_message() -> String:
+	## Get the error message if this is an error result
+	return error_message if is_error() else ""
+
+func is_object_reference() -> bool:
+	## Check if this result is an object reference  
+	return result_type == Type.OBJECT_REFERENCE
+
+func is_variable_reference() -> bool:
+	## Check if this result is a variable reference
+	return result_type == Type.VARIABLE_REFERENCE

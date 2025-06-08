@@ -42,6 +42,7 @@ signal performance_alert(expression: String, time_ms: float, optimization_hints:
 ## EPIC-004 performance integration
 var performance_debugger: SexpPerformanceDebugger
 var performance_monitor: SexpPerformanceMonitor
+var debug_evaluator: SexpEvaluator
 
 ## Debug session management (AC7)
 var current_session_id: String = ""
@@ -120,9 +121,11 @@ func _ready() -> void:
 func _initialize_performance_integration() -> void:
 	"""Initialize EPIC-004 performance debugging integration (AC6)."""
 	
-	# Create performance debugger
-	performance_debugger = SexpPerformanceDebugger.new()
-	add_child(performance_debugger)
+	# Create performance debugger (needs evaluator reference)
+	if debug_evaluator:
+		performance_debugger = SexpPerformanceDebugger.new(debug_evaluator)
+	else:
+		performance_debugger = SexpPerformanceDebugger.new(SexpEvaluator.new())
 	
 	# Connect performance signals
 	performance_debugger.performance_alert.connect(_on_performance_alert)
@@ -168,15 +171,21 @@ func _connect_debug_component_signals() -> void:
 	
 	# Debug controls
 	if debug_controls:
-		debug_controls.debug_session_started.connect(_on_debug_session_started)
-		debug_controls.debug_session_stopped.connect(_on_debug_session_stopped)
-		debug_controls.execution_paused.connect(_on_execution_paused)
+		if debug_controls.has_signal("debug_session_started"):
+			debug_controls.debug_session_started.connect(_on_debug_session_started)
+		if debug_controls.has_signal("debug_session_stopped"):
+			debug_controls.debug_session_stopped.connect(_on_debug_session_stopped)
+		if debug_controls.has_signal("execution_paused"):
+			debug_controls.execution_paused.connect(_on_execution_paused)
 	
 	# Breakpoint manager
 	if breakpoint_manager:
-		breakpoint_manager.breakpoint_added.connect(_on_breakpoint_added)
-		breakpoint_manager.breakpoint_removed.connect(_on_breakpoint_removed)
-		breakpoint_manager.breakpoint_hit.connect(_on_breakpoint_hit)
+		if breakpoint_manager.has_signal("breakpoint_added"):
+			breakpoint_manager.breakpoint_added.connect(_on_breakpoint_added)
+		if breakpoint_manager.has_signal("breakpoint_removed"):
+			breakpoint_manager.breakpoint_removed.connect(_on_breakpoint_removed)
+		if breakpoint_manager.has_signal("breakpoint_hit"):
+			breakpoint_manager.breakpoint_hit.connect(_on_breakpoint_hit)
 	
 	# Variable watch
 	if variable_watch:
@@ -599,25 +608,25 @@ func _on_debug_session_stopped(session_id: String) -> void:
 	"""Handle debug session stop from controls."""
 	status_label.text = "Debug session stopped"
 
-func _on_execution_paused(context: SexpDebugContext) -> void:
+func _on_execution_paused(context: Dictionary) -> void:
 	## Handle execution pause from controls.
 	status_label.text = "Execution paused at breakpoint"
 
-func _on_breakpoint_added(breakpoint: SexpDebugEvaluator.SexpBreakpoint) -> void:
+func _on_breakpoint_added(bp: Variant) -> void:
 	## Handle breakpoint addition.
 	if debug_console:
-		debug_console.print_output("Breakpoint added: " + breakpoint.expression_pattern, Color.CYAN)
+		debug_console.print_output("Breakpoint added: " + bp.expression_pattern, Color.CYAN)
 
-func _on_breakpoint_removed(breakpoint: SexpDebugEvaluator.SexpBreakpoint) -> void:
+func _on_breakpoint_removed(bp: Variant) -> void:
 	## Handle breakpoint removal.
 	if debug_console:
-		debug_console.print_output("Breakpoint removed: " + breakpoint.expression_pattern, Color.CYAN)
+		debug_console.print_output("Breakpoint removed: " + bp.expression_pattern, Color.CYAN)
 
-func _on_breakpoint_hit(breakpoint: SexpDebugEvaluator.SexpBreakpoint, context: SexpDebugContext) -> void:
+func _on_breakpoint_hit(bp: Variant, context: Dictionary) -> void:
 	## Handle breakpoint hit.
-	status_label.text = "Breakpoint hit: " + breakpoint.expression_pattern
+	status_label.text = "Breakpoint hit: " + bp.expression_pattern
 	if debug_console:
-		debug_console.print_output("*** BREAKPOINT HIT: " + breakpoint.expression_pattern, Color.RED)
+		debug_console.print_output("*** BREAKPOINT HIT: " + bp.expression_pattern, Color.RED)
 
 func _on_variable_watch_added(variable_name: String) -> void:
 	## Handle variable watch addition.

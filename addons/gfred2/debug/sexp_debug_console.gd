@@ -73,7 +73,6 @@ func _initialize_sexp_integration() -> void:
 	
 	# Create evaluator for console
 	sexp_evaluator = SexpEvaluator.new()
-	add_child(sexp_evaluator)
 	
 	# Create evaluation context with test data
 	evaluation_context = SexpEvaluationContext.new()
@@ -139,12 +138,12 @@ func _setup_console_evaluation_context() -> void:
 		return
 	
 	# Add test variables
-	evaluation_context.set_variable("test_health", 100.0)
-	evaluation_context.set_variable("test_shield", 85)
-	evaluation_context.set_variable("test_name", "Debug Ship")
-	evaluation_context.set_variable("test_alive", true)
-	evaluation_context.set_variable("test_count", 5)
-	evaluation_context.set_variable("mission_debug", true)
+	evaluation_context.set_variable("test_health", SexpResult.create_number(100.0))
+	evaluation_context.set_variable("test_shield", SexpResult.create_number(85))
+	evaluation_context.set_variable("test_name", SexpResult.create_string("Debug Ship"))
+	evaluation_context.set_variable("test_alive", SexpResult.create_boolean(true))
+	evaluation_context.set_variable("test_count", SexpResult.create_number(5))
+	evaluation_context.set_variable("mission_debug", SexpResult.create_boolean(true))
 
 ## Public API
 
@@ -155,7 +154,7 @@ func execute_command(command: String) -> Variant:
 	Returns:
 		Execution result"""
 	
-	command = command.strip()
+	command = command.strip_edges()
 	if command.is_empty():
 		return null
 	

@@ -20,7 +20,7 @@ class SetAIGoalFunction extends BaseSexpFunction:
 		maximum_args = 4
 		is_pure_function = false  # Changes AI state
 		is_cacheable = false
-		supported_argument_types = [SexpResult.ResultType.STRING]
+		supported_argument_types = [SexpResult.Type.STRING]
 	
 	func _execute_implementation(args: Array[SexpResult]) -> SexpResult:
 		var ship_name: String = args[0].get_string_value()
@@ -60,7 +60,7 @@ class ChangeAIBehaviorFunction extends BaseSexpFunction:
 		maximum_args = 3
 		is_pure_function = false
 		is_cacheable = false
-		supported_argument_types = [SexpResult.ResultType.STRING]
+		supported_argument_types = [SexpResult.Type.STRING]
 	
 	func _execute_implementation(args: Array[SexpResult]) -> SexpResult:
 		var ship_name: String = args[0].get_string_value()
@@ -91,7 +91,7 @@ class SetFormationFunction extends BaseSexpFunction:
 		maximum_args = 4
 		is_pure_function = false
 		is_cacheable = false
-		supported_argument_types = [SexpResult.ResultType.STRING, SexpResult.ResultType.ARRAY]
+		supported_argument_types = [SexpResult.Type.STRING, SexpResult.Type.ARRAY]
 	
 	func _execute_implementation(args: Array[SexpResult]) -> SexpResult:
 		var leader_name: String = args[0].get_string_value()
@@ -140,7 +140,7 @@ class SetTargetPriorityFunction extends BaseSexpFunction:
 		maximum_args = 3
 		is_pure_function = false
 		is_cacheable = false
-		supported_argument_types = [SexpResult.ResultType.STRING, SexpResult.ResultType.NUMBER]
+		supported_argument_types = [SexpResult.Type.STRING, SexpResult.Type.NUMBER]
 	
 	func _execute_implementation(args: Array[SexpResult]) -> SexpResult:
 		var ship_name: String = args[0].get_string_value()
@@ -174,7 +174,7 @@ class SetAIEnabledFunction extends BaseSexpFunction:
 		maximum_args = 2
 		is_pure_function = false
 		is_cacheable = false
-		supported_argument_types = [SexpResult.ResultType.STRING, SexpResult.ResultType.BOOLEAN]
+		supported_argument_types = [SexpResult.Type.STRING, SexpResult.Type.BOOLEAN]
 	
 	func _execute_implementation(args: Array[SexpResult]) -> SexpResult:
 		var ship_name: String = args[0].get_string_value()
@@ -198,7 +198,7 @@ class GetAIStatusFunction extends BaseSexpFunction:
 		maximum_args = 2
 		is_pure_function = true
 		is_cacheable = false  # Status changes frequently
-		supported_argument_types = [SexpResult.ResultType.STRING]
+		supported_argument_types = [SexpResult.Type.STRING]
 	
 	func _execute_implementation(args: Array[SexpResult]) -> SexpResult:
 		var ship_name: String = args[0].get_string_value()

@@ -14,7 +14,7 @@ func _init():
 	function_signature = "(string-equals string1 string2 ...)"
 	minimum_args = 2
 	maximum_args = -1  # unlimited
-	supported_argument_types = [SexpResult.ResultType.STRING]
+	supported_argument_types = [SexpResult.Type.STRING]
 	wcs_compatibility_notes = "Case-sensitive string comparison using strcmp semantics"
 
 func _execute_implementation(args: Array[SexpResult]) -> SexpResult:
@@ -57,9 +57,9 @@ func _execute_implementation(args: Array[SexpResult]) -> SexpResult:
 func _convert_to_string(result: SexpResult) -> String:
 	## Convert SEXP result to string following WCS semantics
 	match result.result_type:
-		SexpResult.ResultType.STRING:
+		SexpResult.Type.STRING:
 			return result.get_string_value()
-		SexpResult.ResultType.NUMBER:
+		SexpResult.Type.NUMBER:
 			# Convert number to string representation
 			var num: float = result.get_number_value()
 			# Use integer representation if it's a whole number
@@ -67,12 +67,12 @@ func _convert_to_string(result: SexpResult) -> String:
 				return str(int(num))
 			else:
 				return str(num)
-		SexpResult.ResultType.BOOLEAN:
+		SexpResult.Type.BOOLEAN:
 			return "true" if result.get_boolean_value() else "false"
-		SexpResult.ResultType.OBJECT_REFERENCE:
+		SexpResult.Type.OBJECT_REFERENCE:
 			var obj = result.get_object_reference()
 			return str(obj) if obj != null else "null"
-		SexpResult.ResultType.VOID:
+		SexpResult.Type.VOID:
 			return "void"
 		_:
 			return "unknown"

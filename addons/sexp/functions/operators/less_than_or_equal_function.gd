@@ -45,7 +45,7 @@ func _compare_values(left: SexpResult, right: SexpResult) -> int:
 		return _compare_different_types(left, right)
 	
 	match left.result_type:
-		SexpResult.ResultType.NUMBER:
+		SexpResult.Type.NUMBER:
 			var left_num: float = left.get_number_value()
 			var right_num: float = right.get_number_value()
 			if left_num < right_num:
@@ -54,9 +54,9 @@ func _compare_values(left: SexpResult, right: SexpResult) -> int:
 				return 1
 			else:
 				return 0
-		SexpResult.ResultType.STRING:
+		SexpResult.Type.STRING:
 			return left.get_string_value().naturalnocasecmp_to(right.get_string_value())
-		SexpResult.ResultType.BOOLEAN:
+		SexpResult.Type.BOOLEAN:
 			var left_bool: bool = left.get_boolean_value()
 			var right_bool: bool = right.get_boolean_value()
 			if left_bool == right_bool:
@@ -83,9 +83,9 @@ func _compare_different_types(left: SexpResult, right: SexpResult) -> int:
 
 func _try_convert_to_number(result: SexpResult) -> float:
 	match result.result_type:
-		SexpResult.ResultType.NUMBER:
+		SexpResult.Type.NUMBER:
 			return result.get_number_value()
-		SexpResult.ResultType.STRING:
+		SexpResult.Type.STRING:
 			var str_val: String = result.get_string_value()
 			if str_val.is_valid_int():
 				return str_val.to_int() as float
@@ -93,23 +93,23 @@ func _try_convert_to_number(result: SexpResult) -> float:
 				return str_val.to_float()
 			else:
 				return NAN
-		SexpResult.ResultType.BOOLEAN:
+		SexpResult.Type.BOOLEAN:
 			return 1.0 if result.get_boolean_value() else 0.0
 		_:
 			return NAN
 
 func _convert_to_string(result: SexpResult) -> String:
 	match result.result_type:
-		SexpResult.ResultType.STRING:
+		SexpResult.Type.STRING:
 			return result.get_string_value()
-		SexpResult.ResultType.NUMBER:
+		SexpResult.Type.NUMBER:
 			return str(result.get_number_value())
-		SexpResult.ResultType.BOOLEAN:
+		SexpResult.Type.BOOLEAN:
 			return "true" if result.get_boolean_value() else "false"
-		SexpResult.ResultType.OBJECT_REFERENCE:
+		SexpResult.Type.OBJECT_REFERENCE:
 			var obj = result.get_object_reference()
 			return str(obj) if obj != null else "null"
-		SexpResult.ResultType.VOID:
+		SexpResult.Type.VOID:
 			return "void"
 		_:
 			return "unknown"

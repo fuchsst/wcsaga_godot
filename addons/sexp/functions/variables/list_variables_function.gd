@@ -14,7 +14,7 @@ func _init():
 	function_signature = "(list-variables scope)"
 	minimum_args = 1
 	maximum_args = 1
-	supported_argument_types = [SexpResult.ResultType.STRING]
+	supported_argument_types = [SexpResult.Type.STRING]
 	wcs_compatibility_notes = "Lists variable names from local, campaign, or global scope"
 
 func _execute_implementation(args: Array[SexpResult]) -> SexpResult:
@@ -61,15 +61,15 @@ func _get_variable_manager() -> SexpVariableManager:
 func _convert_to_string(result: SexpResult) -> String:
 	## Convert SEXP result to string
 	match result.result_type:
-		SexpResult.ResultType.STRING:
+		SexpResult.Type.STRING:
 			return result.get_string_value()
-		SexpResult.ResultType.NUMBER:
+		SexpResult.Type.NUMBER:
 			var num: float = result.get_number_value()
 			if num == floor(num):
 				return str(int(num))
 			else:
 				return str(num)
-		SexpResult.ResultType.BOOLEAN:
+		SexpResult.Type.BOOLEAN:
 			return "true" if result.get_boolean_value() else "false"
 		_:
 			return str(result)

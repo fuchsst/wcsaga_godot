@@ -66,7 +66,7 @@ func test_type_locking():
 
 func test_allowed_types():
 	# Set allowed types to only numbers and strings
-	variable.set_allowed_types([SexpResult.ResultType.NUMBER, SexpResult.ResultType.STRING])
+	variable.set_allowed_types([SexpResult.Type.NUMBER, SexpResult.Type.STRING])
 	
 	# Number should be allowed
 	var number_value: SexpResult = SexpResult.create_number(42)
@@ -250,7 +250,7 @@ func test_serialization_roundtrip():
 	variable.set_description("Serialization test variable")
 	variable.set_source_info("test_mission", "serialize_function")
 	variable.set_number_range(0.0, 100.0)
-	variable.set_allowed_types([SexpResult.ResultType.NUMBER])
+	variable.set_allowed_types([SexpResult.Type.NUMBER])
 	variable.lock_type()
 	variable.access_count = 5
 	
@@ -304,7 +304,7 @@ func test_constraint_clearing():
 	# Set up constraints
 	variable.set_number_range(0.0, 100.0)
 	variable.set_allowed_string_values(["a", "b", "c"])
-	variable.set_allowed_types([SexpResult.ResultType.NUMBER])
+	variable.set_allowed_types([SexpResult.Type.NUMBER])
 	
 	# Clear constraints
 	variable.clear_constraints()

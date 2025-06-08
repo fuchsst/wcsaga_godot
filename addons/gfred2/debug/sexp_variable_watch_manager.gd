@@ -131,11 +131,9 @@ func _initialize_sexp_integration() -> void:
 	# Create debug evaluator if needed
 	if not debug_evaluator:
 		debug_evaluator = SexpDebugEvaluator.new()
-		add_child(debug_evaluator)
 	
 	# Create variable watch system
 	variable_watch_system = SexpVariableWatchSystem.new()
-	add_child(variable_watch_system)
 	
 	# Connect variable watch signals
 	variable_watch_system.variable_value_changed.connect(_on_variable_value_changed)

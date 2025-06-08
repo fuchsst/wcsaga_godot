@@ -18,7 +18,7 @@ var function_signature: String = ""
 
 ## Argument information
 var arguments: Array[Dictionary] = []  # [{name, type, description, optional, default}]
-var return_type: SexpResult.ResultType = SexpResult.ResultType.VOID
+var return_type: SexpResult.Type = SexpResult.Type.VOID
 var return_description: String = ""
 
 ## Usage and examples
@@ -74,7 +74,7 @@ func set_basic_info(name: String, category: String, description: String, signatu
 	function_signature = signature
 
 ## Add argument information
-func add_argument(name: String, type: SexpResult.ResultType, description: String, optional: bool = false, default_value: String = "") -> void:
+func add_argument(name: String, type: SexpResult.Type, description: String, optional: bool = false, default_value: String = "") -> void:
 	arguments.append({
 		"name": name,
 		"type": type,
@@ -85,7 +85,7 @@ func add_argument(name: String, type: SexpResult.ResultType, description: String
 	})
 
 ## Set return information
-func set_return_info(type: SexpResult.ResultType, description: String = "") -> void:
+func set_return_info(type: SexpResult.Type, description: String = "") -> void:
 	return_type = type
 	return_description = description
 
@@ -218,7 +218,7 @@ func _generate_text_help() -> String:
 			]
 	
 	# Return value
-	if return_type != SexpResult.ResultType.VOID:
+	if return_type != SexpResult.Type.VOID:
 		help += "\nReturns: %s\n" % SexpResult.get_type_name(return_type)
 		if not return_description.is_empty():
 			help += "  %s\n" % return_description
@@ -342,7 +342,7 @@ func _generate_markdown_help() -> String:
 		help += "\n"
 	
 	# Return value
-	if return_type != SexpResult.ResultType.VOID:
+	if return_type != SexpResult.Type.VOID:
 		help += "## Returns\n\n"
 		help += "**Type:** `%s`  \n" % SexpResult.get_type_name(return_type)
 		if not return_description.is_empty():

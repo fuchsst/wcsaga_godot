@@ -148,7 +148,7 @@ func test_type_conversion():
 	# Test string to number conversion
 	var string_result: SexpResult = variable_manager.convert_value_to_type(
 		SexpResult.create_string("42.5"), 
-		SexpResult.ResultType.NUMBER
+		SexpResult.Type.NUMBER
 	)
 	assert_true(string_result.is_number(), "Should convert string to number")
 	assert_eq(string_result.get_number_value(), 42.5, "Should convert correctly")
@@ -156,7 +156,7 @@ func test_type_conversion():
 	# Test number to string conversion
 	var number_result: SexpResult = variable_manager.convert_value_to_type(
 		SexpResult.create_number(123),
-		SexpResult.ResultType.STRING
+		SexpResult.Type.STRING
 	)
 	assert_true(number_result.is_string(), "Should convert number to string")
 	assert_eq(number_result.get_string_value(), "123", "Should convert correctly")
@@ -164,7 +164,7 @@ func test_type_conversion():
 	# Test boolean to number conversion (WCS semantics)
 	var bool_result: SexpResult = variable_manager.convert_value_to_type(
 		SexpResult.create_boolean(true),
-		SexpResult.ResultType.NUMBER
+		SexpResult.Type.NUMBER
 	)
 	assert_true(bool_result.is_number(), "Should convert boolean to number")
 	assert_eq(bool_result.get_number_value(), 1.0, "True should convert to 1")

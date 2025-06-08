@@ -47,7 +47,7 @@ class FunctionCallRecord extends RefCounted:
 		context_id = ctx_id
 		call_stack_depth = stack_depth
 
-class PerformanceMetrics extends RefCounted:
+class SexpPerformanceMetrics extends RefCounted:
 	var total_calls: int = 0
 	var total_time_ms: float = 0.0
 	var min_time_ms: float = 999999.0
@@ -92,8 +92,8 @@ class PerformanceMetrics extends RefCounted:
 		return recent_calls.size() / time_span
 
 # Core monitoring data
-var _function_metrics: Dictionary = {}  # String -> PerformanceMetrics
-var _global_metrics: PerformanceMetrics = PerformanceMetrics.new()
+var _function_metrics: Dictionary = {}  # String -> SexpPerformanceMetrics
+var _global_metrics: SexpPerformanceMetrics = SexpPerformanceMetrics.new()
 var _expression_call_stack: Array[String] = []
 
 # Configuration
@@ -129,9 +129,9 @@ func track_function_call(
 	
 	# Update function-specific metrics
 	if function_name not in _function_metrics:
-		_function_metrics[function_name] = PerformanceMetrics.new()
+		_function_metrics[function_name] = SexpPerformanceMetrics.new()
 	
-	var func_metrics: PerformanceMetrics = _function_metrics[function_name]
+	var func_metrics: SexpPerformanceMetrics = _function_metrics[function_name]
 	func_metrics.update_timing(execution_time_ms, was_cached)
 	
 	# Store detailed call record if enabled
@@ -189,7 +189,7 @@ func pop_call_context() -> void:
 
 ## Performance analysis methods
 
-func _check_performance_warnings(function_name: String, execution_time: float, metrics: PerformanceMetrics) -> void:
+func _check_performance_warnings(function_name: String, execution_time: float, metrics: SexpPerformanceMetrics) -> void:
 	"""Check for performance threshold violations"""
 	if execution_time > slow_function_threshold_ms:
 		performance_warning.emit("slow_function", execution_time, slow_function_threshold_ms)
@@ -200,7 +200,7 @@ func _check_performance_warnings(function_name: String, execution_time: float, m
 		if error_rate > 0.1:  # More than 10% errors
 			performance_warning.emit("high_error_rate", error_rate, 0.1)
 
-func _analyze_optimization_opportunities(function_name: String, metrics: PerformanceMetrics) -> void:
+func _analyze_optimization_opportunities(function_name: String, metrics: SexpPerformanceMetrics) -> void:
 	"""Analyze function performance for optimization opportunities"""
 	if metrics.total_calls < 5:  # Need enough data
 		return
@@ -236,7 +236,7 @@ func _analyze_optimization_opportunities(function_name: String, metrics: Perform
 				metrics.average_time_ms * avg_stack_depth
 			)
 
-func _calculate_time_variance(metrics: PerformanceMetrics) -> float:
+func _calculate_time_variance(metrics: SexpPerformanceMetrics) -> float:
 	"""Calculate execution time variance for optimization analysis"""
 	if not enable_detailed_tracking or metrics.recent_calls.is_empty():
 		return 0.0
@@ -277,13 +277,13 @@ func get_performance_report() -> Dictionary:
 	
 	# Add detailed function metrics
 	for func_name in _function_metrics:
-		var metrics: PerformanceMetrics = _function_metrics[func_name]
+		var metrics: SexpPerformanceMetrics = _function_metrics[func_name]
 		report["function_performance"][func_name] = _get_metrics_dict(metrics)
 	
 	return report
 
-func _get_metrics_dict(metrics: PerformanceMetrics) -> Dictionary:
-	"""Convert PerformanceMetrics to dictionary"""
+func _get_metrics_dict(metrics: SexpPerformanceMetrics) -> Dictionary:
+	"""Convert SexpPerformanceMetrics to dictionary"""
 	return {
 		"total_calls": metrics.total_calls,
 		"total_time_ms": metrics.total_time_ms,
@@ -301,7 +301,7 @@ func _get_top_functions_by_total_time(limit: int) -> Array[Dictionary]:
 	var function_list: Array[Dictionary] = []
 	
 	for func_name in _function_metrics:
-		var metrics: PerformanceMetrics = _function_metrics[func_name]
+		var metrics: SexpPerformanceMetrics = _function_metrics[func_name]
 		function_list.append({
 			"function_name": func_name,
 			"total_time_ms": metrics.total_time_ms,
@@ -317,7 +317,7 @@ func _get_top_functions_by_call_count(limit: int) -> Array[Dictionary]:
 	var function_list: Array[Dictionary] = []
 	
 	for func_name in _function_metrics:
-		var metrics: PerformanceMetrics = _function_metrics[func_name]
+		var metrics: SexpPerformanceMetrics = _function_metrics[func_name]
 		function_list.append({
 			"function_name": func_name,
 			"call_count": metrics.total_calls,
@@ -333,7 +333,7 @@ func _get_slowest_functions(limit: int) -> Array[Dictionary]:
 	var function_list: Array[Dictionary] = []
 	
 	for func_name in _function_metrics:
-		var metrics: PerformanceMetrics = _function_metrics[func_name]
+		var metrics: SexpPerformanceMetrics = _function_metrics[func_name]
 		if metrics.total_calls >= 2:  # Only include functions with multiple calls
 			function_list.append({
 				"function_name": func_name,
@@ -350,7 +350,7 @@ func _generate_optimization_recommendations() -> Array[Dictionary]:
 	var recommendations: Array[Dictionary] = []
 	
 	for func_name in _function_metrics:
-		var metrics: PerformanceMetrics = _function_metrics[func_name]
+		var metrics: SexpPerformanceMetrics = _function_metrics[func_name]
 		
 		# Recommend caching for frequently called, slow functions
 		if metrics.total_calls > 50 and metrics.average_time_ms > 1.0:
@@ -406,7 +406,7 @@ func enable_feature(feature: String, enabled: bool) -> void:
 func reset_statistics() -> void:
 	"""Reset all performance statistics"""
 	_function_metrics.clear()
-	_global_metrics = PerformanceMetrics.new()
+	_global_metrics = SexpPerformanceMetrics.new()
 	_expression_call_stack.clear()
 	_session_start_time = Time.get_ticks_msec() / 1000.0
 	_last_report_time = _session_start_time
@@ -457,7 +457,7 @@ func get_top_performance_issues(limit: int = 5) -> Array[Dictionary]:
 	
 	# Check for poor cache performance
 	for func_name in _function_metrics:
-		var metrics: PerformanceMetrics = _function_metrics[func_name]
+		var metrics: SexpPerformanceMetrics = _function_metrics[func_name]
 		if metrics.total_calls > 20:
 			var hit_ratio = metrics.get_cache_hit_ratio()
 			if hit_ratio < cache_hit_ratio_warning and hit_ratio > 0:

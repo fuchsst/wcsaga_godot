@@ -58,13 +58,13 @@ func _execute_implementation(args: Array[SexpResult]) -> SexpResult:
 func _convert_to_boolean(result: SexpResult) -> bool:
 	## Convert SEXP result to boolean following WCS semantics
 	match result.result_type:
-		SexpResult.ResultType.BOOLEAN:
+		SexpResult.Type.BOOLEAN:
 			return result.get_boolean_value()
-		SexpResult.ResultType.NUMBER:
+		SexpResult.Type.NUMBER:
 			var num: float = result.get_number_value()
 			# WCS treats non-zero as true, zero as false
 			return num != 0.0
-		SexpResult.ResultType.STRING:
+		SexpResult.Type.STRING:
 			var str_val: String = result.get_string_value()
 			# WCS uses atoi() conversion: non-empty numeric strings are true
 			if str_val.is_empty():
@@ -74,13 +74,13 @@ func _convert_to_boolean(result: SexpResult) -> bool:
 				return str_val.to_float() != 0.0
 			# Non-numeric strings are considered true if non-empty
 			return true
-		SexpResult.ResultType.OBJECT_REFERENCE:
+		SexpResult.Type.OBJECT_REFERENCE:
 			# Object references are true if they point to a valid object
 			return result.get_object_reference() != null
-		SexpResult.ResultType.VOID:
+		SexpResult.Type.VOID:
 			# Void results are considered false
 			return false
-		SexpResult.ResultType.ERROR:
+		SexpResult.Type.ERROR:
 			# Error results are considered false
 			return false
 		_:

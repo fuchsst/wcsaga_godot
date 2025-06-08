@@ -29,13 +29,13 @@ extends VBoxContainer
 signal debug_session_started(session_id: String)
 signal debug_session_stopped(session_id: String)
 signal debug_step_completed(step_info: Dictionary)
-signal execution_paused(context: SexpDebugContext)
+signal execution_paused(context: Dictionary)
 signal execution_resumed()
 
 ## EPIC-004 debug integration
 var debug_evaluator: SexpDebugEvaluator
 var current_session_id: String = ""
-var current_debug_context: SexpDebugContext
+var current_debug_context: Dictionary
 
 ## Debug state
 var current_step_count: int = 0
@@ -98,7 +98,6 @@ func _initialize_debug_evaluator() -> void:
 	"""Initialize the EPIC-004 SexpDebugEvaluator for step-through debugging."""
 	
 	debug_evaluator = SexpDebugEvaluator.new()
-	add_child(debug_evaluator)
 	
 	# Connect debug evaluator signals
 	debug_evaluator.debug_session_started.connect(_on_debug_session_started)
@@ -156,8 +155,7 @@ func start_debug_session(expression: String = "") -> String:
 	
 	# Start debug session with evaluator
 	if debug_evaluator:
-		debug_evaluator.start_debug_session(current_session_id)
-		debug_evaluator.set_debug_mode(SexpDebugEvaluator.DebugMode.STEP_INTO)
+		debug_evaluator.start_debug_session(current_session_id, SexpDebugEvaluator.DebugMode.STEP_INTO)
 	
 	# Reset debug state
 	current_step_count = 0
@@ -187,7 +185,7 @@ func stop_debug_session() -> void:
 	
 	# End debug session with evaluator
 	if debug_evaluator and not current_session_id.is_empty():
-		debug_evaluator.end_debug_session(current_session_id)
+		debug_evaluator.end_debug_session()
 	
 	# Reset state
 	var session_id: String = current_session_id
@@ -212,12 +210,11 @@ func step_into() -> bool:
 	if not is_debugging or not debug_evaluator:
 		return false
 	
-	debug_evaluator.set_debug_mode(SexpDebugEvaluator.DebugMode.STEP_INTO)
 	current_debug_mode = SexpDebugEvaluator.DebugMode.STEP_INTO
 	current_execution_state = ExecutionState.STEPPING
 	
-	# Execute step
-	debug_evaluator.step()
+	# Execute step into
+	debug_evaluator.step_into()
 	
 	_update_ui_state()
 	return true
@@ -230,12 +227,11 @@ func step_over() -> bool:
 	if not is_debugging or not debug_evaluator:
 		return false
 	
-	debug_evaluator.set_debug_mode(SexpDebugEvaluator.DebugMode.STEP_OVER)
 	current_debug_mode = SexpDebugEvaluator.DebugMode.STEP_OVER
 	current_execution_state = ExecutionState.STEPPING
 	
-	# Execute step
-	debug_evaluator.step()
+	# Execute step over
+	debug_evaluator.step_over()
 	
 	_update_ui_state()
 	return true
@@ -248,12 +244,11 @@ func step_out() -> bool:
 	if not is_debugging or not debug_evaluator:
 		return false
 	
-	debug_evaluator.set_debug_mode(SexpDebugEvaluator.DebugMode.STEP_OUT)
 	current_debug_mode = SexpDebugEvaluator.DebugMode.STEP_OUT
 	current_execution_state = ExecutionState.STEPPING
 	
-	# Execute step
-	debug_evaluator.step()
+	# Execute step out
+	debug_evaluator.step_out()
 	
 	_update_ui_state()
 	return true
@@ -266,13 +261,12 @@ func continue_execution() -> bool:
 	if not is_debugging or not debug_evaluator:
 		return false
 	
-	debug_evaluator.set_debug_mode(SexpDebugEvaluator.DebugMode.CONTINUOUS)
 	current_debug_mode = SexpDebugEvaluator.DebugMode.CONTINUOUS
 	current_execution_state = ExecutionState.RUNNING
 	is_paused = false
 	
 	# Resume execution
-	debug_evaluator.resume()
+	debug_evaluator.continue_execution()
 	
 	_update_ui_state()
 	execution_resumed.emit()
@@ -290,7 +284,7 @@ func pause_execution() -> bool:
 	is_paused = true
 	
 	# Request pause from evaluator
-	debug_evaluator.pause()
+	debug_evaluator.pause_execution()
 	
 	_update_ui_state()
 	return true
@@ -394,7 +388,7 @@ func _update_call_stack() -> void:
 	call_stack_list.clear()
 	
 	for i in range(execution_stack.size()):
-		var entry: CallStackEntry = execution_stack[i]
+		var entry = execution_stack[i]
 		var item_index: int = call_stack_list.add_item(entry.get_display_text())
 		call_stack_list.set_item_metadata(item_index, i)
 
@@ -412,7 +406,7 @@ func _add_call_stack_entry(function_name: String, expression: String) -> void:
 		function_name: Name of function being called
 		expression: Expression being executed"""
 	
-	var entry: CallStackEntry = CallStackEntry.new(function_name, expression, current_depth, current_step_count)
+	var entry = CallStackEntry.new(function_name, expression, current_depth, current_step_count)
 	execution_stack.append(entry)
 	_update_call_stack()
 
@@ -466,7 +460,7 @@ func _on_call_stack_selected(index: int) -> void:
 		index: Selected item index"""
 	
 	if index >= 0 and index < execution_stack.size():
-		var entry: CallStackEntry = execution_stack[index]
+		var entry = execution_stack[index]
 		current_expression_text.text = entry.expression
 
 func _on_auto_step_toggled(pressed: bool) -> void:
@@ -488,16 +482,16 @@ func _on_show_internal_toggled(pressed: bool) -> void:
 	Args:
 		pressed: New enabled state"""
 	
-	if debug_evaluator:
-		debug_evaluator.set_show_internal_calls(pressed)
+	# Note: set_show_internal_calls method not yet implemented in debug evaluator
+	print("Show internal calls setting: ", pressed)
 
 func _on_verbose_toggled(pressed: bool) -> void:
 	"""Handle verbose checkbox toggle.
 	Args:
 		pressed: New enabled state"""
 	
-	if debug_evaluator:
-		debug_evaluator.set_verbose_mode(pressed)
+	# Note: set_verbose_mode method not yet implemented in debug evaluator
+	print("Verbose mode setting: ", pressed)
 
 func _on_auto_step_timer_timeout() -> void:
 	"""Handle auto-step timer timeout."""
@@ -522,10 +516,10 @@ func _on_debug_session_ended(session_id: String, summary: Dictionary) -> void:
 	
 	print("Debug session ended: ", session_id, " Summary: ", summary)
 
-func _on_breakpoint_hit(breakpoint: SexpBreakpoint, context: SexpDebugContext) -> void:
+func _on_breakpoint_hit(_bp: Dictionary, context: Dictionary) -> void:
 	"""Handle breakpoint hit from evaluator.
 	Args:
-		breakpoint: Breakpoint that was hit
+		bp: Breakpoint that was hit
 		context: Debug context at breakpoint"""
 	
 	current_debug_context = context
@@ -571,7 +565,7 @@ func _on_step_completed(step_info: Dictionary) -> void:
 	if auto_step_enabled and auto_step_timer:
 		auto_step_timer.start()
 
-func _on_evaluation_paused(reason: String, context: SexpDebugContext) -> void:
+func _on_evaluation_paused(reason: String, context: Dictionary) -> void:
 	"""Handle evaluation pause from evaluator.
 	Args:
 		reason: Reason for pause
@@ -587,7 +581,7 @@ func _on_evaluation_paused(reason: String, context: SexpDebugContext) -> void:
 	_update_ui_state()
 	execution_paused.emit(context)
 
-func _on_evaluation_resumed(context: SexpDebugContext) -> void:
+func _on_evaluation_resumed(context: Dictionary) -> void:
 	"""Handle evaluation resume from evaluator.
 	Args:
 		context: Current debug context"""

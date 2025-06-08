@@ -8,5 +8,4 @@ script = ExtResource("1_lwevj")
 
 [node name="ManagerDebugOverlay" type="CanvasLayer" parent="."]
 script = ExtResource("2_debug")
-update_interval = 0.5
 auto_hide_timer = 5.0

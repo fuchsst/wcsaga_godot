@@ -118,12 +118,12 @@ static func create_metadata() -> SexpFunctionMetadata:
 	metadata.detailed_description = "Evaluates a condition and returns one of two expressions based on the result. If the condition is true (or truthy), returns the then-expression. If false (or falsy), returns the else-expression if provided, otherwise returns void. Supports type coercion for condition evaluation."
 	
 	# Arguments
-	metadata.add_argument("condition", SexpResult.ResultType.BOOLEAN, "Boolean condition to test (supports type conversion)", false)
-	metadata.add_argument("then-expr", SexpResult.ResultType.VOID, "Expression to return if condition is true", false)
-	metadata.add_argument("else-expr", SexpResult.ResultType.VOID, "Expression to return if condition is false", true, "void")
+	metadata.add_argument("condition", SexpResult.Type.BOOLEAN, "Boolean condition to test (supports type conversion)", false)
+	metadata.add_argument("then-expr", SexpResult.Type.VOID, "Expression to return if condition is true", false)
+	metadata.add_argument("else-expr", SexpResult.Type.VOID, "Expression to return if condition is false", true, "void")
 	
 	# Return information
-	metadata.set_return_info(SexpResult.ResultType.VOID, "Result of then-expr or else-expr based on condition")
+	metadata.set_return_info(SexpResult.Type.VOID, "Result of then-expr or else-expr based on condition")
 	
 	# Usage examples
 	metadata.add_example("(if true \"yes\" \"no\")", "Simple boolean condition", "\"yes\"")

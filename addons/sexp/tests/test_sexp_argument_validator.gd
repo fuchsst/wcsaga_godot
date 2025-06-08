@@ -119,9 +119,9 @@ func test_count_range_validation():
 
 ## Test required types validation
 func test_required_types_validation():
-	var required_types: Array[SexpResult.ResultType] = [
-		SexpResult.ResultType.NUMBER,
-		SexpResult.ResultType.STRING
+	var required_types: Array[SexpResult.Type] = [
+		SexpResult.Type.NUMBER,
+		SexpResult.Type.STRING
 	]
 	validator.require_types(required_types)
 	
@@ -144,9 +144,9 @@ func test_required_types_validation():
 
 ## Test allowed types validation
 func test_allowed_types_validation():
-	var allowed_types: Array[SexpResult.ResultType] = [
-		SexpResult.ResultType.NUMBER,
-		SexpResult.ResultType.STRING
+	var allowed_types: Array[SexpResult.Type] = [
+		SexpResult.Type.NUMBER,
+		SexpResult.Type.STRING
 	]
 	validator.allow_types(allowed_types)
 	
@@ -376,7 +376,7 @@ func test_statistics_reset():
 ## Test clearing rules
 func test_clear_rules():
 	validator.require_exact_count(2)
-	validator.allow_types([SexpResult.ResultType.NUMBER])
+	validator.allow_types([SexpResult.Type.NUMBER])
 	
 	# Should have rules
 	var stats_before: Dictionary = validator.get_statistics()

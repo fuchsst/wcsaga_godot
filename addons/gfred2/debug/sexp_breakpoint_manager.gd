@@ -17,10 +17,10 @@ extends VBoxContainer
 @onready var hit_count_value: Label = $BreakpointDetails/DetailsContainer/HitCountValue
 @onready var enabled_checkbox: CheckBox = $BreakpointDetails/DetailsContainer/EnabledCheckBox
 
-signal breakpoint_added(breakpoint: SexpBreakpoint)
-signal breakpoint_removed(breakpoint: SexpBreakpoint)
-signal breakpoint_toggled(breakpoint: SexpBreakpoint, enabled: bool)
-signal breakpoint_hit(breakpoint: SexpBreakpoint, context: SexpDebugContext)
+signal breakpoint_added(bp: Dictionary)
+signal breakpoint_removed(bp: Dictionary)
+signal breakpoint_toggled(bp: Dictionary, enabled: bool)
+signal breakpoint_hit(bp: Dictionary, context: Dictionary)
 
 ## EPIC-004 debug integration
 var debug_evaluator: SexpDebugEvaluator
@@ -85,7 +85,6 @@ func _initialize_debug_evaluator() -> void:
 	"""Initialize the EPIC-004 SexpDebugEvaluator for breakpoint integration."""
 	
 	debug_evaluator = SexpDebugEvaluator.new()
-	add_child(debug_evaluator)
 	
 	# Connect debug evaluator signals
 	debug_evaluator.breakpoint_hit.connect(_on_breakpoint_hit)
@@ -118,24 +117,37 @@ func add_expression_breakpoint(expression: String) -> SexpBreakpoint:
 		Created breakpoint object"""
 	
 	var breakpoint_id: String = "bp_%d" % Time.get_ticks_msec()
-	var breakpoint: SexpBreakpoint = SexpBreakpoint.new(breakpoint_id, expression, BreakpointType.EXPRESSION)
+	var bp: SexpBreakpoint = SexpBreakpoint.new(breakpoint_id, expression, BreakpointType.EXPRESSION)
 	
 	# Register with debug evaluator
 	if debug_evaluator:
-		var debug_breakpoint = debug_evaluator.add_expression_breakpoint(expression)
-		if debug_breakpoint:
-			breakpoint.id = debug_breakpoint.id
+		var debug_bp_dict = {
+			"id": bp.id,
+			"breakpoint_type": int(BreakpointType.EXPRESSION),
+			"expression_pattern": expression,
+			"enabled": true,
+			"hit_count": 0,
+			"use_regex": false,
+			"function_name": "",
+			"variable_name": "",
+			"condition": "",
+			"description": "Expression breakpoint",
+			"temporary": false
+		}
+		var success = debug_evaluator.add_breakpoint(debug_bp_dict)
+		if not success:
+			push_warning("Failed to register breakpoint with debug evaluator")
 	
 	# Store in local management
-	active_breakpoints[breakpoint.id] = breakpoint
+	active_breakpoints[bp.id] = bp
 	
 	# Update UI
 	_refresh_breakpoint_list()
 	
 	# Emit signal
-	breakpoint_added.emit(breakpoint)
+	breakpoint_added.emit(bp)
 	
-	return breakpoint
+	return bp
 
 func add_function_breakpoint(function_name: String) -> SexpBreakpoint:
 	"""Add a breakpoint for function calls.
@@ -146,20 +158,33 @@ func add_function_breakpoint(function_name: String) -> SexpBreakpoint:
 	
 	var breakpoint_id: String = "bp_%d" % Time.get_ticks_msec()
 	var expression: String = "(%s ...)" % function_name
-	var breakpoint: SexpBreakpoint = SexpBreakpoint.new(breakpoint_id, expression, BreakpointType.FUNCTION_CALL)
-	breakpoint.function_name = function_name
+	var bp: SexpBreakpoint = SexpBreakpoint.new(breakpoint_id, expression, BreakpointType.FUNCTION_CALL)
+	bp.function_name = function_name
 	
 	# Register with debug evaluator
 	if debug_evaluator:
-		var debug_breakpoint = debug_evaluator.add_function_breakpoint(function_name)
-		if debug_breakpoint:
-			breakpoint.id = debug_breakpoint.id
+		var debug_bp_dict = {
+			"id": bp.id,
+			"breakpoint_type": int(BreakpointType.FUNCTION_CALL),
+			"expression_pattern": "",
+			"enabled": true,
+			"hit_count": 0,
+			"use_regex": false,
+			"function_name": function_name,
+			"variable_name": "",
+			"condition": "",
+			"description": "Function breakpoint",
+			"temporary": false
+		}
+		var success = debug_evaluator.add_breakpoint(debug_bp_dict)
+		if not success:
+			push_warning("Failed to register function breakpoint with debug evaluator")
 	
-	active_breakpoints[breakpoint.id] = breakpoint
+	active_breakpoints[bp.id] = bp
 	_refresh_breakpoint_list()
-	breakpoint_added.emit(breakpoint)
+	breakpoint_added.emit(bp)
 	
-	return breakpoint
+	return bp
 
 func add_variable_breakpoint(variable_name: String, break_on_write: bool = true) -> SexpBreakpoint:
 	"""Add a breakpoint for variable access.
@@ -172,20 +197,33 @@ func add_variable_breakpoint(variable_name: String, break_on_write: bool = true)
 	var breakpoint_id: String = "bp_%d" % Time.get_ticks_msec()
 	var expression: String = "@%s" % variable_name
 	var bp_type: BreakpointType = BreakpointType.VARIABLE_WRITE if break_on_write else BreakpointType.VARIABLE_READ
-	var breakpoint: SexpBreakpoint = SexpBreakpoint.new(breakpoint_id, expression, bp_type)
-	breakpoint.variable_name = variable_name
+	var bp: SexpBreakpoint = SexpBreakpoint.new(breakpoint_id, expression, bp_type)
+	bp.variable_name = variable_name
 	
 	# Register with debug evaluator
 	if debug_evaluator:
-		var debug_breakpoint = debug_evaluator.add_variable_breakpoint(variable_name, break_on_write)
-		if debug_breakpoint:
-			breakpoint.id = debug_breakpoint.id
+		var debug_bp_dict = {
+			"id": bp.id,
+			"breakpoint_type": int(bp_type),
+			"expression_pattern": "",
+			"enabled": true,
+			"hit_count": 0,
+			"use_regex": false,
+			"function_name": "",
+			"variable_name": variable_name,
+			"condition": "",
+			"description": "Variable breakpoint",
+			"temporary": false
+		}
+		var success = debug_evaluator.add_breakpoint(debug_bp_dict)
+		if not success:
+			push_warning("Failed to register variable breakpoint with debug evaluator")
 	
-	active_breakpoints[breakpoint.id] = breakpoint
+	active_breakpoints[bp.id] = bp
 	_refresh_breakpoint_list()
-	breakpoint_added.emit(breakpoint)
+	breakpoint_added.emit(bp)
 	
-	return breakpoint
+	return bp
 
 func remove_breakpoint(breakpoint_id: String) -> bool:
 	"""Remove a breakpoint by ID.
@@ -197,7 +235,7 @@ func remove_breakpoint(breakpoint_id: String) -> bool:
 	if not active_breakpoints.has(breakpoint_id):
 		return false
 	
-	var breakpoint: SexpBreakpoint = active_breakpoints[breakpoint_id]
+	var bp: SexpBreakpoint = active_breakpoints[breakpoint_id]
 	
 	# Remove from debug evaluator
 	if debug_evaluator:
@@ -214,7 +252,7 @@ func remove_breakpoint(breakpoint_id: String) -> bool:
 		selected_breakpoint_id = ""
 		_update_details_panel()
 	
-	breakpoint_removed.emit(breakpoint)
+	breakpoint_removed.emit(bp)
 	return true
 
 func clear_all_breakpoints() -> void:
@@ -243,19 +281,19 @@ func toggle_breakpoint(breakpoint_id: String, enabled: bool) -> bool:
 	if not active_breakpoints.has(breakpoint_id):
 		return false
 	
-	var breakpoint: SexpBreakpoint = active_breakpoints[breakpoint_id]
-	breakpoint.enabled = enabled
+	var bp: SexpBreakpoint = active_breakpoints[breakpoint_id]
+	bp.enabled = enabled
 	
 	# Update debug evaluator
 	if debug_evaluator:
-		debug_evaluator.set_breakpoint_enabled(breakpoint_id, enabled)
+		debug_evaluator.enable_breakpoint(breakpoint_id, enabled)
 	
 	# Update UI
 	_refresh_breakpoint_list()
 	if selected_breakpoint_id == breakpoint_id:
 		_update_details_panel()
 	
-	breakpoint_toggled.emit(breakpoint, enabled)
+	breakpoint_toggled.emit(bp, enabled)
 	return true
 
 func get_breakpoint_count() -> int:
@@ -271,8 +309,8 @@ func get_enabled_breakpoint_count() -> int:
 		Number of enabled breakpoints"""
 	
 	var count: int = 0
-	for breakpoint in active_breakpoints.values():
-		if breakpoint.enabled:
+	for bp in active_breakpoints.values():
+		if bp.enabled:
 			count += 1
 	return count
 
@@ -283,13 +321,13 @@ func _refresh_breakpoint_list() -> void:
 	
 	breakpoint_list.clear()
 	
-	for breakpoint in active_breakpoints.values():
-		var display_text: String = breakpoint.get_display_text()
+	for bp in active_breakpoints.values():
+		var display_text: String = bp.get_display_text()
 		var item_index: int = breakpoint_list.add_item(display_text)
-		breakpoint_list.set_item_metadata(item_index, breakpoint.id)
+		breakpoint_list.set_item_metadata(item_index, bp.id)
 		
 		# Set color based on enabled state
-		var color: Color = Color.WHITE if breakpoint.enabled else Color.GRAY
+		var color: Color = Color.WHITE if bp.enabled else Color.GRAY
 		breakpoint_list.set_item_custom_fg_color(item_index, color)
 
 func _update_details_panel() -> void:
@@ -303,12 +341,12 @@ func _update_details_panel() -> void:
 		enabled_checkbox.disabled = true
 		return
 	
-	var breakpoint: SexpBreakpoint = active_breakpoints[selected_breakpoint_id]
+	var bp: SexpBreakpoint = active_breakpoints[selected_breakpoint_id]
 	
-	expression_value.text = breakpoint.expression
-	type_value.text = _get_type_display_name(breakpoint.breakpoint_type)
-	hit_count_value.text = str(breakpoint.hit_count)
-	enabled_checkbox.button_pressed = breakpoint.enabled
+	expression_value.text = bp.expression
+	type_value.text = _get_type_display_name(bp.breakpoint_type)
+	hit_count_value.text = str(bp.hit_count)
+	enabled_checkbox.button_pressed = bp.enabled
 	enabled_checkbox.disabled = false
 
 func _get_type_display_name(breakpoint_type: BreakpointType) -> String:
@@ -376,25 +414,26 @@ func _on_enabled_toggled(pressed: bool) -> void:
 
 ## Debug Evaluator Signal Handlers
 
-func _on_breakpoint_hit(breakpoint: SexpBreakpoint, context: SexpDebugContext) -> void:
+func _on_breakpoint_hit(bp: Dictionary, context: Dictionary) -> void:
 	"""Handle breakpoint hit from debug evaluator.
 	Args:
-		breakpoint: Breakpoint that was hit
+		bp: Breakpoint that was hit
 		context: Debug context at breakpoint"""
 	
 	# Update hit count
-	if active_breakpoints.has(breakpoint.id):
-		var local_breakpoint: SexpBreakpoint = active_breakpoints[breakpoint.id]
-		local_breakpoint.hit_count += 1
+	var bp_id = bp.get("id", "")
+	if active_breakpoints.has(bp_id):
+		var local_bp: SexpBreakpoint = active_breakpoints[bp_id]
+		local_bp.hit_count += 1
 		
 		# Update UI if this breakpoint is selected
-		if selected_breakpoint_id == breakpoint.id:
+		if selected_breakpoint_id == bp_id:
 			_update_details_panel()
 		
 		_refresh_breakpoint_list()
 	
 	# Emit for external handling
-	breakpoint_hit.emit(breakpoint, context)
+	breakpoint_hit.emit(bp, context)
 
 func _on_debug_session_started(session_id: String) -> void:
 	"""Handle debug session start.
@@ -402,8 +441,8 @@ func _on_debug_session_started(session_id: String) -> void:
 		session_id: ID of started debug session"""
 	
 	# Reset hit counts for new session
-	for breakpoint in active_breakpoints.values():
-		breakpoint.hit_count = 0
+	for bp in active_breakpoints.values():
+		bp.hit_count = 0
 	
 	_refresh_breakpoint_list()
 	if not selected_breakpoint_id.is_empty():

@@ -15,9 +15,9 @@ func _init():
 	minimum_args = 3
 	maximum_args = 3
 	supported_argument_types = [
-		SexpResult.ResultType.STRING,  # scope
-		SexpResult.ResultType.STRING,  # name
-		SexpResult.ResultType.NUMBER   # value (any type actually)
+		SexpResult.Type.STRING,  # scope
+		SexpResult.Type.STRING,  # name
+		SexpResult.Type.NUMBER   # value (any type actually)
 	]
 	wcs_compatibility_notes = "Creates or updates variables in local, campaign, or global scope"
 
@@ -79,15 +79,15 @@ func _get_variable_manager() -> SexpVariableManager:
 func _convert_to_string(result: SexpResult) -> String:
 	## Convert SEXP result to string
 	match result.result_type:
-		SexpResult.ResultType.STRING:
+		SexpResult.Type.STRING:
 			return result.get_string_value()
-		SexpResult.ResultType.NUMBER:
+		SexpResult.Type.NUMBER:
 			var num: float = result.get_number_value()
 			if num == floor(num):
 				return str(int(num))
 			else:
 				return str(num)
-		SexpResult.ResultType.BOOLEAN:
+		SexpResult.Type.BOOLEAN:
 			return "true" if result.get_boolean_value() else "false"
 		_:
 			return str(result)

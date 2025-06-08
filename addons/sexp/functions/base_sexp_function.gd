@@ -21,7 +21,7 @@ var is_pure_function: bool = true  # No side effects
 var is_cacheable: bool = true      # Results can be cached
 var minimum_args: int = 0
 var maximum_args: int = -1  # -1 means unlimited
-var supported_argument_types: Array[SexpResult.ResultType] = []
+var supported_argument_types: Array[SexpResult.Type] = []
 
 ## Performance tracking
 var call_count: int = 0
@@ -236,7 +236,7 @@ func can_handle_arg_count(arg_count: int) -> bool:
 	return true
 
 ## Check if function can handle given argument types
-func can_handle_arg_types(arg_types: Array[SexpResult.ResultType]) -> bool:
+func can_handle_arg_types(arg_types: Array[SexpResult.Type]) -> bool:
 	if supported_argument_types.is_empty():
 		return true  # Accept any types
 	

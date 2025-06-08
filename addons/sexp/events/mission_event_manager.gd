@@ -1,4 +1,4 @@
-class_name MissionEventManager
+class_name SexpEventManager
 extends Node
 
 ## Mission Event Manager for SEXP-007: Mission Event Integration
@@ -71,7 +71,7 @@ var connected_signals: Dictionary = {}  # String -> Dictionary of connections
 ## Initialization and setup
 
 func _init():
-	name = "MissionEventManager"
+	name = "SexpEventManager"
 	# Initialize priority queues
 	for i in range(TriggerPriority.BACKGROUND + 1):
 		priority_queues.append([])
@@ -88,7 +88,7 @@ func _ready():
 		variable_manager.variable_changed.connect(_on_variable_changed)
 		connected_signals["variable_manager"] = {"variable_changed": _on_variable_changed}
 	
-	_log_debug("MissionEventManager initialized with %d priority levels" % priority_queues.size())
+	_log_debug("SexpEventManager initialized with %d priority levels" % priority_queues.size())
 
 func setup(sexp_evaluator: SexpEvaluator, var_manager: SexpVariableManager) -> void:
 	## Set up the event manager with required components
@@ -548,10 +548,10 @@ func _update_performance_stats() -> void:
 
 func _log_debug(message: String) -> void:
 	if enable_debug_logging:
-		print("[MissionEventManager] DEBUG: %s" % message)
+		print("[SexpEventManager] DEBUG: %s" % message)
 
 func _log_warning(message: String) -> void:
-	print("[MissionEventManager] WARNING: %s" % message)
+	print("[SexpEventManager] WARNING: %s" % message)
 
 func _log_error(message: String) -> void:
-	push_error("[MissionEventManager] ERROR: %s" % message)
+	push_error("[SexpEventManager] ERROR: %s" % message)

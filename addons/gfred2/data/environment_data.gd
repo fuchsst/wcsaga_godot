@@ -134,8 +134,8 @@ func _set(property: StringName, value: Variant) -> bool:
 	return result
 
 ## Validates the environment configuration
-func validate() -> ValidationResult:
-	var result: ValidationResult = ValidationResult.new()
+func validate() -> VariableValidator.ValidationResult:
+	var result: VariableValidator.ValidationResult = VariableValidator.ValidationResult.new()
 	
 	# Validate asteroid field
 	if asteroid_field_enabled:

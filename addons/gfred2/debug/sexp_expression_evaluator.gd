@@ -80,7 +80,6 @@ func _initialize_sexp_integration() -> void:
 	
 	# Create evaluator for preview
 	sexp_evaluator = SexpEvaluator.new()
-	add_child(sexp_evaluator)
 	
 	# Create evaluation context with mock data
 	evaluation_context = SexpEvaluationContext.new()
@@ -142,14 +141,14 @@ func _setup_mock_evaluation_context() -> void:
 		return
 	
 	# Add mock variables for testing
-	evaluation_context.set_variable("health", 85.0)
-	evaluation_context.set_variable("shield", 70)
-	evaluation_context.set_variable("mission_time", 120.5)
-	evaluation_context.set_variable("player_name", "Alpha 1")
-	evaluation_context.set_variable("is_alive", true)
-	evaluation_context.set_variable("weapon_count", 4)
-	evaluation_context.set_variable("score", 1500)
-	evaluation_context.set_variable("difficulty", "Medium")
+	evaluation_context.set_variable("health", SexpResult.create_number(85.0))
+	evaluation_context.set_variable("shield", SexpResult.create_number(70))
+	evaluation_context.set_variable("mission_time", SexpResult.create_number(120.5))
+	evaluation_context.set_variable("player_name", SexpResult.create_string("Alpha 1"))
+	evaluation_context.set_variable("is_alive", SexpResult.create_boolean(true))
+	evaluation_context.set_variable("weapon_count", SexpResult.create_number(4))
+	evaluation_context.set_variable("score", SexpResult.create_number(1500))
+	evaluation_context.set_variable("difficulty", SexpResult.create_string("Medium"))
 
 ## Public API
 
@@ -161,7 +160,7 @@ func evaluate_expression(expression: String, force_evaluate: bool = false) -> Se
 	Returns:
 		Evaluation result"""
 	
-	current_expression = expression.strip()
+	current_expression = expression.strip_edges()
 	
 	if current_expression.is_empty():
 		_clear_results()
@@ -298,20 +297,18 @@ func _evaluate_with_mock_data(expression: String) -> SexpResult:
 	if not sexp_evaluator or not evaluation_context:
 		return null
 	
-	try:
-		# Parse expression
-		var parsed_expression: SexpExpression = sexp_manager.parse_expression(expression)
-		if not parsed_expression:
-			return null
-		
-		# Evaluate with mock context
-		var result: SexpResult = sexp_evaluator.evaluate_expression(parsed_expression, evaluation_context)
-		return result
-	except:
+	# Parse expression
+	var parsed_expression: SexpExpression = sexp_manager.parse_expression(expression)
+	if not parsed_expression:
+		return null
+	
+	# Evaluate with mock context
+	var result: SexpResult = sexp_evaluator.evaluate_expression(parsed_expression, evaluation_context)
+	if result and result.is_error():
 		# Handle evaluation errors gracefully
-		var error_result: SexpResult = SexpResult.new()
-		error_result.set_error("Evaluation failed: " + str(get_last_error()))
-		return error_result
+		return result
+	
+	return result
 
 func _evaluate_with_real_data(expression: String) -> SexpResult:
 	"""Evaluate expression with real mission data.
@@ -377,16 +374,18 @@ func _get_result_type_display_name(result_type: SexpResult.Type) -> String:
 	match result_type:
 		SexpResult.Type.BOOLEAN:
 			return "Boolean"
-		SexpResult.Type.INTEGER:
-			return "Integer"
-		SexpResult.Type.FLOAT:
-			return "Float"
+		SexpResult.Type.NUMBER:
+			return "Number"
 		SexpResult.Type.STRING:
 			return "String"
-		SexpResult.Type.ARRAY:
-			return "Array"
-		SexpResult.Type.OBJECT:
-			return "Object"
+		SexpResult.Type.OBJECT_REFERENCE:
+			return "Object Reference"
+		SexpResult.Type.VARIABLE_REFERENCE:
+			return "Variable Reference"
+		SexpResult.Type.ERROR:
+			return "Error"
+		SexpResult.Type.VOID:
+			return "Void"
 		_:
 			return "Unknown"
 
@@ -466,7 +465,7 @@ func _build_analysis_tree_node(expression: SexpExpression, parent: TreeItem, lab
 func _on_evaluate_pressed() -> void:
 	"""Handle evaluate button press."""
 	
-	var expression: String = expression_text.text.strip()
+	var expression: String = expression_text.text.strip_edges()
 	evaluate_expression(expression, true)
 
 func _on_clear_pressed() -> void:
@@ -520,6 +519,6 @@ func _on_evaluation_timer_timeout() -> void:
 	"""Handle evaluation timer timeout for auto-evaluation."""
 	
 	if auto_evaluate_enabled:
-		var expression: String = expression_text.text.strip()
+		var expression: String = expression_text.text.strip_edges()
 		if not expression.is_empty():
 			evaluate_expression(expression)

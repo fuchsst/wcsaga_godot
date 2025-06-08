@@ -34,7 +34,7 @@ extends Resource
 
 # Mission metadata
 @export var level: int = 0  # Tree level for editor
-@export var position: int = 0  # X position for editor
+@export var x_position: int = 0  # X position for editor
 @export var flags: int = 0
 @export var main_hall: String = "default"
 @export var debrief_persona: String = "default"

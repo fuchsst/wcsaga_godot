@@ -298,10 +298,10 @@ func get_debug_string() -> String:
 	debug_info.append("  Repeats: %s" % (str(repeat_count) if repeat_count >= 0 else "infinite"))
 	
 	if not condition_expression.is_empty():
-		debug_info.append("  Condition: %s" % condition_expression[:50] + ("..." if condition_expression.length() > 50 else ""))
+		debug_info.append("  Condition: %s" % (condition_expression.substr(0, 50) + ("..." if len(condition_expression) > 50 else "")))
 	
 	if not action_expression.is_empty():
-		debug_info.append("  Action: %s" % action_expression[:50] + ("..." if action_expression.length() > 50 else ""))
+		debug_info.append("  Action: %s" % (action_expression.substr(0, 50) + ("..." if len(action_expression) > 50 else "")))
 	
 	return "\n".join(debug_info)
 
