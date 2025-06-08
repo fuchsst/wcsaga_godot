@@ -7,10 +7,18 @@ extends BaseSpaceObject
 
 # EPIC-002 Asset Core Integration
 const ShipTypes = preload("res://addons/wcs_asset_core/constants/ship_types.gd")
-const ObjectTypes = preload("res://addons/wcs_asset_core/constants/object_types.gd")
 const ShipClass = preload("res://addons/wcs_asset_core/resources/ship/ship_class.gd")
 const SubsystemTypes = preload("res://addons/wcs_asset_core/constants/subsystem_types.gd")
 const SubsystemManager = preload("res://scripts/ships/subsystems/subsystem_manager.gd")
+
+# SHIP-004 Lifecycle and State Management
+const ShipLifecycleController = preload("res://scripts/ships/core/ship_lifecycle_controller.gd")
+const ShipStateManager = preload("res://scripts/ships/core/ship_state_manager.gd")
+const ShipTeamManager = preload("res://scripts/ships/core/ship_team_manager.gd")
+
+# SHIP-005 Weapon Management and Firing System
+const WeaponManager = preload("res://scripts/ships/weapons/weapon_manager.gd")
+const WeaponBankType = preload("res://addons/wcs_asset_core/constants/weapon_bank_types.gd")
 
 # Ship-specific signals (SHIP-001 AC7)
 signal ship_destroyed(ship: BaseShip)
@@ -22,6 +30,12 @@ signal afterburner_deactivated()
 signal energy_transfer_changed(shields: float, weapons: float, engines: float)
 signal ship_disabled()
 signal ship_enabled()
+
+# SHIP-005 Weapon system signals
+signal weapon_fired(bank_type: WeaponBankType.Type, weapon_name: String, projectiles: Array)
+signal weapon_target_acquired(target: Node3D, target_subsystem: Node)
+signal weapon_target_lost()
+signal ammunition_depleted(bank_type: WeaponBankType.Type, bank_index: int)
 
 # Core ship properties (SHIP-001 AC1)
 @export var ship_class: ShipClass
@@ -39,6 +53,9 @@ signal ship_enabled()
 @export var angular_acceleration: float = 180.0  # degrees per second squared
 @export var mass: float = 1000.0
 @export var moment_of_inertia: float = 2000.0
+
+# Current maximum velocity affected by performance and ETS
+var current_max_speed: float = 50.0
 
 # Energy Transfer System (ETS) (SHIP-001 AC6)
 @export var max_weapon_energy: float = 100.0
@@ -75,6 +92,13 @@ var is_secondary_dual_fire: bool = false
 # Subsystem management (SHIP-002 - integrated)
 var subsystem_manager: SubsystemManager
 
+# Lifecycle and state management (SHIP-004 - integrated)
+var lifecycle_controller: ShipLifecycleController
+var state_manager: ShipStateManager
+
+# Weapon management system (SHIP-005 - integrated)
+var weapon_manager: WeaponManager
+
 # Performance tracking
 var performance_modifier: float = 1.0  # Overall ship performance (affected by damage)
 var engine_performance: float = 1.0    # Engine subsystem performance
@@ -93,10 +117,13 @@ func _init() -> void:
 
 func _ready() -> void:
 	super._ready()
+	current_max_speed = max_velocity  # Initialize current max speed
 	_initialize_ship_physics()
 	_setup_ship_signals()
 	_initialize_ets_system()
 	_initialize_subsystem_manager()
+	_initialize_lifecycle_management()
+	_initialize_weapon_manager()
 	_register_with_ship_manager()
 
 ## Initialize ship with configuration from ship class definition (SHIP-001 AC2)
@@ -211,6 +238,40 @@ func _initialize_subsystem_manager() -> void:
 	# Connect subsystem manager signals
 	subsystem_manager.subsystem_performance_changed.connect(_on_subsystem_performance_changed)
 	subsystem_manager.critical_subsystem_destroyed.connect(_on_critical_subsystem_destroyed)
+
+## Initialize lifecycle management system (SHIP-004)
+func _initialize_lifecycle_management() -> void:
+	"""Create and initialize the lifecycle management system."""
+	# Create lifecycle controller
+	lifecycle_controller = ShipLifecycleController.new()
+	add_child(lifecycle_controller)
+	
+	if not lifecycle_controller.initialize_controller(self):
+		push_error("BaseShip: Failed to initialize lifecycle controller")
+		return
+	
+	# Get state manager reference (created by lifecycle controller)
+	state_manager = lifecycle_controller.state_manager
+	
+	# Connect lifecycle signals
+	lifecycle_controller.ship_activated.connect(_on_ship_activated)
+	lifecycle_controller.ship_destroyed.connect(_on_ship_lifecycle_destroyed)
+
+## Initialize weapon management system (SHIP-005)
+func _initialize_weapon_manager() -> void:
+	"""Create and initialize the weapon management system."""
+	weapon_manager = WeaponManager.new()
+	add_child(weapon_manager)
+	
+	# Initialize after ship class is set
+	if ship_class:
+		weapon_manager.initialize_weapon_manager(self)
+		
+		# Connect weapon manager signals
+		weapon_manager.weapon_fired.connect(_on_weapon_fired)
+		weapon_manager.target_acquired.connect(_on_weapon_target_acquired)
+		weapon_manager.target_lost.connect(_on_weapon_target_lost)
+		weapon_manager.ammunition_depleted.connect(_on_ammunition_depleted)
 
 ## Register with ship management systems
 func _register_with_ship_manager() -> void:
@@ -663,6 +724,35 @@ func _on_critical_subsystem_destroyed(subsystem_name: String) -> void:
 			is_disabled = true
 			ship_disabled.emit()
 
+## Handle ship activation from lifecycle controller (SHIP-004)
+func _on_ship_activated(activated_ship: BaseShip) -> void:
+	"""Handle ship activation completion."""
+	if activated_ship == self:
+		is_disabled = false
+		ship_enabled.emit()
+
+## Handle ship destruction from lifecycle controller (SHIP-004)
+func _on_ship_lifecycle_destroyed(destroyed_ship: BaseShip) -> void:
+	"""Handle ship destruction from lifecycle controller."""
+	if destroyed_ship == self:
+		# Lifecycle controller handles the destruction sequence
+		# BaseShip just needs to update its state
+		is_dying = true
+
+## Handle ship arrival completion (SHIP-004)
+func _on_ship_arrival_completed(arrived_ship: BaseShip) -> void:
+	"""Handle ship arrival sequence completion."""
+	if arrived_ship == self:
+		# Ship is now fully active and operational
+		pass
+
+## Handle ship departure start (SHIP-004)
+func _on_ship_departure_started(departing_ship: BaseShip, stage: int) -> void:
+	"""Handle ship departure sequence start."""
+	if departing_ship == self:
+		# Begin shutdown of non-essential systems
+		pass
+
 # ============================================================================
 # DEBUG AND INFORMATION
 # ============================================================================
@@ -765,3 +855,397 @@ func get_performance_info() -> Dictionary:
 		"dying": is_dying,
 		"subsystem_status": subsystem_manager.get_subsystem_status() if subsystem_manager else {}
 	}
+
+
+# ============================================================================
+# LIFECYCLE AND STATE MANAGEMENT API (SHIP-004)
+# ============================================================================
+
+## Begin ship arrival sequence (SHIP-004 AC2)
+func begin_arrival(arrival_position: Vector3 = Vector3.ZERO, arrival_cue: String = "") -> bool:
+	"""Begin ship arrival sequence with warp effects.
+	
+	Args:
+		arrival_position: World position for arrival
+		arrival_cue: Mission cue name for arrival event
+		
+	Returns:
+		true if arrival sequence started successfully
+	"""
+	if not lifecycle_controller:
+		push_error("BaseShip: Lifecycle controller not initialized")
+		return false
+	
+	return lifecycle_controller.begin_ship_arrival(arrival_position, arrival_cue)
+
+## Begin ship departure sequence (SHIP-004 AC2)
+func begin_departure(departure_position: Vector3 = Vector3.ZERO, departure_cue: String = "", via_warp: bool = true) -> bool:
+	"""Begin ship departure sequence.
+	
+	Args:
+		departure_position: World position for departure
+		departure_cue: Mission cue name for departure event
+		via_warp: true for warp departure, false for docking bay
+		
+	Returns:
+		true if departure sequence started successfully
+	"""
+	if not lifecycle_controller:
+		push_error("BaseShip: Lifecycle controller not initialized")
+		return false
+	
+	return lifecycle_controller.begin_ship_departure(departure_position, departure_cue, via_warp)
+
+## Get current ship state (SHIP-004 AC1)
+func get_ship_state() -> int:
+	"""Get current ship lifecycle state.
+	
+	Returns:
+		ShipStateManager.ShipState value
+	"""
+	if not state_manager:
+		return 0  # NOT_YET_PRESENT
+	
+	return state_manager.get_ship_state()
+
+## Set ship state with validation (SHIP-004 AC3)
+func set_ship_state(new_state: int) -> bool:
+	"""Set ship state with validation.
+	
+	Args:
+		new_state: Target ship state
+		
+	Returns:
+		true if state transition was valid and applied
+	"""
+	if not state_manager:
+		push_error("BaseShip: State manager not initialized")
+		return false
+	
+	return state_manager.set_ship_state(new_state)
+
+## Set ship team assignment (SHIP-004 AC5)
+func set_ship_team(new_team: int) -> bool:
+	"""Set ship team assignment.
+	
+	Args:
+		new_team: New team assignment
+		
+	Returns:
+		true if team was set successfully
+	"""
+	if not state_manager:
+		push_error("BaseShip: State manager not initialized")
+		return false
+	
+	# Update both state manager and ship property
+	if state_manager.set_team(new_team):
+		team = new_team
+		return true
+	
+	return false
+
+## Get ship team relationship with another ship (SHIP-004 AC5)
+func get_relationship_with_ship(other_ship: BaseShip) -> int:
+	"""Get relationship with another ship.
+	
+	Args:
+		other_ship: Ship to check relationship with
+		
+	Returns:
+		TeamTypes.Relationship value
+	"""
+	if not state_manager or not other_ship or not other_ship.state_manager:
+		return 1  # HOSTILE (safe default)
+	
+	return state_manager.get_team_relationship(other_ship.get_ship_team())
+
+## Check if hostile to another ship (SHIP-004 AC5)
+func is_hostile_to_ship(other_ship: BaseShip) -> bool:
+	"""Check if this ship is hostile to another ship."""
+	var relationship: int = get_relationship_with_ship(other_ship)
+	return relationship == 1  # TeamTypes.Relationship.HOSTILE
+
+## Set mission flag (SHIP-004 AC1)
+func set_mission_flag(flag: int, enabled: bool) -> bool:
+	"""Set mission-persistent flag.
+	
+	Args:
+		flag: Flag from ShipStateManager.MissionFlags enum
+		enabled: true to set, false to clear
+		
+	Returns:
+		true if flag was set successfully
+	"""
+	if not state_manager:
+		return false
+	
+	return state_manager.set_mission_flag(flag, enabled)
+
+## Set runtime flag (SHIP-004 AC1)
+func set_runtime_flag(flag: int, enabled: bool) -> bool:
+	"""Set runtime flag.
+	
+	Args:
+		flag: Flag from ShipStateManager.RuntimeFlags enum
+		enabled: true to set, false to clear
+		
+	Returns:
+		true if flag was set successfully
+	"""
+	if not state_manager:
+		return false
+	
+	return state_manager.set_runtime_flag(flag, enabled)
+
+## Check if mission flag is set (SHIP-004 AC1)
+func has_mission_flag(flag: int) -> bool:
+	"""Check if mission-persistent flag is set."""
+	if not state_manager:
+		return false
+	
+	return state_manager.has_mission_flag(flag)
+
+## Check if runtime flag is set (SHIP-004 AC1)
+func has_runtime_flag(flag: int) -> bool:
+	"""Check if runtime flag is set."""
+	if not state_manager:
+		return false
+	
+	return state_manager.has_runtime_flag(flag)
+
+## Get save data for mission persistence (SHIP-004 AC7)
+func get_mission_save_data() -> Dictionary:
+	"""Get ship data for mission save files.
+	
+	Returns:
+		Dictionary containing all persistent ship data
+	"""
+	var save_data: Dictionary = {
+		"ship_name": ship_name,
+		"ship_class_path": ship_class.resource_path if ship_class else "",
+		"position": global_position,
+		"rotation": global_rotation,
+		"hull_strength": current_hull_strength,
+		"shield_strength": current_shield_strength,
+		"weapon_energy": current_weapon_energy,
+		"afterburner_fuel": current_afterburner_fuel,
+		"ets_allocation": [shield_recharge_rate, weapon_recharge_rate, engine_power_rate]
+	}
+	
+	# Include state manager data
+	if state_manager:
+		save_data["state_data"] = state_manager.get_mission_save_data()
+	
+	# Include lifecycle controller data
+	if lifecycle_controller:
+		save_data["lifecycle_data"] = lifecycle_controller.get_save_data()
+	
+	# Include subsystem data
+	if subsystem_manager:
+		save_data["subsystem_data"] = subsystem_manager.get_save_data()
+	
+	return save_data
+
+# ============================================================================
+# WEAPON MANAGEMENT API (SHIP-005)
+# ============================================================================
+
+## Fire primary weapons (SHIP-005 AC2)
+func fire_primary_weapons() -> bool:
+	"""Fire selected primary weapon banks.
+	
+	Returns:
+		true if weapons fired successfully
+	"""
+	if not weapon_manager:
+		return false
+	
+	return weapon_manager.fire_primary_weapons()
+
+## Fire secondary weapons (SHIP-005 AC4)
+func fire_secondary_weapons() -> bool:
+	"""Fire selected secondary weapon banks.
+	
+	Returns:
+		true if weapons fired successfully
+	"""
+	if not weapon_manager:
+		return false
+	
+	return weapon_manager.fire_secondary_weapons()
+
+## Set weapon target (SHIP-005 AC6)
+func set_weapon_target(target: Node3D, target_subsystem: Node = null) -> void:
+	"""Set target for weapon systems.
+	
+	Args:
+		target: Target node to engage
+		target_subsystem: Optional specific subsystem to target
+	"""
+	if weapon_manager:
+		weapon_manager.set_weapon_target(target, target_subsystem)
+
+## Select weapon bank (SHIP-005 AC5)
+func select_weapon_bank(bank_type: WeaponBankType.Type, bank_index: int) -> bool:
+	"""Select specific weapon bank.
+	
+	Args:
+		bank_type: Type of weapon bank (PRIMARY, SECONDARY)
+		bank_index: Index of bank to select
+		
+	Returns:
+		true if selection successful
+	"""
+	if not weapon_manager:
+		return false
+	
+	return weapon_manager.select_weapon_bank(bank_type, bank_index)
+
+## Cycle weapon selection (SHIP-005 AC5)
+func cycle_weapon_selection(bank_type: WeaponBankType.Type, forward: bool = true) -> bool:
+	"""Cycle through available weapons.
+	
+	Args:
+		bank_type: Type of weapon bank to cycle
+		forward: true for next weapon, false for previous
+		
+	Returns:
+		true if cycling successful
+	"""
+	if not weapon_manager:
+		return false
+	
+	return weapon_manager.cycle_weapon_selection(bank_type, forward)
+
+## Set weapon linking mode (SHIP-005 AC5)
+func set_weapon_linking_mode(bank_type: WeaponBankType.Type, linked: bool) -> void:
+	"""Set weapon linking mode for bank type.
+	
+	Args:
+		bank_type: Type of weapon bank to modify
+		linked: true to link weapons of same type, false for single bank
+	"""
+	if weapon_manager:
+		weapon_manager.set_weapon_linking_mode(bank_type, linked)
+
+## Get weapon status (SHIP-005 AC1)
+func get_weapon_status() -> Dictionary:
+	"""Get comprehensive weapon system status.
+	
+	Returns:
+		Dictionary containing weapon system information
+	"""
+	if not weapon_manager:
+		return {}
+	
+	return weapon_manager.get_weapon_status()
+
+## Enable/disable weapon systems (SHIP-005 AC7)
+func set_weapons_enabled(enabled: bool) -> void:
+	"""Enable or disable weapon systems.
+	
+	Args:
+		enabled: true to enable weapons, false to disable
+	"""
+	if weapon_manager:
+		weapon_manager.set_weapons_enabled(enabled)
+
+## Consume weapon energy (SHIP-005 AC3)
+func consume_weapon_energy(amount: float) -> bool:
+	"""Consume weapon energy for firing.
+	
+	Args:
+		amount: Amount of energy to consume
+		
+	Returns:
+		true if energy was available and consumed
+	"""
+	if current_weapon_energy >= amount:
+		current_weapon_energy -= amount
+		current_weapon_energy = max(0.0, current_weapon_energy)
+		return true
+	return false
+
+## Add weapon energy (SHIP-005 AC3)
+func add_weapon_energy(amount: float) -> void:
+	"""Add weapon energy from regeneration.
+	
+	Args:
+		amount: Amount of energy to add
+	"""
+	current_weapon_energy = min(current_weapon_energy + amount, max_weapon_energy)
+
+## Get weapon energy allocation from ETS (SHIP-005 AC3)
+func get_weapon_energy_allocation() -> float:
+	"""Get current weapon energy allocation from ETS.
+	
+	Returns:
+		Weapon energy allocation percentage (0.0 to 1.0)
+	"""
+	return weapon_recharge_rate
+
+# ============================================================================
+# WEAPON SYSTEM SIGNAL HANDLERS (SHIP-005)
+# ============================================================================
+
+## Handle weapon fired signal
+func _on_weapon_fired(bank_type: WeaponBankType.Type, weapon_name: String, projectiles: Array[WeaponBase]) -> void:
+	"""Handle weapon firing event."""
+	weapon_fired.emit(bank_type, weapon_name, projectiles)
+
+## Handle weapon target acquired signal
+func _on_weapon_target_acquired(target: Node3D, target_subsystem: Node) -> void:
+	"""Handle weapon target acquisition."""
+	weapon_target_acquired.emit(target, target_subsystem)
+
+## Handle weapon target lost signal
+func _on_weapon_target_lost() -> void:
+	"""Handle weapon target loss."""
+	weapon_target_lost.emit()
+
+## Handle ammunition depleted signal
+func _on_ammunition_depleted(bank_type: WeaponBankType.Type, bank_index: int) -> void:
+	"""Handle ammunition depletion."""
+	ammunition_depleted.emit(bank_type, bank_index)
+
+## Load save data from mission persistence (SHIP-004 AC7)
+func load_mission_save_data(save_data: Dictionary) -> bool:
+	"""Load ship data from mission save files.
+	
+	Args:
+		save_data: Dictionary containing saved ship data
+		
+	Returns:
+		true if data was loaded successfully
+	"""
+	if not save_data:
+		return false
+	
+	# Load basic ship properties
+	ship_name = save_data.get("ship_name", ship_name)
+	global_position = save_data.get("position", global_position)
+	global_rotation = save_data.get("rotation", global_rotation)
+	current_hull_strength = save_data.get("hull_strength", current_hull_strength)
+	current_shield_strength = save_data.get("shield_strength", current_shield_strength)
+	current_weapon_energy = save_data.get("weapon_energy", current_weapon_energy)
+	current_afterburner_fuel = save_data.get("afterburner_fuel", current_afterburner_fuel)
+	
+	# Load ETS allocation
+	var ets_allocation: Array = save_data.get("ets_allocation", [0.333, 0.333, 0.333])
+	if ets_allocation.size() >= 3:
+		set_ets_allocation(ets_allocation[0], ets_allocation[1], ets_allocation[2])
+	
+	# Load state manager data
+	if state_manager and save_data.has("state_data"):
+		state_manager.load_mission_save_data(save_data["state_data"])
+	
+	# Load lifecycle controller data
+	if lifecycle_controller and save_data.has("lifecycle_data"):
+		lifecycle_controller.load_save_data(save_data["lifecycle_data"])
+	
+	# Load subsystem data
+	if subsystem_manager and save_data.has("subsystem_data"):
+		subsystem_manager.load_save_data(save_data["subsystem_data"])
+	
+	return true

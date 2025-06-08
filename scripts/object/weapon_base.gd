@@ -8,9 +8,9 @@ extends Area3D # Use Area3D for simple collision detection
 
 # Weapon properties (set during initialization)
 var weapon_data: WeaponData = null
-var owner_ship: ShipBase = null # The ship that fired this weapon
+var owner_ship: BaseShip = null # The ship that fired this weapon
 var target_node: Node3D = null # Optional target node
-var target_subsystem: ShipSubsystem = null # Optional target subsystem
+var target_subsystem: Node = null # Optional target subsystem
 var lifetime: float = 5.0 # Seconds
 
 # Movement state
@@ -33,7 +33,7 @@ func _physics_process(delta):
 	global_position += current_velocity * delta
 
 # Initialization function called after instantiating the projectile scene
-func setup(w_data: WeaponData, owner: ShipBase, target: Node3D = null, target_sub: ShipSubsystem = null, initial_velocity: Vector3 = Vector3.ZERO):
+func setup(w_data: WeaponData, owner: BaseShip, target: Node3D = null, target_sub: Node = null, initial_velocity: Vector3 = Vector3.ZERO):
 	weapon_data = w_data
 	owner_ship = owner
 	target_node = target
@@ -63,28 +63,20 @@ func _on_body_entered(body: Node3D):
 	var hit_pos = global_position # Approximate hit position
 
 	# Handle collision based on body type
-	if body is ShipBase:
-		var ship: ShipBase = body
+	if body is BaseShip:
+		var ship: BaseShip = body
 		# TODO: Check team affiliation (don't hit friendlies unless specified by weapon flags)
 		# if ship.get_team() == owner_ship.get_team() and not _weapon_can_hit_friendly(): return
 
 		print("Weapon hit ship: ", ship.name)
-		if ship.has_method("take_damage"):
-			ship.take_damage(hit_pos, weapon_data.damage, owner_ship.get_instance_id(), weapon_data.damage_type_idx)
+		if ship.has_method("apply_hull_damage"):
+			ship.apply_hull_damage(weapon_data.damage if weapon_data else 10.0)
 		_handle_impact(body, hit_pos) # Handle effects and destruction
 
-	elif body is AsteroidObject:
-		var asteroid: AsteroidObject = body
-		print("Weapon hit asteroid")
-		if asteroid.has_method("hit"):
-			asteroid.hit(self, hit_pos, weapon_data.damage)
-		_handle_impact(body, hit_pos)
-
-	elif body is DebrisObject:
-		var debris: DebrisObject = body
-		print("Weapon hit debris")
-		if debris.has_method("hit"):
-			debris.hit(self, hit_pos, weapon_data.damage)
+	elif body.has_method("hit"):
+		# Generic collision handler for asteroids, debris, etc.
+		print("Weapon hit object: ", body.name)
+		body.hit(self, hit_pos, weapon_data.damage if weapon_data else 10.0)
 		_handle_impact(body, hit_pos)
 
 	# Note: Weapon-weapon collisions handled by _on_area_entered if both are Area3D

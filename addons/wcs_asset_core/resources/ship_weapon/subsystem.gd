@@ -1,5 +1,5 @@
 extends Node
-class_name Subsystem
+class_name WCSSubsystem
 
 # Subsystem types
 enum Type {

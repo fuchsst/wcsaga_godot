@@ -1,5 +1,5 @@
 class_name Subsystem
-extends Node
+extends Node3D
 
 ## Active subsystem instance for ship subsystem management
 ## Represents runtime state and behavior of a ship subsystem

@@ -116,7 +116,7 @@ func create_ship_class() -> ShipClass:
 	_apply_capability_modifiers(configured_class)
 	
 	# Set template-specific properties
-	configured_class.class_name = get_full_name()
+	configured_class.ship_class_name = get_full_name()
 	configured_class.display_name = get_display_name()
 	
 	return configured_class

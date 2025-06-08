@@ -6,7 +6,7 @@ extends Resource
 ## Based on WCS ship.tbl entries with Godot-native implementation
 
 # Basic ship information
-@export var class_name: String = ""
+@export var ship_class_name: String = ""
 @export var short_name: String = ""
 @export var display_name: String = ""
 @export var species: String = "Terran"
@@ -211,7 +211,7 @@ func has_capability(capability: String) -> bool:
 ## Get ship configuration summary
 func get_config_summary() -> Dictionary:
 	return {
-		"class_name": class_name,
+		"ship_class_name": ship_class_name,
 		"type": get_type_display_name(),
 		"mass": mass,
 		"max_speed": max_velocity,
@@ -231,7 +231,7 @@ func get_config_summary() -> Dictionary:
 ## Validate ship class configuration
 func is_valid() -> bool:
 	# Basic validation
-	if class_name.is_empty():
+	if ship_class_name.is_empty():
 		return false
 	if max_hull_strength <= 0.0:
 		return false
@@ -250,7 +250,7 @@ func is_valid() -> bool:
 func get_validation_errors() -> Array[String]:
 	var errors: Array[String] = []
 	
-	if class_name.is_empty():
+	if ship_class_name.is_empty():
 		errors.append("Ship class name cannot be empty")
 	if max_hull_strength <= 0.0:
 		errors.append("Max hull strength must be greater than 0")

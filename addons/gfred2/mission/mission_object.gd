@@ -61,12 +61,12 @@ enum LocationType {
 @export var scale := Vector3.ONE
 
 # Weapon loadout
-class WeaponBank:
+class MissionWeaponBank:
 	var weapon_index := -1  # Index into weapon info array
 	var ammo_pct := 100.0  # Ammo percentage (0-100)
 
-var primary_banks: Array[WeaponBank] = []
-var secondary_banks: Array[WeaponBank] = []
+var primary_banks: Array[MissionWeaponBank] = []
+var secondary_banks: Array[MissionWeaponBank] = []
 
 # AI properties
 class MissionAIGoal:

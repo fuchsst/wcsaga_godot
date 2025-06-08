@@ -46,8 +46,8 @@ func _init() -> void:
 	if not performance_degradation_curve:
 		performance_degradation_curve = Curve.new()
 		# Default linear degradation from 100% to 0%
-		performance_degradation_curve.add_point(0.0, 0.0)   # 0% health = 0% performance
-		performance_degradation_curve.add_point(1.0, 1.0)   # 100% health = 100% performance
+		performance_degradation_curve.add_point(Vector2(0.0, 0.0))   # 0% health = 0% performance
+		performance_degradation_curve.add_point(Vector2(1.0, 1.0))   # 100% health = 100% performance
 
 ## Get display name for the subsystem
 func get_display_name() -> String:
