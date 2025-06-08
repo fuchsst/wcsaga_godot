@@ -10,6 +10,7 @@ const ShipTypes = preload("res://addons/wcs_asset_core/constants/ship_types.gd")
 const ObjectTypes = preload("res://addons/wcs_asset_core/constants/object_types.gd")
 const ShipClass = preload("res://addons/wcs_asset_core/resources/ship/ship_class.gd")
 const SubsystemTypes = preload("res://addons/wcs_asset_core/constants/subsystem_types.gd")
+const SubsystemManager = preload("res://scripts/ships/subsystems/subsystem_manager.gd")
 
 # Ship-specific signals (SHIP-001 AC7)
 signal ship_destroyed(ship: BaseShip)
@@ -71,9 +72,8 @@ var is_afterburner_active: bool = false
 var is_primary_linked: bool = false
 var is_secondary_dual_fire: bool = false
 
-# Subsystem references (SHIP-001 AC7)
-var subsystems: Dictionary = {}
-var subsystem_list: Array[Node] = []
+# Subsystem management (SHIP-002 - integrated)
+var subsystem_manager: SubsystemManager
 
 # Performance tracking
 var performance_modifier: float = 1.0  # Overall ship performance (affected by damage)
@@ -96,6 +96,7 @@ func _ready() -> void:
 	_initialize_ship_physics()
 	_setup_ship_signals()
 	_initialize_ets_system()
+	_initialize_subsystem_manager()
 	_register_with_ship_manager()
 
 ## Initialize ship with configuration from ship class definition (SHIP-001 AC2)
@@ -139,8 +140,9 @@ func initialize_ship(ship_class_resource: ShipClass, ship_name_param: String = "
 	# Configure physics body with ship properties
 	_apply_ship_physics_configuration()
 	
-	# Initialize subsystems (SHIP-001 AC7)
-	_initialize_ship_subsystems()
+	# Initialize subsystems (SHIP-002 - integrated)
+	if subsystem_manager:
+		subsystem_manager.create_subsystems_from_ship_class(ship_class)
 	
 	return true
 
@@ -196,22 +198,19 @@ func _initialize_ets_system() -> void:
 	current_weapon_energy = max_weapon_energy
 	current_afterburner_fuel = afterburner_fuel_capacity
 
-## Initialize ship subsystems (SHIP-001 AC7)
-func _initialize_ship_subsystems() -> void:
-	"""Create and configure ship subsystems from ship class definition."""
-	if not ship_class:
+## Initialize subsystem manager (SHIP-002)
+func _initialize_subsystem_manager() -> void:
+	"""Create and initialize the subsystem manager."""
+	subsystem_manager = SubsystemManager.new()
+	add_child(subsystem_manager)
+	
+	if not subsystem_manager.initialize_manager(self):
+		push_error("BaseShip: Failed to initialize subsystem manager")
 		return
 	
-	# This will be expanded in SHIP-002: Subsystem Management
-	# For now, create placeholder subsystem tracking
-	subsystems.clear()
-	subsystem_list.clear()
-	
-	# Initialize performance tracking
-	engine_performance = 1.0
-	weapon_performance = 1.0
-	shield_performance = 1.0
-	_update_performance_modifier()
+	# Connect subsystem manager signals
+	subsystem_manager.subsystem_performance_changed.connect(_on_subsystem_performance_changed)
+	subsystem_manager.critical_subsystem_destroyed.connect(_on_critical_subsystem_destroyed)
 
 ## Register with ship management systems
 func _register_with_ship_manager() -> void:
@@ -624,8 +623,12 @@ func get_ship_status() -> Dictionary:
 ## Handle ship collision events
 func _on_ship_collision_detected(other_object: BaseSpaceObject, collision_info: Dictionary) -> void:
 	"""Handle collisions with other space objects."""
-	# This will be expanded in damage system stories
-	pass
+	# Forward collision to subsystem manager for damage allocation (SHIP-002 AC4)
+	if subsystem_manager and collision_info.has("impact_position"):
+		var impact_pos: Vector3 = collision_info.get("impact_position", global_position)
+		# Calculate damage based on collision (placeholder for now)
+		var collision_damage: float = 25.0  # Base collision damage
+		subsystem_manager.allocate_damage_to_subsystems(collision_damage, impact_pos)
 
 ## Handle ship destruction
 func _on_ship_object_destroyed() -> void:
@@ -644,6 +647,22 @@ func _on_shields_restored() -> void:
 	# Visual/audio effects will be added in later stories
 	pass
 
+## Handle subsystem performance changes (SHIP-002)
+func _on_subsystem_performance_changed(subsystem_name: String, performance: float) -> void:
+	"""Handle subsystem performance changes."""
+	# Emit subsystem damage signal for external systems
+	var damage_percent: float = (1.0 - performance) * 100.0
+	subsystem_damaged.emit(subsystem_name, damage_percent)
+
+## Handle critical subsystem destruction (SHIP-002)
+func _on_critical_subsystem_destroyed(subsystem_name: String) -> void:
+	"""Handle critical subsystem destruction."""
+	# Check if ship should be disabled due to critical failures
+	if subsystem_manager:
+		if subsystem_manager.has_critical_subsystem_failure():
+			is_disabled = true
+			ship_disabled.emit()
+
 # ============================================================================
 # DEBUG AND INFORMATION
 # ============================================================================
@@ -656,7 +675,81 @@ func debug_info() -> String:
 		current_shield_strength, max_shield_strength,
 		shield_recharge_rate, weapon_recharge_rate, engine_power_rate
 	]
+	
+	# Add subsystem information (SHIP-002)
+	if subsystem_manager:
+		var subsystem_info: String = " " + subsystem_manager.debug_info()
+		return base_info + " " + ship_info + subsystem_info
+	
 	return base_info + " " + ship_info
+
+# ============================================================================
+# SUBSYSTEM API METHODS (SHIP-002)
+# ============================================================================
+
+## Apply damage to specific subsystem
+func apply_subsystem_damage(subsystem_name: String, damage: float, impact_position: Vector3 = Vector3.ZERO) -> float:
+	"""Apply damage to a specific subsystem.
+	
+	Args:
+		subsystem_name: Name of subsystem to damage
+		damage: Amount of damage to apply
+		impact_position: World position of impact for proximity calculation
+		
+	Returns:
+		Actual damage applied
+	"""
+	if not subsystem_manager:
+		return 0.0
+	
+	var subsystem: Subsystem = subsystem_manager.get_subsystem_by_name(subsystem_name)
+	if not subsystem:
+		return 0.0
+	
+	return subsystem.apply_damage(damage, impact_position)
+
+## Get subsystem health percentage
+func get_subsystem_health(subsystem_name: String) -> float:
+	"""Get health percentage of named subsystem (0-100)."""
+	if not subsystem_manager:
+		return 0.0
+	
+	return subsystem_manager.get_subsystem_health(subsystem_name)
+
+## Check if subsystem is functional
+func is_subsystem_functional(subsystem_name: String) -> bool:
+	"""Check if named subsystem is functional."""
+	if not subsystem_manager:
+		return false
+	
+	return subsystem_manager.is_subsystem_functional(subsystem_name)
+
+## Queue subsystem for repair
+func repair_subsystem(subsystem_name: String) -> bool:
+	"""Queue named subsystem for repair.
+	
+	Args:
+		subsystem_name: Name of subsystem to repair
+		
+	Returns:
+		true if successfully queued for repair
+	"""
+	if not subsystem_manager:
+		return false
+	
+	var subsystem: Subsystem = subsystem_manager.get_subsystem_by_name(subsystem_name)
+	if not subsystem:
+		return false
+	
+	return subsystem_manager.queue_subsystem_repair(subsystem)
+
+## Get overall performance by category
+func get_subsystem_performance(category: String) -> float:
+	"""Get overall subsystem performance for category (engine, weapon, shield, sensor)."""
+	if not subsystem_manager:
+		return 1.0
+	
+	return subsystem_manager.get_overall_performance(category)
 
 ## Get ship performance information
 func get_performance_info() -> Dictionary:
@@ -669,5 +762,6 @@ func get_performance_info() -> Dictionary:
 		"current_max_speed": current_max_speed,
 		"afterburner_active": is_afterburner_active,
 		"disabled": is_disabled,
-		"dying": is_dying
+		"dying": is_dying,
+		"subsystem_status": subsystem_manager.get_subsystem_status() if subsystem_manager else {}
 	}

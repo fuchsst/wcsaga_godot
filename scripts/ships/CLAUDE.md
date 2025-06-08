@@ -5,6 +5,7 @@ The Ship Systems package provides comprehensive ship behavior, combat mechanics,
 
 ## Implementation Status
 **✅ SHIP-001 COMPLETED**: Ship Controller and Base Ship Systems implemented with full WCS-authentic behavior.
+**✅ SHIP-002 COMPLETED**: Subsystem Management and Configuration implemented with WCS-authentic damage modeling and turret AI.
 
 ## Package Overview
 
@@ -246,9 +247,42 @@ ship.energy_transfer_changed.connect(func(s, w, e): print("ETS: %.2f/%.2f/%.2f" 
 
 ## Next Steps
 
+### SHIP-002: Subsystem Management and Configuration
+**Status**: ✅ COMPLETED  
+**Location**: `scripts/ships/subsystems/`
+
+**Key Features**:
+- Complete subsystem management with 11 WCS subsystem types
+- Proximity-based damage allocation with distance falloff
+- Performance degradation following WCS curves and thresholds
+- Independent turret AI with multi-criteria target selection
+- Priority-based repair system with authentic WCS rates
+- Full SEXP integration for mission scripting queries
+- BaseShip integration with performance effects and API methods
+
+**Core Classes**:
+- **SubsystemDefinition**: Resource defining subsystem properties and behavior
+- **Subsystem**: Active instance managing runtime state and turret AI
+- **SubsystemManager**: Coordinator for lifecycle and performance management
+
+**Usage**:
+```gdscript
+# Access ship subsystems through BaseShip API
+var engine_health = ship.get_subsystem_health("Engine")
+var is_functional = ship.is_subsystem_functional("Weapons")
+
+# Apply damage with proximity calculation
+var damage_applied = ship.apply_subsystem_damage("Radar", 50.0, impact_position)
+
+# Queue repair
+var repair_queued = ship.repair_subsystem("Engine")
+
+# Get performance by category
+var engine_performance = ship.get_subsystem_performance("engine")
+```
+
 ### Upcoming Stories
-With SHIP-001 complete, the foundation is ready for:
-- **SHIP-002**: Subsystem Management and Configuration
+With SHIP-001 and SHIP-002 complete, the foundation is ready for:
 - **SHIP-003**: Ship Class Definitions and Factory System
 - **SHIP-004**: Ship Lifecycle and State Management
 - **SHIP-005**: Weapon Manager and Firing System
