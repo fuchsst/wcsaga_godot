@@ -332,8 +332,9 @@ func apply_force(force: Vector3, application_point: Vector3 = Vector3.ZERO, impu
 		return false
 	
 	# Use PhysicsManager's enhanced force application if available
-	if PhysicsManager and PhysicsManager.has_method("apply_force_to_space_object"):
-		PhysicsManager.apply_force_to_space_object(physics_body, force, impulse, application_point)
+	var physics_manager = get_node_or_null("/root/PhysicsManager")
+	if physics_manager and physics_manager.has_method("apply_force_to_space_object"):
+		physics_manager.apply_force_to_space_object(physics_body, force, impulse, application_point)
 		return true
 	
 	# Fallback to direct Godot physics
@@ -371,8 +372,9 @@ func set_thruster_input(forward: float, side: float, vertical: float, afterburne
 		return false
 	
 	# Use enhanced ForceApplication system through PhysicsManager
-	if PhysicsManager and PhysicsManager.has_method("set_thruster_input"):
-		return PhysicsManager.set_thruster_input(physics_body, forward, side, vertical, afterburner)
+	var physics_manager = get_node_or_null("/root/PhysicsManager")
+	if physics_manager and physics_manager.has_method("set_thruster_input"):
+		return physics_manager.set_thruster_input(physics_body, forward, side, vertical, afterburner)
 	
 	# Fallback thruster implementation
 	var thrust_force: float = 1000.0  # Default thrust magnitude
@@ -396,8 +398,9 @@ func apply_physics_damping(delta: float) -> void:
 		return
 	
 	# Use enhanced damping system through PhysicsManager  
-	if PhysicsManager and PhysicsManager.has_method("apply_wcs_damping"):
-		PhysicsManager.apply_wcs_damping(physics_body, delta)
+	var physics_manager = get_node_or_null("/root/PhysicsManager")
+	if physics_manager and physics_manager.has_method("apply_wcs_damping"):
+		physics_manager.apply_wcs_damping(physics_body, delta)
 		return
 	
 	# Fallback basic damping
@@ -416,8 +419,9 @@ func get_momentum_state() -> Dictionary:
 		return {}
 	
 	# Use enhanced momentum tracking through PhysicsManager
-	if PhysicsManager and PhysicsManager.has_method("get_momentum_state"):
-		return PhysicsManager.get_momentum_state(physics_body)
+	var physics_manager = get_node_or_null("/root/PhysicsManager")
+	if physics_manager and physics_manager.has_method("get_momentum_state"):
+		return physics_manager.get_momentum_state(physics_body)
 	
 	# Fallback momentum calculation
 	return {
@@ -440,8 +444,9 @@ func get_thruster_state() -> Dictionary:
 		return {}
 	
 	# Use enhanced thruster tracking through PhysicsManager
-	if PhysicsManager and PhysicsManager.has_method("get_thruster_state"):
-		return PhysicsManager.get_thruster_state(physics_body)
+	var physics_manager = get_node_or_null("/root/PhysicsManager")
+	if physics_manager and physics_manager.has_method("get_thruster_state"):
+		return physics_manager.get_thruster_state(physics_body)
 	
 	# Fallback empty state
 	return {
@@ -457,15 +462,17 @@ func get_thruster_state() -> Dictionary:
 ## Register this object with the enhanced force application system
 func _register_force_application() -> void:
 	"""Register this object with PhysicsManager's enhanced force application system."""
-	if physics_body and PhysicsManager and PhysicsManager.has_method("register_space_physics_body"):
+	var physics_manager = get_node_or_null("/root/PhysicsManager")
+	if physics_body and physics_manager and physics_manager.has_method("register_space_physics_body"):
 		var physics_profile_resource = physics_profile if physics_profile else null
-		PhysicsManager.register_space_physics_body(physics_body, physics_profile_resource)
+		physics_manager.register_space_physics_body(physics_body, physics_profile_resource)
 
 ## Unregister this object from the enhanced force application system
 func _unregister_force_application() -> void:
 	"""Unregister this object from PhysicsManager's enhanced force application system.""" 
-	if physics_body and PhysicsManager and PhysicsManager.has_method("unregister_space_physics_body"):
-		PhysicsManager.unregister_space_physics_body(physics_body)
+	var physics_manager = get_node_or_null("/root/PhysicsManager")
+	if physics_body and physics_manager and physics_manager.has_method("unregister_space_physics_body"):
+		physics_manager.unregister_space_physics_body(physics_body)
 
 ## Reset object state for pooling
 func reset_state() -> void:
