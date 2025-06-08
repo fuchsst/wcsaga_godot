@@ -18,7 +18,8 @@ enum Type {
 	SOLAR = 8,
 	GAS_COLLECT = 9,
 	ACTIVATION = 10,
-	UNKNOWN = 11
+	SHIELDS = 11,
+	UNKNOWN = 12
 }
 
 # Subsystem damage states

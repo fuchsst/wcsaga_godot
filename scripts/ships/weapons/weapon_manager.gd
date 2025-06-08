@@ -11,6 +11,7 @@ const WeaponBankType = preload("res://addons/wcs_asset_core/constants/weapon_ban
 const WeaponBankConfig = preload("res://addons/wcs_asset_core/resources/ship/weapon_bank_config.gd")
 
 # SHIP-005 Weapon System Components
+const WeaponBase = preload("res://scripts/object/weapon_base.gd")
 const FiringController = preload("res://scripts/ships/weapons/firing_controller.gd")
 const WeaponBank = preload("res://scripts/ships/weapons/weapon_bank.gd")
 const WeaponSelectionManager = preload("res://scripts/ships/weapons/weapon_selection_manager.gd")
@@ -68,7 +69,7 @@ func _ready() -> void:
 	_connect_component_signals()
 	
 	# Start energy regeneration timer
-	last_energy_regeneration_time = Time.get_time_dict_from_system()
+	last_energy_regeneration_time = Time.get_ticks_msec() / 1000.0
 
 func _physics_process(delta: float) -> void:
 	if not ship:

@@ -8,6 +8,14 @@ extends Node
 # EPIC-002 Asset Core Integration
 const WeaponData = preload("res://addons/wcs_asset_core/structures/weapon_data.gd")
 
+# SHIP-006 Targeting Components
+const TargetManager = preload("res://scripts/ships/weapons/target_manager.gd")
+const AspectLockController = preload("res://scripts/ships/weapons/aspect_lock_controller.gd")
+const LeadingCalculator = preload("res://scripts/ships/weapons/leading_calculator.gd")
+const SubsystemTargeting = preload("res://scripts/ships/weapons/subsystem_targeting.gd")
+const RangeValidator = preload("res://scripts/ships/weapons/range_validator.gd")
+const AITargetingPriority = preload("res://scripts/ships/weapons/ai_targeting_priority.gd")
+
 # Targeting system signals
 signal target_acquired(target: Node3D, target_subsystem: Node)
 signal target_lost()
@@ -17,6 +25,14 @@ signal firing_solution_updated(solution: Dictionary)
 
 # Ship reference
 var ship: BaseShip
+
+# SHIP-006 Advanced targeting components
+var target_manager: TargetManager
+var aspect_lock_controller: AspectLockController
+var leading_calculator: LeadingCalculator
+var subsystem_targeting: SubsystemTargeting
+var range_validator: RangeValidator
+var ai_targeting_priority: AITargetingPriority
 
 # Current target state (SHIP-005 AC6)
 var current_target: Node3D = null

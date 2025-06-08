@@ -1,5 +1,5 @@
 class_name ShipStateManager
-extends RefCounted
+extends Node
 
 ## Ship state management system implementing WCS ship flag system and state validation
 ## Handles all ship lifecycle states, team management, and state persistence (SHIP-004)
@@ -117,7 +117,8 @@ var departure_location: Vector3 = Vector3.ZERO
 var state_transition_rules: Dictionary = {}
 var flag_dependency_rules: Dictionary = {}
 
-func _init(ship: BaseShip) -> void:
+## Initialize state manager for specific ship
+func initialize_state_manager(ship: BaseShip) -> void:
 	"""Initialize state manager for specific ship.
 	
 	Args:

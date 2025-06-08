@@ -78,8 +78,9 @@ func initialize_controller(target_ship: BaseShip) -> bool:
 	ship = target_ship
 	
 	# Create state manager for this ship
-	state_manager = ShipStateManager.new(ship)
+	state_manager = ShipStateManager.new()
 	add_child(state_manager)
+	state_manager.initialize_state_manager(ship)
 	
 	# Connect state manager signals
 	_connect_state_manager_signals()

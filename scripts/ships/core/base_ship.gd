@@ -19,6 +19,7 @@ const ShipTeamManager = preload("res://scripts/ships/core/ship_team_manager.gd")
 # SHIP-005 Weapon Management and Firing System
 const WeaponManager = preload("res://scripts/ships/weapons/weapon_manager.gd")
 const WeaponBankType = preload("res://addons/wcs_asset_core/constants/weapon_bank_types.gd")
+const WeaponBase = preload("res://scripts/object/weapon_base.gd")
 
 # Ship-specific signals (SHIP-001 AC7)
 signal ship_destroyed(ship: BaseShip)
@@ -32,7 +33,7 @@ signal ship_disabled()
 signal ship_enabled()
 
 # SHIP-005 Weapon system signals
-signal weapon_fired(bank_type: WeaponBankType.Type, weapon_name: String, projectiles: Array)
+signal weapon_fired(bank_type: WeaponBankType.Type, weapon_name: String, projectiles: Array[WeaponBase])
 signal weapon_target_acquired(target: Node3D, target_subsystem: Node)
 signal weapon_target_lost()
 signal ammunition_depleted(bank_type: WeaponBankType.Type, bank_index: int)
