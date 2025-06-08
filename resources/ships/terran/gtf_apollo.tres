@@ -1,0 +1,53 @@
+[gd_resource type="ShipClass" load_steps=2 format=3 uid="uid://bosx7f8mwx1ky"]
+
+[ext_resource type="Script" path="res://addons/wcs_asset_core/resources/ship/ship_class.gd" id="1_3fq1v"]
+
+[resource]
+script = ExtResource("1_3fq1v")
+class_name = "GTF Apollo"
+short_name = "apollo"
+display_name = "GTF Apollo"
+species = "Terran"
+ship_type = 1
+ship_size = 0
+mass = 500.0
+moment_of_inertia = 1000.0
+max_velocity = 75.0
+max_afterburner_velocity = 150.0
+acceleration = 30.0
+angular_acceleration = 200.0
+max_hull_strength = 80.0
+max_shield_strength = 120.0
+armor_type = "Standard"
+max_weapon_energy = 80.0
+weapon_energy_regen_rate = 3.0
+afterburner_fuel_capacity = 60.0
+afterburner_fuel_regen_rate = 1.5
+max_weapon_banks = 2
+max_secondary_banks = 2
+primary_weapon_slots = Array[String](["", ""])
+secondary_weapon_slots = Array[String](["", ""])
+model_path = "res://assets/models/ships/terran/apollo.glb"
+texture_path = "res://assets/textures/ships/terran/apollo_diffuse.png"
+cockpit_model_path = ""
+detail_levels = Array[String]([])
+engine_sound = "apollo_engine"
+engine_wash_info = ""
+thruster_glow_info = ""
+has_afterburner = true
+has_shields = true
+can_warp = true
+stealth_capable = false
+ai_class = "default"
+ai_behavior_flags = 0
+manufacturer = "Galactic Terran-Vasudan Alliance"
+tech_description = "The GTF Apollo is a light fighter optimized for speed and maneuverability."
+length = 15.2
+wingspan = 12.8
+height = 4.1
+ship_flags = 0
+ship_flags2 = 0
+subsystem_definitions = Array[String](["res://resources/subsystems/engine_small.tres", "res://resources/subsystems/weapons_fighter.tres", "res://resources/subsystems/radar_basic.tres"])
+ship_scene_path = "res://scenes/ships/terran/apollo.tscn"
+hardpoint_configuration = {"primary_gun_01": Vector3(1.2, 0.1, 2.1), "primary_gun_02": Vector3(-1.2, 0.1, 2.1), "missile_01": Vector3(1.8, -0.3, 0.5), "missile_02": Vector3(-1.8, -0.3, 0.5)}
+team_color_slots = Array[String](["primary_hull", "cockpit_trim"])

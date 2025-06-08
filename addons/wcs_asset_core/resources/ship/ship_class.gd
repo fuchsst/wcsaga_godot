@@ -72,6 +72,14 @@ extends Resource
 @export var ship_flags: int = 0
 @export var ship_flags2: int = 0
 
+# Subsystem configuration (SHIP-003 integration)
+@export var subsystem_definitions: Array[String] = []  # Paths to SubsystemDefinition resources
+
+# Scene and asset integration
+@export var ship_scene_path: String = ""  # Path to ship scene template
+@export var hardpoint_configuration: Dictionary = {}  # Weapon mount points
+@export var team_color_slots: Array[String] = []  # Material slots for team colors
+
 func _init() -> void:
 	# Set default values
 	resource_name = "ShipClass"
@@ -214,5 +222,69 @@ func get_config_summary() -> Dictionary:
 		"afterburner_fuel": afterburner_fuel_capacity,
 		"primary_banks": max_weapon_banks,
 		"secondary_banks": max_secondary_banks,
-		"combat_rating": get_combat_rating()
+		"combat_rating": get_combat_rating(),
+		"subsystem_count": subsystem_definitions.size(),
+		"has_scene": not ship_scene_path.is_empty(),
+		"hardpoint_count": hardpoint_configuration.size()
 	}
+
+## Validate ship class configuration
+func is_valid() -> bool:
+	# Basic validation
+	if class_name.is_empty():
+		return false
+	if max_hull_strength <= 0.0:
+		return false
+	if max_velocity <= 0.0:
+		return false
+	if mass <= 0.0:
+		return false
+	
+	# Validate weapon configuration
+	if max_weapon_banks < 0 or max_secondary_banks < 0:
+		return false
+	
+	return true
+
+## Get validation errors
+func get_validation_errors() -> Array[String]:
+	var errors: Array[String] = []
+	
+	if class_name.is_empty():
+		errors.append("Ship class name cannot be empty")
+	if max_hull_strength <= 0.0:
+		errors.append("Max hull strength must be greater than 0")
+	if max_velocity <= 0.0:
+		errors.append("Max velocity must be greater than 0")
+	if mass <= 0.0:
+		errors.append("Mass must be greater than 0")
+	if max_weapon_banks < 0:
+		errors.append("Max weapon banks cannot be negative")
+	if max_secondary_banks < 0:
+		errors.append("Max secondary banks cannot be negative")
+	
+	return errors
+
+## Create ship class with subsystem configuration
+static func create_ship_class_with_subsystems(base_name: String, ship_type: ShipTypes.Type, subsystem_paths: Array[String]) -> ShipClass:
+	var ship_class: ShipClass = ShipClass.new()
+	ship_class.class_name = base_name
+	ship_class.ship_type = ship_type
+	ship_class.subsystem_definitions = subsystem_paths.duplicate()
+	
+	# Set default values based on ship type
+	match ship_type:
+		ShipTypes.Type.FIGHTER:
+			ship_class.mass = 500.0
+			ship_class.max_velocity = 75.0
+			ship_class.max_hull_strength = 80.0
+		ShipTypes.Type.BOMBER:
+			ship_class.mass = 1200.0
+			ship_class.max_velocity = 45.0
+			ship_class.max_hull_strength = 150.0
+		ShipTypes.Type.CAPITAL:
+			ship_class.mass = 50000.0
+			ship_class.max_velocity = 15.0
+			ship_class.max_hull_strength = 2500.0
+	
+	return ship_class

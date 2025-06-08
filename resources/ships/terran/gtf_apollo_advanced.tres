@@ -1,0 +1,42 @@
+[gd_resource type="ShipTemplate" load_steps=2 format=3 uid="uid://bfj8x7r9c2k4m"]
+
+[ext_resource type="Script" path="res://addons/wcs_asset_core/resources/ship/ship_template.gd" id="1_5k8mz"]
+
+[resource]
+script = ExtResource("1_5k8mz")
+template_name = "GTF Apollo"
+display_name = "GTF Apollo Advanced"
+base_ship_class = "res://resources/ships/terran/gtf_apollo.tres"
+variant_suffix = "Advanced"
+template_type = 0
+inheritance_mode = 0
+override_mass = -1.0
+override_max_velocity = 85.0
+override_max_afterburner_velocity = 165.0
+override_acceleration = 35.0
+override_angular_acceleration = -1.0
+override_max_hull_strength = -1.0
+override_max_shield_strength = 140.0
+override_armor_type = ""
+override_max_weapon_energy = 90.0
+override_weapon_energy_regen_rate = 3.5
+override_afterburner_fuel_capacity = -1.0
+override_afterburner_fuel_regen_rate = -1.0
+primary_weapon_loadout = Array[String](["res://resources/weapons/primary/prometheus_r.tres", "res://resources/weapons/primary/prometheus_r.tres"])
+secondary_weapon_loadout = Array[String](["res://resources/weapons/secondary/interceptor.tres"])
+weapon_bank_configuration = Array[WeaponBankConfig]([])
+subsystem_overrides = Array[SubsystemOverride]([])
+additional_subsystems = Array[String]([])
+override_model_path = ""
+override_texture_path = ""
+override_engine_sound = ""
+team_color_variations = Array[TeamColorVariation]([])
+override_ai_class = ""
+ai_behavior_modifiers = Array[AIBehaviorModifier]([])
+capability_modifiers = Array[CapabilityModifier]([])
+special_flags = Array[String]([])
+mission_restrictions = Array[String]([])
+description = "Advanced variant of the GTF Apollo with enhanced performance and upgraded systems."
+tech_description = "This advanced variant features improved engine performance, enhanced shields, and upgraded weapon systems."
+unlock_requirements = Array[String](["campaign_progress:5"])
+compatibility_version = "1.0"

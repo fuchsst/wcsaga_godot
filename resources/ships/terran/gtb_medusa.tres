@@ -1,0 +1,53 @@
+[gd_resource type="ShipClass" load_steps=2 format=3 uid="uid://c8k4x7m9n2p5q"]
+
+[ext_resource type="Script" path="res://addons/wcs_asset_core/resources/ship/ship_class.gd" id="1_7h9l3"]
+
+[resource]
+script = ExtResource("1_7h9l3")
+class_name = "GTB Medusa"
+short_name = "medusa"
+display_name = "GTB Medusa"
+species = "Terran"
+ship_type = 2
+ship_size = 0
+mass = 1200.0
+moment_of_inertia = 2400.0
+max_velocity = 45.0
+max_afterburner_velocity = 90.0
+acceleration = 20.0
+angular_acceleration = 120.0
+max_hull_strength = 150.0
+max_shield_strength = 180.0
+armor_type = "Heavy"
+max_weapon_energy = 120.0
+weapon_energy_regen_rate = 2.5
+afterburner_fuel_capacity = 80.0
+afterburner_fuel_regen_rate = 1.2
+max_weapon_banks = 3
+max_secondary_banks = 4
+primary_weapon_slots = Array[String](["", "", ""])
+secondary_weapon_slots = Array[String](["", "", "", ""])
+model_path = "res://assets/models/ships/terran/medusa.glb"
+texture_path = "res://assets/textures/ships/terran/medusa_diffuse.png"
+cockpit_model_path = ""
+detail_levels = Array[String]([])
+engine_sound = "bomber_engine"
+engine_wash_info = ""
+thruster_glow_info = ""
+has_afterburner = true
+has_shields = true
+can_warp = true
+stealth_capable = false
+ai_class = "bomber"
+ai_behavior_flags = 0
+manufacturer = "Galactic Terran-Vasudan Alliance"
+tech_description = "The GTB Medusa is a heavy bomber designed for anti-capital ship operations."
+length = 22.4
+wingspan = 18.6
+height = 6.2
+ship_flags = 0
+ship_flags2 = 0
+subsystem_definitions = Array[String](["res://resources/subsystems/engine_heavy.tres", "res://resources/subsystems/weapons_bomber.tres", "res://resources/subsystems/radar_advanced.tres"])
+ship_scene_path = "res://scenes/ships/terran/medusa.tscn"
+hardpoint_configuration = {"primary_gun_01": Vector3(2.1, 0.2, 3.2), "primary_gun_02": Vector3(-2.1, 0.2, 3.2), "primary_gun_03": Vector3(0.0, 0.3, 3.5), "missile_01": Vector3(3.2, -0.8, 1.0), "missile_02": Vector3(-3.2, -0.8, 1.0), "missile_03": Vector3(2.8, -1.2, -0.5), "missile_04": Vector3(-2.8, -1.2, -0.5)}
+team_color_slots = Array[String](["primary_hull", "wing_tips", "engine_glow"])
