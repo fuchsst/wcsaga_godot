@@ -192,11 +192,11 @@ func _setup_audio_streams() -> void:
 func update_from_game_state() -> void:
 	"""Update weapon lock display from current game state."""
 	# Check if player ship and weapon systems exist
-	if not GameState.player_ship or not is_instance_valid(GameState.player_ship):
+	if not get_tree().get_nodes_in_group("player")[0] or not is_instance_valid(GameState.player_ship):
 		_reset_display()
 		return
 	
-	var player_ship = GameState.player_ship
+	var player_ship = player_nodes[0]
 	if not player_ship.weapon_manager:
 		_reset_display()
 		return

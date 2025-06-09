@@ -29,9 +29,9 @@ var passed_checks: int = 0
 
 func _run() -> void:
 	"""Run complete verification of HUD-007 implementation."""
-	print("=" * 60)
+	print("============================================================")
 	print("HUD-007 WEAPON LOCK & FIRING SOLUTION DISPLAY VERIFICATION")
-	print("=" * 60)
+	print("============================================================")
 	
 	# Initialize results
 	verification_results.clear()
@@ -53,7 +53,7 @@ func _run() -> void:
 func _verify_file_existence() -> void:
 	"""Verify all component files exist."""
 	print("\n1. FILE EXISTENCE VERIFICATION")
-	print("-" * 40)
+	print("----------------------------------------")
 	
 	var file_checks: Dictionary = {}
 	
@@ -77,7 +77,7 @@ func _verify_file_existence() -> void:
 func _verify_class_structure() -> void:
 	"""Verify class structure and inheritance."""
 	print("\n2. CLASS STRUCTURE VERIFICATION")
-	print("-" * 40)
+	print("----------------------------------------")
 	
 	var class_checks: Dictionary = {}
 	
@@ -127,7 +127,7 @@ func _verify_script_structure(script_path: String, component_name: String) -> Di
 func _verify_component_interfaces() -> void:
 	"""Verify component public interfaces."""
 	print("\n3. COMPONENT INTERFACE VERIFICATION")
-	print("-" * 40)
+	print("----------------------------------------")
 	
 	var interface_checks: Dictionary = {}
 	
@@ -394,7 +394,7 @@ func _verify_firing_opportunity_alert_interface() -> Dictionary:
 func _verify_integration_points() -> void:
 	"""Verify integration between components."""
 	print("\n4. INTEGRATION VERIFICATION")
-	print("-" * 40)
+	print("----------------------------------------")
 	
 	var integration_checks: Dictionary = {}
 	
@@ -422,7 +422,7 @@ func _verify_integration_points() -> void:
 func _verify_test_coverage() -> void:
 	"""Verify test coverage for all components."""
 	print("\n5. TEST COVERAGE VERIFICATION")
-	print("-" * 40)
+	print("----------------------------------------")
 	
 	var test_checks: Dictionary = {}
 	
@@ -452,7 +452,7 @@ func _verify_test_coverage() -> void:
 func _verify_performance_requirements() -> void:
 	"""Verify performance optimization implementations."""
 	print("\n6. PERFORMANCE REQUIREMENTS VERIFICATION")
-	print("-" * 40)
+	print("----------------------------------------")
 	
 	var perf_checks: Dictionary = {}
 	
@@ -505,9 +505,9 @@ func _log_check(description: String, passed: bool) -> void:
 ## Print verification summary
 func _print_verification_summary() -> void:
 	"""Print final verification summary."""
-	print("\n" + "=" * 60)
+	print("\n============================================================")
 	print("VERIFICATION SUMMARY")
-	print("=" * 60)
+	print("============================================================")
 	
 	var pass_percentage: float = (float(passed_checks) / float(total_checks)) * 100.0
 	
@@ -564,4 +564,4 @@ func _print_verification_summary() -> void:
 		print("- Gather user feedback for further improvements")
 	
 	print("\nVerification completed at: %s" % Time.get_datetime_string_from_system())
-	print("=" * 60)
+	print("============================================================")

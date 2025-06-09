@@ -45,7 +45,7 @@ class ConvergenceData:
 # Display configuration
 @export_group("Display Configuration")
 @export var convergence_mode: ConvergenceMode = ConvergenceMode.DETAILED
-@export var show_weapon_groups: Array[WeaponGroup] = [WeaponGroup.PRIMARY, WeaponGroup.SECONDARY]
+@export var show_weapon_groups: Array[WeaponGroup] = []
 @export var show_convergence_point: bool = true
 @export var show_convergence_zone: bool = true
 @export var show_weapon_spread_pattern: bool = true
@@ -101,6 +101,9 @@ var update_frequency: float = 20.0  # Hz
 var last_update_time: float = 0.0
 
 func _ready() -> void:
+	# Initialize default weapon groups
+	show_weapon_groups = [WeaponGroup.PRIMARY, WeaponGroup.SECONDARY]
+	
 	set_process(true)
 	_initialize_convergence_indicator()
 
@@ -108,8 +111,9 @@ func _ready() -> void:
 func _initialize_convergence_indicator() -> void:
 	"""Initialize weapon convergence display system."""
 	# Get player ship reference
-	if GameState.player_ship:
-		player_ship = GameState.player_ship
+	var player_nodes = get_tree().get_nodes_in_group("player")
+	if player_nodes.size() > 0:
+		player_ship = player_nodes[0]
 		
 		# Get weapon manager
 		if player_ship.has_method("get_weapon_manager"):
@@ -124,7 +128,7 @@ func update_convergence_data(weapon_data: Dictionary) -> void:
 	if not weapon_data:
 		return
 	
-	var current_time: float = Time.get_time_from_start()
+	var current_time: float = Time.get_ticks_msec() / 1000.0
 	
 	# Limit update frequency for performance
 	if current_time - last_update_time < (1.0 / update_frequency):
@@ -609,9 +613,10 @@ func get_best_weapon_group_for_distance(target_distance: float) -> WeaponGroup:
 	var best_group: WeaponGroup = WeaponGroup.PRIMARY
 	var best_score: float = 0.0
 	
-	for group in WeaponGroup.values():
-		if group == WeaponGroup.ALL_WEAPONS:
+	for group_enum in WeaponGroup.values():
+		if group_enum == WeaponGroup.ALL_WEAPONS:
 			continue
+		var group: WeaponGroup = group_enum
 		
 		var convergence_data: ConvergenceData = _get_convergence_data(group)
 		if convergence_data.quality == ConvergenceQuality.UNUSABLE:

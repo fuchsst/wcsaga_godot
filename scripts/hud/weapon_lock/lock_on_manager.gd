@@ -71,8 +71,8 @@ func _ready() -> void:
 func initialize_lock_on_manager() -> bool:
 	"""Initialize lock-on manager with ship reference."""
 	# Get player ship reference
-	if GameState.player_ship:
-		player_ship = GameState.player_ship
+	if get_tree().get_nodes_in_group("player")[0]:
+		player_ship = player_nodes[0]
 		
 		# Get weapon manager
 		if player_ship.has_method("get_weapon_manager"):
@@ -96,7 +96,7 @@ func _initialize_lock_manager() -> void:
 ## Main process loop
 func _process(delta: float) -> void:
 	"""Process lock acquisition and maintenance."""
-	var current_time: float = Time.get_time_from_start()
+	var current_time: float = Time.get_ticks_msec() / 1000.0
 	
 	# Limit update frequency for performance
 	if current_time - last_update_time < (1.0 / update_frequency):
@@ -173,7 +173,7 @@ func _handle_acquiring_state(delta: float) -> void:
 		return
 	
 	# Update lock progress
-	var current_time: float = Time.get_time_from_start()
+	var current_time: float = Time.get_ticks_msec() / 1000.0
 	var elapsed_time: float = current_time - lock_start_time
 	
 	lock_progress = clampf(elapsed_time / lock_acquisition_time, 0.0, 1.0)
@@ -202,7 +202,7 @@ func _handle_maintaining_state(delta: float) -> void:
 ## Handle lost state
 func _handle_lost_state(delta: float) -> void:
 	"""Handle lock lost state - attempt reacquisition."""
-	var current_time: float = Time.get_time_from_start()
+	var current_time: float = Time.get_ticks_msec() / 1000.0
 	var time_since_lost: float = current_time - lock_lost_time
 	
 	# Check if we should give up reacquisition
@@ -226,7 +226,7 @@ func _handle_failed_state(delta: float) -> void:
 func _start_lock_acquisition() -> void:
 	"""Start the lock acquisition process."""
 	acquisition_state = AcquisitionState.INITIALIZING
-	lock_start_time = Time.get_time_from_start()
+	lock_start_time = Time.get_ticks_msec() / 1000.0
 	lock_progress = 0.0
 	lock_strength = 0.0
 	
@@ -236,7 +236,7 @@ func _start_lock_acquisition() -> void:
 func _transition_to_acquiring() -> void:
 	"""Transition to acquiring state."""
 	acquisition_state = AcquisitionState.ACQUIRING
-	lock_start_time = Time.get_time_from_start()
+	lock_start_time = Time.get_ticks_msec() / 1000.0
 	
 	lock_state_changed.emit(acquisition_state)
 
@@ -256,7 +256,7 @@ func _lose_lock(reason: String) -> void:
 	var previous_state: AcquisitionState = acquisition_state
 	
 	acquisition_state = AcquisitionState.LOST
-	lock_lost_time = Time.get_time_from_start()
+	lock_lost_time = Time.get_ticks_msec() / 1000.0
 	
 	# Only emit lock lost if we had a complete lock
 	if previous_state == AcquisitionState.MAINTAINING:

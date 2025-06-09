@@ -122,8 +122,8 @@ func _ready() -> void:
 func _initialize_missile_lock_system() -> void:
 	"""Initialize missile lock system."""
 	# Get player ship reference
-	if GameState.player_ship:
-		player_ship = GameState.player_ship
+	if get_tree().get_nodes_in_group("player")[0]:
+		player_ship = player_nodes[0]
 		
 		# Get weapon manager
 		if player_ship.has_method("get_weapon_manager"):
@@ -168,7 +168,7 @@ func _initialize_seeker_head() -> void:
 ## Main process loop
 func _process(delta: float) -> void:
 	"""Process missile lock system updates."""
-	var current_time: float = Time.get_time_from_start()
+	var current_time: float = Time.get_ticks_msec() / 1000.0
 	
 	# Limit update frequency for performance
 	if current_time - last_update_time < (1.0 / update_frequency):
@@ -225,7 +225,7 @@ func _handle_inactive_stage() -> void:
 ## Handle seeker initialization stage
 func _handle_seeker_init_stage(delta: float) -> void:
 	"""Handle seeker head initialization."""
-	var current_time: float = Time.get_time_from_start()
+	var current_time: float = Time.get_ticks_msec() / 1000.0
 	var elapsed_time: float = current_time - stage_start_time
 	
 	# Seeker initialization takes time
@@ -248,7 +248,7 @@ func _handle_target_paint_stage(delta: float) -> void:
 		_fail_lock_sequence("Target lost during painting")
 		return
 	
-	var current_time: float = Time.get_time_from_start()
+	var current_time: float = Time.get_ticks_msec() / 1000.0
 	var elapsed_time: float = current_time - stage_start_time
 	
 	# Check if target is still in paint range
@@ -278,7 +278,7 @@ func _handle_acquiring_stage(delta: float) -> void:
 		_fail_lock_sequence("Target not lockable")
 		return
 	
-	var current_time: float = Time.get_time_from_start()
+	var current_time: float = Time.get_ticks_msec() / 1000.0
 	var elapsed_time: float = current_time - stage_start_time
 	
 	# Update lock progress based on target quality
@@ -333,7 +333,7 @@ func _handle_tracking_stage(delta: float) -> void:
 ## Handle lost stage
 func _handle_lost_stage(delta: float) -> void:
 	"""Handle lock lost stage."""
-	var current_time: float = Time.get_time_from_start()
+	var current_time: float = Time.get_ticks_msec() / 1000.0
 	var time_since_lost: float = current_time - stage_start_time
 	
 	# Try to reacquire for a limited time
@@ -350,7 +350,7 @@ func _start_lock_sequence() -> void:
 	"""Start the missile lock sequence."""
 	lock_stage = LockStage.SEEKER_INIT
 	seeker_status = SeekerStatus.INITIALIZING
-	stage_start_time = Time.get_time_from_start()
+	stage_start_time = Time.get_ticks_msec() / 1000.0
 	lock_progress = 0.0
 	lock_strength = 0.0
 
@@ -358,7 +358,7 @@ func _start_lock_sequence() -> void:
 func _transition_to_target_paint() -> void:
 	"""Transition to target painting stage."""
 	lock_stage = LockStage.TARGET_PAINT
-	stage_start_time = Time.get_time_from_start()
+	stage_start_time = Time.get_ticks_msec() / 1000.0
 	lock_progress = 0.0
 	target_painting_started.emit(current_target)
 
@@ -367,7 +367,7 @@ func _transition_to_acquiring() -> void:
 	"""Transition to lock acquiring stage."""
 	lock_stage = LockStage.ACQUIRING
 	seeker_status = SeekerStatus.TRACKING
-	stage_start_time = Time.get_time_from_start()
+	stage_start_time = Time.get_ticks_msec() / 1000.0
 	lock_progress = 0.0
 
 ## Transition to tracking
@@ -392,7 +392,7 @@ func _lose_lock(reason: String) -> void:
 	var previous_stage: LockStage = lock_stage
 	
 	lock_stage = LockStage.LOST
-	stage_start_time = Time.get_time_from_start()
+	stage_start_time = Time.get_ticks_msec() / 1000.0
 	
 	# Only emit lock lost if we had a complete lock
 	if previous_stage in [LockStage.LOCKED, LockStage.TRACKING]:

@@ -128,8 +128,9 @@ func _ready() -> void:
 func _initialize_beam_lock_system() -> void:
 	"""Initialize beam weapon targeting system."""
 	# Get player ship reference
-	if GameState.player_ship:
-		player_ship = GameState.player_ship
+	var player_nodes = get_tree().get_nodes_in_group("player")
+	if player_nodes.size() > 0:
+		player_ship = player_nodes[0]
 		
 		# Get weapon manager
 		if player_ship.has_method("get_weapon_manager"):
@@ -187,7 +188,7 @@ func _configure_beam_parameters() -> void:
 ## Main process loop
 func _process(delta: float) -> void:
 	"""Process beam weapon system updates."""
-	var current_time: float = Time.get_time_from_start()
+	var current_time: float = Time.get_ticks_msec() / 1000.0
 	
 	# High-frequency updates for beam weapons
 	if current_time - last_update_time < (1.0 / update_frequency):

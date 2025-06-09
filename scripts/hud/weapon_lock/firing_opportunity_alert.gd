@@ -123,8 +123,8 @@ func _ready() -> void:
 func _initialize_firing_opportunity_alert() -> void:
 	"""Initialize firing opportunity analysis system."""
 	# Get player ship reference
-	if GameState.player_ship:
-		player_ship = GameState.player_ship
+	if get_tree().get_nodes_in_group("player")[0]:
+		player_ship = player_nodes[0]
 		
 		# Get weapon manager
 		if player_ship.has_method("get_weapon_manager"):
@@ -156,7 +156,7 @@ func update_firing_analysis(
 	tactical_data: Dictionary
 ) -> void:
 	"""Update firing opportunity analysis with current game state."""
-	var current_time: float = Time.get_time_from_start()
+	var current_time: float = Time.get_ticks_msec() / 1000.0
 	
 	# Limit analysis frequency for performance
 	if current_time - last_analysis_time < (1.0 / analysis_frequency):
@@ -418,7 +418,7 @@ func _create_opportunity(
 	opportunity.description = description
 	
 	active_opportunities.append(opportunity)
-	opportunity_start_times.append(Time.get_time_from_start())
+	opportunity_start_times.append(Time.get_ticks_msec() / 1000.0)
 	_alert_slide_positions.append(0.0)  # Start off-screen
 	
 	# Play audio alert
