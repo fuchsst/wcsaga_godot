@@ -1,14 +1,15 @@
 class_name HUDPerformanceMonitor
 extends Node
 
-## EPIC-012 HUD-001: HUD Performance Monitor
-## Performance tracking and optimization system for HUD elements
-## Monitors frame times, memory usage, and provides optimization recommendations
+## EPIC-012 HUD-003: HUD Performance Monitor Integration
+## Enhanced performance tracking and optimization system for HUD elements
+## Integrates with LOD, scheduler, render, and memory optimization systems
 
 signal performance_warning(metric: String, value: float, threshold: float)
 signal frame_budget_exceeded(total_time_ms: float, budget_ms: float)
 signal element_performance_warning(element_id: String, frame_time_ms: float)
 signal optimization_recommendation(recommendation: String, details: Dictionary)
+signal optimization_system_status_changed(system: String, status: String)
 
 # Performance configuration
 var target_fps: float = 60.0
@@ -35,8 +36,20 @@ var optimization_active: bool = false
 var frame_skip_recommendations: Dictionary = {}
 var lod_recommendations: Dictionary = {}
 
+# References to optimization systems (HUD-003 integration)
+var lod_manager: HUDLODManager
+var update_scheduler: HUDUpdateScheduler
+var render_optimizer: HUDRenderOptimizer
+var memory_manager: HUDMemoryManager
+var performance_scaler: HUDPerformanceScaler
+var performance_profiler: HUDPerformanceProfiler
+
+# System status tracking
+var optimization_systems_status: Dictionary = {}
+
 func _ready() -> void:
 	set_process(true)
+	_initialize_optimization_systems()
 
 ## Setup performance monitoring
 func setup_monitoring(fps: float, budget_ms: float) -> void:
@@ -381,3 +394,172 @@ func _generate_profiling_report() -> String:
 func _process(_delta: float) -> void:
 	if detailed_monitoring:
 		update_memory_usage()
+
+## Initialize optimization systems (HUD-003 integration)
+func _initialize_optimization_systems() -> void:
+	# Try to find optimization systems
+	var hud_manager = get_parent()
+	
+	if hud_manager:
+		lod_manager = hud_manager.get_node_or_null("HUDLODManager")
+		update_scheduler = hud_manager.get_node_or_null("HUDUpdateScheduler")
+		render_optimizer = hud_manager.get_node_or_null("HUDRenderOptimizer")
+		memory_manager = hud_manager.get_node_or_null("HUDMemoryManager")
+		performance_scaler = hud_manager.get_node_or_null("HUDPerformanceScaler")
+		performance_profiler = hud_manager.get_node_or_null("HUDPerformanceProfiler")
+	
+	# Connect to optimization system signals
+	_connect_optimization_signals()
+	
+	# Update system status
+	_update_optimization_system_status()
+	
+	print("HUDPerformanceMonitor: Initialized integration with optimization systems")
+
+## Connect to optimization system signals
+func _connect_optimization_signals() -> void:
+	if lod_manager:
+		lod_manager.lod_level_changed.connect(_on_lod_level_changed)
+		lod_manager.global_lod_changed.connect(_on_global_lod_changed)
+	
+	if update_scheduler:
+		update_scheduler.frame_budget_exceeded.connect(_on_scheduler_budget_exceeded)
+		update_scheduler.update_completed.connect(_on_element_update_completed)
+	
+	if render_optimizer:
+		render_optimizer.element_culled.connect(_on_element_culled)
+		render_optimizer.render_optimization_applied.connect(_on_render_optimization_applied)
+	
+	if memory_manager:
+		memory_manager.memory_warning.connect(_on_memory_warning)
+		memory_manager.memory_cleanup_completed.connect(_on_memory_cleanup_completed)
+	
+	if performance_scaler:
+		performance_scaler.performance_profile_changed.connect(_on_performance_profile_changed)
+		performance_scaler.quality_adjustment_applied.connect(_on_quality_adjustment_applied)
+
+## Update optimization system status
+func _update_optimization_system_status() -> void:
+	optimization_systems_status = {
+		"lod_manager": lod_manager != null,
+		"update_scheduler": update_scheduler != null,
+		"render_optimizer": render_optimizer != null,
+		"memory_manager": memory_manager != null,
+		"performance_scaler": performance_scaler != null,
+		"performance_profiler": performance_profiler != null
+	}
+	
+	for system in optimization_systems_status:
+		var status = "available" if optimization_systems_status[system] else "unavailable"
+		optimization_system_status_changed.emit(system, status)
+
+## Get comprehensive performance data including optimization systems
+func get_comprehensive_performance_data() -> Dictionary:
+	var data = get_detailed_statistics()
+	
+	# Add optimization system data
+	if lod_manager:
+		data["lod_system"] = lod_manager.get_lod_statistics()
+	
+	if update_scheduler:
+		data["update_scheduler"] = update_scheduler.get_statistics()
+		data["element_update_stats"] = update_scheduler.get_element_statistics()
+	
+	if render_optimizer:
+		data["render_optimizer"] = render_optimizer.get_statistics()
+	
+	if memory_manager:
+		data["memory_manager"] = memory_manager.get_memory_statistics()
+		data["pool_statistics"] = memory_manager.get_pool_statistics()
+	
+	if performance_scaler:
+		data["performance_scaler"] = performance_scaler.get_performance_statistics()
+	
+	if performance_profiler:
+		data["performance_profiler"] = performance_profiler.get_performance_report()
+	
+	data["optimization_systems_status"] = optimization_systems_status
+	
+	return data
+
+## Trigger comprehensive optimization
+func trigger_comprehensive_optimization() -> void:
+	if optimization_active:
+		return
+	
+	optimization_active = true
+	print("HUDPerformanceMonitor: Triggering comprehensive optimization")
+	
+	# Enable performance scaling
+	if performance_scaler:
+		performance_scaler.enable_emergency_mode()
+	
+	# Optimize LOD levels
+	if lod_manager:
+		lod_manager.enable_performance_mode()
+	
+	# Optimize memory usage
+	if memory_manager:
+		memory_manager._perform_cleanup()
+	
+	# Optimize render settings
+	if render_optimizer:
+		render_optimizer.set_culling_enabled(true)
+	
+	# Reset optimization flag after delay
+	get_tree().create_timer(5.0).timeout.connect(func(): optimization_active = false)
+
+## Signal handlers for optimization systems
+func _on_lod_level_changed(element_id: String, old_level, new_level) -> void:
+	print("HUDPerformanceMonitor: LOD changed for %s: %s -> %s" % [element_id, old_level, new_level])
+
+func _on_global_lod_changed(old_level, new_level) -> void:
+	print("HUDPerformanceMonitor: Global LOD changed: %s -> %s" % [old_level, new_level])
+
+func _on_scheduler_budget_exceeded(total_time_ms: float, budget_ms: float) -> void:
+	frame_budget_exceeded.emit(total_time_ms, budget_ms)
+	performance_warning.emit("scheduler_budget", total_time_ms, budget_ms)
+
+func _on_element_update_completed(element_id: String, execution_time_ms: float) -> void:
+	record_element_performance(element_id, execution_time_ms)
+
+func _on_element_culled(element_id: String, reason: String) -> void:
+	print("HUDPerformanceMonitor: Element culled - %s (%s)" % [element_id, reason])
+
+func _on_render_optimization_applied(optimization_type: String, savings_ms: float) -> void:
+	print("HUDPerformanceMonitor: Render optimization applied - %s (%.2fms saved)" % [optimization_type, savings_ms])
+
+func _on_memory_warning(usage_mb: float, limit_mb: float) -> void:
+	performance_warning.emit("memory_usage", usage_mb, limit_mb)
+
+func _on_memory_cleanup_completed(freed_mb: float, objects_freed: int) -> void:
+	print("HUDPerformanceMonitor: Memory cleanup completed - %.1fMB freed, %d objects" % [freed_mb, objects_freed])
+
+func _on_performance_profile_changed(old_profile, new_profile) -> void:
+	print("HUDPerformanceMonitor: Performance profile changed: %s -> %s" % [old_profile, new_profile])
+
+func _on_quality_adjustment_applied(element_type: String, quality_change: String) -> void:
+	print("HUDPerformanceMonitor: Quality adjustment - %s: %s" % [element_type, quality_change])
+
+## Enable/disable specific optimization systems
+func set_optimization_system_enabled(system_name: String, enabled: bool) -> void:
+	match system_name:
+		"lod_manager":
+			if lod_manager:
+				lod_manager.set_auto_lod_enabled(enabled)
+		"update_scheduler":
+			if update_scheduler:
+				update_scheduler.set_scheduler_enabled(enabled)
+		"render_optimizer":
+			if render_optimizer:
+				render_optimizer.set_culling_enabled(enabled)
+				render_optimizer.set_batching_enabled(enabled)
+		"memory_manager":
+			if memory_manager:
+				memory_manager.set_object_pooling_enabled(enabled)
+				memory_manager.set_cache_management_enabled(enabled)
+		"performance_scaler":
+			if performance_scaler:
+				performance_scaler.set_auto_scaling_enabled(enabled)
+	
+	optimization_system_status_changed.emit(system_name, "enabled" if enabled else "disabled")
