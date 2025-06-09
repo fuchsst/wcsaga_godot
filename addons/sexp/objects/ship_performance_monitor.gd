@@ -186,9 +186,10 @@ func measure_operation(operation_name: String, operation_callable: Callable, arg
 	var had_error = false
 	var result = null
 	
-	try:
+	# GDScript doesn't have try/except - handle errors through return values
+	if operation_callable.is_valid():
 		result = operation_callable.callv(args)
-	except:
+	else:
 		had_error = true
 		result = null
 	
