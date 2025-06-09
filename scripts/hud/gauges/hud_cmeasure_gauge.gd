@@ -47,31 +47,36 @@ func _ready() -> void:
 
 # Update gauge based on current game state
 func update_from_game_state() -> void:
-	# Check if player ship exists using GameState singleton
-	if GameState.player_ship and is_instance_valid(GameState.player_ship):
+	# Check if player ship exists using GameStateManager singleton
+	var player_ship = ObjectManager.get_player_ship() if ObjectManager else null
+	if player_ship and is_instance_valid(player_ship):
 		# Read countermeasure count and max from player ship
 		# Assuming these methods/properties exist on ShipBase or WeaponSystem
 		var current_count = 0
 		var max_count = 1 # Default to avoid division by zero
 
 		# Try getting from WeaponSystem first, then fallback to ShipBase
-		if GameState.player_ship.weapon_system and GameState.player_ship.weapon_system.has_method("get_cmeasure_count"):
-			current_count = GameState.player_ship.weapon_system.get_cmeasure_count()
-		elif GameState.player_ship.has_method("get_cmeasure_count"):
-			current_count = GameState.player_ship.get_cmeasure_count() # Placeholder method name
+		if player_ship.has_method("get_weapon_system"):
+			var weapon_system = player_ship.get_weapon_system()
+			if weapon_system and weapon_system.has_method("get_cmeasure_count"):
+				current_count = weapon_system.get_cmeasure_count()
+		elif player_ship.has_method("get_cmeasure_count"):
+			current_count = player_ship.get_cmeasure_count() # Placeholder method name
 
-		if GameState.player_ship.weapon_system and GameState.player_ship.weapon_system.has_method("get_max_cmeasures"):
-			max_count = GameState.player_ship.weapon_system.get_max_cmeasures()
-		elif GameState.player_ship.has_method("get_max_cmeasures"):
-			max_count = GameState.player_ship.get_max_cmeasures() # Placeholder method name
+		if player_ship.has_method("get_weapon_system"):
+			var weapon_system = player_ship.get_weapon_system()
+			if weapon_system and weapon_system.has_method("get_max_cmeasures"):
+				max_count = weapon_system.get_max_cmeasures()
+		elif player_ship.has_method("get_max_cmeasures"):
+			max_count = player_ship.get_max_cmeasures() # Placeholder method name
 
 		# Update gauge properties (setters handle queue_redraw)
 		cmeasure_count = current_count
 		max_cmeasures = max(1, max_count) # Ensure max is at least 1
 
 		# Optional: Sync recharge state if managed externally
-		# _is_recharging = GameState.player_ship.is_cmeasure_recharging() # Placeholder
-		# _recharge_time_left = GameState.player_ship.get_cmeasure_recharge_time_left() # Placeholder
+		# _is_recharging = player_ship.is_cmeasure_recharging() # Placeholder
+		# _recharge_time_left = player_ship.get_cmeasure_recharge_time_left() # Placeholder
 	else:
 		# Default state if no player ship
 		cmeasure_count = 0

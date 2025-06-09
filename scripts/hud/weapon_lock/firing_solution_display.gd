@@ -93,7 +93,8 @@ func _ready() -> void:
 func _initialize_firing_solution_display() -> bool:
 	"""Initialize firing solution display system."""
 	# Get player ship reference
-	if get_tree().get_nodes_in_group("player")[0]:
+	var player_nodes = get_tree().get_nodes_in_group("player")
+	if player_nodes.size() > 0:
 		player_ship = player_nodes[0]
 		
 		# Get weapon manager
@@ -251,7 +252,9 @@ func _draw_intercept_marker(position: Vector2, color: Color) -> void:
 	if current_solution.optimal_firing_window and _flash_state:
 		draw_colored_polygon(points, color)
 	else:
-		draw_polyline(points + [points[0]], color, solution_line_width)
+		var closed_points = points.duplicate()
+		closed_points.append(points[0])
+		draw_polyline(closed_points, color, solution_line_width)
 	
 	# Draw center dot
 	draw_circle(position, 2, color)

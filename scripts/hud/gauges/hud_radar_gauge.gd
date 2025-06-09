@@ -101,7 +101,7 @@ func _init() -> void:
 	draw_centered = true # Radar is drawn centered
 
 	# Store HUD config reference locally for easier access
-	var _hud_config: HUDConfig = null
+	var _hud_config: HUDConfigExtended = null
 	var _hud_manager = null # Reference to HUDManager singleton
 
 func _ready() -> void:
@@ -152,7 +152,7 @@ func add_radar_object(pos: Vector3, type: BlipType, team: int, targeted: bool = 
 		blip.color = Color(0.5, 0.5, 1.0) # Blue for jump nodes
 	else:
 		# Normal ships - color based on IFF
-		if team == GameState.player_ship.team:
+		if team == GameStateManager.player_ship.team:
 			blip.color = Color(0.0, 1.0, 0.0) # Green for friendly
 		else:
 			blip.color = Color(1.0, 0.0, 0.0) # Red for hostile
@@ -170,15 +170,15 @@ func clear_radar_objects() -> void:
 func update_from_game_state() -> void:
 	clear_radar_objects()
 
-	if not GameState.player_ship or not is_instance_valid(GameState.player_ship):
+	if not GameStateManager.player_ship or not is_instance_valid(GameStateManager.player_ship):
 		return
 
 	if not _hud_config:
 		printerr("HUDRadarGauge: HUDConfig not available.")
 		return # Cannot function without config
 
-	var player_pos = GameState.player_ship.global_position
-	var player_ship_node = GameState.player_ship
+	var player_pos = GameStateManager.player_ship.global_position
+	var player_ship_node = GameStateManager.player_ship
 	var max_radar_dist = RADAR_RANGES[_hud_config.rp_dist] # Use range from config
 
 	# Update bright range periodically
@@ -209,18 +209,18 @@ func update_from_game_state() -> void:
 			# awacs_level = AWACSManager.get_level(ship, player_ship_node)
 			awacs_level = 0.5 # Placeholder if not visible by team
 
-		if awacs_level < 0.0 and not GlobalConstants.See_all: # Check See_all global
+		if awacs_level < 0.0 and not WCSConstants.See_all: # Check See_all global
 			continue # Completely hidden by sensors/AWACS
 
 		var blip_type = BlipType.NORMAL_SHIP
 		# Determine blip type (same logic as before)
-		if ship.flags & GlobalConstants.SF_ARRIVING_STAGE_1:
+		if ship.flags & WCSConstants.SF_ARRIVING_STAGE_1:
 			blip_type = BlipType.WARPING_SHIP
-		elif GlobalConstants.Highlight_tagged_ships and ship.is_tagged: # Check global Highlight_tagged_ships
+		elif WCSConstants.Highlight_tagged_ships and ship.is_tagged: # Check global Highlight_tagged_ships
 			blip_type = BlipType.TAGGED_SHIP
-		elif ship.ship_data and ship.ship_data.flags & (GlobalConstants.SIF_NAVBUOY | GlobalConstants.SIF_CARGO):
+		elif ship.ship_data and ship.ship_data.flags & (WCSConstants.SIF_NAVBUOY | WCSConstants.SIF_CARGO):
 			blip_type = BlipType.NAVBUOY_CARGO
-		elif ship.flags & GlobalConstants.OF_TARGETABLE_AS_BOMB: # Check object flag
+		elif ship.flags & WCSConstants.OF_TARGETABLE_AS_BOMB: # Check object flag
 			blip_type = BlipType.BOMB
 
 		var blip = add_radar_object(
@@ -232,11 +232,11 @@ func update_from_game_state() -> void:
 
 		# Check for sensor distortion
 		var is_distorted = false
-		if ship.flags & GlobalConstants.SF_HIDDEN_FROM_SENSORS:
+		if ship.flags & WCSConstants.SF_HIDDEN_FROM_SENSORS:
 			is_distorted = true
 		if awacs_level < 1.0: # Distort if not fully visible via AWACS
 			is_distorted = true
-		if player_ship_node.flags2 & GlobalConstants.SF2_PRIMITIVE_SENSORS:
+		if player_ship_node.flags2 & WCSConstants.SF2_PRIMITIVE_SENSORS:
 			# Primitive sensors always distort unless in nebula? Check FS2 logic.
 			# For now, assume primitive sensors always distort if target isn't fully visible.
 			if awacs_level < 1.0: is_distorted = true
@@ -247,8 +247,8 @@ func update_from_game_state() -> void:
 
 
 	# --- Add Missiles ---
-	var show_friendly = _hud_config.rp_flags & GlobalConstants.RP_SHOW_FRIENDLY_MISSILES # Use RP flags from config
-	var show_hostile = _hud_config.rp_flags & GlobalConstants.RP_SHOW_HOSTILE_MISSILES
+	var show_friendly = _hud_config.rp_flags & WCSConstants.RP_SHOW_FRIENDLY_MISSILES # Use RP flags from config
+	var show_hostile = _hud_config.rp_flags & WCSConstants.RP_SHOW_HOSTILE_MISSILES
 
 	if show_friendly or show_hostile:
 		for weapon_node in ObjectManager.get_all_weapons(): # Use ObjectManager
@@ -256,11 +256,11 @@ func update_from_game_state() -> void:
 			if not is_instance_valid(weapon) or not is_instance_valid(weapon.weapon_data): continue
 
 			# Check if it's a missile/bomb shown on radar
-			if not (weapon.weapon_data.flags2 & GlobalConstants.WIF2_SHOWN_ON_RADAR) and not (weapon.weapon_data.flags & GlobalConstants.WIF_BOMB):
+			if not (weapon.weapon_data.flags2 & WCSConstants.WIF2_SHOWN_ON_RADAR) and not (weapon.weapon_data.flags & WCSConstants.WIF_BOMB):
 				continue
 
-			var team_matches = (show_friendly and IFFManager.is_friendly(player_ship_node.team, weapon.team)) or \
-							   (show_hostile and IFFManager.is_hostile(player_ship_node.team, weapon.team))
+			var team_matches = (show_friendly and ObjectManager.is_friendly(player_ship_node.team, weapon.team)) or \
+							   (show_hostile and ObjectManager.is_hostile(player_ship_node.team, weapon.team))
 
 			if not team_matches:
 				continue
@@ -280,7 +280,7 @@ func update_from_game_state() -> void:
 				# Missiles generally aren't distorted by sensors/AWACS in FS2
 
 	# --- Add Debris ---
-	if _hud_config.rp_flags & GlobalConstants.RP_SHOW_DEBRIS:
+	if _hud_config.rp_flags & WCSConstants.RP_SHOW_DEBRIS:
 		for debris_node in get_tree().get_nodes_in_group(ObjectManager.GROUP_DEBRIS): # Use group name
 			var debris: DebrisBase = debris_node # Assume nodes in group are DebrisBase
 			if not is_instance_valid(debris): continue
@@ -291,7 +291,7 @@ func update_from_game_state() -> void:
 				var blip = add_radar_object(
 					debris.global_position,
 					BlipType.NAVBUOY_CARGO, # Reuse this type? Or add DEBRIS type?
-					GlobalConstants.IFF_NEUTRAL, # Debris is neutral
+					WCSConstants.IFF_NEUTRAL, # Debris is neutral
 					debris == player_ship_node.target_node
 				)
 				# Optionally make debris blips dimmer or different shape if needed
@@ -308,49 +308,10 @@ func update_from_game_state() -> void:
 				add_radar_object(
 					jump_node.global_position,
 					BlipType.JUMP_NODE,
-					GlobalConstants.IFF_NEUTRAL, # Jump nodes are neutral
+					WCSConstants.IFF_NEUTRAL, # Jump nodes are neutral
 					jump_node == player_ship_node.target_node
 				)
 
-
-func _draw() -> void:
-	if Engine.is_editor_hint():
-			if ship.is_warping:
-				blip_type = BlipType.WARPING_SHIP
-			elif ship.is_tagged:
-				blip_type = BlipType.TAGGED_SHIP
-			elif ship.is_cargo or ship.is_navbuoy:
-				blip_type = BlipType.NAVBUOY_CARGO
-			elif ship.is_bomb:
-				blip_type = BlipType.BOMB
-				
-			var blip = add_radar_object(
-				ship.global_position,
-				blip_type,
-				ship.team,
-				ship == GameState.player_ship.target
-			)
-			
-			# Check for sensor distortion
-			if ship.hidden_from_sensors or ship.awacs_level < 1.0:
-				blip.is_distorted = true
-	
-	# Add missiles if enabled
-	if show_friendly_missiles || show_hostile_missiles:
-		for missile in get_tree().get_nodes_in_group("missiles"):
-			var team_matches = (
-				(show_friendly_missiles && missile.team == GameState.player_ship.team) ||
-				(show_hostile_missiles && missile.team != GameState.player_ship.team)
-			)
-			if team_matches:
-				var distance = missile.global_position.distance_to(GameState.player_ship.global_position)
-				if distance <= RADAR_RANGES[current_range]:
-					add_radar_object(
-						missile.global_position,
-						BlipType.BOMB,
-						missile.team,
-						false
-					)
 
 func _draw() -> void:
 	if Engine.is_editor_hint():
@@ -366,8 +327,8 @@ func _draw() -> void:
 	
 	# Get sensor strength
 	var sensor_strength = 1.0
-	if GameState.player_ship:
-		sensor_strength = GameState.player_ship.get_sensor_strength()
+	if GameStateManager.player_ship:
+		sensor_strength = GameStateManager.player_ship.get_sensor_strength()
 	
 	# Check if radar is functional
 	if sensor_strength < min_sensor_strength && !Engine.is_editor_hint():
@@ -451,12 +412,12 @@ func _draw_noise_effect(center: Vector2, color: Color, intensity: float) -> void
 
 # Draw actual radar objects
 func _draw_radar_objects(center: Vector2) -> void:
-	if !GameState.player_ship:
+	if !GameStateManager.player_ship:
 		return
 		
-	var player_pos = GameState.player_ship.global_position
-	var player_forward = GameState.player_ship.global_transform.basis.z
-	var player_up = GameState.player_ship.global_transform.basis.y
+	var player_pos = GameStateManager.player_ship.global_position
+	var player_forward = GameStateManager.player_ship.global_transform.basis.z
+	var player_up = GameStateManager.player_ship.global_transform.basis.y
 	
 	# Sort blips by distance
 	var sorted_blips = _radar_objects.duplicate()
@@ -484,7 +445,7 @@ func _draw_radar_objects(center: Vector2) -> void:
 			if _flash_state:
 				# Apply distortion
 				var distort_angle = sensor_distortion_angle
-				if GameState.player_ship.emp_active:
+				if GameStateManager.player_ship.emp_active:
 					distort_angle *= randf_range(1.0, 3.0)
 				var distorted_pos = radar_pos.rotated(randf_range(-distort_angle, distort_angle))
 				radar_pos = distorted_pos

@@ -82,9 +82,9 @@ func _ready() -> void:
 
 # Update gauge based on current game state
 func update_from_game_state() -> void:
-	# Check if player ship exists using GameState singleton
-	if GameState.player_ship and is_instance_valid(GameState.player_ship):
-		var ship = GameState.player_ship
+	# Check if player ship exists using GameStateManager singleton
+	if GameStateManager.player_ship and is_instance_valid(GameStateManager.player_ship):
+		var ship = GameStateManager.player_ship
 
 		# Read ETS indices from ShipBase
 		weapon_index = ship.weapon_recharge_index # Setter handles redraw
@@ -97,13 +97,13 @@ func update_from_game_state() -> void:
 		if ship.weapon_system and ship.weapon_system.num_primary_banks > 0:
 			for wpn_idx in ship.weapon_system.primary_bank_weapons:
 				if wpn_idx >= 0:
-					var wpn_data: WeaponData = GlobalConstants.get_weapon_data(wpn_idx)
-					if wpn_data and not (wpn_data.flags2 & GlobalConstants.WIF2_BALLISTIC):
+					var wpn_data: WeaponData = WCSConstants.get_weapon_data(wpn_idx)
+					if wpn_data and not (wpn_data.flags2 & WCSConstants.WIF2_BALLISTIC):
 						energy_weapon_exists = true
 						break
 		has_weapons = energy_weapon_exists
 
-		has_shields = not (ship.flags & GlobalConstants.OF_NO_SHIELDS)
+		has_shields = not (ship.flags & WCSConstants.OF_NO_SHIELDS)
 
 		# Check if engine system exists and ship has max speed > 0
 		has_engines = is_instance_valid(ship.engine_system) and ship.ship_data and ship.ship_data.max_vel.z > 0.01
@@ -244,7 +244,7 @@ func get_energy_level(system: String) -> float:
 	return energy_levels[index_ref.value]
 
 # Helper to get reference to system index
-func _get_system_index_ref(system: String) -> Reference:
+func _get_system_index_ref(system: String) -> Dictionary:
 	match system:
 		"weapons":
 			if !has_weapons:

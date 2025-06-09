@@ -49,37 +49,27 @@ func _ready() -> void:
 # Update gauge based on current game state
 func update_from_game_state() -> void:
 	# Check if player ship and its damage system exist
-	if GameState.player_ship and is_instance_valid(GameState.player_ship) and GameState.player_ship.damage_system:
-		var damage_sys: DamageSystem = GameState.player_ship.damage_system
+	if GameStateManager.player_ship and is_instance_valid(GameStateManager.player_ship) and GameStateManager.player_ship.subsystem_manager:
+		var subsystem_manager = GameStateManager.player_ship.subsystem_manager
 
 		# Update hull integrity
 		# Assuming hull_strength is directly on ShipBase for easier access
-		hull_integrity = GameState.player_ship.hull_strength / GameState.player_ship.ship_max_hull_strength
+		hull_integrity = GameStateManager.player_ship.hull_strength / GameStateManager.player_ship.ship_max_hull_strength
 
 		# Update subsystems
-		# This requires DamageSystem to provide a way to get current subsystem states
-		# Option 1: DamageSystem provides a list of subsystem status dictionaries/objects
-		# Option 2: Iterate through ShipBase's subsystem nodes and get their status
-
-		# Using Option 2 for now (assuming subsystems are children with ShipSubsystem script)
 		var current_subsystems_data = []
-		var ship_subsystems = GameState.player_ship.get_subsystems() # Assuming ShipBase has this helper
+		var ship_subsystems = subsystem_manager.get_subsystem_status()
 
-		for subsys_node in ship_subsystems:
-			if subsys_node is ShipSubsystem and is_instance_valid(subsys_node.subsystem_definition):
-				var subsys: ShipSubsystem = subsys_node
-				var subsys_def = subsys.subsystem_definition
-				# Create a new Subsystem data object for the gauge
-				var gauge_subsys = Subsystem.new(
-					subsys_def.type,
-					subsys_def.subobj_name, # Or use ship_subsys_get_name(subsys)?
-					subsys.current_hits, # Use current hits
-					subsys_def.max_hits, # Pass max hits
-					subsys_def.is_critical # Pass critical flag
-				)
-				# Copy flash state if needed (or handle flash purely in gauge)
-				# gauge_subsys.damage_flash_time = subsys.get_damage_flash_time_remaining() # Needs method on ShipSubsystem
-				current_subsystems_data.append(gauge_subsys)
+		for subsys_data in ship_subsystems:
+			# Create a new Subsystem data object for the gauge
+			var gauge_subsys = HUDSubsystem.new(
+				subsys_data.get("type", HUDSubsystem.Type.OTHER),
+				subsys_data.get("name", "Unknown"),
+				subsys_data.get("health", 1.0) * 100.0,
+				100.0,
+				subsys_data.get("is_critical", false)
+			)
+			current_subsystems_data.append(gauge_subsys)
 
 		# Update the gauge's subsystems array (setter handles redraw)
 		subsystems = current_subsystems_data
@@ -92,8 +82,8 @@ func update_from_game_state() -> void:
 
 # --- Subsystem Inner Class ---
 # Represents subsystem data specifically for this gauge's display needs
-class Subsystem:
-	enum Type { # Mirror GlobalConstants.SubsystemType if possible
+class HUDSubsystem:
+	enum Type { # Mirror WCSConstants.SubsystemType if possible
 		ENGINES, WEAPONS, SHIELDS, SENSORS, NAVIGATION, COMMUNICATION, WARPDRIVE, TURRET, OTHER
 	}
 	var type: Type
@@ -113,11 +103,11 @@ class Subsystem:
 
 
 # Add a subsystem
-func add_subsystem(type: Subsystem.Type, name: String, health: float = 100.0, max_health: float = 100.0,
+func add_subsystem(type: HUDSubsystem.Type, name: String, health: float = 100.0, max_health: float = 100.0,
 	critical: bool = false) -> void:
 	# This method might become obsolete if update_from_game_state replaces it,
 	# but keep it for potential manual testing or specific scenarios.
-	var sys = Subsystem.new(type, name, health, max_health, critical)
+	var sys = HUDSubsystem.new(type, name, health, max_health, critical)
 	subsystems.append(sys)
 	queue_redraw()
 

@@ -40,8 +40,8 @@ func _ready() -> void:
 # Update gauge based on current game state
 func update_from_game_state() -> void:
 	# Check if player ship and targeting component exist
-	if GameState.player_ship and is_instance_valid(GameState.player_ship) and GameState.player_ship.targeting_component:
-		var targeting_comp = GameState.player_ship.targeting_component # Assuming TargetingComponent exists
+	if GameStateManager.player_ship and is_instance_valid(GameStateManager.player_ship) and GameStateManager.player_ship.targeting_component:
+		var targeting_comp = GameStateManager.player_ship.targeting_component # Assuming TargetingComponent exists
 
 		# Get lead indicator data
 		var lead_data = targeting_comp.get_lead_indicator_data() # Placeholder method

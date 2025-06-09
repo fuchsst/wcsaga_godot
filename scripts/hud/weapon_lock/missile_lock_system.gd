@@ -122,7 +122,8 @@ func _ready() -> void:
 func _initialize_missile_lock_system() -> void:
 	"""Initialize missile lock system."""
 	# Get player ship reference
-	if get_tree().get_nodes_in_group("player")[0]:
+	var player_nodes = get_tree().get_nodes_in_group("player")
+	if player_nodes.size() > 0:
 		player_ship = player_nodes[0]
 		
 		# Get weapon manager
@@ -321,7 +322,7 @@ func _handle_tracking_stage(delta: float) -> void:
 		return
 	
 	# Update tracking parameters
-	_update_seeker_tracking(delta)
+	_update_seeker_tracking_error(delta)
 	
 	# Check tracking quality
 	var tracking_quality: float = _calculate_tracking_quality()

@@ -355,8 +355,8 @@ class SignatureAnalyzer:
 		
 		# Combine analyses
 		var combined_confidence = (radar_analysis.confidence + 
-		                          thermal_analysis.confidence + 
-		                          em_analysis.confidence) / 3.0
+								  thermal_analysis.confidence + 
+								  em_analysis.confidence) / 3.0
 		
 		if combined_confidence > analysis.confidence:
 			analysis.classification = radar_analysis.classification  # Use best analysis

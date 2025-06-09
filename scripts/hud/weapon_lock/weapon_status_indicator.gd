@@ -95,7 +95,8 @@ func _ready() -> void:
 func _initialize_weapon_status_indicator() -> bool:
 	"""Initialize weapon status indicator system."""
 	# Get player ship reference
-	if get_tree().get_nodes_in_group("player")[0]:
+	var player_nodes = get_tree().get_nodes_in_group("player")
+	if player_nodes.size() > 0:
 		player_ship = player_nodes[0]
 		
 		# Get weapon manager

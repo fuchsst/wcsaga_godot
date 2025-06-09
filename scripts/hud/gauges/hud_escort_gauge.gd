@@ -13,7 +13,7 @@ class EscortTarget:
 
 # Gauge settings
 @export_group("Escort Settings")
-@export var escort_list: Array[EscortTarget]:
+@export var escort_list: Array:
 	set(value):
 		escort_list = value
 		queue_redraw()
@@ -48,36 +48,49 @@ func _ready() -> void:
 # Update gauge based on current game state
 func update_from_game_state() -> void:
 	# Check if player ship exists
-	if not GameState.player_ship or not is_instance_valid(GameState.player_ship):
+	var player_ship = ObjectManager.get_player_ship() if ObjectManager else null
+	if not player_ship or not is_instance_valid(player_ship):
 		if not escort_list.is_empty(): escort_list.clear(); queue_redraw()
 		return
 
-	# Get the list of escort targets from a manager or GameState
+	# Get the list of escort targets from object manager
 	# Assuming a function returns an array of ShipBase nodes marked for escort
-	var escort_targets_nodes = GameState.get_escort_list() # Placeholder function in GameState
+	var escort_targets_nodes = ObjectManager.get_escort_list() if ObjectManager and ObjectManager.has_method("get_escort_list") else []
 
 	var new_escort_data = []
-	var player_target_id = GameState.player_ship.target_object_id
+	var player_target_id = player_ship.get("target_object_id", 0) if player_ship.has_method("get") else 0
 
 	for ship_node in escort_targets_nodes:
-		if not is_instance_valid(ship_node) or not ship_node is ShipBase: continue
-		var ship: ShipBase = ship_node
+		if not is_instance_valid(ship_node): continue
+		var ship = ship_node  # Use generic node reference
 
 		# Limit display count
 		if new_escort_data.size() >= max_display_ships: break
 
 		var target_info = EscortTarget.new()
-		target_info.name = ship.ship_name # Or formatted name/callsign
-		target_info.hull_percent = ship.hull_strength / ship.ship_max_hull_strength if ship.ship_max_hull_strength > 0 else 0.0
+		target_info.name = ship.get("ship_name", "Unknown") if ship.has_method("get") else ship.name if ship.has_property("name") else "Unknown"
+		
+		# Get hull percentage using safe access
+		var hull_strength = ship.get("hull_strength", 0.0) if ship.has_method("get") else 0.0
+		var max_hull = ship.get("ship_max_hull_strength", 1.0) if ship.has_method("get") else 1.0
+		target_info.hull_percent = hull_strength / max_hull if max_hull > 0 else 0.0
 
-		# Get overall shield percentage
-		if ship.shield_system and is_instance_valid(ship.shield_system) and ship.shield_system.max_shield_strength > 0:
-			target_info.shield_percent = ship.shield_system.get_total_strength() / ship.shield_system.max_shield_strength
+		# Get overall shield percentage using safe access
+		var shield_system = ship.get("shield_system", null) if ship.has_method("get") else null
+		if shield_system and is_instance_valid(shield_system):
+			var shield_strength = shield_system.get("shield_strength", 0.0) if shield_system.has_method("get") else 0.0
+			var max_shield = shield_system.get("max_shield_strength", 1.0) if shield_system.has_method("get") else 1.0
+			target_info.shield_percent = shield_strength / max_shield if max_shield > 0 else 0.0
 		else:
-			target_info.shield_percent = 0.0 # Assume no shields if system missing or max is zero
+			target_info.shield_percent = 0.0 # Assume no shields if system missing
 
 		# Determine status text
-		if ship.flags & GlobalConstants.SF_DISABLED or ship.flags2 & GlobalConstants.SF2_DISABLED:
+		var flags = ship.get("flags", 0) if ship.has_method("get") else 0
+		var flags2 = ship.get("flags2", 0) if ship.has_method("get") else 0
+		var disabled_flag = WCSConstants.SF_DISABLED if WCSConstants and WCSConstants.has_property("SF_DISABLED") else 0
+		var disabled_flag2 = WCSConstants.SF2_DISABLED if WCSConstants and WCSConstants.has_property("SF2_DISABLED") else 0
+		
+		if (flags & disabled_flag) or (flags2 & disabled_flag2):
 			target_info.status = "DIS"
 		elif target_info.hull_percent <= 0.25:
 			target_info.status = "CRIT"

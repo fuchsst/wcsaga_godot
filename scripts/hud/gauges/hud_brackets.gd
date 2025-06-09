@@ -65,12 +65,14 @@ func _ready() -> void:
 # Update gauge based on current game state
 func update_from_game_state() -> void:
 	# Check if player ship and target exist
-	if not GameState.player_ship or not is_instance_valid(GameState.player_ship) or GameState.player_ship.target_object_id == -1:
+	var player_ship = ObjectManager.get_player_ship() if ObjectManager else null
+	var target_object_id = player_ship.get("target_object_id", -1) if player_ship and player_ship.has_method("get") else -1
+	if not player_ship or not is_instance_valid(player_ship) or target_object_id == -1:
 		brackets_active = false
 		subsystem_bracket_active = false
 		return
 
-	var target_node = ObjectManager.get_object_by_id(GameState.player_ship.target_object_id)
+	var target_node = ObjectManager.get_object_by_id(target_object_id) if ObjectManager and ObjectManager.has_method("get_object_by_id") else null
 	if not is_instance_valid(target_node):
 		brackets_active = false
 		subsystem_bracket_active = false
@@ -87,18 +89,19 @@ func update_from_game_state() -> void:
 	if main_rect:
 		brackets_active = true
 		bracket_rect = main_rect
-		target_distance = GameState.player_ship.global_position.distance_to(target_node.global_position)
+		target_distance = player_ship.global_position.distance_to(target_node.global_position)
 		# Determine IFF color
-		var target_team = target_node.get_team() if target_node.has_method("get_team") else GlobalConstants.IFF_UNKNOWN
-		target_iff_color = IFFManager.get_iff_color(target_team, GameState.player_ship.team, true) # Assuming IFFManager
+		var target_team = target_node.get_team() if target_node.has_method("get_team") else 0  # Unknown team
+		var player_team = player_ship.get("team", 0) if player_ship.has_method("get") else 0
+		target_iff_color = Color.GREEN if ObjectManager.is_friendly(player_team, target_team) else Color.RED
 	else:
 		brackets_active = false
 		target_distance = 0.0
 
 	# --- Subsystem Target Brackets ---
-	var subsys_node = GameState.player_ship.target_subsystem_node # Assuming ShipBase stores the Node ref
-	if brackets_active and is_instance_valid(subsys_node) and subsys_node is ShipSubsystem:
-		var subsys: ShipSubsystem = subsys_node
+	var subsys_node = player_ship.get("target_subsystem_node", null) if player_ship.has_method("get") else null
+	if brackets_active and is_instance_valid(subsys_node):
+		var subsys = subsys_node  # Generic subsystem reference
 		var subsys_rect = _calculate_screen_bounds(subsys, camera, target_node) # Pass parent for world pos calculation
 
 		if subsys_rect:
@@ -118,14 +121,14 @@ func update_from_game_state() -> void:
 
 
 # Placeholder: Calculate screen bounds for an object or subsystem
-func _calculate_screen_bounds(node: Node3D, camera: Camera3D, parent_ship: ShipBase = null) -> Rect2:
+func _calculate_screen_bounds(node: Node3D, camera: Camera3D, parent_ship: Node = null) -> Rect2:
 	var aabb: AABB
 	var world_transform: Transform3D
 
-	if node is ShipSubsystem and is_instance_valid(parent_ship):
+	if parent_ship and is_instance_valid(parent_ship):
 		# Calculate world position for subsystem
-		var subsys: ShipSubsystem = node
-		if not is_instance_valid(subsys.subsystem_definition): return null
+		var subsys = node
+		if not subsys.has_method("get") or not subsys.get("subsystem_definition"): return Rect2()
 		# Need a way to get the world transform of the subsystem node itself
 		# Assuming the node's global_transform is correct
 		world_transform = subsys.global_transform
@@ -149,12 +152,12 @@ func _calculate_screen_bounds(node: Node3D, camera: Camera3D, parent_ship: ShipB
 			# If any corner is behind, the projection is unreliable for bounds
 			# FS2 logic might handle this differently (clipping?)
 			# For now, return null if any point is behind.
-			return null
+			return Rect2()
 		var screen_pos = camera.unproject_position(corner_world)
 		screen_points.append(screen_pos)
 
 	if screen_points.is_empty():
-		return null
+		return Rect2()
 
 	# Find min/max screen coordinates
 	var min_pos = screen_points[0]
@@ -169,7 +172,7 @@ func _calculate_screen_bounds(node: Node3D, camera: Camera3D, parent_ship: ShipB
 	var viewport_rect = get_viewport_rect()
 	if max_pos.x < viewport_rect.position.x or min_pos.x > viewport_rect.end.x or \
 	   max_pos.y < viewport_rect.position.y or min_pos.y > viewport_rect.end.y:
-		return null # Completely off-screen
+		return Rect2() # Completely off-screen
 
 	return Rect2(min_pos, max_pos - min_pos)
 

@@ -66,11 +66,11 @@ func _ready() -> void:
 # Update gauge based on current game state
 func update_from_game_state() -> void:
 	# Check if player ship and target exist
-	if not GameState.player_ship or not is_instance_valid(GameState.player_ship) or GameState.player_ship.target_object_id == -1:
+	if not GameStateManager.player_ship or not is_instance_valid(GameStateManager.player_ship) or GameStateManager.player_ship.target_object_id == -1:
 		clear_target()
 		return
 
-	var target_node = ObjectManager.get_object_by_id(GameState.player_ship.target_object_id)
+	var target_node = ObjectManager.get_object_by_id(GameStateManager.player_ship.target_object_id)
 	if not is_instance_valid(target_node) or not target_node is ShipBase:
 		# Only show icon for ships
 		clear_target()
@@ -87,12 +87,12 @@ func update_from_game_state() -> void:
 	# Get shield percentage (average or overall?)
 	# FS2 likely uses overall shield strength for the mini icon
 	var shield_pct = 0.0
-	var has_shield_system = is_instance_valid(target_shield_system) and not (target_ship.flags & GlobalConstants.OF_NO_SHIELDS)
+	var has_shield_system = is_instance_valid(target_shield_system) and not (target_ship.flags & WCSConstants.OF_NO_SHIELDS)
 	if has_shield_system and target_shield_system.max_shield_strength > 0:
 		shield_pct = target_shield_system.get_total_strength() / target_shield_system.max_shield_strength
 
 	# Get friendliness
-	var friendly = IFFManager.is_friendly(GameState.player_ship.team, target_ship.team) # Assuming IFFManager
+	var friendly = ObjectManager.is_friendly(GameStateManager.player_ship.team, target_ship.team) # Assuming IFFManager
 
 	# Update the gauge
 	show_target(hull_pct, shield_pct, friendly, has_shield_system)

@@ -127,24 +127,24 @@ class RadarSignalProcessor:
 		return clean_signal
 	
 	class NoiseFilter:
-		func filter_signal(signal: Dictionary) -> Dictionary:
+		func filter_signal(input_signal: Dictionary) -> Dictionary:
 			# Implement noise filtering
-			var filtered = signal.duplicate()
-			var noise_level = signal.get("noise_level", 0.1)
+			var filtered = input_signal.duplicate()
+			var noise_level = input_signal.get("noise_level", 0.1)
 			filtered["signal_strength"] = max(0.0, filtered.get("signal_strength", 0.0) - noise_level)
 			return filtered
 	
 	class DopplerProcessor:
-		func calculate_doppler(signal: Dictionary) -> Dictionary:
+		func calculate_doppler(input_signal: Dictionary) -> Dictionary:
 			# Calculate Doppler shift for velocity determination
-			var processed = signal.duplicate()
+			var processed = input_signal.duplicate()
 			# Doppler calculation would go here
 			return processed
 	
 	class ClutterFilter:
-		func remove_clutter(signal: Dictionary) -> Dictionary:
+		func remove_clutter(input_signal: Dictionary) -> Dictionary:
 			# Remove ground/space clutter
-			var filtered = signal.duplicate()
+			var filtered = input_signal.duplicate()
 			# Clutter filtering would go here
 			return filtered
 
@@ -153,7 +153,7 @@ class JammingDetector:
 	var jamming_threshold: float = 0.8
 	var known_jammers: Array[Node] = []
 	
-	func detect_jamming(signal: Dictionary) -> Dictionary:
+	func detect_jamming(input_signal: Dictionary) -> Dictionary:
 		var jamming_data = {
 			"is_jammed": false,
 			"jamming_strength": 0.0,
@@ -161,16 +161,16 @@ class JammingDetector:
 			"jamming_type": "none"
 		}
 		
-		var noise_to_signal_ratio = signal.get("noise_level", 0.0) / max(0.01, signal.get("signal_strength", 0.01))
+		var noise_to_signal_ratio = input_signal.get("noise_level", 0.0) / max(0.01, input_signal.get("signal_strength", 0.01))
 		
 		if noise_to_signal_ratio > jamming_threshold:
 			jamming_data.is_jammed = true
 			jamming_data.jamming_strength = noise_to_signal_ratio
-			jamming_data.jamming_type = _identify_jamming_type(signal)
+			jamming_data.jamming_type = _identify_jamming_type(input_signal)
 		
 		return jamming_data
 	
-	func _identify_jamming_type(signal: Dictionary) -> String:
+	func _identify_jamming_type(input_signal: Dictionary) -> String:
 		# Analyze jamming patterns
 		return "noise"  # Default type
 
@@ -537,16 +537,16 @@ func _calculate_raw_radar_return(target: Node, distance: float) -> Dictionary:
 		"doppler_shift": _calculate_doppler_shift(target)
 	}
 
-func _calculate_track_quality(signal: Dictionary, jamming: Dictionary) -> float:
-	var quality = signal.signal_strength
+func _calculate_track_quality(input_signal: Dictionary, jamming: Dictionary) -> float:
+	var quality = input_signal.signal_strength
 	
 	# Reduce quality for jamming
 	if jamming.is_jammed:
 		quality *= (1.0 - jamming.jamming_strength * 0.5)
 	
 	# Reduce quality for weak signals
-	if signal.signal_strength < 0.5:
-		quality *= signal.signal_strength * 2.0
+	if input_signal.signal_strength < 0.5:
+		quality *= input_signal.signal_strength * 2.0
 	
 	return clamp(quality, 0.0, 1.0)
 

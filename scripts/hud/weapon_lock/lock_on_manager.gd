@@ -71,7 +71,8 @@ func _ready() -> void:
 func initialize_lock_on_manager() -> bool:
 	"""Initialize lock-on manager with ship reference."""
 	# Get player ship reference
-	if get_tree().get_nodes_in_group("player")[0]:
+	var player_nodes = get_tree().get_nodes_in_group("player")
+	if player_nodes.size() > 0:
 		player_ship = player_nodes[0]
 		
 		# Get weapon manager

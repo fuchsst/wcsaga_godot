@@ -61,11 +61,11 @@ func _ready() -> void:
 # Update gauge based on current game state
 func update_from_game_state() -> void:
 	# Check if player ship exists
-	if GameState.player_ship and is_instance_valid(GameState.player_ship):
+	if GameStateManager.player_ship and is_instance_valid(GameStateManager.player_ship):
 		# Get missile threat info from the player ship
 		# Assuming a method exists that returns the most relevant threat data
 		# or null if no significant threat exists.
-		var threat_data = GameState.player_ship.get_missile_warning_data() # Placeholder method
+		var threat_data = GameStateManager.player_ship.get_missile_warning_data() # Placeholder method
 
 		if threat_data:
 			# Assuming threat_data is a Dictionary like:

@@ -123,7 +123,8 @@ func _ready() -> void:
 func _initialize_firing_opportunity_alert() -> void:
 	"""Initialize firing opportunity analysis system."""
 	# Get player ship reference
-	if get_tree().get_nodes_in_group("player")[0]:
+	var player_nodes = get_tree().get_nodes_in_group("player")
+	if player_nodes.size() > 0:
 		player_ship = player_nodes[0]
 		
 		# Get weapon manager
@@ -360,7 +361,7 @@ func _analyze_energy_efficiency_opportunity() -> void:
 	var shot_efficiency: float = weapon_analysis_data.get("shot_efficiency", 0.0)
 	
 	# Energy efficiency when we have good energy and efficient shot opportunity
-	if energy_level >= 0.8 and shot_efficiency >= 0.7 and not energy_recharging:
+	if energy_level >= 0.8 and shot_efficiency >= 0.7 and not energy_recharge:
 		var confidence: float = (energy_level + shot_efficiency) / 2.0
 		
 		if not _has_opportunity_type(OpportunityType.ENERGY_EFFICIENT):
@@ -598,9 +599,9 @@ func _draw_opportunity_panel(position: Vector2, opportunity: FiringOpportunity, 
 	_draw_opportunity_icon(icon_pos, opportunity.opportunity_type, priority_color)
 	
 	# Opportunity text
+	var font := ThemeDB.fallback_font
+	var font_size := 14
 	if show_opportunity_text:
-		var font := ThemeDB.fallback_font
-		var font_size := 14
 		var text_pos: Vector2 = position + Vector2(35, font_size + 5)
 		draw_string(font, text_pos, opportunity.description,
 			HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, priority_color)

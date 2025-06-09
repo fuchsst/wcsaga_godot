@@ -459,6 +459,17 @@ func sexp_get_ships_in_wing(wing_name: String) -> Array[BaseSpaceObject]:
 func sexp_get_object_count_by_type(object_type: int) -> int:
 	return space_objects_by_type.get(object_type, []).size()
 
+# IFF Management
+func is_friendly(team1: int, team2: int) -> bool:
+	# A simple implementation for now.
+	# In the future, this should use the data from iff_defs_data.gd
+	return team1 == team2
+
+func is_hostile(team1: int, team2: int) -> bool:
+	# A simple implementation for now.
+	# In the future, this should use the data from iff_defs_data.gd
+	return team1 != team2
+
 ## Clear all space objects
 func _clear_all_space_objects() -> void:
 	# Destroy all space objects

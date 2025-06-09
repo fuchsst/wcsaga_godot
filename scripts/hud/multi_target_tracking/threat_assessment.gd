@@ -479,14 +479,6 @@ class FormationAnalyzer:
 func _ready() -> void:
 	_initialize_threat_assessment()
 
-## Get player position
-func _get_player_position() -> Vector3:
-	"""Get current player ship position."""
-	var player_nodes = get_tree().get_nodes_in_group("player")
-	if player_nodes.size() > 0:
-		return player_nodes[0].global_position
-	return Vector3.ZERO
-
 func _initialize_threat_assessment() -> void:
 	print("ThreatAssessment: Initializing threat assessment system...")
 	

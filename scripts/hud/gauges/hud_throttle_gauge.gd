@@ -149,17 +149,19 @@ func _draw() -> void:
 		draw_colored_polygon(points, ab_color)
 	
 	# Draw glide/match speed indicators
-	if GameState.player_ship:
+	var player_ship = ObjectManager.get_player_ship() if ObjectManager else null
+	if player_ship:
 		var y_offset = font_size + 2
 		var x_offset = -31 if current_speed <= 9.5 else (-22 if current_speed <= 99.5 else -13)
 		
-		if GameState.player_ship.is_gliding:
 		# Check glide status
-		if ship.physics_flags & GlobalConstants.PF_GLIDING: # Check physics flag
+		var physics_flags = player_ship.get("physics_flags", 0) if player_ship.has_method("get") else 0
+		var gliding_flag = WCSConstants.PF_GLIDING if WCSConstants and WCSConstants.has_property("PF_GLIDING") else 0
+		if physics_flags & gliding_flag:
 			draw_string(font, Vector2(x_offset, bar_rect.position.y + bar_height + y_offset),
 				"GLIDE", HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, color)
-		# Check match speed status (assuming a property exists)
-		elif ship.match_target_speed: # Placeholder property name
+		# Check match speed status
+		elif player_ship.get("match_target_speed", false) if player_ship.has_method("get") else false:
 			draw_string(font, Vector2(x_offset, bar_rect.position.y + bar_height + y_offset),
 				"MATCH", HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, color)
 

@@ -44,9 +44,10 @@ func _ready() -> void:
 
 # Update gauge based on current game state
 func update_from_game_state() -> void:
-	# Check if PlayerData exists via GameState singleton
-	if GameState.player_data and is_instance_valid(GameState.player_data):
-		var player_stats = GameState.player_data.stats # Assuming stats are stored here
+	# Check if PlayerData exists via GameStateManager singleton
+	var player_data = GameStateManager.get_player_data("stats", {}) if GameStateManager else {}
+	if not player_data.is_empty():
+		var player_stats = player_data # Assuming stats are stored here
 
 		# Update kill info directly (setters handle redraw)
 		# Assuming PlayerData.stats has properties like:

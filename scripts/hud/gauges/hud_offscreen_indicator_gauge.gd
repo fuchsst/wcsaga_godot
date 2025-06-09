@@ -58,11 +58,11 @@ func _ready() -> void:
 # Update gauge based on current game state
 func update_from_game_state() -> void:
 	# Check if player ship and target exist
-	if not GameState.player_ship or not is_instance_valid(GameState.player_ship) or GameState.player_ship.target_object_id == -1:
+	if not GameStateManager.player_ship or not is_instance_valid(GameStateManager.player_ship) or GameStateManager.player_ship.target_object_id == -1:
 		clear_target()
 		return
 
-	var target_node = ObjectManager.get_object_by_id(GameState.player_ship.target_object_id)
+	var target_node = ObjectManager.get_object_by_id(GameStateManager.player_ship.target_object_id)
 	if not is_instance_valid(target_node):
 		clear_target()
 		return
@@ -78,10 +78,10 @@ func update_from_game_state() -> void:
 
 	# Check if target is off-screen (or behind camera)
 	if not viewport_rect.has_point(screen_pos) or camera.is_position_behind(target_world_pos):
-		var distance = GameState.player_ship.global_position.distance_to(target_world_pos)
+		var distance = GameStateManager.player_ship.global_position.distance_to(target_world_pos)
 		var friendly = false
 		if target_node.has_method("get_team"): # Check if target has team info
-			friendly = IFFManager.is_friendly(GameState.player_ship.team, target_node.get_team()) # Assuming IFFManager
+			friendly = ObjectManager.is_friendly(GameStateManager.player_ship.team, target_node.get_team()) # Assuming IFFManager
 
 		# Calculate position relative to gauge center for _get_edge_point
 		# Note: This assumes the gauge itself might not be centered on the screen.

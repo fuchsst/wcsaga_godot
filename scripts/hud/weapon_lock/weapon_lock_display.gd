@@ -192,7 +192,8 @@ func _setup_audio_streams() -> void:
 func update_from_game_state() -> void:
 	"""Update weapon lock display from current game state."""
 	# Check if player ship and weapon systems exist
-	if not get_tree().get_nodes_in_group("player")[0] or not is_instance_valid(GameState.player_ship):
+	var player_nodes = get_tree().get_nodes_in_group("player")
+	if player_nodes.size() == 0 or not is_instance_valid(player_nodes[0]):
 		_reset_display()
 		return
 	
@@ -484,7 +485,9 @@ func _draw_missile_weapon_indicator(position: Vector2, color: Color, is_preview:
 		position + Vector2(0, size),
 		position + Vector2(-size, 0)
 	])
-	draw_polyline(points + [points[0]], color, 2.0)
+	var closed_points = points.duplicate()
+	closed_points.append(points[0])
+	draw_polyline(closed_points, color, 2.0)
 	
 	# Draw seeking animation
 	if lock_state == LockState.SEEKING:
@@ -529,7 +532,9 @@ func _draw_special_weapon_indicator(position: Vector2, color: Color, is_preview:
 		var angle: float = i * PI/3
 		points.append(position + Vector2(cos(angle), sin(angle)) * size)
 	
-	draw_polyline(points + [points[0]], color, 2.0)
+	var closed_points = points.duplicate()
+	closed_points.append(points[0])
+	draw_polyline(closed_points, color, 2.0)
 	
 	# Special seeking animation
 	if lock_state == LockState.SEEKING:

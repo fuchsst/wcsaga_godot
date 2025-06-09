@@ -46,9 +46,11 @@ func _init() -> void:
 
 # Update gauge based on current game state
 func update_from_game_state() -> void:
-	if GameState.player_ship: # Check if player ship exists
-		set_auto_target(GameState.player_ship.auto_target_on) # Placeholder property name
-		set_auto_speed(GameState.player_ship.auto_speed_on) # Placeholder property name
+	# TODO: Replace with proper player ship reference when ObjectManager is available
+	var player_ship = ObjectManager.get_player_ship() if ObjectManager else null
+	if player_ship:
+		set_auto_target(player_ship.get("auto_target_on", false))
+		set_auto_speed(player_ship.get("auto_speed_on", false))
 	else:
 		# Default state if no player ship
 		set_auto_target(false)
