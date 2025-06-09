@@ -42,7 +42,7 @@ var update_scheduler: HUDUpdateScheduler
 var render_optimizer: HUDRenderOptimizer
 var memory_manager: HUDMemoryManager
 var performance_scaler: HUDPerformanceScaler
-var performance_profiler: HUDPerformanceProfiler
+var performance_profiler  # HUDPerformanceProfiler - removed type hint to fix circular dependency
 
 # System status tracking
 var optimization_systems_status: Dictionary = {}
