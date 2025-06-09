@@ -75,8 +75,8 @@ func _ready() -> void:
 # Update gauge based on current game state
 func update_from_game_state() -> void:
 	# Check if player ship and its targeting component exist
-	if GameState.player_ship and is_instance_valid(GameState.player_ship) and GameState.player_ship.targeting_component:
-		var targeting_comp = GameState.player_ship.targeting_component # Assuming TargetingComponent exists
+	if GameStateManager.player_ship and is_instance_valid(GameStateManager.player_ship) and GameStateManager.player_ship.targeting_component:
+		var targeting_comp = GameStateManager.player_ship.targeting_component # Assuming TargetingComponent exists
 
 		# Update target status
 		has_target = targeting_comp.has_target() # Placeholder method
@@ -113,7 +113,7 @@ func update_from_game_state() -> void:
 
 
 # Update reticle from ship state (Keep for potential direct calls?)
-func update_from_ship(ship: ShipBase) -> void:
+func update_from_ship(ship: BaseShip) -> void:
 	# TODO: Update reticle info from ship
 	# This would update:
 	# - Target status

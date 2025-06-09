@@ -46,12 +46,12 @@ func _ready() -> void:
 # Update gauge based on current game state
 func update_from_game_state() -> void:
 	# Check if player ship exists
-	if not GameState.player_ship or not is_instance_valid(GameState.player_ship):
+	if not GameStateManager.player_ship or not is_instance_valid(GameStateManager.player_ship):
 		if not wingmen.is_empty(): clear_wingmen()
 		return
 
 	# Get player's wing number
-	var player_wing_num = GameState.player_ship.wingnum
+	var player_wing_num = GameStateManager.player_ship.wingnum
 	if player_wing_num < 0:
 		if not wingmen.is_empty(): clear_wingmen() # Player has no wing
 		return
@@ -62,12 +62,12 @@ func update_from_game_state() -> void:
 	var all_ships = ObjectManager.get_all_ships() # Assuming ObjectManager exists
 
 	for ship_node in all_ships:
-		if not is_instance_valid(ship_node) or not ship_node is ShipBase: continue
-		var ship: ShipBase = ship_node
+		if not is_instance_valid(ship_node) or not ship_node is BaseShip: continue
+		var ship: BaseShip = ship_node
 
 		# Skip player, ships not in the same wing, or ships that shouldn't be shown
-		if ship == GameState.player_ship or ship.wingnum != player_wing_num: continue
-		if ship.flags & (GlobalConstants.SF_DEPARTING | GlobalConstants.SF_DYING | GlobalConstants.SF_ARRIVING): continue # Don't show arriving/departing/dying? Check FS2 logic.
+		if ship == GameStateManager.player_ship or ship.wingnum != player_wing_num: continue
+		if ship.flags & (WCSConstants.SF_DEPARTING | WCSConstants.SF_DYING | WCSConstants.SF_ARRIVING): continue # Don't show arriving/departing/dying? Check FS2 logic.
 		# TODO: Check if ship should be ignored based on mission flags or other criteria?
 
 		# Determine status

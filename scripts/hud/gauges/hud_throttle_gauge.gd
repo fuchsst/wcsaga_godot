@@ -50,15 +50,15 @@ func _ready() -> void:
 # Update gauge based on current game state
 func update_from_game_state() -> void:
 	# Check if player ship exists
-	if GameState.player_ship and is_instance_valid(GameState.player_ship):
-		var ship = GameState.player_ship
+	if GameStateManager.player_ship and is_instance_valid(GameStateManager.player_ship):
+		var ship = GameStateManager.player_ship
 
 		# Read speed, throttle, and status flags from ShipBase
 		# Assuming these properties/methods exist
 		current_speed = ship.linear_velocity.length() # Get current speed magnitude
 		max_speed = ship.current_max_speed # Get current max speed (might change with ETS)
 		current_throttle = ship.get_throttle_input() # Placeholder: Need method/property for desired throttle (0-1)
-		afterburner_active = (ship.physics_flags & GlobalConstants.PF_AFTERBURNER_ON) != 0
+		afterburner_active = (ship.physics_flags & WCSConstants.PF_AFTERBURNER_ON) != 0
 
 		# Glide and Match Speed status are checked directly in _draw() using GameState.player_ship
 		# No need to store them as separate gauge properties unless needed elsewhere.

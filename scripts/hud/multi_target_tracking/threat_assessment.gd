@@ -21,7 +21,7 @@ signal threat_pattern_detected(pattern_type: String, involved_targets: Array[Nod
 # Threat analysis components
 var threat_analyzer: ThreatAnalyzer
 var weapon_threat_calculator: WeaponThreatCalculator
-var tactical_analyzer: TacticalAnalyzer
+var tactical_analyzer: SituationAnalyzer
 var behavior_predictor: BehaviorPredictor
 var formation_analyzer: FormationAnalyzer
 
@@ -94,25 +94,25 @@ class ThreatAnalyzer:
 	func _init():
 		_load_threat_models()
 	
-	func analyze_threat(target: Node, track_data: Dictionary) -> ThreatData:
+	func analyze_threat(target: Node, track_data: Dictionary, player_position: Vector3, threat_weights: Dictionary) -> ThreatData:
 		var threat_data = ThreatData.new(target)
 		
 		# Analyze different threat components
 		threat_data.proximity_threat = _analyze_proximity_threat(target, track_data)
 		threat_data.weapon_threat = _analyze_weapon_threat(target, track_data)
 		threat_data.maneuver_threat = _analyze_maneuver_threat(target, track_data)
-		threat_data.behavior_threat = _analyze_behavior_threat(target, track_data)
+		threat_data.behavior_threat = _analyze_behavior_threat(target, track_data, player_position)
 		threat_data.formation_threat = _analyze_formation_threat(target, track_data)
 		
 		# Calculate overall threat
-		threat_data.overall_threat = _calculate_overall_threat(threat_data)
+		threat_data.overall_threat = _calculate_overall_threat(threat_data, threat_weights)
 		
 		# Determine immediate threats
-		threat_data.immediate_threats = _identify_immediate_threats(target, track_data)
+		threat_data.immediate_threats = _identify_immediate_threats(target, track_data, player_position)
 		
 		# Calculate threat vector and time to impact
-		threat_data.threat_vector = _calculate_threat_vector(target, track_data)
-		threat_data.time_to_impact = _calculate_time_to_impact(target, track_data)
+		threat_data.threat_vector = _calculate_threat_vector(target, track_data, player_position)
+		threat_data.time_to_impact = _calculate_time_to_impact(target, track_data, player_position)
 		
 		# Calculate confidence
 		threat_data.confidence = _calculate_threat_confidence(target, track_data)
@@ -171,11 +171,10 @@ class ThreatAnalyzer:
 		
 		return speed_factor + maneuver_factor
 	
-	func _analyze_behavior_threat(target: Node, track_data: Dictionary) -> float:
+	func _analyze_behavior_threat(target: Node, track_data: Dictionary, player_position: Vector3) -> float:
 		var behavior_threat = 0.0
 		
 		# Check heading toward player
-		var player_position = _get_player_position()
 		var target_position = track_data.get("position", Vector3.ZERO)
 		var target_velocity = track_data.get("velocity", Vector3.ZERO)
 		
@@ -215,19 +214,17 @@ class ThreatAnalyzer:
 		
 		return formation_threat
 	
-	func _calculate_overall_threat(threat_data: ThreatData) -> float:
-		var weights = get_parent().threat_weights
-		
+	func _calculate_overall_threat(threat_data: ThreatData, threat_weights: Dictionary) -> float:
 		var overall = 0.0
-		overall += threat_data.proximity_threat * weights.proximity
-		overall += threat_data.weapon_threat * weights.weapon_capability
-		overall += threat_data.maneuver_threat * weights.maneuverability
-		overall += threat_data.behavior_threat * weights.target_behavior
-		overall += threat_data.formation_threat * weights.formation_support
+		overall += threat_data.proximity_threat * threat_weights.proximity
+		overall += threat_data.weapon_threat * threat_weights.weapon_capability
+		overall += threat_data.maneuver_threat * threat_weights.maneuverability
+		overall += threat_data.behavior_threat * threat_weights.target_behavior
+		overall += threat_data.formation_threat * threat_weights.formation_support
 		
 		return clamp(overall, 0.0, 1.0)
 	
-	func _identify_immediate_threats(target: Node, track_data: Dictionary) -> Array[String]:
+	func _identify_immediate_threats(target: Node, track_data: Dictionary, player_position: Vector3) -> Array[String]:
 		var threats: Array[String] = []
 		
 		# Check for incoming missiles
@@ -244,19 +241,17 @@ class ThreatAnalyzer:
 				threats.append("beam_lock")
 		
 		# Check for collision course
-		var time_to_impact = _calculate_time_to_impact(target, track_data)
+		var time_to_impact = _calculate_time_to_impact(target, track_data, player_position)
 		if time_to_impact > 0 and time_to_impact < 10.0:
 			threats.append("collision_course")
 		
 		return threats
 	
-	func _calculate_threat_vector(target: Node, track_data: Dictionary) -> Vector3:
-		var player_position = _get_player_position()
+	func _calculate_threat_vector(target: Node, track_data: Dictionary, player_position: Vector3) -> Vector3:
 		var target_position = track_data.get("position", Vector3.ZERO)
 		return (target_position - player_position).normalized()
 	
-	func _calculate_time_to_impact(target: Node, track_data: Dictionary) -> float:
-		var player_position = _get_player_position()
+	func _calculate_time_to_impact(target: Node, track_data: Dictionary, player_position: Vector3) -> float:
 		var target_position = track_data.get("position", Vector3.ZERO)
 		var target_velocity = track_data.get("velocity", Vector3.ZERO)
 		
@@ -353,7 +348,7 @@ class WeaponThreatCalculator:
 		}
 
 # Tactical situation analyzer
-class TATacticalAnalyzer:
+class SituationAnalyzer:
 	func analyze_tactical_situation(all_threats: Dictionary) -> Dictionary:
 		var analysis = {
 			"overall_threat_level": 0.0,
@@ -485,7 +480,7 @@ func _initialize_threat_assessment() -> void:
 	# Create component instances
 	threat_analyzer = ThreatAnalyzer.new()
 	weapon_threat_calculator = WeaponThreatCalculator.new()
-	tactical_analyzer = TATacticalAnalyzer.new()
+	tactical_analyzer = SituationAnalyzer.new()
 	behavior_predictor = BehaviorPredictor.new()
 	formation_analyzer = FormationAnalyzer.new()
 	
@@ -509,7 +504,8 @@ func assess_target_threat(target: Node, track_data: Dictionary) -> void:
 		return
 	
 	# Analyze threat using threat analyzer
-	var threat_data = threat_analyzer.analyze_threat(target, track_data)
+	var player_position = _get_player_position()
+	var threat_data = threat_analyzer.analyze_threat(target, track_data, player_position, threat_weights)
 	
 	# Check if threat level changed significantly
 	var old_threat_level = 0.0
@@ -728,12 +724,9 @@ func _threat_data_to_dictionary(threat_data: ThreatData) -> Dictionary:
 	}
 
 func _get_player_position() -> Vector3:
-	var player_ship = _get_player_ship()
-	return player_ship.global_position if player_ship else Vector3.ZERO
-
-func _get_player_ship() -> Node:
-	var player_ships = get_tree().get_nodes_in_group("player_ships")
-	return player_ships[0] if not player_ships.is_empty() else null
+	if GameStateManager.player_ship and is_instance_valid(GameStateManager.player_ship):
+		return GameStateManager.player_ship.global_position
+	return Vector3.ZERO
 
 ## Status and debugging
 

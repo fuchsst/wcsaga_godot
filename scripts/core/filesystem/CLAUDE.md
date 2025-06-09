@@ -14,9 +14,9 @@ scripts/core/filesystem/
 ├── file_manager.gd               # Main file system manager (singleton)
 ├── file_utils.gd                 # Utility functions and convenience methods
 └── ../archives/                  # VP archive support (separate package)
-    ├── vp_archive.gd
-    ├── vp_file_access.gd
-    └── vp_archive_manager.gd
+	├── vp_archive.gd
+	├── vp_file_access.gd
+	└── vp_archive_manager.gd
 ```
 
 ## Key Classes
@@ -91,14 +91,14 @@ The package implements WCS's original path type system with 37 distinct content 
 
 ```gdscript
 enum PathType {
-    ROOT = 1,           # Base game directory
-    DATA = 2,           # General data files
-    MAPS = 3,           # Textures and images  
-    MODELS = 5,         # 3D model files (.pof)
-    TABLES = 6,         # Game data tables (.tbl)
-    SOUNDS = 7,         # Audio files
-    MISSIONS = 30,      # Mission files (.fs2)
-    # ... and 30 more types
+	ROOT = 1,           # Base game directory
+	DATA = 2,           # General data files
+	MAPS = 3,           # Textures and images  
+	MODELS = 5,         # 3D model files (.pof)
+	TABLES = 6,         # Game data tables (.tbl)
+	SOUNDS = 7,         # Audio files
+	MISSIONS = 30,      # Mission files (.fs2)
+	# ... and 30 more types
 }
 ```
 
@@ -191,7 +191,7 @@ debug_manager.log_info("FileSystem", "Cache stats: %s" % file_manager.get_cache_
 # Pattern: Read file with fallback
 var content: String = file_manager.read_file_text("config.cfg", FileManager.PathType.CONFIG)
 if content.is_empty():
-    content = _get_default_config()
+	content = _get_default_config()
 ```
 
 ### Configuration Management Pattern
@@ -207,7 +207,7 @@ FileUtils.write_config_file("settings.cfg", settings)
 # Pattern: Find all assets of specific type
 var ship_models: PackedStringArray = FileUtils.find_files_matching("data/models/", "*.pof")
 for model_file in ship_models:
-    _load_ship_model(model_file)
+	_load_ship_model(model_file)
 ```
 
 ### Cache Monitoring Pattern
@@ -215,7 +215,7 @@ for model_file in ship_models:
 # Pattern: Monitor and adjust cache performance
 var stats: Dictionary = file_manager.get_cache_stats()
 if stats["hit_ratio"] < 0.7:  # Less than 70% hit ratio
-    file_manager.configure_cache(true, stats["max_size"] * 2)  # Double cache size
+	file_manager.configure_cache(true, stats["max_size"] * 2)  # Double cache size
 ```
 
 ## Future Enhancements
@@ -252,7 +252,7 @@ if stats["hit_ratio"] < 0.7:  # Less than 70% hit ratio
 ```gdscript
 # Check if file exists before accessing
 if file_manager.file_exists("missing.txt", FileManager.PathType.DATA):
-    var content = file_manager.read_file_text("missing.txt", FileManager.PathType.DATA)
+	var content = file_manager.read_file_text("missing.txt", FileManager.PathType.DATA)
 ```
 
 **Cache Memory Issues**:
@@ -260,7 +260,7 @@ if file_manager.file_exists("missing.txt", FileManager.PathType.DATA):
 # Monitor and adjust cache size
 var stats = file_manager.get_cache_stats()
 if stats["current_size"] > stats["max_size"] * 0.9:
-    file_manager.configure_cache(true, stats["max_size"] / 2)
+	file_manager.configure_cache(true, stats["max_size"] / 2)
 ```
 
 **VP Archive Problems**:

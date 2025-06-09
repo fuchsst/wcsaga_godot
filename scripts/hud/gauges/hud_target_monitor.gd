@@ -58,19 +58,19 @@ class_name HUDTargetMonitor
 @export_group("Editor Preview")
 @export var preview_size := Vector2(250, 200)
 
+# References to child nodes (assuming names in target_monitor.tscn)
+@onready var sub_viewport: SubViewport = $TargetModelViewportContainer/SubViewport # Example path
+@onready var target_model_node: Node3D = $TargetModelViewportContainer/SubViewport/TargetModelRoot # Example path for the node holding the target model instance
+@onready var viewport_camera: Camera3D = $TargetModelViewportContainer/SubViewport/ViewportCamera # Example path
+
+# Runtime state for 3D view
+var _target_model_instance: Node3D = null
+var _target_radius: float = 1.0
+var _target_rotation_speed: float = 0.5 # Radians per second
+
 func _init() -> void:
 	super._init()
 	gauge_id = GaugeType.TARGET_MONITOR
-
-	# References to child nodes (assuming names in target_monitor.tscn)
-	@onready var sub_viewport: SubViewport = $TargetModelViewportContainer/SubViewport # Example path
-	@onready var target_model_node: Node3D = $TargetModelViewportContainer/SubViewport/TargetModelRoot # Example path for the node holding the target model instance
-	@onready var viewport_camera: Camera3D = $TargetModelViewportContainer/SubViewport/ViewportCamera # Example path
-
-	# Runtime state for 3D view
-	var _target_model_instance: Node3D = null
-	var _target_radius: float = 1.0
-	var _target_rotation_speed: float = 0.5 # Radians per second
 
 	# Flashing/Static effect state
 	# TODO: Implement flashing/static logic based on C++ TBOX_FLASH_* and hud_targetbox_static_maybe_blit
@@ -88,17 +88,17 @@ func _ready() -> void:
 # Update gauge based on current game state
 func update_from_game_state() -> void:
 	# Check if player ship and target exist
-	if not GameState.player_ship or not is_instance_valid(GameState.player_ship) or GameState.player_ship.target_object_id == -1:
+	if not GameStateManager.player_ship or not is_instance_valid(GameStateManager.player_ship) or GameStateManager.player_ship.target_object_id == -1:
 		_clear_target_display()
 		return
 
-	var target_node = ObjectManager.get_object_by_id(GameState.player_ship.target_object_id)
+	var target_node = ObjectManager.get_object_by_id(GameStateManager.player_ship.target_object_id)
 	if not is_instance_valid(target_node):
 		_clear_target_display()
 		return
 
 	# Update display based on target type
-	if target_node is ShipBase:
+	if target_node is BaseShip:
 		update_from_target(target_node)
 	# TODO: Add cases for other target types if needed (Asteroid, Debris, Weapon, JumpNode)
 	# elif target_node is AsteroidObject: update_from_asteroid(target_node)
@@ -126,7 +126,7 @@ func _clear_target_display():
 
 
 # Update monitor from target ship
-func update_from_target(target_ship: ShipBase) -> void:
+func update_from_target(target_ship: BaseShip) -> void:
 	if not is_instance_valid(target_ship) or not is_instance_valid(target_ship.ship_data):
 		_clear_target_display()
 		return
@@ -138,20 +138,20 @@ func update_from_target(target_ship: ShipBase) -> void:
 	target_name = target_ship.ship_name # Or get formatted name
 	target_class = ship_data.ship_class_name # Or get formatted class
 	target_team = target_ship.team
-	target_distance = GameState.player_ship.global_position.distance_to(target_ship.global_position) # Recalculate distance
+	target_distance = GameStateManager.player_ship.global_position.distance_to(target_ship.global_position) # Recalculate distance
 
 	# Update Status
 	hull_strength = target_ship.hull_strength / target_ship.ship_max_hull_strength if target_ship.ship_max_hull_strength > 0 else 0.0
 	if shield_sys and is_instance_valid(shield_sys):
-		shield_strength = target_shield_system.shield_quadrants.duplicate() # Get current quadrant strengths
+		shield_strength = shield_sys.shield_quadrants.duplicate() # Get current quadrant strengths
 	else:
 		shield_strength = [0.0, 0.0, 0.0, 0.0] # Default if no shield system
-	is_disabled = (target_ship.flags & GlobalConstants.SF_DISABLED) or \
-				  (target_ship.flags2 & GlobalConstants.SF2_DISABLED) # Check relevant flags
+	is_disabled = (target_ship.flags & WCSConstants.SF_DISABLED) or \
+				  (target_ship.flags2 & WCSConstants.SF2_DISABLED) # Check relevant flags
 
 	# Update Subsystem Info
-	if is_instance_valid(target_ship.target_subsystem_node) and target_ship.target_subsystem_node is ShipSubsystem:
-		var subsys: ShipSubsystem = target_ship.target_subsystem_node
+	if is_instance_valid(target_ship.target_subsystem_node) and target_ship.target_subsystem_node is Subsystem:
+		var subsys: Subsystem = target_ship.target_subsystem_node
 		if is_instance_valid(subsys.subsystem_definition):
 			current_subsystem = subsys.subsystem_definition.subobj_name # Or formatted name
 			subsystem_strength = subsys.current_hits / subsys.subsystem_definition.max_hits if subsys.subsystem_definition.max_hits > 0 else 0.0
@@ -169,7 +169,7 @@ func update_from_target(target_ship: ShipBase) -> void:
 
 
 # Update the 3D model displayed in the SubViewport
-func _update_target_model(target_ship: ShipBase):
+func _update_target_model(target_ship: BaseShip):
 	if not sub_viewport or not target_model_node or not is_instance_valid(target_ship.ship_data):
 		return
 

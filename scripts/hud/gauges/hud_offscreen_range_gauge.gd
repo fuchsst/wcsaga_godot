@@ -80,8 +80,8 @@ func update_from_game_state() -> void:
 	var distance = 0.0
 
 	# Check if player ship and target exist
-	if GameState.player_ship and is_instance_valid(GameState.player_ship) and GameState.player_ship.target_object_id != -1:
-		var target_node = ObjectManager.get_object_by_id(GameState.player_ship.target_object_id)
+	if GameStateManager.player_ship and is_instance_valid(GameStateManager.player_ship) and GameStateManager.player_ship.target_object_id != -1:
+		var target_node = ObjectManager.get_object_by_id(GameStateManager.player_ship.target_object_id)
 		if is_instance_valid(target_node):
 			var camera = get_viewport().get_camera_3d()
 			if camera:
@@ -91,7 +91,7 @@ func update_from_game_state() -> void:
 
 				# Check if target is off-screen
 				if not viewport_rect.has_point(screen_pos) or camera.is_position_behind(target_world_pos):
-					distance = GameState.player_ship.global_position.distance_to(target_world_pos)
+					distance = GameStateManager.player_ship.global_position.distance_to(target_world_pos)
 					show_range = true
 
 	if show_range:

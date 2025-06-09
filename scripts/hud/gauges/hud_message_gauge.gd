@@ -91,7 +91,7 @@ func update_from_game_state() -> void:
 		pass
 
 # Helper to split long messages and add lines
-func _add_and_split_message(text: String, source: MessageSource, source_name: String, duration: float):
+func _add_and_split_message(text: String, source: MessageSource, source_name: String, duration: float=5.0):
 	var font = ThemeDB.fallback_font
 	if not font:
 		printerr("HUDMessageGauge: Fallback font not found in ThemeDB!")
@@ -201,7 +201,7 @@ func _draw() -> void:
 			_add_and_split_message("Mission objectives updated: Destroy the Kilrathi carrier before it launches fighters.", MessageSource.COMPUTER, "", 8.0)
 			_add_and_split_message("Watch your six!", MessageSource.WINGMAN, "Alpha 2")
 			_add_and_split_message("Engaging hostiles near Nav Point 1.", MessageSource.SHIP, "TCS Victory")
-			_add_and_split_message("Training complete. Proceed to next objective.", MessageSource.TRAINING)
+			_add_and_split_message("Training complete. Proceed to next objective.", MessageSource.TRAINING, "")
 
 	if !can_draw() && !Engine.is_editor_hint():
 		return

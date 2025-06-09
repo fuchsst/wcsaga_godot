@@ -69,9 +69,9 @@ func _ready() -> void:
 # Update gauge based on current game state
 func update_from_game_state() -> void:
 	# Check if player ship and its weapon system exist
-	if GameState.player_ship and is_instance_valid(GameState.player_ship) and GameState.player_ship.weapon_system:
-		var weapon_sys: WeaponSystem = GameState.player_ship.weapon_system
-		var ship = GameState.player_ship
+	if GameStateManager.player_ship and is_instance_valid(GameStateManager.player_ship) and GameStateManager.player_ship.weapon_manager:
+		var weapon_sys: WeaponManager = GameStateManager.player_ship.weapon_manager
+		var ship = GameStateManager.player_ship
 
 		var new_num_primary = weapon_sys.num_primary_banks
 		var new_num_secondary = weapon_sys.num_secondary_banks
@@ -79,7 +79,7 @@ func update_from_game_state() -> void:
 		var new_secondary_mask = 0
 
 		# Determine link masks based on ship flags
-		if ship.flags & GlobalConstants.SF_PRIMARY_LINKED:
+		if ship.flags & WCSConstants.SF_PRIMARY_LINKED:
 			# Set all bits up to num_primary_banks if linked
 			new_primary_mask = (1 << new_num_primary) - 1
 		else:
@@ -87,7 +87,7 @@ func update_from_game_state() -> void:
 			if weapon_sys.current_primary_bank >= 0:
 				new_primary_mask = 1 << weapon_sys.current_primary_bank
 
-		if ship.flags & GlobalConstants.SF_SECONDARY_DUAL_FIRE:
+		if ship.flags & WCSConstants.SF_SECONDARY_DUAL_FIRE:
 			# Set all bits up to num_secondary_banks if dual fire
 			# Note: FS2 dual fire might have different logic than simple linking all.
 			# Assuming for now it means all secondaries fire together.

@@ -51,19 +51,19 @@ func _ready() -> void:
 
 # Update gauge based on current game state
 func update_from_game_state() -> void:
-	var target_ship: ShipBase = null
-	var target_shield_system: ShieldSystem = null
+	var target_ship: BaseShip = null
+	var target_shield_system: ShieldQuadrantManager = null
 
 	if is_player_gauge:
 		# Get player ship data
-		if GameState.player_ship and is_instance_valid(GameState.player_ship):
-			target_ship = GameState.player_ship
+		if GameStateManager.player_ship and is_instance_valid(GameStateManager.player_ship):
+			target_ship = GameStateManager.player_ship
 			target_shield_system = target_ship.shield_system
 	else:
 		# Get target ship data
-		if GameState.player_ship and is_instance_valid(GameState.player_ship) and GameState.player_ship.target_object_id != -1:
-			var target_node = ObjectManager.get_object_by_id(GameState.player_ship.target_object_id)
-			if target_node is ShipBase and is_instance_valid(target_node):
+		if GameStateManager.player_ship and is_instance_valid(GameStateManager.player_ship) and GameStateManager.player_ship.target_object_id != -1:
+			var target_node = ObjectManager.get_object_by_id(GameStateManager.player_ship.target_object_id)
+			if target_node is BaseShip and is_instance_valid(target_node):
 				target_ship = target_node
 				target_shield_system = target_ship.shield_system
 

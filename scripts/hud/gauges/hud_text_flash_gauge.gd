@@ -34,7 +34,7 @@ var _flash_state := false
 
 func _init() -> void:
 	super._init()
-	gauge_id = HUDGauge.TEXT_FLASH
+	gauge_id = GaugeType.TEXT_FLASH
 	if flash_duration == 0:
 		flash_duration = 3.0
 
@@ -56,7 +56,7 @@ func update_from_game_state() -> void:
 
 	if not current_flash_text.is_empty():
 		# Only show if it's a *new* message or the gauge is currently inactive
-		if not is_flashing() or flash_text != current_flash_text:
+		if not is_text_flashing() or flash_text != current_flash_text:
 			show_text(current_flash_text, current_flash_duration)
 	# else:
 		# If no text flash is active in game state, the gauge will fade out on its own.
@@ -81,7 +81,7 @@ func clear_text() -> void:
 	queue_redraw()
 
 # Check if text is currently flashing
-func is_flashing() -> bool:
+func is_text_flashing() -> bool:
 	return _flash_time_left > 0.0 && !flash_text.is_empty()
 
 # Draw the gauge using Node2D drawing
@@ -110,7 +110,7 @@ func _draw() -> void:
 		-1, font_size)
 	
 	var x := 0.0
-	var y := font_size + background_padding.y
+	var y: float = font_size + background_padding.y
 	
 	if auto_center:
 		x = (gauge_size.x - text_size.x) / 2
@@ -157,7 +157,7 @@ func _process(delta: float) -> void:
 	if _flash_time >= flash_rate:
 		_flash_time = 0.0
 		_flash_state = !_flash_state
-		if is_flashing():
+		if is_text_flashing():
 			needs_redraw = true
 	
 	if needs_redraw:

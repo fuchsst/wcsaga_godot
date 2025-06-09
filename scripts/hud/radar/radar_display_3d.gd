@@ -392,7 +392,7 @@ func get_contact_at_position(screen_pos: Vector2) -> RadarContact:
 ## Event handlers
 
 func _on_radar_update_timer() -> void:
-	if is_visible() and element_enabled:
+	if is_visible() and is_active:
 		update_radar_display(1.0 / radar_update_frequency)
 
 func _on_zoom_changed(new_zoom: int) -> void:

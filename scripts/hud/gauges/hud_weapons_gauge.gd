@@ -54,9 +54,9 @@ func _ready() -> void:
 # Update gauge based on current game state
 func update_from_game_state() -> void:
 	# Check if player ship and its weapon system exist
-	if GameState.player_ship and is_instance_valid(GameState.player_ship) and GameState.player_ship.weapon_system:
-		var weapon_sys: WeaponSystem = GameState.player_ship.weapon_system
-		var ship = GameState.player_ship
+	if GameStateManager.player_ship and is_instance_valid(GameStateManager.player_ship) and GameStateManager.player_ship.weapon_manager:
+		var weapon_sys: WeaponManager = GameStateManager.player_ship.weapon_manager
+		var ship = GameStateManager.player_ship
 
 		# Update Weapon Energy (setter handles redraw)
 		weapon_energy = weapon_sys.get_weapon_energy_pct()
@@ -70,13 +70,13 @@ func update_from_game_state() -> void:
 		for i in range(weapon_sys.num_primary_banks):
 			var weapon_index = weapon_sys.primary_bank_weapons[i]
 			if weapon_index >= 0:
-				var weapon_data: WeaponData = GlobalConstants.get_weapon_data(weapon_index)
+				var weapon_data: WeaponData = WCSConstants.get_weapon_data(weapon_index)
 				if weapon_data:
 					var ammo = weapon_sys.primary_bank_ammo[i]
 					var max_ammo = weapon_sys.primary_bank_capacity[i]
-					var is_energy = not (weapon_data.flags2 & GlobalConstants.WIF2_BALLISTIC)
+					var is_energy = not (weapon_data.flags2 & WCSConstants.WIF2_BALLISTIC)
 					# Check linking status (assuming WeaponSystem tracks this or ShipBase flags)
-					var is_linked = (ship.flags & GlobalConstants.SF_PRIMARY_LINKED) and (weapon_sys.num_primary_banks > 1)
+					var is_linked = (ship.flags & WCSConstants.SF_PRIMARY_LINKED) and (weapon_sys.num_primary_banks > 1)
 
 					var group = WeaponGroup.new(
 						weapon_data.weapon_name, # Or use alt_name?
@@ -96,12 +96,12 @@ func update_from_game_state() -> void:
 		for i in range(weapon_sys.num_secondary_banks):
 			var weapon_index = weapon_sys.secondary_bank_weapons[i]
 			if weapon_index >= 0:
-				var weapon_data: WeaponData = GlobalConstants.get_weapon_data(weapon_index)
+				var weapon_data: WeaponData = WCSConstants.get_weapon_data(weapon_index)
 				if weapon_data:
 					var ammo = weapon_sys.secondary_bank_ammo[i]
 					var max_ammo = weapon_sys.secondary_bank_capacity[i]
 					# Check linking status (dual fire)
-					var is_linked = (ship.flags & GlobalConstants.SF_SECONDARY_DUAL_FIRE) and (weapon_sys.num_secondary_banks > 1)
+					var is_linked = (ship.flags & WCSConstants.SF_SECONDARY_DUAL_FIRE) and (weapon_sys.num_secondary_banks > 1)
 
 					var group = WeaponGroup.new(
 						weapon_data.weapon_name, # Or use alt_name?
@@ -130,7 +130,7 @@ func update_from_game_state() -> void:
 
 
 # Update weapons from ship state (Keep for potential direct calls?)
-func update_from_ship(ship: ShipBase) -> void:
+func update_from_ship(ship: BaseShip) -> void:
 	# TODO: Update weapon info from ship
 	# This would update:
 	# - Weapon groups

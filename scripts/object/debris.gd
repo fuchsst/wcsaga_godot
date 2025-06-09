@@ -55,8 +55,8 @@ func _on_body_entered(body: Node3D):
 
 	var hit_pos = global_position # Approximate contact point
 
-	if body is ShipBase:
-		var ship: ShipBase = body
+	if body is BaseShip:
+		var ship: BaseShip = body
 		print("Debris collided with Ship ", ship.name)
 		# Apply damage to ship (placeholder amount, scaled by debris damage multiplier)
 		# TODO: Calculate impact damage based on relative velocity/mass?

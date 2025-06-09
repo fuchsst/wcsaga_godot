@@ -21,13 +21,13 @@ class_name SoundEntry
 @export var max_distance: float = 100.0
 
 # Whether the sound should be preloaded. Corresponds to 'Preload' in sounds.tbl.
-@export var preload: bool = false
+@export var do_preload: bool = false
 
 # Sound priority for instance limiting (maps roughly to original logic).
 # Higher value means higher priority.
 # Corresponds to SND_PRIORITY_* constants conceptually.
 # Using SoundManager.SoundPriority enum values is recommended.
-@export var priority: int = SoundManager.SoundPriority.DEFAULT
+@export var priority: int = 1
 
 # Sound category for volume control via audio buses.
 enum Category { MASTER, MUSIC, VOICE, INTERFACE, SFX, AMBIENT }
@@ -42,7 +42,7 @@ func _init(p_id_name := "", p_path := "", p_volume := 1.0, p_min := 1.0, p_max :
 	default_volume = p_volume
 	min_distance = p_min
 	max_distance = p_max
-	preload = p_preload
+	do_preload = p_preload
 	priority = p_priority
 	original_sig = p_orig_sig
 	# Category needs to be set after initialization, likely during parsing/loading.

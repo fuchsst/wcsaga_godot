@@ -484,7 +484,7 @@ func _initialize_target_handoff() -> void:
 	handoff_optimizer = HandoffOptimizer.new(self)
 	quality_assessor = QualityAssessor.new(self)
 	system_selector = SystemSelector.new(self)
-	performance_monitor = THPerformanceMonitor.new()
+	performance_monitor = PerformanceMonitor.new()
 	
 	# Components are internal objects, not nodes
 	# No need to add as children

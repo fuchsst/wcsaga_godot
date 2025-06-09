@@ -177,14 +177,14 @@ class SATacticalAnalyzer:
 	func _init():
 		_initialize_analysis_algorithms()
 	
-	func analyze_tactical_situation(track_data: Array[Dictionary]) -> TacticalSituation:
+	func analyze_tactical_situation(track_data: Array[Dictionary], player_position: Vector3) -> TacticalSituation:
 		var situation = TacticalSituation.new()
 		
 		# Analyze overall threat level
 		situation.overall_threat_level = _calculate_overall_threat(track_data)
 		
 		# Determine tactical advantage
-		situation.tactical_advantage = _calculate_tactical_advantage(track_data)
+		situation.tactical_advantage = _calculate_tactical_advantage(track_data, player_position)
 		
 		# Classify situation type
 		situation.situation_type = _classify_situation_type(situation)
@@ -205,7 +205,7 @@ class SATacticalAnalyzer:
 		situation.situational_factors = _analyze_situational_factors(track_data)
 		
 		# Find escape routes
-		situation.escape_routes = _calculate_escape_routes(track_data)
+		situation.escape_routes = _calculate_escape_routes(track_data, player_position)
 		
 		return situation
 	
@@ -227,13 +227,12 @@ class SATacticalAnalyzer:
 		
 		return total_threat / max(1, threat_count) if threat_count > 0 else 0.0
 	
-	func _calculate_tactical_advantage(track_data: Array[Dictionary]) -> float:
+	func _calculate_tactical_advantage(track_data: Array[Dictionary], player_position: Vector3) -> float:
 		var player_advantages = 0.0
 		var enemy_advantages = 0.0
 		
 		var friendly_count = 0
 		var hostile_count = 0
-		var player_position = _get_player_position()
 		
 		for track in track_data:
 			var relationship = track.get("relationship", "unknown")
@@ -417,9 +416,8 @@ class SATacticalAnalyzer:
 			"threat_concentration": _calculate_threat_concentration(track_data)
 		}
 	
-	func _calculate_escape_routes(track_data: Array[Dictionary]) -> Array[Vector3]:
+	func _calculate_escape_routes(track_data: Array[Dictionary], player_position: Vector3) -> Array[Vector3]:
 		var escape_routes: Array[Vector3] = []
-		var player_position = _get_player_position()
 		
 		# Analyze threat positions to find safe directions
 		var threat_positions: Array[Vector3] = []
@@ -435,13 +433,12 @@ class SATacticalAnalyzer:
 		
 		for direction in candidate_directions:
 			var escape_vector = player_position + direction * 5000.0
-			if _is_escape_route_safe(escape_vector, threat_positions):
+			if _is_escape_route_safe(escape_vector, threat_positions, player_position):
 				escape_routes.append(escape_vector)
 		
 		return escape_routes
 	
-	func _is_escape_route_safe(escape_vector: Vector3, threat_positions: Array[Vector3]) -> bool:
-		var player_position = _get_player_position()
+	func _is_escape_route_safe(escape_vector: Vector3, threat_positions: Array[Vector3], player_position: Vector3) -> bool:
 		var escape_direction = (escape_vector - player_position).normalized()
 		
 		# Check if escape route leads away from threats
@@ -527,20 +524,20 @@ class SATacticalAnalyzer:
 
 # Threat environment mapper
 class ThreatEnvironmentMapper:
-	func map_threat_environment(track_data: Array[Dictionary]) -> ThreatEnvironment:
+	func map_threat_environment(track_data: Array[Dictionary], player_position: Vector3) -> ThreatEnvironment:
 		var environment = ThreatEnvironment.new()
 		
 		# Create threat zones around hostile contacts
 		environment.threat_zones = _create_threat_zones(track_data)
 		
 		# Identify safe zones
-		environment.safe_zones = _identify_safe_zones(track_data)
+		environment.safe_zones = _identify_safe_zones(track_data, player_position)
 		
 		# Map contested areas
 		environment.contested_zones = _map_contested_zones(track_data)
 		
 		# Calculate escape vectors
-		environment.escape_vectors = _calculate_escape_vectors(track_data)
+		environment.escape_vectors = _calculate_escape_vectors(track_data, player_position)
 		
 		# Identify choke points
 		environment.choke_points = _identify_choke_points(track_data)
@@ -577,9 +574,8 @@ class ThreatEnvironmentMapper:
 		
 		return threat_zones
 	
-	func _identify_safe_zones(track_data: Array[Dictionary]) -> Dictionary:
+	func _identify_safe_zones(track_data: Array[Dictionary], player_position: Vector3) -> Dictionary:
 		var safe_zones: Dictionary = {}
-		var player_position = _get_player_position()
 		
 		# Look for areas with friendly presence
 		for track in track_data:
@@ -597,7 +593,7 @@ class ThreatEnvironmentMapper:
 				safe_zones[zone_id] = safe_zone
 		
 		# Look for areas away from threats
-		var low_threat_areas = _find_low_threat_areas(track_data)
+		var low_threat_areas = _find_low_threat_areas(track_data, player_position)
 		for i in range(low_threat_areas.size()):
 			var zone_id = "safe_zone_clear_" + str(i)
 			var safe_zone = SafeZone.new(zone_id, low_threat_areas[i], 1500.0)
@@ -640,9 +636,8 @@ class ThreatEnvironmentMapper:
 		
 		return contested_zones
 	
-	func _calculate_escape_vectors(track_data: Array[Dictionary]) -> Array[Vector3]:
+	func _calculate_escape_vectors(track_data: Array[Dictionary], player_position: Vector3) -> Array[Vector3]:
 		var escape_vectors: Array[Vector3] = []
-		var player_position = _get_player_position()
 		
 		# Calculate vectors leading away from threat concentrations
 		var threat_center = _calculate_threat_center_of_mass(track_data)
@@ -701,9 +696,8 @@ class ThreatEnvironmentMapper:
 		else:
 			return "moderate_threat"
 	
-	func _find_low_threat_areas(track_data: Array[Dictionary]) -> Array[Vector3]:
+	func _find_low_threat_areas(track_data: Array[Dictionary], player_position: Vector3) -> Array[Vector3]:
 		var low_threat_areas: Array[Vector3] = []
-		var player_position = _get_player_position()
 		
 		# Generate candidate positions in a grid around player
 		var search_radius = 8000.0
@@ -771,21 +765,13 @@ class PredictiveEngine:
 func _ready() -> void:
 	_initialize_situational_awareness()
 
-## Get player position
-func _get_player_position() -> Vector3:
-	"""Get current player ship position."""
-	var player_nodes = get_tree().get_nodes_in_group("player")
-	if player_nodes.size() > 0:
-		return player_nodes[0].global_position
-	return Vector3.ZERO
-
 func _initialize_situational_awareness() -> void:
 	print("SituationalAwareness: Initializing situational awareness system...")
 	
 	# Create component instances
-	tactical_analyzer = SATacticalAnalyzer.new()
+	tactical_analyzer = TacticalAnalyzer.new()
 	threat_environment_mapper = ThreatEnvironmentMapper.new()
-	engagement_calculator = SAEngagementCalculator.new()
+	engagement_calculator = EngagementCalculator.new()
 	defensive_advisor = DefensiveAdvisor.new()
 	formation_analyzer = FormationAnalyzer.new()
 	predictive_engine = PredictiveEngine.new()
@@ -826,7 +812,7 @@ func update_situational_analysis(track_data: Array[Dictionary]) -> void:
 		tactical_situation_changed.emit(new_situation.situation_type, _calculate_urgency(new_situation))
 	
 	# Update threat environment
-	threat_environment = threat_environment_mapper.map_threat_environment(track_data)
+	threat_environment = threat_environment_mapper.map_threat_environment(track_data, _get_player_position())
 	threat_environment_updated.emit(_threat_environment_to_dictionary(threat_environment))
 	
 	# Analyze engagement opportunities
@@ -958,12 +944,9 @@ func _formation_assessment_to_dictionary(assessment: FormationAssessment) -> Dic
 	}
 
 func _get_player_position() -> Vector3:
-	var player_ship = _get_player_ship()
-	return player_ship.global_position if player_ship else Vector3.ZERO
-
-func _get_player_ship() -> Node:
-	var player_ships = get_tree().get_nodes_in_group("player_ships")
-	return player_ships[0] if not player_ships.is_empty() else null
+	if GameStateManager.player_ship and is_instance_valid(GameStateManager.player_ship):
+		return GameStateManager.player_ship.global_position
+	return Vector3.ZERO
 
 ## Status and debugging
 

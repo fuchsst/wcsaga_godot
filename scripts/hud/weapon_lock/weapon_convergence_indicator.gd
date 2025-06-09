@@ -14,7 +14,7 @@ enum ConvergenceMode {
 }
 
 # Weapon group types
-enum WeaponGroup {
+enum ConvergenceWeaponGroup {
 	PRIMARY,		# Primary weapon group
 	SECONDARY,		# Secondary weapon group
 	TERTIARY,		# Tertiary weapon group
@@ -45,7 +45,7 @@ class ConvergenceData:
 # Display configuration
 @export_group("Display Configuration")
 @export var convergence_mode: ConvergenceMode = ConvergenceMode.DETAILED
-@export var show_weapon_groups: Array[WeaponGroup] = []
+@export var show_weapon_groups: Array[ConvergenceWeaponGroup] = []
 @export var show_convergence_point: bool = true
 @export var show_convergence_zone: bool = true
 @export var show_weapon_spread_pattern: bool = true
@@ -102,7 +102,7 @@ var last_update_time: float = 0.0
 
 func _ready() -> void:
 	# Initialize default weapon groups
-	show_weapon_groups = [WeaponGroup.PRIMARY, WeaponGroup.SECONDARY]
+	show_weapon_groups = [ConvergenceWeaponGroup.PRIMARY, ConvergenceWeaponGroup.SECONDARY]
 	
 	set_process(true)
 	_initialize_convergence_indicator()
@@ -310,7 +310,7 @@ func _update_screen_positions() -> void:
 	weapon_screen_positions.clear()
 	
 	# Convert convergence points to screen coordinates
-	for group in WeaponGroup.values():
+	for group in ConvergenceWeaponGroup.values():
 		var convergence_data: ConvergenceData = _get_convergence_data(group)
 		if convergence_data.convergence_point != Vector3.ZERO:
 			var screen_pos: Vector2 = camera.unproject_position(convergence_data.convergence_point)
@@ -322,16 +322,16 @@ func _update_screen_positions() -> void:
 		weapon_screen_positions.append(screen_pos)
 
 ## Get convergence data for weapon group
-func _get_convergence_data(group: WeaponGroup) -> ConvergenceData:
+func _get_convergence_data(group: ConvergenceWeaponGroup) -> ConvergenceData:
 	"""Get convergence data for specific weapon group."""
 	match group:
-		WeaponGroup.PRIMARY:
+		ConvergenceWeaponGroup.PRIMARY:
 			return primary_convergence
-		WeaponGroup.SECONDARY:
+		ConvergenceWeaponGroup.SECONDARY:
 			return secondary_convergence
-		WeaponGroup.TERTIARY:
+		ConvergenceWeaponGroup.TERTIARY:
 			return tertiary_convergence
-		WeaponGroup.ALL_WEAPONS:
+		ConvergenceWeaponGroup.ALL_WEAPONS:
 			return combined_convergence
 		_:
 			return ConvergenceData.new()
@@ -374,8 +374,8 @@ func _draw() -> void:
 func _draw_basic_convergence() -> void:
 	"""Draw basic convergence point display."""
 	# Draw primary weapon convergence only
-	if WeaponGroup.PRIMARY in show_weapon_groups:
-		var screen_pos: Vector2 = convergence_screen_positions.get(WeaponGroup.PRIMARY, Vector2.ZERO)
+	if ConvergenceWeaponGroup.PRIMARY in show_weapon_groups:
+		var screen_pos: Vector2 = convergence_screen_positions.get(ConvergenceWeaponGroup.PRIMARY, Vector2.ZERO)
 		if screen_pos != Vector2.ZERO:
 			var quality_color: Color = _get_quality_color(primary_convergence.quality)
 			_draw_convergence_point(screen_pos, quality_color, primary_convergence.quality)
@@ -562,7 +562,7 @@ func set_convergence_mode(mode: ConvergenceMode) -> void:
 	queue_redraw()
 
 ## Set weapon groups to display
-func set_weapon_groups_display(groups: Array[WeaponGroup]) -> void:
+func set_weapon_groups_display(groups: Array[ConvergenceWeaponGroup]) -> void:
 	"""Set which weapon groups to display."""
 	show_weapon_groups = groups
 	queue_redraw()
@@ -582,7 +582,7 @@ func set_display_elements(
 	queue_redraw()
 
 ## Get convergence information for weapon group
-func get_convergence_info(group: WeaponGroup) -> Dictionary:
+func get_convergence_info(group: ConvergenceWeaponGroup) -> Dictionary:
 	"""Get convergence information for specific weapon group."""
 	var convergence_data: ConvergenceData = _get_convergence_data(group)
 	
@@ -596,27 +596,27 @@ func get_convergence_info(group: WeaponGroup) -> Dictionary:
 	}
 
 ## Get optimal firing range for weapon group
-func get_optimal_firing_range(group: WeaponGroup) -> float:
+func get_optimal_firing_range(group: ConvergenceWeaponGroup) -> float:
 	"""Get optimal firing range for weapon group."""
 	var convergence_data: ConvergenceData = _get_convergence_data(group)
 	return convergence_data.optimal_range
 
 ## Check if convergence is good for weapon group
-func is_convergence_good(group: WeaponGroup) -> bool:
+func is_convergence_good(group: ConvergenceWeaponGroup) -> bool:
 	"""Check if convergence is good enough for effective firing."""
 	var convergence_data: ConvergenceData = _get_convergence_data(group)
 	return convergence_data.quality in [ConvergenceQuality.PERFECT, ConvergenceQuality.EXCELLENT, ConvergenceQuality.GOOD]
 
 ## Get best weapon group for current target distance
-func get_best_weapon_group_for_distance(target_distance: float) -> WeaponGroup:
+func get_best_weapon_group_for_distance(target_distance: float) -> ConvergenceWeaponGroup:
 	"""Get the best weapon group for a given target distance."""
-	var best_group: WeaponGroup = WeaponGroup.PRIMARY
+	var best_group: ConvergenceWeaponGroup = ConvergenceWeaponGroup.PRIMARY
 	var best_score: float = 0.0
 	
-	for group_enum in WeaponGroup.values():
-		if group_enum == WeaponGroup.ALL_WEAPONS:
+	for group_enum in ConvergenceWeaponGroup.values():
+		if group_enum == ConvergenceWeaponGroup.ALL_WEAPONS:
 			continue
-		var group: WeaponGroup = group_enum
+		var group: ConvergenceWeaponGroup = group_enum
 		
 		var convergence_data: ConvergenceData = _get_convergence_data(group)
 		if convergence_data.quality == ConvergenceQuality.UNUSABLE:

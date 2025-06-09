@@ -44,11 +44,11 @@ func _ready() -> void:
 # Update gauge based on current game state
 func update_from_game_state() -> void:
 	# Check if player ship exists
-	if GameState.player_ship and is_instance_valid(GameState.player_ship):
+	if GameStateManager.player_ship and is_instance_valid(GameStateManager.player_ship):
 		# Get threat list from the player ship
 		# Assuming PlayerShip has a method get_current_threats() that returns an array of Dictionaries
 		# matching the Threat class structure or adaptable to it.
-		var current_threats_data = GameState.player_ship.get_current_threats() # Placeholder method
+		var current_threats_data = GameStateManager.player_ship.get_current_threats() # Placeholder method
 
 		var new_threats_list = []
 		var updated = false

@@ -71,13 +71,13 @@ func update_from_game_state() -> void:
 		return
 
 	var target_node = ObjectManager.get_object_by_id(GameStateManager.player_ship.target_object_id)
-	if not is_instance_valid(target_node) or not target_node is ShipBase:
+	if not is_instance_valid(target_node) or not target_node is BaseShip:
 		# Only show icon for ships
 		clear_target()
 		return
 
-	var target_ship: ShipBase = target_node
-	var target_shield_system: ShieldSystem = target_ship.shield_system
+	var target_ship: BaseShip = target_node
+	var target_shield_system: ShieldQuadrantManager = target_ship.shield_system
 
 	# Get hull percentage
 	var hull_pct = 0.0

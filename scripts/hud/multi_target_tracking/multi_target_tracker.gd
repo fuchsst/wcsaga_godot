@@ -304,11 +304,11 @@ func _element_update(delta: float) -> void:
 	if frame_time > frame_budget_ms:
 		_handle_performance_degradation(frame_time)
 
-func _update_radar_tracking(delta: float) -> void:
+func _update_radar_tracking(_delta: float) -> void:
 	if tracking_radar:
 		tracking_radar.perform_radar_sweep()
 
-func _update_target_priorities(delta: float) -> void:
+func _update_target_priorities(_delta: float) -> void:
 	if target_priority_manager and not active_tracks.is_empty():
 		# Update priorities for active tracks
 		var track_data_array: Array[Dictionary] = []
@@ -325,13 +325,13 @@ func _update_target_priorities(delta: float) -> void:
 		
 		target_priority_manager.update_priorities(track_data_array)
 
-func _update_threat_assessments(delta: float) -> void:
+func _update_threat_assessments(_delta: float) -> void:
 	if threat_assessment:
 		for track_id in active_tracks.keys():
 			var track = active_tracks[track_id]
 			threat_assessment.assess_target_threat(track.target_node, track)
 
-func _update_track_predictions(delta: float) -> void:
+func _update_track_predictions(_delta: float) -> void:
 	var prediction_time = tracking_config.prediction_time
 	
 	for track_id in active_tracks.keys():
@@ -354,7 +354,7 @@ func _update_spatial_partitioning() -> void:
 		var track = active_tracks[track_id]
 		spatial_partition.update_track_position(track_id, track.position)
 
-func _cleanup_expired_tracks(delta: float) -> void:
+func _cleanup_expired_tracks(_delta: float) -> void:
 	var current_time = Time.get_ticks_usec() / 1000000.0
 	var tracks_to_remove: Array[int] = []
 	

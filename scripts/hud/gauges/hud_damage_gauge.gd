@@ -53,7 +53,7 @@ func update_from_game_state() -> void:
 		var subsystem_manager = GameStateManager.player_ship.subsystem_manager
 
 		# Update hull integrity
-		# Assuming hull_strength is directly on ShipBase for easier access
+		# Assuming hull_strength is directly on BaseShip for easier access
 		hull_integrity = GameStateManager.player_ship.hull_strength / GameStateManager.player_ship.ship_max_hull_strength
 
 		# Update subsystems
@@ -136,12 +136,31 @@ func _draw() -> void:
 		
 		# Add sample subsystems for preview
 		if subsystems.is_empty():
-			subsystems = [
-				Subsystem.new(Subsystem.Type.ENGINES, "Engines", 75.0, true),
-				Subsystem.new(Subsystem.Type.WEAPONS, "Weapons", 100.0),
-				Subsystem.new(Subsystem.Type.SHIELDS, "Shields", 50.0),
-				Subsystem.new(Subsystem.Type.SENSORS, "Sensors", 25.0, true)
-			]
+			var engines = Subsystem.new()
+			engines.name = "Engines"
+			engines.subsystem_type = SubsystemTypes.Type.ENGINE
+			engines.current_hits = 75.0
+			engines.max_hits = 100.0
+			
+			var weapons = Subsystem.new()
+			weapons.name = "Weapons"
+			weapons.subsystem_type = SubsystemTypes.Type.WEAPONS
+			weapons.current_hits = 100.0
+			weapons.max_hits = 100.0
+			
+			var shields = Subsystem.new()
+			shields.name = "Shields"
+			shields.subsystem_type = SubsystemTypes.Type.SHIELDS
+			shields.current_hits = 50.0
+			shields.max_hits = 100.0
+			
+			var sensors = Subsystem.new()
+			sensors.name = "Sensors"
+			sensors.subsystem_type = SubsystemTypes.Type.SENSORS
+			sensors.current_hits = 25.0
+			sensors.max_hits = 100.0
+			
+			subsystems = [engines, weapons, shields, sensors]
 	
 	if !can_draw() && !Engine.is_editor_hint():
 		return

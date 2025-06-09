@@ -2,6 +2,10 @@
 extends HUDGauge
 class_name HUDRadarGauge
 
+# Type references
+const WeaponBase = preload("res://scripts/object/weapon_base.gd")
+const DebrisObject = preload("res://scripts/object/debris.gd")
+
 # Radar range settings
 enum RadarRange {
 	SHORT = 0,    # 2000m
@@ -87,6 +91,8 @@ class RadarBlip:
 # Radar state
 var _radar_objects: Array[RadarBlip] = []
 var _flash_time := 0.0
+var _hud_manager: Node
+var _hud_config: Resource
 var _flash_state := false
 var _warning_flash_time := 0.0
 var _warning_flash_state := false
@@ -194,7 +200,7 @@ func update_from_game_state() -> void:
 		if ship_node == player_ship_node:
 			continue
 
-		var ship: ShipBase = ship_node # Assume nodes in group are ShipBase
+		var ship: BaseShip = ship_node # Assume nodes in group are BaseShip
 		if not is_instance_valid(ship): continue
 
 		var distance = ship.global_position.distance_to(player_pos)
@@ -227,7 +233,7 @@ func update_from_game_state() -> void:
 			ship.global_position,
 			blip_type,
 			ship.team,
-			ship == player_ship_node.target_node # Check against ShipBase target_node
+			ship == player_ship_node.target_node # Check against BaseShip target_node
 		)
 
 		# Check for sensor distortion
@@ -275,14 +281,14 @@ func update_from_game_state() -> void:
 					weapon.global_position,
 					blip_type,
 					weapon.team,
-					weapon == player_ship_node.target_node # Check against ShipBase target_node
+					weapon == player_ship_node.target_node # Check against BaseShip target_node
 				)
 				# Missiles generally aren't distorted by sensors/AWACS in FS2
 
 	# --- Add Debris ---
 	if _hud_config.rp_flags & WCSConstants.RP_SHOW_DEBRIS:
 		for debris_node in get_tree().get_nodes_in_group(ObjectManager.GROUP_DEBRIS): # Use group name
-			var debris: DebrisBase = debris_node # Assume nodes in group are DebrisBase
+			var debris: DebrisObject = debris_node # Assume nodes in group are DebrisObject
 			if not is_instance_valid(debris): continue
 
 			var distance = debris.global_position.distance_to(player_pos)
@@ -300,7 +306,8 @@ func update_from_game_state() -> void:
 	# --- Add Jump Nodes ---
 	# Assuming JumpNodeManager exists and provides nodes
 	if Engine.has_singleton("JumpNodeManager"):
-		for jump_node in JumpNodeManager.get_all_jump_nodes():
+		var jump_node_manager = Engine.get_singleton("JumpNodeManager")
+		for jump_node in jump_node_manager.get_all_jump_nodes():
 			if not is_instance_valid(jump_node) or jump_node.hidden: continue
 
 			var distance = jump_node.global_position.distance_to(player_pos)

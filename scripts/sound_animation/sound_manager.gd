@@ -8,10 +8,10 @@ extends Node
 
 # Constants for sound priorities, mirroring original logic conceptually.
 enum SoundPriority {
-	MUST_PLAY, 			# Highest priority, might stop lower priority sounds.
-	SINGLE_INSTANCE, 	# Only one instance of this sound can play at a time.
-	DOUBLE_INSTANCE, 	# Max two instances.
-	TRIPLE_INSTANCE, 	# Max three instances.
+	MUST_PLAY=0, 			# Highest priority, might stop lower priority sounds.
+	SINGLE_INSTANCE=1, 	# Only one instance of this sound can play at a time.
+	DOUBLE_INSTANCE=2, 	# Max two instances.
+	TRIPLE_INSTANCE=3, 	# Max three instances.
 	DEFAULT = SINGLE_INSTANCE # Default if not specified
 }
 
@@ -341,7 +341,7 @@ func _allocate_sound_channel(sound_entry: SoundEntry, priority: SoundPriority) -
 	if current_count < limit:
 		# Space available, allocate
 		_active_sound_counts[sound_id_name] = current_count + 1
-		return _generate_handle()
+		return _get_next_sig()
 	elif priority == SoundPriority.MUST_PLAY:
 		# Limit reached, but MUST_PLAY - find oldest/lowest priority sound of SAME ID to stop
 		var oldest_handle = -1
@@ -357,14 +357,14 @@ func _allocate_sound_channel(sound_entry: SoundEntry, priority: SoundPriority) -
 				# More complex: consider priority of existing sounds if needed
 
 		if oldest_handle != -1:
-			print(f"SoundManager: MUST_PLAY stopping existing sound '{sound_id_name}' (handle {oldest_handle})")
+			print("SoundManager: MUST_PLAY stopping existing sound '{sound_id_name}' (handle {oldest_handle})")
 			stop_sound(oldest_handle) # This will call _free_sound_channel
 			# Now allocate the new one
 			_active_sound_counts[sound_id_name] = _active_sound_counts.get(sound_id_name, 0) + 1 # Increment count again
-			return _generate_handle()
+			return _get_next_sig()
 		else:
 			# Should not happen if current_count >= limit, but safety check
-			printerr(f"SoundManager: MUST_PLAY failed to find existing sound '{sound_id_name}' to stop.")
+			printerr("SoundManager: MUST_PLAY failed to find existing sound '{sound_id_name}' to stop.")
 			return -1
 	else:
 		# Limit reached, and not MUST_PLAY

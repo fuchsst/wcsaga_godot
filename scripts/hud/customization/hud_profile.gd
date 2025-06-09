@@ -76,16 +76,16 @@ func duplicate_profile(new_name: String = "") -> HUDProfile:
 	new_profile.is_readonly = false
 	
 	# Copy global settings
-	new_profile.global_settings = global_settings.duplicate() if global_settings else GlobalHUDSettings.new()
+	new_profile.global_settings = global_settings.duplicate_settings() if global_settings else GlobalHUDSettings.new()
 	
 	# Copy element configurations
 	for element_id in element_configurations:
 		var config = element_configurations[element_id]
-		new_profile.element_configurations[element_id] = config.duplicate() if config else null
+		new_profile.element_configurations[element_id] = config.duplicate_configuration() if config else null
 	
 	# Copy visibility rules
 	for rule in visibility_rules:
-		new_profile.visibility_rules.append(rule.duplicate() if rule else null)
+		new_profile.visibility_rules.append(rule.duplicate_rule() if rule else null)
 	
 	return new_profile
 

@@ -41,8 +41,8 @@ func _on_body_entered(body: Node3D):
 
 	var hit_pos = global_position # Approximate
 
-	if body is ShipBase:
-		var ship: ShipBase = body
+	if body is BaseShip:
+		var ship: BaseShip = body
 		print("Asteroid collided with Ship ", ship.name)
 		# Apply damage to ship (placeholder amount)
 		# TODO: Calculate damage based on relative velocity/mass?

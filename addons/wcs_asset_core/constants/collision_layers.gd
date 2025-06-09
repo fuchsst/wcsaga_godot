@@ -55,41 +55,41 @@ enum Layer {
 enum Mask {
 	# Ship collision masks
 	SHIP_STANDARD = (1 << Layer.SHIPS) | (1 << Layer.WEAPONS) | (1 << Layer.DEBRIS) | 
-	                (1 << Layer.ASTEROIDS) | (1 << Layer.ENVIRONMENT) | (1 << Layer.SHIELDS),
+					(1 << Layer.ASTEROIDS) | (1 << Layer.ENVIRONMENT) | (1 << Layer.SHIELDS),
 	
 	SHIP_FIGHTER = (1 << Layer.SHIPS) | (1 << Layer.CAPITALS) | (1 << Layer.WEAPONS) | 
-	               (1 << Layer.DEBRIS) | (1 << Layer.ASTEROIDS) | (1 << Layer.ENVIRONMENT) | 
-	               (1 << Layer.SHIELDS) | (1 << Layer.BEAMS),
+				   (1 << Layer.DEBRIS) | (1 << Layer.ASTEROIDS) | (1 << Layer.ENVIRONMENT) | 
+				   (1 << Layer.SHIELDS) | (1 << Layer.BEAMS),
 	
 	SHIP_CAPITAL = (1 << Layer.SHIPS) | (1 << Layer.FIGHTERS) | (1 << Layer.BOMBERS) | 
-	               (1 << Layer.WEAPONS) | (1 << Layer.DEBRIS) | (1 << Layer.ASTEROIDS) | 
-	               (1 << Layer.ENVIRONMENT) | (1 << Layer.SHIELDS),
+				   (1 << Layer.WEAPONS) | (1 << Layer.DEBRIS) | (1 << Layer.ASTEROIDS) | 
+				   (1 << Layer.ENVIRONMENT) | (1 << Layer.SHIELDS),
 	
 	SHIP_SUPPORT = (1 << Layer.SHIPS) | (1 << Layer.DEBRIS) | (1 << Layer.ASTEROIDS) | 
-	               (1 << Layer.ENVIRONMENT) | (1 << Layer.SHIELDS),
+				   (1 << Layer.ENVIRONMENT) | (1 << Layer.SHIELDS),
 	
 	# Weapon collision masks
 	WEAPON_STANDARD = (1 << Layer.SHIPS) | (1 << Layer.SHIELDS) | (1 << Layer.DEBRIS) | 
-	                  (1 << Layer.ASTEROIDS) | (1 << Layer.ENVIRONMENT),
+					  (1 << Layer.ASTEROIDS) | (1 << Layer.ENVIRONMENT),
 	
 	WEAPON_BEAM = (1 << Layer.SHIPS) | (1 << Layer.SHIELDS) | (1 << Layer.ASTEROIDS) | 
-	              (1 << Layer.ENVIRONMENT),
+				  (1 << Layer.ENVIRONMENT),
 	
 	WEAPON_MISSILE = (1 << Layer.SHIPS) | (1 << Layer.SHIELDS) | (1 << Layer.DEBRIS) | 
-	                 (1 << Layer.ASTEROIDS) | (1 << Layer.ENVIRONMENT) | (1 << Layer.COUNTERMEASURES),
+					 (1 << Layer.ASTEROIDS) | (1 << Layer.ENVIRONMENT) | (1 << Layer.COUNTERMEASURES),
 	
 	WEAPON_POINT_DEFENSE = (1 << Layer.WEAPONS) | (1 << Layer.MISSILE_WEAPONS) | 
-	                       (1 << Layer.COUNTERMEASURES),
+						   (1 << Layer.COUNTERMEASURES),
 	
 	# Environment collision masks
 	DEBRIS_STANDARD = (1 << Layer.SHIPS) | (1 << Layer.WEAPONS) | (1 << Layer.DEBRIS) | 
-	                  (1 << Layer.ASTEROIDS) | (1 << Layer.ENVIRONMENT),
+					  (1 << Layer.ASTEROIDS) | (1 << Layer.ENVIRONMENT),
 	
 	ASTEROID_STANDARD = (1 << Layer.SHIPS) | (1 << Layer.WEAPONS) | (1 << Layer.DEBRIS) | 
-	                    (1 << Layer.ASTEROIDS) | (1 << Layer.ENVIRONMENT),
+						(1 << Layer.ASTEROIDS) | (1 << Layer.ENVIRONMENT),
 	
 	ENVIRONMENT_STATIC = (1 << Layer.SHIPS) | (1 << Layer.WEAPONS) | (1 << Layer.DEBRIS) | 
-	                     (1 << Layer.ASTEROIDS),
+						 (1 << Layer.ASTEROIDS),
 	
 	# Effect collision masks
 	EXPLOSION_DAMAGE = (1 << Layer.SHIPS) | (1 << Layer.SHIELDS),
@@ -98,20 +98,20 @@ enum Mask {
 	
 	# Shield collision masks
 	SHIELD_OUTER = (1 << Layer.WEAPONS) | (1 << Layer.DEBRIS) | (1 << Layer.ASTEROIDS) | 
-	               (1 << Layer.BEAMS),
+				   (1 << Layer.BEAMS),
 	
 	SHIELD_INNER = (1 << Layer.WEAPONS) | (1 << Layer.BEAMS),
 	
 	# Trigger and system masks
 	TRIGGER_AREA = (1 << Layer.SHIPS) | (1 << Layer.FIGHTERS) | (1 << Layer.BOMBERS) | 
-	               (1 << Layer.CAPITALS),
+				   (1 << Layer.CAPITALS),
 	
 	SENSOR_DETECTION = (1 << Layer.SHIPS) | (1 << Layer.WEAPONS) | (1 << Layer.ASTEROIDS),
 	
 	WAYPOINT_NAVIGATION = (1 << Layer.SHIPS),
 	
 	DOCKING_BAY = (1 << Layer.SHIPS) | (1 << Layer.FIGHTERS) | (1 << Layer.BOMBERS) | 
-	              (1 << Layer.SUPPORT),
+				  (1 << Layer.SUPPORT),
 	
 	# Special masks
 	PHYSICS_ALL = 0xFFFFFFFF,  # Collides with everything (use sparingly)

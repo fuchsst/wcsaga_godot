@@ -36,7 +36,7 @@ class Objective:
 
 # Directives settings
 @export_group("Directives Settings")
-@export var objectives: Array[Objective]:
+@export var objectives: Array:
 	set(value):
 		objectives = value
 		queue_redraw()
@@ -67,7 +67,7 @@ var _flash_state := false
 
 func _init() -> void:
 	super._init()
-	gauge_id = HUDGauge.DIRECTIVES_VIEW
+	gauge_id = GaugeType.DIRECTIVES_VIEW
 
 func _ready() -> void:
 	super._ready()
@@ -192,7 +192,7 @@ func _draw() -> void:
 	var current_type = -1
 	for obj in sorted_objectives:
 		# Skip if hidden
-		if (!show_complete && obj.status == ObjectiveStatus.COMPLETE) ||
+		if (!show_complete && obj.status == ObjectiveStatus.COMPLETE) or \
 			(!show_failed && obj.status == ObjectiveStatus.FAILED):
 			continue
 		

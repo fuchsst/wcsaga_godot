@@ -86,7 +86,7 @@ func update_from_game_state() -> void:
 	if GameStateManager.player_ship and is_instance_valid(GameStateManager.player_ship):
 		var ship = GameStateManager.player_ship
 
-		# Read ETS indices from ShipBase
+		# Read ETS indices from BaseShip
 		weapon_index = ship.weapon_recharge_index # Setter handles redraw
 		shield_index = ship.shield_recharge_index # Setter handles redraw
 		engine_index = ship.engine_recharge_index # Setter handles redraw
@@ -160,11 +160,11 @@ func set_available_systems(weapons: bool, shields: bool, engines: bool) -> void:
 
 # Increase energy to a system
 # NOTE: This function currently modifies the gauge's state directly.
-# Ideally, it should send a request to the ShipBase/EnergyTransferSystem
+# Ideally, it should send a request to the BaseShip/EnergyTransferSystem
 # to change the energy distribution, and the gauge would update via
 # update_from_game_state().
 func increase_system(system: String) -> void:
-	# TODO: Refactor - Send signal/call to ShipBase instead of direct modification.
+	# TODO: Refactor - Send signal/call to BaseShip instead of direct modification.
 	# Example: ship_base.request_increase_ets(system)
 
 	var index_ref = _get_system_index_ref(system)
@@ -199,11 +199,11 @@ func increase_system(system: String) -> void:
 
 # Decrease energy from a system
 # NOTE: This function currently modifies the gauge's state directly.
-# Ideally, it should send a request to the ShipBase/EnergyTransferSystem
+# Ideally, it should send a request to the BaseShip/EnergyTransferSystem
 # to change the energy distribution, and the gauge would update via
 # update_from_game_state().
 func decrease_system(system: String) -> void:
-	# TODO: Refactor - Send signal/call to ShipBase instead of direct modification.
+	# TODO: Refactor - Send signal/call to BaseShip instead of direct modification.
 	# Example: ship_base.request_decrease_ets(system)
 
 	var index_ref = _get_system_index_ref(system)
@@ -248,17 +248,17 @@ func _get_system_index_ref(system: String) -> Dictionary:
 	match system:
 		"weapons":
 			if !has_weapons:
-				return null
+				return {}
 			return {"value": weapon_index}
 		"shields":
 			if !has_shields:
-				return null
+				return {}
 			return {"value": shield_index}
 		"engines":
 			if !has_engines:
-				return null
+				return {}
 			return {"value": engine_index}
-	return null
+	return {}
 
 # Helper to get other available systems
 func _get_other_systems(system: String) -> Array:

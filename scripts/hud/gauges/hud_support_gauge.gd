@@ -40,10 +40,10 @@ func _ready() -> void:
 # Update gauge based on current game state
 func update_from_game_state() -> void:
 	# Check if player ship exists
-	if GameState.player_ship and is_instance_valid(GameState.player_ship):
+	if GameStateManager.player_ship and is_instance_valid(GameStateManager.player_ship):
 		# Get support status from the player ship or a dedicated SupportManager
 		# Assuming PlayerShip has methods or properties to get this info
-		var current_support_data = GameState.player_ship.get_support_status_data() # Placeholder method
+		var current_support_data = GameStateManager.player_ship.get_support_status_data() # Placeholder method
 
 		if current_support_data and current_support_data.get("is_active", false):
 			# Assuming current_support_data is a Dictionary like:

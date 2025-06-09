@@ -133,47 +133,6 @@ func start_music(start_in_battle: bool = false):
 		add_child(_initial_pattern_timer)
 		_initial_pattern_timer.start()
 		print("MusicManager: Starting music with pattern: ", MusicEntry.MusicPattern.keys()[current_pattern])
-	# TODO: Potentially preload some music streams if needed (though usually streamed)
-
-func start_music(start_in_battle: bool = false):
-	"""Starts the music system, usually called at mission start."""
-	if MusicData == null: return # Guard against missing MusicData
-
-	stop_music() # Ensure clean state
-	_reset_timers() # Reset timers when starting new music sequence
-
-	var initial_pattern_type = MusicEntry.MusicPattern.NRML_1
-	# Use the current soundtrack name stored during load_soundtrack
-	if current_soundtrack_name == "":
-		printerr("MusicManager: No soundtrack loaded before calling start_music!")
-		return
-
-	if start_in_battle or _check_hostile_presence():
-		initial_pattern_type = MusicEntry.MusicPattern.BTTL_1
-		current_state = MusicState.BATTLE
-	else:
-		current_state = MusicState.NORMAL
-
-	var initial_entry = MusicData.get_entry(initial_pattern_type, current_soundtrack_name)
-	if initial_entry:
-		current_pattern = initial_pattern_type
-		# Use the correct function to get the next pattern based on the loaded entry
-		pending_pattern = _get_default_next_pattern(initial_entry) # Set initial pending pattern
-		next_pattern = pending_pattern # Initialize next_pattern as well
-		current_loop_count = initial_entry.default_loop_for
-
-		# Delay starting the first pattern slightly
-		if _initial_pattern_timer != null and is_instance_valid(_initial_pattern_timer):
-			_initial_pattern_timer.stop()
-			_initial_pattern_timer.queue_free()
-
-		_initial_pattern_timer = Timer.new()
-		_initial_pattern_timer.wait_time = PATTERN_DELAY_SHORT / 1000.0
-		_initial_pattern_timer.one_shot = true
-		_initial_pattern_timer.connect("timeout", Callable(self, "_play_current_pattern"), CONNECT_ONE_SHOT) # Use CONNECT_ONE_SHOT
-		add_child(_initial_pattern_timer)
-		_initial_pattern_timer.start()
-		print("MusicManager: Starting music with pattern: ", MusicEntry.MusicPattern.keys()[current_pattern])
 	else:
 		printerr("MusicManager: Could not find initial music pattern '%s' in soundtrack '%s'" % [MusicEntry.MusicPattern.keys()[initial_pattern_type], current_soundtrack_name])
 
@@ -239,13 +198,13 @@ func _check_game_state_transitions(current_time: int):
 	# Check battle state transitions only if not already in VICTORY/FAILURE/DEAD states
 	if current_state in [MusicState.NORMAL, MusicState.BATTLE, MusicState.ARRIVAL]:
 		match current_state:
-		MusicState.NORMAL:
-			if current_time >= check_for_battle_music_timestamp:
-				check_for_battle_music_timestamp = current_time + BATTLE_START_INTERVAL
-				if _check_hostile_presence():
-					_request_transition(MusicEntry.MusicPattern.BTTL_1)
-					current_state = MusicState.BATTLE
-					battle_over_timestamp = 0 # Reset battle over timer
+			MusicState.NORMAL:
+				if current_time >= check_for_battle_music_timestamp:
+					check_for_battle_music_timestamp = current_time + BATTLE_START_INTERVAL
+					if _check_hostile_presence():
+						_request_transition(MusicEntry.MusicPattern.BTTL_1)
+						current_state = MusicState.BATTLE
+						battle_over_timestamp = 0 # Reset battle over timer
 			MusicState.BATTLE:
 				if battle_over_timestamp > 0 and current_time >= battle_over_timestamp:
 					battle_over_timestamp = 0

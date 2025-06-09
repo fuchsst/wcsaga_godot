@@ -178,7 +178,7 @@ func _calculate_screen_bounds(node: Node3D, camera: Camera3D, parent_ship: Node 
 
 
 # Placeholder: Check if subsystem is visible (not occluded)
-func _is_subsystem_in_sight(parent_ship: ShipBase, subsys: ShipSubsystem, camera: Camera3D) -> bool:
+func _is_subsystem_in_sight(parent_ship: BaseShip, subsys: Subsystem, camera: Camera3D) -> bool:
 	# TODO: Implement line-of-sight check from camera to subsystem position,
 	# potentially ignoring the parent ship's collision body.
 	# var space_state = get_world_3d().direct_space_state
