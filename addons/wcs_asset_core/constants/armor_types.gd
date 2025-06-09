@@ -112,3 +112,16 @@ static func is_energy_focused(armor_class: Class) -> bool:
 static func is_kinetic_focused(armor_class: Class) -> bool:
 	"""Check if armor class specializes in kinetic resistance."""
 	return armor_class in [Class.KINETIC, Class.HEAVY, Class.ABLATIVE]
+
+## Get all armor classes
+static func get_all_armor_classes() -> Array[int]:
+	"""Get array of all armor class IDs."""
+	var classes: Array[int] = []
+	for i in range(Class.size()):
+		classes.append(i)
+	return classes
+
+## Get damage types supported
+static func get_supported_damage_types() -> Array[String]:
+	"""Get array of all supported damage type names."""
+	return ["kinetic", "energy", "plasma", "explosive", "beam", "piercing"]

@@ -88,3 +88,12 @@ static func bypasses_shields(damage_type: Type) -> bool:
 static func affects_subsystems(damage_type: Type) -> bool:
 	"""Check if damage type has special subsystem effects."""
 	return damage_type in [Type.EMP, Type.ION, Type.SHOCKWAVE, Type.SPECIAL]
+
+## Get damage type from name
+static func get_damage_type_from_name(damage_name: String) -> Type:
+	"""Get damage type enum from name string."""
+	var lower_name = damage_name.to_lower()
+	for i in range(DAMAGE_TYPE_NAMES.size()):
+		if DAMAGE_TYPE_NAMES[i].to_lower() == lower_name:
+			return i as Type
+	return Type.KINETIC  # Default
