@@ -7,29 +7,44 @@ This directory contains all game assets, such as 3D models, textures, audio file
 
 - **`common/`**: Contains assets shared across all campaigns and parts of the game.
   - **`audio/`**: Globally used sound effects and music.
-    - **`sfx/`**: Common sound effects (e.g., explosions, generic alerts).
-    - **`ui_feedback/`**: Sounds for button clicks, menu navigation, etc.
-  - **`fonts/`**: Standard font files (`.ttf`, `.otf`).
-  - **`icons/`**: Shared UI icons for generic actions or symbols.
-  - **`materials/`**: A library of reusable base materials (e.g., standard metal, glass, thruster plasma).
-  - **`effects/`**: Common particle effects and shaders (e.g., standard explosions, muzzle flashes).
+    - **`sfx/`**: `explosion_small.ogg`, `shield_impact.ogg`
+    - **`ui_feedback/`**: `button_click.ogg`, `menu_swoosh.ogg`
+  - **`fonts/`**: `main_font.ttf`, `hud_font.otf`
+  - **`icons/`**: `target_reticle.png`, `missile_lock_icon.svg`
+  - **`materials/`**: `standard_hull_metal.material`, `glass_canopy.material`
+  - **`effects/`**: Reusable particle effects and shaders.
+    - **`explosions/`**: `small_ship_explosion.tscn`
+    - **`muzzle_flashes/`**: `laser_cannon_flash.tscn`
 
-- **`campaigns/`**: Contains all assets and data specific to a single campaign. Each campaign is a self-contained unit.
+- **`campaigns/`**: Contains all assets and data specific to a single campaign.
   - **`wing_commander_saga/`**: An example campaign folder.
-    - **`ships/`**: Models, textures, and cockpit assets for ships appearing in this campaign.
-    - **`weapons/`**: Projectiles, effects, and audio for campaign-specific weapons.
-    - **`environments/`**: Skyboxes, asteroids, and nebulas unique to this campaign's missions.
-    - **`missions/`**: Data files (`.json`, `.tres`) defining mission objectives, ship layouts, and events.
-    - **`cutscenes/`**: Videos, animations, and audio for campaign-specific cinematics.
-    - **`ui/`**: HUD elements, briefing screens, or UI themes specific to this campaign.
-    - **`audio/`**: Voiceovers, music tracks, and sound effects exclusive to this campaign.
-    - **`campaign_data.tres`**: A custom resource defining the campaign's mission progression and story flow.
-  - **`another_campaign/`**: A placeholder for a future campaign, following the same structure.
-
-- **`ui/`**: Contains assets for global UI elements that are not part of a specific campaign.
-  - **`main_menu/`**: Assets for the main menu scene.
-  - **`options_screen/`**: Assets for the settings and options menus.
-  - **`themes/`**: Global `Theme` resources for a consistent UI look and feel.
+    - **`ships/`**: All ship assets, organized by faction and class.
+      - **`terran/`**
+        - **`fighters/`**
+          - **`hornet/`**: `hornet.glb`, `hornet_albedo.png`, `hornet_normal.png`, `ship_configuration.tres`
+          - **`rapier/`**: `rapier.glb`, `rapier_albedo.png`, `ship_configuration.tres`
+        - **`capital_ships/`**
+          - **`bengal_carrier/`**: `bengal_carrier.glb`, `bengal_carrier_textureset_a.png`
+      - **`kilrathi/`**
+        - **`fighters/`**
+          - **`dralthi/`**: `dralthi.glb`, `dralthi_albedo.png`
+        - **`capital_ships/`**
+          - **`fralthi_cruiser/`**: `fralthi_cruiser.glb`
+    - **`weapons/`**: Campaign-specific weapon assets.
+      - **`laser_cannon/`**: `laser_bolt_red.tscn`, `laser_fire.ogg`
+      - **`image_recon_missile/`**: `ir_missile.glb`, `ir_missile_trail.tscn`
+    - **`environments/`**:
+      - **`enigma_sector/`**: `enigma_nebula.tscn`, `enigma_skybox.png`
+    - **`missions/`**:
+      - **`e01m01/`**: `mission_data.json`, `briefing_text.txt`, `briefing_map.png`
+    - **`cutscenes/`**:
+      - **`intro/`**: `intro_video.ogv`, `admiral_tolwyn_vo.ogg`
+    - **`ui/`**:
+      - **`hud/`**: `terran_hud_layout.tscn`, `terran_target_box.png`
+    - **`audio/`**:
+      - **`music/`**: `enigma_sector_combat.ogg`
+      - **`voice/`**: `terran_pilot_vo_set/`
+    - **`campaign_data.tres`**: A resource defining the campaign's mission progression.
 
 ## Key Guidelines
 - Use descriptive, `snake_case` filenames (e.g., `terran_fighter_albedo.png`).
