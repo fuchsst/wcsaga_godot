@@ -17,6 +17,10 @@ var mission_manager: Node
 var input_manager: Node
 var game_state_manager: Node
 
+# Specialized data collectors
+var ship_data_collector: ShipDataCollector
+var targeting_data_collector: TargetingDataCollector
+
 # Data caching system
 var cached_data: Dictionary = {}
 var cache_timestamps: Dictionary = {}
@@ -54,6 +58,9 @@ func _initialize_data_provider() -> void:
 	
 	# Find and connect to data sources
 	_connect_to_data_sources()
+	
+	# Initialize specialized collectors
+	_initialize_specialized_collectors()
 	
 	# Initialize cache system
 	_initialize_cache_system()
@@ -118,6 +125,50 @@ func _register_data_source(source_name: String, available: bool) -> void:
 		print("HUDDataProvider: Connected to %s" % source_name)
 	else:
 		print("HUDDataProvider: %s not available" % source_name)
+
+## Initialize specialized data collectors
+func _initialize_specialized_collectors() -> void:
+	# Initialize ship data collector
+	ship_data_collector = ShipDataCollector.new()
+	var ship_init_success = ship_data_collector.initialize(ship_manager)
+	
+	if ship_init_success:
+		ship_data_collector.ship_data_updated.connect(_on_ship_data_updated)
+		ship_data_collector.ship_data_error.connect(_on_ship_data_error)
+		print("HUDDataProvider: Ship data collector initialized")
+	else:
+		print("HUDDataProvider: Ship data collector initialization failed")
+	
+	# Initialize targeting data collector
+	var player_ship = _get_player_ship()
+	if player_ship:
+		targeting_data_collector = TargetingDataCollector.new()
+		var targeting_init_success = targeting_data_collector.initialize(player_ship, object_manager)
+		
+		if targeting_init_success:
+			targeting_data_collector.targeting_data_updated.connect(_on_targeting_data_updated)
+			targeting_data_collector.targeting_data_error.connect(_on_targeting_data_error)
+			print("HUDDataProvider: Targeting data collector initialized")
+		else:
+			print("HUDDataProvider: Targeting data collector initialization failed")
+	else:
+		print("HUDDataProvider: Cannot initialize targeting collector - no player ship")
+
+## Handle ship data updates from specialized collector
+func _on_ship_data_updated(data: Dictionary) -> void:
+	_update_cache("ship_status", data)
+
+## Handle ship data errors
+func _on_ship_data_error(error: String) -> void:
+	data_source_error.emit("ship_data_collector", error)
+
+## Handle targeting data updates from specialized collector
+func _on_targeting_data_updated(data: Dictionary) -> void:
+	_update_cache("targeting_data", data)
+
+## Handle targeting data errors
+func _on_targeting_data_error(error: String) -> void:
+	data_source_error.emit("targeting_data_collector", error)
 
 ## Initialize cache system with TTL values
 func _initialize_cache_system() -> void:
@@ -190,7 +241,12 @@ func _on_update_timer_timeout(data_type: String) -> void:
 
 ## Collect ship status data
 func _collect_ship_status_data() -> void:
-	if not _is_cache_valid("ship_status"):
+	if ship_data_collector and ship_data_collector.is_functional():
+		# Use specialized collector
+		ship_data_collector.collect_ship_data()
+		total_queries_per_frame += 1
+	elif not _is_cache_valid("ship_status"):
+		# Fallback to legacy method
 		var data = _gather_ship_status()
 		_update_cache("ship_status", data)
 		total_queries_per_frame += 1
@@ -221,7 +277,12 @@ func _gather_ship_status() -> Dictionary:
 
 ## Collect targeting data
 func _collect_targeting_data() -> void:
-	if not _is_cache_valid("targeting_data"):
+	if targeting_data_collector and targeting_data_collector.is_functional():
+		# Use specialized collector
+		targeting_data_collector.collect_targeting_data()
+		total_queries_per_frame += 1
+	elif not _is_cache_valid("targeting_data"):
+		# Fallback to legacy method
 		var data = _gather_targeting_data()
 		_update_cache("targeting_data", data)
 		total_queries_per_frame += 1
@@ -286,12 +347,14 @@ func _gather_radar_contacts() -> Dictionary:
 		var contacts: Array[Dictionary] = []
 		
 		for obj in objects:
-			if obj.has_method("is_radar_visible") and obj.is_radar_visible():
+			# Only process BaseSpaceObject instances that are radar visible
+			if obj is BaseSpaceObject and obj.is_object_active():
+				var contact_info = obj.get_space_object_info()
 				contacts.append({
-					"name": obj.get_name() if obj.has_method("get_name") else "Unknown",
+					"name": contact_info.get("name", "Unknown"),
 					"position": obj.global_position,
-					"type": obj.get_object_type() if obj.has_method("get_object_type") else "unknown",
-					"is_hostile": obj.is_hostile() if obj.has_method("is_hostile") else false,
+					"type": obj.get_object_type(),
+					"is_hostile": _is_object_hostile_to_player(obj),
 					"distance": obj.global_position.distance_to(_get_player_position())
 				})
 		
@@ -459,7 +522,7 @@ func _get_default_ship_data() -> Dictionary:
 
 ## Get data provider statistics
 func get_statistics() -> Dictionary:
-	return {
+	var stats = {
 		"data_sources_available": data_sources_available,
 		"cached_data_types": cached_data.keys(),
 		"data_collection_time_ms": data_collection_time_ms,
@@ -467,12 +530,36 @@ func get_statistics() -> Dictionary:
 		"cache_hit_rates": _calculate_cache_hit_rates(),
 		"update_intervals": update_intervals
 	}
+	
+	# Add specialized collector statistics
+	if ship_data_collector:
+		stats["ship_collector_performance"] = ship_data_collector.get_performance_statistics()
+	
+	if targeting_data_collector:
+		stats["targeting_collector_performance"] = targeting_data_collector.get_performance_statistics()
+	
+	return stats
 
 ## Calculate cache hit rates
 func _calculate_cache_hit_rates() -> Dictionary:
 	var hit_rates: Dictionary = {}
 	# Implementation would track cache hits vs misses
 	return hit_rates
+
+## Check if object is hostile to player
+func _is_object_hostile_to_player(obj: BaseSpaceObject) -> bool:
+	var player_ship = _get_player_ship()
+	if not player_ship or not obj is BaseShip:
+		return false
+	
+	# Use proper ship relationship system
+	if obj.has_method("is_hostile_to_ship"):
+		return obj.is_hostile_to_ship(player_ship)
+	elif obj.has_method("get_relationship_with_ship"):
+		var relationship = obj.get_relationship_with_ship(player_ship)
+		return relationship < 0  # Negative relationship = hostile
+	
+	return false
 
 ## Error handling
 func _on_data_collection_error(source: String, error: String) -> void:
