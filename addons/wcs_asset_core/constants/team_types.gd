@@ -13,6 +13,15 @@ enum Team {
 	ALL = 4                    # All teams (for targeting filters)
 }
 
+# Alias for compatibility
+enum Type {
+	FRIENDLY = 0,              # Player and allied forces
+	HOSTILE = 1,               # Enemy forces
+	NEUTRAL = 2,               # Non-combatant forces
+	UNKNOWN = 3,               # Unidentified forces
+	ALL = 4                    # All teams (for targeting filters)
+}
+
 # Team relationship types
 enum Relationship {
 	FRIENDLY = 0,              # Ships cooperate and don't target each other

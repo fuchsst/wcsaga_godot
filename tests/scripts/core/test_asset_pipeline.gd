@@ -405,11 +405,11 @@ func run_all_tests() -> Dictionary:
 		before_each()
 		
 		var success: bool = false
-		try:
+		if has_method(test_name):
 			success = call(test_name)
-		except:
+		else:
 			success = false
-			results.failures.append(test_name + ": Exception occurred")
+			results.failures.append(test_name + ": Method not found")
 		
 		if success:
 			results.passed += 1

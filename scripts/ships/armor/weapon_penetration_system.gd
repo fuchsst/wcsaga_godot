@@ -269,7 +269,7 @@ func _setup_weapon_penetration_data() -> void:
 		},
 		
 		# Flak/Point Defense
-		WeaponTypes.Type.FLAK_WEAPON: {
+		WeaponTypes.Type.FLAK_CANNON: {
 			"base_penetration": 0.6,
 			"damage_type": DamageTypes.Type.KINETIC,
 			"velocity_dependence": 0.5,

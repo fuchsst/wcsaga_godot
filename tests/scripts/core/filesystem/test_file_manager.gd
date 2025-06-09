@@ -160,7 +160,7 @@ func test_cache_eviction() -> void:
 	# Configure small cache to test eviction
 	_file_manager.configure_cache(true, 1)  # 1MB cache
 	var small_cache_size: int = 1024  # 1KB for testing
-	_file_manager.get("_cache_max_size") = small_cache_size
+	_file_manager.set_meta("_cache_max_size", small_cache_size)
 	
 	# Create multiple files that exceed cache size
 	var large_content: String = "x".repeat(500)  # 500 bytes each

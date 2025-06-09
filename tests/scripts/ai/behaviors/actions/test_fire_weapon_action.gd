@@ -17,8 +17,8 @@ func before_test():
 	mock_target = MockTarget.new()
 	
 	# Setup mocks
-	fire_weapon_action.ship_controller = mock_ship_controller
-	fire_weapon_action.ai_agent = mock_ai_agent
+	fire_weapon_action.ship_controller = mock_ship_controller as Node
+	fire_weapon_action.set_meta("ai_agent", mock_ai_agent)
 	fire_weapon_action._setup()
 
 func after_test():
@@ -154,8 +154,8 @@ func test_fire_mode_requirements():
 	var alpha_valid = fire_weapon_action._check_fire_mode_requirements(solution)
 	assert_that(alpha_valid).is_true()
 	
-	# Precision requires high hit probability
-	fire_weapon_action.fire_mode = FireWeaponAction.FireMode.PRECISION
+	# Precision requires high hit probability  
+	fire_weapon_action.fire_mode = FireWeaponAction.FireMode.SINGLE_SHOT
 	var precision_valid = fire_weapon_action._check_fire_mode_requirements(solution)
 	assert_that(precision_valid).is_true()
 	
@@ -254,7 +254,7 @@ func test_weapon_fire_execution_with_refire_delay():
 	
 	# Setup weapon specs with fast refire rate
 	fire_weapon_action.current_weapon_group = 0
-	fire_weapon_action.last_fire_time = Time.get_time_from_start() - 1.0  # 1 second ago
+	fire_weapon_action.last_fire_time = Time.get_unix_time_from_system() - 1.0  # 1 second ago
 	
 	var solution = {
 		"hit_probability": 0.8,

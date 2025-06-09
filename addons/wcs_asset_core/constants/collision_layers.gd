@@ -24,6 +24,7 @@ enum Layer {
 	FIGHTERS = 10,          # Fighter craft
 	BOMBERS = 11,           # Bomber craft
 	CAPITALS = 12,          # Capital ships and large vessels
+	CAPITAL_SHIPS = 12,     # Alias for compatibility
 	SUPPORT = 13,           # Support ships (repair, rearm)
 	CARGO = 14,             # Cargo vessels and containers
 	INSTALLATIONS = 15,     # Space stations and installations

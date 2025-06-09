@@ -13,7 +13,11 @@ enum Class {
 	ABLATIVE = 3,   # Ablative armor - specialized protection
 	ENERGY = 4,     # Energy-resistant armor
 	KINETIC = 5,    # Kinetic-resistant armor
-	ADAPTIVE = 6    # Adaptive armor - changes resistance
+	ADAPTIVE = 6,   # Adaptive armor - changes resistance
+	CAPITAL = 7,    # Capital ship armor - maximum protection
+	COMPOSITE = 8,  # Composite armor - mixed materials
+	SHIELDED = 9,   # Shielded armor - integrated shield systems
+	STEALTH = 10    # Stealth armor - reduces detection
 }
 
 # Armor type names for display
@@ -24,7 +28,11 @@ const ARMOR_CLASS_NAMES: Array[String] = [
 	"Ablative",
 	"Energy-Resistant",
 	"Kinetic-Resistant",
-	"Adaptive"
+	"Adaptive",
+	"Capital",
+	"Composite",
+	"Shielded",
+	"Stealth"
 ]
 
 # Base armor resistance values (0.0 = no resistance, 1.0 = full resistance)
@@ -84,6 +92,38 @@ const BASE_RESISTANCES: Dictionary = {
 		"explosive": 0.3,
 		"beam": 0.3,
 		"piercing": 0.2
+	},
+	Class.CAPITAL: {
+		"kinetic": 0.8,
+		"energy": 0.7,
+		"plasma": 0.7,
+		"explosive": 0.9,
+		"beam": 0.6,
+		"piercing": 0.5
+	},
+	Class.COMPOSITE: {
+		"kinetic": 0.5,
+		"energy": 0.4,
+		"plasma": 0.4,
+		"explosive": 0.6,
+		"beam": 0.3,
+		"piercing": 0.3
+	},
+	Class.SHIELDED: {
+		"kinetic": 0.4,
+		"energy": 0.8,
+		"plasma": 0.8,
+		"explosive": 0.4,
+		"beam": 0.9,
+		"piercing": 0.2
+	},
+	Class.STEALTH: {
+		"kinetic": 0.2,
+		"energy": 0.5,
+		"plasma": 0.3,
+		"explosive": 0.2,
+		"beam": 0.4,
+		"piercing": 0.1
 	}
 }
 

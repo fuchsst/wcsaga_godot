@@ -17,8 +17,8 @@ func before_test():
 	mock_target = MockTarget.new()
 	
 	# Setup mocks
-	conserve_ammo_action.ship_controller = mock_ship_controller
-	conserve_ammo_action.ai_agent = mock_ai_agent
+	conserve_ammo_action.ship_controller = mock_ship_controller as Node
+	conserve_ammo_action.set_meta("ai_agent", mock_ai_agent)
 	conserve_ammo_action._setup()
 
 func after_test():
@@ -237,7 +237,7 @@ func test_resource_usage_logging():
 
 func test_resource_burn_rate_calculation():
 	# Setup history with resource consumption
-	var time_base = Time.get_time_from_start()
+	var time_base = Time.get_unix_time_from_system()
 	
 	conserve_ammo_action.resource_usage_history = [
 		{
@@ -275,9 +275,8 @@ func test_resource_sufficiency_assessment():
 		ConserveAmmoAction.ResourceType.ENERGY: 0.8       # 80% remaining
 	}
 	
-	# Mock burn rate calculation
-	var original_method = conserve_ammo_action._calculate_resource_burn_rate
-	conserve_ammo_action._calculate_resource_burn_rate = func(): return burn_rates
+	# Mock burn rate by setting test data
+	conserve_ammo_action.set_meta("test_burn_rates", burn_rates)
 	
 	var sufficiency = conserve_ammo_action._assess_resource_sufficiency(10.0)  # 10 seconds expected
 	
@@ -286,8 +285,8 @@ func test_resource_sufficiency_assessment():
 	# Should return minimum (weakest resource) = 0.5
 	assert_that(sufficiency).is_approximately(0.5, 0.1)
 	
-	# Restore original method
-	conserve_ammo_action._calculate_resource_burn_rate = original_method
+	# Clear test data
+	conserve_ammo_action.remove_meta("test_burn_rates")
 
 func test_shots_needed_estimation():
 	# Setup target with known health

@@ -17,8 +17,8 @@ func before_test():
 	mock_target = MockTarget.new()
 	
 	# Setup mocks
-	select_weapon_action.ship_controller = mock_ship_controller
-	select_weapon_action.ai_agent = mock_ai_agent
+	select_weapon_action.ship_controller = mock_ship_controller as Node
+	select_weapon_action.set_meta("ai_agent", mock_ai_agent)
 	select_weapon_action._setup()
 
 func after_test():

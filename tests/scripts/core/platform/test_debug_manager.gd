@@ -325,7 +325,7 @@ func test_settings_integration() -> void:
 	SettingsManager.os_config_write_uint("Debug", "category_general", 1)
 	SettingsManager.os_config_write_uint("Debug", "category_physics", 0)
 	
-	DebugManager.load_config_from_settings(SettingsManager)
+	DebugManager.load_config_from_settings()
 	
 	# Verify settings were applied
 	assert_that(DebugManager.get_log_level()).is_equal(DebugManager.LogLevel.ERROR)
@@ -336,7 +336,7 @@ func test_settings_integration() -> void:
 	DebugManager.set_log_level(DebugManager.LogLevel.WARNING)
 	DebugManager.set_category_enabled(DebugManager.Category.SOUND, false)
 	
-	DebugManager.save_config_to_settings(SettingsManager)
+	DebugManager.save_config_to_settings()
 	
 	# Verify settings were saved
 	var saved_level: int = SettingsManager.os_config_read_uint("Debug", "log_level", 0)

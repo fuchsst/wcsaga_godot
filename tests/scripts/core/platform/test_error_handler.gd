@@ -314,7 +314,7 @@ func test_concurrent_error_reporting() -> void:
 	var error_types: Array[ErrorHandler.ErrorType] = [
 		ErrorHandler.ErrorType.GRAPHICS,
 		ErrorHandler.ErrorType.PHYSICS,
-		ErrorHandler.ErrorType.SOUND,
+		ErrorHandler.ErrorType.AUDIO,
 		ErrorHandler.ErrorType.NETWORK
 	]
 	

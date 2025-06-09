@@ -21,8 +21,29 @@ enum Type {
 	
 	# Special Weapons
 	BEAM_WEAPON,
-	FLAK_WEAPON,
 	POINT_DEFENSE,
+	
+	# EMP Weapons
+	EMP_BOMB,
+	EMP_MISSILE,
+	EMP_CANNON,
+	
+	# Flak Weapon Variants
+	FLAK_CANNON,
+	FLAK_BURST,
+	FLAK_AAA,
+	
+	# Swarm Missile Types
+	SWARM_MISSILE,
+	HEAVY_SWARM,
+	LIGHT_SWARM,
+	
+	# Beam Weapon Types (WCS A-E)
+	BEAM_TYPE_A,           # Standard continuous beam
+	BEAM_TYPE_B,           # Slash beam
+	BEAM_TYPE_C,           # Targeting laser
+	BEAM_TYPE_D,           # Chasing beam
+	BEAM_TYPE_E,           # Fixed beam
 	
 	# Utility/Support
 	COUNTERMEASURE,
@@ -57,8 +78,16 @@ static var type_names: Dictionary = {
 	Type.SECONDARY_BOMB: "Bomb",
 	Type.SECONDARY_MINE: "Mine",
 	Type.BEAM_WEAPON: "Beam Weapon",
-	Type.FLAK_WEAPON: "Flak Gun",
 	Type.POINT_DEFENSE: "Point Defense",
+	Type.EMP_BOMB: "EMP Bomb",
+	Type.EMP_MISSILE: "EMP Missile",
+	Type.EMP_CANNON: "EMP Cannon",
+	Type.FLAK_CANNON: "Flak Cannon",
+	Type.FLAK_BURST: "Flak Burst",
+	Type.FLAK_AAA: "Flak AAA",
+	Type.SWARM_MISSILE: "Swarm Missile",
+	Type.HEAVY_SWARM: "Heavy Swarm",
+	Type.LIGHT_SWARM: "Light Swarm",
 	Type.COUNTERMEASURE: "Countermeasure",
 	Type.ELECTRONIC_WARFARE: "Electronic Warfare"
 }
@@ -75,8 +104,16 @@ static var type_categories: Dictionary = {
 	Type.SECONDARY_BOMB: Category.SECONDARY,
 	Type.SECONDARY_MINE: Category.SECONDARY,
 	Type.BEAM_WEAPON: Category.BEAM,
-	Type.FLAK_WEAPON: Category.DEFENSE,
 	Type.POINT_DEFENSE: Category.DEFENSE,
+	Type.EMP_BOMB: Category.SPECIAL,
+	Type.EMP_MISSILE: Category.SPECIAL,
+	Type.EMP_CANNON: Category.SPECIAL,
+	Type.FLAK_CANNON: Category.DEFENSE,
+	Type.FLAK_BURST: Category.DEFENSE,
+	Type.FLAK_AAA: Category.DEFENSE,
+	Type.SWARM_MISSILE: Category.SECONDARY,
+	Type.HEAVY_SWARM: Category.SECONDARY,
+	Type.LIGHT_SWARM: Category.SECONDARY,
 	Type.COUNTERMEASURE: Category.SPECIAL,
 	Type.ELECTRONIC_WARFARE: Category.SPECIAL
 }
@@ -93,8 +130,16 @@ static var type_firing_modes: Dictionary = {
 	Type.SECONDARY_BOMB: FiringMode.UNGUIDED_PROJECTILE,
 	Type.SECONDARY_MINE: FiringMode.UNGUIDED_PROJECTILE,
 	Type.BEAM_WEAPON: FiringMode.CONTINUOUS_BEAM,
-	Type.FLAK_WEAPON: FiringMode.BURST_FIRE,
 	Type.POINT_DEFENSE: FiringMode.BURST_FIRE,
+	Type.EMP_BOMB: FiringMode.SINGLE_SHOT,
+	Type.EMP_MISSILE: FiringMode.GUIDED_MISSILE,
+	Type.EMP_CANNON: FiringMode.SINGLE_SHOT,
+	Type.FLAK_CANNON: FiringMode.SINGLE_SHOT,
+	Type.FLAK_BURST: FiringMode.BURST_FIRE,
+	Type.FLAK_AAA: FiringMode.BURST_FIRE,
+	Type.SWARM_MISSILE: FiringMode.GUIDED_MISSILE,
+	Type.HEAVY_SWARM: FiringMode.GUIDED_MISSILE,
+	Type.LIGHT_SWARM: FiringMode.GUIDED_MISSILE,
 	Type.COUNTERMEASURE: FiringMode.SINGLE_SHOT,
 	Type.ELECTRONIC_WARFARE: FiringMode.CONTINUOUS_BEAM
 }
