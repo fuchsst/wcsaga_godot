@@ -51,7 +51,7 @@ func test_object_manager_registration() -> bool:
 	
 	# Create a test WCS object
 	var test_object: WCSObject = WCSObject.new()
-	test_object.object_type = WCSObject.ObjectType.SHIP
+	test_object.object_type = WCSObject.OBJECT_TYPE_SHIP
 	
 	# Test registration
 	object_manager.register_object(test_object)
@@ -91,7 +91,7 @@ func test_game_state_transitions() -> bool:
 	# Note: This might fail due to scene loading, which is expected in unit tests
 	
 	# Test state stack operations
-	success = game_state_manager.push_state(GameStateManager.GameState.PAUSED)
+	success = game_state_manager.push_state(GameStateManager.GameState.MAIN_MENU)
 	var stats: Dictionary = game_state_manager.get_debug_stats()
 	# State stack behavior depends on successful state transitions
 	
@@ -118,15 +118,17 @@ func test_physics_body_management() -> bool:
 	
 	# Create test object
 	var test_object: WCSObject = WCSObject.new()
-	test_object.object_type = WCSObject.ObjectType.SHIP
+	test_object.object_type = WCSObject.OBJECT_TYPE_SHIP
 	
 	# Test body creation
-	physics_manager.register_physics_body(test_object)
+	var physics_body: CustomPhysicsBody = CustomPhysicsBody.new()
+	physics_body.set_meta("wcs_object", test_object)
+	physics_manager.register_physics_body(physics_body)
 	var stats: Dictionary = physics_manager.get_debug_stats()
 	assert(stats.active_bodies == 1, "Should have 1 active body after registration")
 	
 	# Test body removal
-	physics_manager.unregister_physics_body(test_object)
+	physics_manager.unregister_physics_body(physics_body)
 	stats = physics_manager.get_debug_stats()
 	assert(stats.active_bodies == 0, "Should have 0 active bodies after removal")
 	

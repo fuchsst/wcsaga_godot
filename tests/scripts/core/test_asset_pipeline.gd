@@ -59,8 +59,9 @@ func test_vp_archive_header_validation() -> bool:
 	var temp_file: String = "res://temp_test.vp"
 	_save_test_file(temp_file, invalid_data)
 	
-	var result: bool = vp_archive.load_archive(temp_file)
-	assert(not result, "Loading should fail with invalid magic")
+	var result: VPArchive.LoadResult = vp_archive.load_archive(temp_file)
+	var success: bool = (result == VPArchive.LoadResult.SUCCESS)
+	assert(not success, "Loading should fail with invalid magic")
 	
 	# Clean up
 	DirAccess.remove_absolute(temp_file)
@@ -305,7 +306,8 @@ func test_error_handling() -> bool:
 	"""Test error handling across the asset pipeline."""
 	
 	# Test VP archive error handling
-	var invalid_load: bool = vp_archive.load_archive("nonexistent.vp")
+	var load_result: VPArchive.LoadResult = vp_archive.load_archive("nonexistent.vp")
+	var invalid_load: bool = (load_result == VPArchive.LoadResult.SUCCESS)
 	assert(not invalid_load, "Should handle non-existent VP file gracefully")
 	
 	# Test table parser error handling
