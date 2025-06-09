@@ -184,7 +184,7 @@ func _enable_motion_blur(viewport: Viewport) -> void:
 ## Enable screen-space reflections
 func _enable_screen_space_reflections(viewport: Viewport) -> void:
 	# Setup SSR if available
-	var render_data = viewport.get_render_info(Viewport.RENDER_INFO_TYPE_VISIBLE, Viewport.RENDER_INFO_VISIBLE_PRIMITIVES)
+	var render_data = viewport.get_render_info(Viewport.RENDER_INFO_TYPE_VISIBLE, Viewport.RENDER_INFO_PRIMITIVES)
 	if render_data:
 		post_processing_effects["screen_space_reflections"] = true
 
