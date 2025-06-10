@@ -17,7 +17,7 @@ import json
 import logging
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import dataclass
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from asset_catalog import AssetCatalog

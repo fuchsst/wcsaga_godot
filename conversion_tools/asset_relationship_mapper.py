@@ -242,43 +242,65 @@ class AssetRelationshipMapper:
             with open(ships_table, 'r', encoding='utf-8', errors='ignore') as f:
                 content = f.read()
             
-            # Extract ship definitions using regex patterns
+            # Extract ship definitions using WCS-specific patterns
             ship_pattern = r'\$Name:\s*([^\r\n]+)'
-            model_pattern = r'\$Model\s+File:\s*([^\r\n]+)'
+            pof_pattern = r'\$POF\s+file:\s*([^\r\n]+)'  # Correct WCS format
             texture_pattern = r'\$Texture\s+Replace:\s*([^\r\n]+)'
             
             current_ship = None
+            in_ship_section = False
             
             for line_num, line in enumerate(content.split('\n'), 1):
                 line = line.strip()
                 
+                # Skip comments and empty lines
+                if not line or line.startswith(';') or line.startswith('#'):
+                    continue
+                
+                # Check if we're in the Ship Classes section
+                if '#Ship Classes' in line:
+                    in_ship_section = True
+                    continue
+                
+                if not in_ship_section:
+                    continue
+                
                 # Ship name
                 ship_match = re.match(ship_pattern, line)
                 if ship_match:
-                    current_ship = ship_match.group(1).strip()
-                    relationships[current_ship] = []
+                    ship_name = ship_match.group(1).strip()
+                    # Skip engine wash definitions and other non-ship entities
+                    if not any(skip in ship_name.lower() for skip in ['default', 'none', 'engine']):
+                        current_ship = ship_name
+                        relationships[current_ship] = []
                     continue
                 
                 if not current_ship:
                     continue
                 
-                # Model file
-                model_match = re.match(model_pattern, line)
-                if model_match:
-                    model_file = model_match.group(1).strip()
-                    # Create primary model relationship
-                    model_rel = AssetRelationship(
-                        source_path=f"models/{model_file}",
-                        target_path=self._get_target_path('ship_model', current_ship, model_file),
-                        asset_type='model',
-                        parent_entity=current_ship,
-                        relationship_type='primary_model'
-                    )
-                    relationships[current_ship].append(model_rel)
+                # POF Model file (correct WCS format)
+                pof_match = re.match(pof_pattern, line)
+                if pof_match:
+                    pof_file = pof_match.group(1).strip()
                     
-                    # Add related texture relationships using hardcoded patterns
-                    texture_rels = self._generate_ship_texture_relationships(current_ship, model_file)
-                    relationships[current_ship].extend(texture_rels)
+                    # Verify the POF file actually exists
+                    actual_pof_path = self.source_dir / "hermes_models" / pof_file
+                    if actual_pof_path.exists():
+                        # Create primary model relationship
+                        model_rel = AssetRelationship(
+                            source_path=f"hermes_models/{pof_file}",
+                            target_path=self._get_target_path('ship_model', current_ship, pof_file),
+                            asset_type='model',
+                            parent_entity=current_ship,
+                            relationship_type='primary_model'
+                        )
+                        relationships[current_ship].append(model_rel)
+                        
+                        # Add related texture relationships using hardcoded patterns
+                        texture_rels = self._generate_ship_texture_relationships(current_ship, pof_file)
+                        relationships[current_ship].extend(texture_rels)
+                    else:
+                        logger.warning(f"POF file not found: {actual_pof_path}")
                 
                 # Explicit texture replacements
                 texture_match = re.match(texture_pattern, line)
@@ -301,53 +323,76 @@ class AssetRelationshipMapper:
             with open(weapons_table, 'r', encoding='utf-8', errors='ignore') as f:
                 content = f.read()
             
-            weapon_pattern = r'\$Name:\s*([^\r\n]+)'
+            # WCS weapon patterns
+            weapon_pattern = r'\$Name:\s*@?([^\r\n]+)'  # @ prefix indicates weapon name
             model_pattern = r'\$Model\s+File:\s*([^\r\n]+)'
             sound_pattern = r'\$LaunchSnd:\s*([^\r\n]+)'
             
             current_weapon = None
+            in_primary_section = False
+            in_secondary_section = False
             
             for line in content.split('\n'):
                 line = line.strip()
                 
+                # Skip comments and empty lines
+                if not line or line.startswith(';'):
+                    continue
+                
+                # Track weapon sections
+                if '#Primary Weapons' in line:
+                    in_primary_section = True
+                    in_secondary_section = False
+                    continue
+                elif '#Secondary Weapons' in line:
+                    in_primary_section = False
+                    in_secondary_section = True
+                    continue
+                
+                if not (in_primary_section or in_secondary_section):
+                    continue
+                
                 weapon_match = re.match(weapon_pattern, line)
                 if weapon_match:
-                    current_weapon = weapon_match.group(1).strip()
-                    relationships[current_weapon] = []
+                    weapon_name = weapon_match.group(1).strip()
+                    # Skip if weapon name starts with @ (internal reference)
+                    if not weapon_name.startswith('@'):
+                        current_weapon = weapon_name
+                        relationships[current_weapon] = []
                     continue
                 
                 if not current_weapon:
                     continue
                 
-                # Weapon model
+                # Weapon model (most weapons use "none" for model)
                 model_match = re.match(model_pattern, line)
                 if model_match:
                     model_file = model_match.group(1).strip()
-                    model_rel = AssetRelationship(
-                        source_path=f"models/{model_file}",
-                        target_path=self._get_target_path('weapon_model', current_weapon, model_file),
-                        asset_type='model',
-                        parent_entity=current_weapon,
-                        relationship_type='primary_model'
-                    )
-                    relationships[current_weapon].append(model_rel)
+                    if model_file.lower() != 'none':
+                        model_rel = AssetRelationship(
+                            source_path=f"hermes_models/{model_file}",
+                            target_path=self._get_target_path('weapon_model', current_weapon, model_file),
+                            asset_type='model',
+                            parent_entity=current_weapon,
+                            relationship_type='primary_model'
+                        )
+                        relationships[current_weapon].append(model_rel)
                 
-                # Weapon sounds
+                # Weapon sounds - only if we can find actual sound files
                 sound_match = re.match(sound_pattern, line)
                 if sound_match:
-                    sound_file = sound_match.group(1).strip()
-                    sound_rel = AssetRelationship(
-                        source_path=f"sounds/{sound_file}",
-                        target_path=self._get_target_path('weapon_sound', current_weapon, sound_file),
-                        asset_type='audio',
-                        parent_entity=current_weapon,
-                        relationship_type='fire_sound'
-                    )
-                    relationships[current_weapon].append(sound_rel)
-                    
-                    # Add related weapon effect sounds using hardcoded patterns
-                    effect_rels = self._generate_weapon_effect_relationships(current_weapon)
-                    relationships[current_weapon].extend(effect_rels)
+                    sound_id = sound_match.group(1).strip()
+                    # Look for actual sound files that match this ID in sounds.tbl
+                    actual_sound_file = self._find_actual_sound_file(sound_id)
+                    if actual_sound_file:
+                        sound_rel = AssetRelationship(
+                            source_path=actual_sound_file,
+                            target_path=self._get_target_path('weapon_sound', current_weapon, actual_sound_file),
+                            asset_type='audio',
+                            parent_entity=current_weapon,
+                            relationship_type='fire_sound'
+                        )
+                        relationships[current_weapon].append(sound_rel)
         
         except Exception as e:
             logger.error(f"Failed to extract weapon relationships from {weapons_table}: {e}")
@@ -355,58 +400,77 @@ class AssetRelationshipMapper:
         return relationships
     
     def _generate_ship_texture_relationships(self, ship_name: str, model_file: str) -> List[AssetRelationship]:
-        """Generate texture relationships for a ship using hardcoded patterns"""
+        """Generate texture relationships for a ship using WCS naming patterns"""
         relationships = []
         base_name = Path(model_file).stem
         
-        for suffix_type, suffix in self.hardcoded_mappings.TEXTURE_SUFFIXES.items():
-            for ext in self.hardcoded_mappings.TEXTURE_EXTENSIONS:
-                texture_file = f"{base_name}{suffix}.{ext}"
-                
-                texture_rel = AssetRelationship(
-                    source_path=f"textures/{texture_file}",
-                    target_path=self._get_target_path('ship_texture', ship_name, texture_file),
-                    asset_type='texture',
-                    parent_entity=ship_name,
-                    relationship_type=suffix_type,
-                    required=False  # Texture variants are optional
-                )
-                relationships.append(texture_rel)
+        # WCS texture suffixes based on actual file analysis
+        texture_suffixes = {
+            'diffuse': '',           # base texture
+            'normal': '-normal',     # normal map
+            'shine': '-shine',       # specular/shine map
+            'glow': '-glow',         # glow/emission map
+            'bump': '-bump',         # bump map
+        }
+        
+        # Check for actual texture files in hermes_maps directory
+        maps_dir = self.source_dir / "hermes_maps"
+        if maps_dir.exists():
+            for suffix_type, suffix in texture_suffixes.items():
+                # Try different numbering patterns (ship models can have multiple texture sets)
+                for texture_variant in ['', '_2', '_a']:
+                    texture_name = f"{base_name}{texture_variant}{suffix}"
+                    
+                    # Check for actual files with different extensions
+                    for ext in ['.dds', '.pcx', '.tga']:
+                        texture_file = f"{texture_name}{ext}"
+                        actual_texture_path = maps_dir / texture_file
+                        
+                        if actual_texture_path.exists():
+                            texture_rel = AssetRelationship(
+                                source_path=f"hermes_maps/{texture_file}",
+                                target_path=self._get_target_path('ship_texture', ship_name, texture_file),
+                                asset_type='texture',
+                                parent_entity=ship_name,
+                                relationship_type=suffix_type,
+                                required=(suffix_type == 'diffuse')  # Only base texture is required
+                            )
+                            relationships.append(texture_rel)
         
         return relationships
     
-    def _generate_weapon_effect_relationships(self, weapon_name: str) -> List[AssetRelationship]:
-        """Generate weapon effect relationships using hardcoded patterns"""
-        relationships = []
+    def _find_actual_sound_file(self, sound_id: str) -> Optional[str]:
+        """
+        Find actual sound file by looking up sound ID in sounds.tbl.
+        Only return paths to files that actually exist.
+        """
+        sounds_table = self.source_dir / "hermes_core" / "sounds.tbl"
+        if not sounds_table.exists():
+            return None
         
-        # Determine weapon type from name patterns
-        weapon_type = 'laser'
-        if any(keyword in weapon_name.lower() for keyword in ['missile', 'torpedo', 'bomb']):
-            weapon_type = 'missile'
-        
-        effect_mappings = self.hardcoded_mappings.WEAPON_EFFECTS.get(weapon_type, {})
-        
-        for effect_type, prefix in effect_mappings.items():
-            if effect_type.startswith('sound_'):
-                asset_type = 'audio'
-                ext = 'wav'
-            else:
-                asset_type = 'effect'
-                ext = 'tscn'
+        try:
+            with open(sounds_table, 'r', encoding='utf-8', errors='ignore') as f:
+                content = f.read()
             
-            effect_file = f"{prefix}{weapon_name.lower().replace(' ', '_')}.{ext}"
+            # Look for pattern: $Name: ID filename.wav
+            pattern = rf'\$Name:\s*{re.escape(sound_id)}\s+([^\s,]+\.wav)'
+            match = re.search(pattern, content)
             
-            effect_rel = AssetRelationship(
-                source_path=f"effects/{effect_file}",
-                target_path=self._get_target_path(f'weapon_{asset_type}', weapon_name, effect_file),
-                asset_type=asset_type,
-                parent_entity=weapon_name,
-                relationship_type=effect_type,
-                required=False
-            )
-            relationships.append(effect_rel)
+            if match:
+                sound_filename = match.group(1)
+                # Only return if the actual sound file exists
+                for sound_dir in ['hermes_sounds', 'sounds', 'hermes_core', '.']:
+                    potential_path = self.source_dir / sound_dir / sound_filename
+                    if potential_path.exists():
+                        return str(potential_path.relative_to(self.source_dir))
+                
+                # Don't create fake sound mappings if file doesn't exist
+                logger.debug(f"Sound file {sound_filename} (ID {sound_id}) referenced but not found")
         
-        return relationships
+        except Exception as e:
+            logger.debug(f"Failed to lookup sound ID {sound_id}: {e}")
+        
+        return None
     
     def _parse_texture_replacement(self, entity_name: str, texture_spec: str) -> Optional[AssetRelationship]:
         """Parse explicit texture replacement specification"""
@@ -430,50 +494,377 @@ class AssetRelationshipMapper:
     
     def _get_target_path(self, asset_category: str, entity_name: str, source_file: str) -> str:
         """
-        Generate target path following the structure defined in target/assets/CLAUDE.md
+        Generate clean target path following the structure defined in target/assets/CLAUDE.md
+        with proper format conversion (DDS→PNG, .tbl→.tres, etc.)
         """
-        clean_entity = entity_name.lower().replace(' ', '_').replace('-', '_')
-        file_name = Path(source_file).name.lower()
+        # Clean entity name - remove special characters that cause invalid paths
+        clean_entity = re.sub(r'[^\w\-_]', '_', entity_name.lower())
+        clean_entity = re.sub(r'_+', '_', clean_entity).strip('_')
+        
+        # Get file info and apply format conversion
+        source_path = Path(source_file)
+        file_stem = source_path.stem
+        file_ext = source_path.suffix.lower()
+        
+        # Apply format conversion
+        target_filename = self._convert_file_format(file_stem, file_ext)
         
         # Map to target directory structure based on asset category
-        if asset_category in ['ship_model', 'ship_texture']:
+        if asset_category in ['ship_model', 'ship_texture', 'ship_texture_diffuse', 'ship_texture_normal', 'ship_texture_shine', 'ship_texture_glow']:
             # Determine faction from entity name or default to common
             faction = self._determine_faction(entity_name)
             ship_class = self._determine_ship_class(entity_name)
-            return f"campaigns/wing_commander_saga/ships/{faction}/{ship_class}/{clean_entity}/{file_name}"
+            return f"campaigns/wing_commander_saga/ships/{faction}/{ship_class}/{clean_entity}/{target_filename}"
         
         elif asset_category in ['weapon_model', 'weapon_sound', 'weapon_audio']:
-            return f"campaigns/wing_commander_saga/weapons/{clean_entity}/{file_name}"
+            return f"campaigns/wing_commander_saga/weapons/{clean_entity}/{target_filename}"
         
         elif asset_category == 'texture':
-            return f"common/materials/{file_name}"
+            return f"common/materials/{target_filename}"
+        
+        elif asset_category == 'animation_texture':
+            return f"common/animations/{target_filename}"
+        
+        elif asset_category == 'ui_texture':
+            return f"common/ui/{target_filename}"
+        
+        elif asset_category == 'audio':
+            return f"common/audio/{target_filename}"
+        
+        elif asset_category == 'mission':
+            return f"resources/missions/{target_filename}"
+        
+        elif asset_category == 'data':
+            return f"resources/data/{target_filename}"
+        
+        elif asset_category == 'campaign':
+            return f"resources/campaigns/{target_filename}"
+        
+        elif asset_category == 'font':
+            return f"resources/fonts/{target_filename}"
+        
+        elif asset_category in ['config', 'hud_config', 'data_mod']:
+            return f"resources/config/{target_filename}"
+        
+        elif asset_category == 'text':
+            return f"resources/text/{target_filename}"
         
         else:
             # Default to common directory
             type_dir = 'audio' if asset_category.endswith('_sound') or asset_category.endswith('_audio') else 'effects'
-            return f"common/{type_dir}/{file_name}"
+            return f"common/{type_dir}/{target_filename}"
+    
+    def _convert_file_format(self, file_stem: str, file_ext: str) -> str:
+        """
+        Convert source file format to target format based on conversion rules
+        """
+        # Format conversion mappings
+        format_conversions = {
+            '.dds': '.png',      # DirectDraw Surface → PNG
+            '.pcx': '.png',      # PCX → PNG  
+            '.tga': '.png',      # Targa → PNG
+            '.tbl': '.tres',     # Table → Godot Resource (based on wcs_asset_core)
+            '.fs2': '.tres',     # Mission → Godot Resource
+            '.fc2': '.tres',     # Campaign → Godot Resource
+            '.pof': '.glb',      # POF Model → GLB
+            '.eff': '.tres',     # Effects → Godot Resource
+            '.vf': '.tres',      # Font → Godot Font Resource
+            '.frc': '.tres',     # Force Config → Godot Resource
+            '.hcf': '.tres',     # HUD Config → Godot Resource  
+            '.txt': '.tres',     # Text/Fiction → Godot Resource
+            '.tbm': '.tres',     # Table Mod → Godot Resource
+            # Audio files stay the same format
+            '.wav': '.wav',
+            '.ogg': '.ogg',
+        }
+        
+        # Special handling for .ani files - they become sprite sheets + AnimatedSprite2D
+        if file_ext == '.ani':
+            # Animation files generate both a sprite sheet and an AnimatedSprite2D resource
+            # We'll return the sprite sheet path here, the AnimatedSprite2D will be handled separately
+            return f"{file_stem}_spritesheet.png"
+        
+        # Get target extension with conversion
+        target_ext = format_conversions.get(file_ext, file_ext)
+        
+        return f"{file_stem}{target_ext}"
+    
+    def _create_animation_relationships(self, ani_file: Path, entity_name: str) -> List[AssetRelationship]:
+        """
+        Create relationships for .ani files - both sprite sheet and AnimatedSprite2D resource
+        """
+        rel_path = ani_file.relative_to(self.source_dir)
+        file_stem = ani_file.stem
+        
+        relationships = []
+        
+        # Sprite sheet (converted from .ani)
+        sprite_sheet_rel = AssetRelationship(
+            source_path=str(rel_path),
+            target_path=self._get_target_path('animation', entity_name, str(ani_file)),
+            asset_type='sprite_sheet',
+            parent_entity=entity_name,
+            relationship_type='sprite_sheet',
+            required=True
+        )
+        relationships.append(sprite_sheet_rel)
+        
+        # AnimatedSprite2D resource 
+        animated_sprite_rel = AssetRelationship(
+            source_path=str(rel_path),
+            target_path=f"resources/animations/{file_stem}_animated_sprite.tres",
+            asset_type='animated_sprite_2d',
+            parent_entity=entity_name,
+            relationship_type='animated_sprite_resource',
+            required=True
+        )
+        relationships.append(animated_sprite_rel)
+        
+        return relationships
+    
+    def _create_effect_relationships(self, eff_file: Path, entity_name: str) -> List[AssetRelationship]:
+        """
+        Create relationships for .eff files and their associated numbered .dds frame files
+        """
+        rel_path = eff_file.relative_to(self.source_dir)
+        file_stem = eff_file.stem
+        
+        relationships = []
+        
+        # Main .eff file (converted to .tres effect resource)
+        eff_rel = AssetRelationship(
+            source_path=str(rel_path),
+            target_path=self._get_target_path('effect', entity_name, str(eff_file)),
+            asset_type='effect',
+            parent_entity=entity_name,
+            relationship_type='effect_definition',
+            required=True
+        )
+        relationships.append(eff_rel)
+        
+        # Find associated numbered .dds frame files
+        parent_dir = eff_file.parent
+        frame_files = list(parent_dir.glob(f"{file_stem}_*.dds"))
+        
+        if frame_files:
+            # Sort frame files numerically
+            frame_files.sort(key=lambda x: int(x.stem.split('_')[-1]))
+            
+            # Create sprite sheet from all frames
+            sprite_sheet_rel = AssetRelationship(
+                source_path="",  # Generated from multiple frame files
+                target_path=f"common/effects/{file_stem}_spritesheet.png",
+                asset_type='sprite_sheet',
+                parent_entity=entity_name,
+                relationship_type='effect_frames',
+                required=True
+            )
+            relationships.append(sprite_sheet_rel)
+            
+            # Add each frame file as a related asset
+            for frame_file in frame_files[:10]:  # Limit to first 10 for brevity
+                frame_rel_path = frame_file.relative_to(self.source_dir)
+                frame_rel = AssetRelationship(
+                    source_path=str(frame_rel_path),
+                    target_path=f"common/effects/{frame_file.stem}.png",
+                    asset_type='effect_frame',
+                    parent_entity=entity_name,
+                    relationship_type='frame_texture',
+                    required=False
+                )
+                relationships.append(frame_rel)
+                
+        return relationships
+    
+    def _create_scene_relationship(self, entity_name: str, entity_type: str) -> Optional[AssetRelationship]:
+        """
+        Create scene file relationship for complete entities (ships, weapons, etc.)
+        following wcs_asset_core architecture for combined asset scenes
+        """
+        if entity_type not in ['ship', 'weapon']:
+            return None
+        
+        # Clean entity name for scene filename
+        clean_name = re.sub(r'[^\w\-_]', '_', entity_name.lower())
+        clean_name = re.sub(r'_+', '_', clean_name).strip('_')
+        
+        if entity_type == 'ship':
+            # Ship scenes combine GLB model, textures, sounds, and ShipData resource
+            faction = self._determine_faction(entity_name)
+            ship_class = self._determine_ship_class(entity_name)
+            scene_path = f"scenes/ships/{faction}/{ship_class}/{clean_name}.tscn"
+        elif entity_type == 'weapon':
+            # Weapon scenes combine effects, sounds, and WeaponData resource
+            scene_path = f"scenes/weapons/{clean_name}.tscn"
+        else:
+            return None
+        
+        return AssetRelationship(
+            source_path="",  # Scene is generated, not converted from source
+            target_path=scene_path,
+            asset_type='scene',
+            parent_entity=entity_name,
+            relationship_type='complete_scene',
+            required=True
+        )
     
     def _determine_faction(self, entity_name: str) -> str:
-        """Determine faction from entity name using hardcoded patterns"""
+        """Determine faction from entity name using WCS naming conventions"""
         name_lower = entity_name.lower()
         
-        # Kilrathi patterns
-        if any(pattern in name_lower for pattern in ['dralthi', 'salthi', 'gratha', 'jalthi', 'fralthi']):
+        # WCS faction prefixes from model analysis
+        if any(prefix in name_lower for prefix in ['tcf_', 'confed', 'terran']):
+            return 'terran'
+        elif any(prefix in name_lower for prefix in ['kib_', 'kilrathi', 'kat']):
+            return 'kilrathi'
+        elif any(prefix in name_lower for prefix in ['bw_', 'border_world']):
+            return 'border_worlds'
+        
+        # Kilrathi ship name patterns
+        if any(pattern in name_lower for pattern in ['dralthi', 'salthi', 'gratha', 'jalthi', 'fralthi', 'paktahn']):
             return 'kilrathi'
         
-        # Terran by default
+        # Terran ship name patterns
+        if any(pattern in name_lower for pattern in ['arrow', 'hellcat', 'excalibur', 'rapier', 'ferret', 'hornet']):
+            return 'terran'
+        
+        # Default to terran
         return 'terran'
     
     def _determine_ship_class(self, entity_name: str) -> str:
-        """Determine ship class from entity name using hardcoded patterns"""
+        """Determine ship class from entity name using WCS patterns"""
         name_lower = entity_name.lower()
         
         # Capital ship patterns
-        if any(pattern in name_lower for pattern in ['carrier', 'cruiser', 'destroyer', 'dreadnought', 'corvette']):
+        if any(pattern in name_lower for pattern in ['carrier', 'cruiser', 'destroyer', 'dreadnought', 'corvette', 'dreadnaught']):
             return 'capital_ships'
+        elif any(pattern in name_lower for pattern in ['transport', 'freighter', 'tanker']):
+            return 'transports'
+        elif any(pattern in name_lower for pattern in ['base', 'station', 'platform', 'starbase', 'drydock']):
+            return 'installations'
         
         # Fighter by default
         return 'fighters'
+    
+    def _determine_asset_type_from_file(self, file_path: Path) -> tuple[str, str]:
+        """
+        Determine asset type and entity name from file path using WCS naming patterns.
+        Returns: (asset_type, entity_name)
+        """
+        file_name = file_path.name
+        file_stem = file_path.stem
+        file_ext = file_path.suffix.lower()
+        parent_dir = file_path.parent.name
+        
+        # POF models - determine type from filename prefixes
+        if file_ext == '.pof':
+            if file_stem.startswith(('tcf_', 'kib_', 'bw_')):
+                # Ship models
+                ship_name = file_stem.replace('tcf_', '').replace('kib_', '').replace('bw_', '')
+                ship_name = ship_name.replace('_', ' ').title()
+                return 'ship_model', ship_name
+            elif file_stem.startswith(('ast', 'debris')):
+                # Asteroids and debris
+                return 'environment_model', f"Asteroid_{file_stem}"
+            elif file_stem.startswith('kb_'):
+                # Kilrathi bases/installations
+                installation_name = file_stem.replace('kb_', '').replace('_', ' ').title()
+                return 'installation_model', installation_name
+            elif file_stem.startswith('f_'):
+                # Effects models
+                return 'effect_model', f"Effect_{file_stem[2:]}"
+            else:
+                # Generic model
+                return 'model', f"Model_{file_stem}"
+        
+        # Texture files - determine type from directory and suffixes
+        elif file_ext in ['.dds', '.pcx', '.tga', '.png', '.jpg']:
+            if parent_dir == 'hermes_maps':
+                # Ship textures with material type suffixes
+                if any(suffix in file_stem for suffix in ['-normal', '-shine', '-glow', '-bump']):
+                    base_name = file_stem.split('-')[0]
+                    material_type = file_stem.split('-')[1] if '-' in file_stem else 'diffuse'
+                    
+                    if base_name.startswith(('tcf_', 'kib_', 'bw_')):
+                        ship_name = base_name.replace('tcf_', '').replace('kib_', '').replace('bw_', '')
+                        ship_name = ship_name.replace('_', ' ').title()
+                        return f'ship_texture_{material_type}', ship_name
+                
+                # Base texture without suffix
+                if file_stem.startswith(('tcf_', 'kib_', 'bw_')):
+                    ship_name = file_stem.replace('tcf_', '').replace('kib_', '').replace('bw_', '')
+                    ship_name = ship_name.replace('_', ' ').title()
+                    return 'ship_texture', ship_name
+                
+                return 'texture', f"Texture_{file_stem}"
+            
+            elif parent_dir == 'hermes_interface':
+                # Interface textures
+                return 'ui_texture', f"UI_{file_stem}"
+            
+            elif parent_dir == 'hermes_cbanims':
+                # Animation frame textures
+                return 'animation_texture', f"Animation_{file_stem}"
+            
+            else:
+                return 'texture', f"Texture_{file_stem}"
+        
+        # Audio files
+        elif file_ext in ['.wav', '.ogg']:
+            return 'audio', f"Audio_{file_stem}"
+        
+        # Animation files - special handling for sprite sheets
+        elif file_ext == '.ani':
+            animation_name = file_stem.replace('_', ' ').title()
+            return 'animation', animation_name
+        
+        # Effect files (.eff often has associated numbered .dds frame files)
+        elif file_ext == '.eff':
+            effect_name = file_stem.replace('_', ' ').title()
+            return 'effect', effect_name
+        
+        # Mission files
+        elif file_ext == '.fs2':
+            mission_name = file_stem.replace('_', ' ').title()
+            return 'mission', mission_name
+        
+        # Campaign files  
+        elif file_ext == '.fc2':
+            campaign_name = file_stem.replace('_', ' ').title()
+            return 'campaign', campaign_name
+        
+        # Table files
+        elif file_ext == '.tbl':
+            table_type = file_stem.replace('_', ' ').title()
+            return 'data', table_type
+        
+        # Table modification files
+        elif file_ext == '.tbm':
+            table_mod_type = file_stem.replace('_', ' ').title()
+            return 'data_mod', table_mod_type
+        
+        # Font files
+        elif file_ext == '.vf':
+            font_name = file_stem.replace('font', 'Font ').title()
+            return 'font', font_name
+        
+        # Force configuration files
+        elif file_ext == '.frc':
+            config_name = file_stem.replace('_', ' ').title()
+            return 'config', config_name
+        
+        # HUD configuration files
+        elif file_ext == '.hcf':
+            hud_config_name = file_stem.replace('_', ' ').title()
+            return 'hud_config', hud_config_name
+        
+        # Text/fiction files
+        elif file_ext == '.txt':
+            text_name = file_stem.replace('_', ' ').title()
+            return 'text', text_name
+        
+        else:
+            return 'other', f"Asset_{file_stem}"
     
     def apply_hardcoded_mappings(self, table_relationships: Dict[str, List[AssetRelationship]]) -> Dict[str, AssetMapping]:
         """
@@ -489,18 +880,29 @@ class AssetRelationshipMapper:
         enhanced_mappings = {}
         
         for entity_name, relationships in table_relationships.items():
+            # Find primary asset (usually the first model)
+            primary_asset = None
+            for rel in relationships:
+                if rel.relationship_type == 'primary_model':
+                    primary_asset = rel
+                    break
+            
+            # Create related assets list without the primary asset to avoid duplication
+            related_assets = [rel for rel in relationships if rel != primary_asset]
+            
+            # Add scene generation for complete entities (ships, weapons, etc.)
+            entity_type = self._determine_entity_type(relationships)
+            scene_relationship = self._create_scene_relationship(entity_name, entity_type)
+            if scene_relationship:
+                related_assets.append(scene_relationship)
+            
             # Create base asset mapping
             asset_mapping = AssetMapping(
                 entity_name=entity_name,
-                entity_type=self._determine_entity_type(relationships),
-                related_assets=relationships.copy()
+                entity_type=entity_type,
+                primary_asset=primary_asset,
+                related_assets=related_assets
             )
-            
-            # Set primary asset (usually the first model)
-            for rel in relationships:
-                if rel.relationship_type == 'primary_model':
-                    asset_mapping.primary_asset = rel
-                    break
             
             # Apply campaign-specific overrides
             if 'hermes' in str(self.source_dir).lower():
@@ -534,6 +936,81 @@ class AssetRelationshipMapper:
                         path_parts[-1] = f"{prefix}{filename}"
                         rel.target_path = '/'.join(path_parts)
     
+    def _scan_and_map_all_source_files(self, existing_mappings: Dict[str, AssetMapping]) -> Dict[str, AssetMapping]:
+        """
+        Scan all actual source files and ensure they have mappings.
+        Creates generic mappings for files not covered by table analysis.
+        """
+        logger.info("Scanning for unmapped source files...")
+        
+        # Get all currently mapped source paths
+        mapped_sources = set()
+        for mapping in existing_mappings.values():
+            for rel in mapping.related_assets:
+                mapped_sources.add(rel.source_path)
+        
+        # Scan all actual source files
+        source_file_patterns = ['*.pof', '*.dds', '*.pcx', '*.tga', '*.png', '*.jpg', 
+                               '*.wav', '*.ogg', '*.eff', '*.ani', '*.tbl', '*.fs2', '*.fc2',
+                               '*.vf', '*.frc', '*.hcf', '*.txt', '*.tbm']
+        
+        unmapped_files = []
+        for pattern in source_file_patterns:
+            for file_path in self.source_dir.rglob(pattern):
+                # Convert to relative path for comparison
+                rel_path = file_path.relative_to(self.source_dir)
+                if str(rel_path) not in mapped_sources:
+                    unmapped_files.append(file_path)
+        
+        logger.info(f"Found {len(unmapped_files)} unmapped source files")
+        
+        # Create generic mappings for unmapped files
+        updated_mappings = existing_mappings.copy()
+        
+        for file_path in unmapped_files:
+            rel_path = file_path.relative_to(self.source_dir)
+            
+            # Use improved heuristics to determine asset type and entity name
+            asset_type, entity_name = self._determine_asset_type_from_file(file_path)
+            
+            # Create asset relationship(s) for this file
+            if asset_type == 'animation':
+                # Special handling for animation files - create both sprite sheet and AnimatedSprite2D
+                relationships = self._create_animation_relationships(file_path, entity_name)
+            elif asset_type == 'effect':
+                # Special handling for effect files - group with numbered .dds frame files
+                relationships = self._create_effect_relationships(file_path, entity_name)
+            else:
+                # Single relationship for other file types using the new target path method
+                relationships = [AssetRelationship(
+                    source_path=str(rel_path),
+                    target_path=self._get_target_path(asset_type, entity_name, str(file_path)),
+                    asset_type=asset_type,
+                    parent_entity=entity_name,
+                    relationship_type='primary_asset',
+                    required=True
+                )]
+            
+            # Handle multiple relationships (e.g., for animations)
+            for i, relationship in enumerate(relationships):
+                if entity_name not in updated_mappings:
+                    # First relationship becomes primary asset
+                    updated_mappings[entity_name] = AssetMapping(
+                        entity_name=entity_name,
+                        entity_type=asset_type,
+                        primary_asset=relationship if i == 0 else None,
+                        related_assets=relationships[1:] if i == 0 else [relationship],
+                        metadata={'source': 'file_scan', 'discovered': True}
+                    )
+                else:
+                    # Add additional relationships to related_assets
+                    existing_mapping = updated_mappings[entity_name]
+                    if existing_mapping.primary_asset != relationship:
+                        existing_mapping.related_assets.append(relationship)
+        
+        logger.info(f"Added mappings for {len(unmapped_files)} previously unmapped files")
+        return updated_mappings
+    
     def generate_project_mapping(self) -> Dict[str, Any]:
         """
         Generate complete project mapping JSON combining table data and hardcoded mappings.
@@ -552,6 +1029,9 @@ class AssetRelationshipMapper:
         
         # Apply hardcoded mappings
         asset_mappings = self.apply_hardcoded_mappings(table_relationships)
+        
+        # Scan for actual source files and ensure they're all mapped
+        asset_mappings = self._scan_and_map_all_source_files(asset_mappings)
         
         # Generate final mapping structure
         project_mapping = {
