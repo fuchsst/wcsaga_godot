@@ -49,3 +49,5 @@ venv.bak/
 
 .util-scripts/
 reports/
+asset_catalog.db
+hermes_campaign_mapping.json
