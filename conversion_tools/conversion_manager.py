@@ -72,6 +72,10 @@ class ConversionManager:
         # Initialize configuration migrator
         self.config_migrator = ConfigMigrator()
         
+        # Initialize asset relationship mapper
+        self.asset_mapper = None
+        self._init_asset_mapper()
+        
         # Initialize converters (will be imported dynamically)
         self.converters = {}
         self._load_converters()
@@ -98,6 +102,25 @@ class ConversionManager:
             
         except ImportError as e:
             logger.warning(f"Could not load some converters: {e}")
+    
+    def _init_asset_mapper(self) -> None:
+        """Initialize asset relationship mapper"""
+        try:
+            from asset_relationship_mapper import AssetRelationshipMapper
+            
+            # Load target structure from assets/CLAUDE.md definition
+            target_structure = {
+                'campaigns': 'campaigns/wing_commander_saga',
+                'common': 'common',
+                'ships': 'ships', 
+                'weapons': 'weapons'
+            }
+            
+            self.asset_mapper = AssetRelationshipMapper(self.wcs_source_dir, target_structure)
+            logger.info("Asset relationship mapper initialized")
+            
+        except ImportError as e:
+            logger.warning(f"Could not load asset relationship mapper: {e}")
     
     def scan_wcs_assets(self) -> Dict[str, List[Path]]:
         """
@@ -246,6 +269,37 @@ class ConversionManager:
         
         logger.info(f"Created conversion plan with {len(jobs)} jobs across 3 phases")
         return jobs
+    
+    def generate_asset_mapping(self, output_path: Optional[Path] = None) -> Optional[Dict[str, Any]]:
+        """
+        Generate comprehensive asset mapping using AssetRelationshipMapper.
+        
+        Args:
+            output_path: Optional path to save the mapping JSON file
+            
+        Returns:
+            Project mapping dictionary if successful, None otherwise
+        """
+        if not self.asset_mapper:
+            logger.error("Asset relationship mapper not available")
+            return None
+        
+        try:
+            logger.info("Generating comprehensive asset mapping...")
+            project_mapping = self.asset_mapper.generate_project_mapping()
+            
+            if output_path:
+                success = self.asset_mapper.save_mapping_json(project_mapping, output_path)
+                if success:
+                    logger.info(f"Asset mapping saved to: {output_path}")
+                else:
+                    logger.error(f"Failed to save asset mapping to: {output_path}")
+            
+            return project_mapping
+            
+        except Exception as e:
+            logger.error(f"Failed to generate asset mapping: {e}")
+            return None
     
     def _check_dependencies_satisfied(self, job: ConversionJob) -> bool:
         """Check if job dependencies are satisfied"""
@@ -613,6 +667,8 @@ def main():
                        help='Run validation after conversion')
     parser.add_argument('--catalog-only', action='store_true',
                        help='Only catalog existing assets without conversion')
+    parser.add_argument('--mapping-only', action='store_true',
+                       help='Only generate asset mapping without conversion')
     parser.add_argument('--dry-run', action='store_true',
                        help='Show conversion plan without executing')
     parser.add_argument('-v', '--verbose', action='store_true',
@@ -639,6 +695,23 @@ def main():
             # Only catalog existing assets
             converter.catalog_converted_assets()
             print("Asset cataloging completed")
+            return 0
+        
+        if args.mapping_only:
+            # Only generate asset mapping
+            mapping_path = args.target / "project_mapping.json"
+            print("Generating asset relationship mapping...")
+            mapping = converter.generate_asset_mapping(mapping_path)
+            if mapping:
+                print(f"Asset mapping generated successfully!")
+                print(f"Entities: {mapping['metadata']['total_entities']}")
+                print(f"Assets: {mapping['metadata']['total_assets']}")
+                print(f"Ships: {mapping['statistics']['ships']}")
+                print(f"Weapons: {mapping['statistics']['weapons']}")
+                print(f"Mapping saved to: {mapping_path}")
+            else:
+                print("Failed to generate asset mapping")
+                return 1
             return 0
         
         # Scan for assets
