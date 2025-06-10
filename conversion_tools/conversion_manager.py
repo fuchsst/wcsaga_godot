@@ -12,6 +12,7 @@ Architecture: EPIC-003 - Data Migration & Conversion Tools
 """
 
 import argparse
+import hashlib
 import json
 import logging
 import sys
@@ -35,6 +36,8 @@ class ConversionJob:
     status: str = "pending"
     progress: float = 0.0
     error_message: Optional[str] = None
+    file_hash: Optional[str] = None
+    duplicate_of: Optional[str] = None
 
 class ConversionManager:
     """
@@ -57,6 +60,10 @@ class ConversionManager:
         self.conversion_queue: List[ConversionJob] = []
         self.completed_jobs: List[ConversionJob] = []
         self.failed_jobs: List[ConversionJob] = []
+        
+        # Initialize duplicate detection
+        self.file_hash_manifest: Dict[str, str] = {}  # hash -> target_path
+        self.duplicate_files: List[ConversionJob] = []
         
         # Initialize asset catalog
         catalog_path = self.godot_target_dir / "asset_catalog.json"
@@ -259,9 +266,61 @@ class ConversionManager:
         
         return True
     
+    def _calculate_file_hash(self, file_path: Path) -> str:
+        """Calculate SHA256 hash of file content"""
+        try:
+            with open(file_path, 'rb') as f:
+                file_hash = hashlib.sha256()
+                # Read file in chunks to handle large files efficiently
+                for chunk in iter(lambda: f.read(8192), b""):
+                    file_hash.update(chunk)
+                return file_hash.hexdigest()
+        except Exception as e:
+            logger.warning(f"Failed to calculate hash for {file_path}: {e}")
+            return ""
+    
+    def _check_duplicate_file(self, job: ConversionJob) -> bool:
+        """
+        Check if file is duplicate and handle accordingly.
+        
+        Returns:
+            True if file should be skipped (is duplicate), False if should be processed
+        """
+        # Skip duplicate detection for certain job types
+        skip_types = {"vp_extraction", "config_migration", "table", "mission"}
+        if job.conversion_type in skip_types:
+            return False
+        
+        # Calculate file hash
+        file_hash = self._calculate_file_hash(job.source_path)
+        if not file_hash:
+            return False  # Process file if hash calculation failed
+        
+        job.file_hash = file_hash
+        
+        # Check if we've seen this hash before
+        if file_hash in self.file_hash_manifest:
+            original_target = self.file_hash_manifest[file_hash]
+            job.duplicate_of = original_target
+            job.status = "skipped_duplicate"
+            job.progress = 1.0
+            
+            # Log duplicate detection
+            logger.info(f"SKIPPED: Duplicate of '{original_target}': {job.source_path.name}")
+            self.duplicate_files.append(job)
+            return True
+        
+        # Register this file hash
+        self.file_hash_manifest[file_hash] = str(job.target_path)
+        return False
+    
     def _execute_single_job(self, job: ConversionJob) -> bool:
         """Execute a single conversion job"""
         try:
+            # Check for duplicate files before processing
+            if self._check_duplicate_file(job):
+                return True  # File was skipped as duplicate
+            
             logger.info(f"Starting conversion: {job.source_path.name} -> {job.conversion_type}")
             job.status = "in_progress"
             
@@ -408,7 +467,7 @@ class ConversionManager:
             return False
     
     def execute_conversion_plan(self, jobs: List[ConversionJob], 
-                              max_workers: int = 4) -> Tuple[int, int, int]:
+                              max_workers: int = 4) -> Tuple[int, int, int, int]:
         """
         Execute conversion plan with parallel processing.
         
@@ -417,11 +476,12 @@ class ConversionManager:
             max_workers: Maximum number of parallel workers
             
         Returns:
-            Tuple of (completed_count, failed_count, total_count)
+            Tuple of (completed_count, failed_count, skipped_count, total_count)
         """
         logger.info(f"Starting conversion with {max_workers} parallel workers")
         completed_count = 0
         failed_count = 0
+        skipped_count = 0
         total_count = len(jobs)
         
         # Group jobs by priority for sequential execution of phases
@@ -442,8 +502,11 @@ class ConversionManager:
                     if self._check_dependencies_satisfied(job):
                         success = self._execute_single_job(job)
                         if success:
-                            completed_count += 1
-                            self.completed_jobs.append(job)
+                            if job.status == "skipped_duplicate":
+                                skipped_count += 1
+                            else:
+                                completed_count += 1
+                                self.completed_jobs.append(job)
                         else:
                             failed_count += 1
                             self.failed_jobs.append(job)
@@ -461,8 +524,11 @@ class ConversionManager:
                         try:
                             result = future.result()
                             if result:
-                                completed_count += 1
-                                self.completed_jobs.append(job)
+                                if job.status == "skipped_duplicate":
+                                    skipped_count += 1
+                                else:
+                                    completed_count += 1
+                                    self.completed_jobs.append(job)
                             else:
                                 failed_count += 1
                                 self.failed_jobs.append(job)
@@ -473,8 +539,8 @@ class ConversionManager:
                             self.failed_jobs.append(job)
                             logger.error(f"Job execution error: {e}")
         
-        logger.info(f"Conversion completed: {completed_count}/{total_count} successful, {failed_count} failed")
-        return completed_count, failed_count, total_count
+        logger.info(f"Conversion completed: {completed_count}/{total_count} successful, {failed_count} failed, {skipped_count} duplicates skipped")
+        return completed_count, failed_count, skipped_count, total_count
     
     def catalog_converted_assets(self) -> None:
         """Catalog all converted assets using the asset catalog system"""
@@ -498,12 +564,27 @@ class ConversionManager:
     
     def generate_conversion_report(self) -> Dict:
         """Generate comprehensive conversion report"""
+        total_processed = len(self.completed_jobs) + len(self.failed_jobs) + len(self.duplicate_files)
+        
         report = {
             'conversion_summary': {
-                'total_jobs': len(self.completed_jobs) + len(self.failed_jobs),
+                'total_jobs': total_processed,
                 'completed': len(self.completed_jobs),
                 'failed': len(self.failed_jobs),
+                'duplicates_skipped': len(self.duplicate_files),
                 'success_rate': len(self.completed_jobs) / max(1, len(self.completed_jobs) + len(self.failed_jobs))
+            },
+            'duplicate_detection': {
+                'duplicates_found': len(self.duplicate_files),
+                'space_saved_estimate': f"{len(self.duplicate_files)} files",
+                'duplicate_files': [
+                    {
+                        'source': str(job.source_path),
+                        'duplicate_of': job.duplicate_of,
+                        'file_hash': job.file_hash
+                    }
+                    for job in self.duplicate_files
+                ]
             },
             'asset_catalog_summary': self.asset_catalog.generate_manifest(),
             'failed_conversions': [
@@ -584,9 +665,9 @@ def main():
         
         # Execute conversion
         print(f"\nStarting conversion with {args.jobs} parallel jobs...")
-        completed, failed, total = converter.execute_conversion_plan(conversion_jobs, args.jobs)
+        completed, failed, skipped, total = converter.execute_conversion_plan(conversion_jobs, args.jobs)
         
-        print(f"\nConversion completed: {completed}/{total} successful, {failed} failed")
+        print(f"\nConversion completed: {completed}/{total} successful, {failed} failed, {skipped} duplicates skipped")
         
         # Catalog converted assets
         print("\nCataloging converted assets...")
