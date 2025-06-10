@@ -5,7 +5,7 @@
 
 # Determine the script's directory and the project root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TARGET_DIR="$(cd "$SCRIPT_DIR/.." && pwd)" # Moves up one level from conversion_tools to target
+TARGET_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)" # Moves up two level from conversion_tools to target
 PROJECT_ROOT_DIR="$(cd "$TARGET_DIR/.." && pwd)" # Moves up one level from target to project root
 VENV_PATH="$TARGET_DIR/venv"
 
@@ -46,7 +46,25 @@ else
   exit 1
 fi
 
-(cd "$SCRIPT_DIR" && "$PYTHON_EXE" -m "$PYTHON_MODULE" "$@")
+# Convert relative --source and --output to absolute paths
+args=()
+while (( "$#" )); do
+  case "$1" in
+    --source|--output)
+      args+=("$1")
+      shift
+      # Use realpath to resolve the path
+      args+=("$(realpath "$1")")
+      shift
+      ;;
+    *)
+      args+=("$1")
+      shift
+      ;;
+  esac
+done
+
+(cd "$SCRIPT_DIR" && "$PYTHON_EXE" -m "$PYTHON_MODULE" "${args[@]}")
 
 # Deactivate virtual environment (optional, as script exits, but good practice)
 deactivate

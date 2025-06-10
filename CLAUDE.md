@@ -14,6 +14,7 @@ Main directories:
 * scripts: The folder for the Godot script game logic (used in scenes and other scripts)
 * shaders: Custom shaders to replicate specific WCS effects
 * tests: gdUnit4 test suites to test the scripts and scenes (use `target\addons\gdUnit4\runtest.sh` to run the tests)
+* Use `target\venv\Scripts\python.exe` to run Python scripts
 
 Godot Coding Guidelines:
 * Use scenes to define UI elements and reusable game objects

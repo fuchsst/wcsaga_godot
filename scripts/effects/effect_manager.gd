@@ -48,41 +48,41 @@ func create_explosion(position: Vector3, type: ExplosionType, radius: float = 1.
 
 func create_muzzle_flash(position: Vector3, direction: Vector3, parent_velocity: Vector3, effect_index: int):
 	# TODO: Implement muzzle flash instantiation using preloaded scenes/data based on effect_index.
-	print(f"EffectManager: Placeholder - Create muzzle flash index {effect_index} at {position} (Dir: {direction})")
+	print_debug(("EffectManager: Placeholder - Create muzzle flash index {effect_index} at {position} (Dir: {direction})")
 	pass
 
 func create_trail(trail_info: Dictionary, parent_node: Node3D):
 	# TODO: Implement trail creation (e.g., RibbonTrailMesh, TubeTrailMesh) based on trail_info.
 	# trail_info might contain texture path, width, alpha, lifetime, etc.
 	var trail_type = trail_info.get("type", "Unknown")
-	print(f"EffectManager: Placeholder - Create trail type '{trail_type}' attached to {parent_node.name if is_instance_valid(parent_node) else 'Invalid Node'}")
+	print_debug("EffectManager: Placeholder - Create trail type '{trail_type}' attached to {parent_node.name if is_instance_valid(parent_node) else 'Invalid Node'}")
 	pass
 
 func create_shockwave(position: Vector3, shockwave_info: Dictionary, parent_id: int):
 	# TODO: Implement shockwave instantiation using preloaded scenes/data based on shockwave_info.
 	# shockwave_info might contain radius, speed, damage, blast, texture/model path.
 	var sw_type = shockwave_info.get("type", "Unknown")
-	print(f"EffectManager: Placeholder - Create shockwave type '{sw_type}' at {position} (ParentID: {parent_id})")
+	print_debug("EffectManager: Placeholder - Create shockwave type '{sw_type}' at {position} (ParentID: {parent_id})")
 	pass
 
 func create_sparks(position: Vector3, normal: Vector3, count: int = 5, speed: float = 10.0, lifetime: float = 0.5):
 	# TODO: Implement spark particle effect instantiation.
-	print(f"EffectManager: Placeholder - Create {count} sparks at {position} (Normal: {normal})")
+	print_debug("EffectManager: Placeholder - Create {count} sparks at {position} (Normal: {normal})")
 	pass
 
 func create_shield_impact(position: Vector3, normal: Vector3, ship_node: Node3D):
 	# TODO: Implement shield impact visual effect (shader effect, particles).
-	print(f"EffectManager: Placeholder - Create shield impact at {position} on {ship_node.name if is_instance_valid(ship_node) else 'Invalid Ship'}")
+	print_debug("EffectManager: Placeholder - Create shield impact at {position} on {ship_node.name if is_instance_valid(ship_node) else 'Invalid Ship'}")
 	pass
 
 func create_beam_impact(position: Vector3, normal: Vector3):
 	# TODO: Implement beam impact visual effect.
-	print(f"EffectManager: Placeholder - Create beam impact at {position}")
+	print_debug("EffectManager: Placeholder - Create beam impact at {position}")
 	pass
 
 func create_flak_muzzle_flash(position: Vector3, direction: Vector3, parent_velocity: Vector3, weapon_info_index: int):
 	# TODO: Implement flak-specific muzzle flash.
-	print(f"EffectManager: Placeholder - Create FLAK muzzle flash at {position} (Weapon Index: {weapon_info_index})")
+	print_debug("EffectManager: Placeholder - Create FLAK muzzle flash at {position} (Weapon Index: {weapon_info_index})")
 	pass
 
 # Add other effect creation functions as needed (e.g., warp effects, cloak effects)

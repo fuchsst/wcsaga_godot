@@ -4,7 +4,7 @@ class_name HUDRadarGauge
 
 # Type references
 const WeaponBase = preload("res://scripts/object/weapon_base.gd")
-const DebrisObject = preload("res://scripts/object/debris.gd")
+const DebrisObject = preload("res://addons/wcs_asset_core/resources/object/debris.gd")
 
 # Radar range settings
 enum RadarRange {
