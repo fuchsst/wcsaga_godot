@@ -78,6 +78,10 @@ enum Type {
 	ARMOR_TABLE = 903,
 	STRING_TABLE = 904,
 	
+	# Environment and object assets
+	ASTEROID = 1000,
+	DEBRIS = 1001,
+	
 	# Faction and species assets
 	SPECIES = 950,
 	FACTION = 951,
@@ -167,6 +171,10 @@ static var TYPE_NAMES: Dictionary = {
 	Type.ARMOR_TABLE: "Armor Table",
 	Type.STRING_TABLE: "String Table",
 	
+	# Environment and Objects
+	Type.ASTEROID: "Asteroid",
+	Type.DEBRIS: "Debris",
+	
 	# Factions and Species
 	Type.SPECIES: "Species",
 	Type.FACTION: "Faction",
@@ -243,6 +251,10 @@ static var TYPE_CATEGORIES: Dictionary = {
 	Type.WEAPON_TABLE: Category.DATA,
 	Type.ARMOR_TABLE: Category.DATA,
 	Type.STRING_TABLE: Category.DATA,
+	
+	# Environment and Objects
+	Type.ASTEROID: Category.CORE,
+	Type.DEBRIS: Category.CORE,
 	
 	# Factions and Species
 	Type.SPECIES: Category.CORE,

@@ -1,0 +1,15 @@
+[gd_resource type="AsteroidData" format=3]
+
+[resource]
+name = "Small Asteroid"
+display_name = "Small Asteroid"
+max_speed = 60.0
+hitpoints = 23
+explosion_inner_radius = 0.0
+explosion_outer_radius = 0.0
+explosion_damage = 0.0
+explosion_blast = 0.0
+detail_distances = [0, 12000, 24000]
+lod_0_model = "campaigns/wing_commander_saga/environments/objects/asteroids/ast03.glb"
+lod_1_model = "campaigns/wing_commander_saga/environments/objects/asteroids/asta03.glb"
+lod_2_model = "campaigns/wing_commander_saga/environments/objects/asteroids/astb03.glb"

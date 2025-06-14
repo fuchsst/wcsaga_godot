@@ -89,6 +89,21 @@ class AsteroidTableConverter(BaseTableConverter):
                 state.current_line -=1
                 break
 
+            # Handle multi-line blast value continuation
+            if line.startswith('$Expl blast:'):
+                match = self._parse_patterns['expl_blast'].match(line)
+                if match:
+                    entry_data['expl_blast'] = float(match.group(1))
+                else:
+                    # Handle multi-line blast value (continuation on next line)
+                    blast_line = state.next_line()
+                    if blast_line:
+                        try:
+                            entry_data['expl_blast'] = float(blast_line.strip())
+                        except ValueError:
+                            entry_data['expl_blast'] = 0.0
+                continue
+
             for key, pattern in self._init_parse_patterns().items():
                 match = pattern.match(line)
                 if match:
@@ -98,6 +113,10 @@ class AsteroidTableConverter(BaseTableConverter):
                         entry_data[key] = float(match.group(1))
                     elif key == 'hitpoints':
                         entry_data[key] = int(match.group(1))
+                    elif key in ['pof_file1', 'pof_file2', 'pof_file3']:
+                        # Handle "none" POF files
+                        pof_value = match.group(1).strip()
+                        entry_data[key] = None if pof_value.lower() == 'none' else pof_value
                     elif key != 'name':
                          entry_data[key] = match.group(1).strip()
                     else:
@@ -139,20 +158,71 @@ class AsteroidTableConverter(BaseTableConverter):
         return 'name' in entry
 
     def convert_to_godot_resource(self, entries: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Convert parsed asteroid entries to a Godot resource dictionary."""
+        """Convert parsed asteroid entries to individual Godot resources."""
         asteroids = [e for e in entries if e.get('type') == 'asteroid']
         impact_data = next((e for e in entries if e.get('type') == 'impact_data'), None)
 
+        # Return individual asteroid resources instead of a single database
         return {
-            'resource_type': 'WCSAsteroidDatabase',
-            'asteroids': {a['name']: self._convert_asteroid_entry(a) for a in asteroids},
+            'individual_resources': [self._convert_asteroid_entry(a) for a in asteroids],
             'impact_data': self._convert_impact_data(impact_data) if impact_data else {},
         }
 
     def _convert_asteroid_entry(self, entry: Dict[str, Any]) -> Dict[str, Any]:
         """Convert a single asteroid entry to the target Godot format."""
-        return entry
+        converted = {
+            'name': entry.get('name', ''),
+            'display_name': entry.get('name', ''),
+            'max_speed': entry.get('max_speed', 0.0),
+            'hitpoints': entry.get('hitpoints', 1),
+            'explosion_inner_radius': entry.get('expl_inner_rad', 0.0),
+            'explosion_outer_radius': entry.get('expl_outer_rad', 0.0),
+            'explosion_damage': entry.get('expl_damage', 0.0),
+            'explosion_blast': entry.get('expl_blast', 0.0),
+            'detail_distances': entry.get('detail_distance', []),
+            'lod_0_model': self._convert_pof_to_glb_path(entry.get('pof_file1')) or "",
+            'lod_1_model': self._convert_pof_to_glb_path(entry.get('pof_file2')) or "",
+            'lod_2_model': self._convert_pof_to_glb_path(entry.get('pof_file3')) or ""
+        }
+        return converted
 
     def _convert_impact_data(self, entry: Dict[str, Any]) -> Dict[str, Any]:
         """Convert the impact data to the target Godot format."""
-        return entry
+        # Clean up impact explosion reference and convert to Godot path
+        impact_explosion = entry.get('impact_explosion', '')
+        # Remove comments (everything after semicolon)
+        if ';' in impact_explosion:
+            impact_explosion = impact_explosion.split(';')[0].strip()
+        
+        # Convert animation reference to Godot path
+        if impact_explosion:
+            impact_explosion = f"campaigns/wing_commander_saga/effects/explosions/{impact_explosion.lower()}.tscn"
+        
+        return {
+            'impact_explosion': impact_explosion,
+            'impact_explosion_radius': entry.get('impact_explosion_radius', 20.0)
+        }
+
+    def _convert_pof_to_glb_path(self, pof_file: Optional[str]) -> Optional[str]:
+        """Convert POF file reference to GLB path following semantic organization."""
+        if not pof_file or pof_file.lower() == 'none':
+            return None
+        
+        # Convert .pof extension to .glb
+        base_name = pof_file.replace('.pof', '')
+        
+        # Follow semantic organization: asteroids and debris go to environment/objects
+        if 'asteroid' in base_name.lower() or 'ast' in base_name.lower():
+            return f"campaigns/wing_commander_saga/environments/objects/asteroids/{base_name}.glb"
+        elif 'debris' in base_name.lower():
+            # Organize debris by faction
+            if 'cdebris' in base_name.lower() or 'terran' in base_name.lower():
+                return f"campaigns/wing_commander_saga/environments/objects/debris/terran/{base_name}.glb"
+            elif 'pdebris' in base_name.lower() or 'pirate' in base_name.lower():
+                return f"campaigns/wing_commander_saga/environments/objects/debris/pirate/{base_name}.glb"
+            elif 'kdebris' in base_name.lower() or 'kilrathi' in base_name.lower():
+                return f"campaigns/wing_commander_saga/environments/objects/debris/kilrathi/{base_name}.glb"
+            else:
+                return f"campaigns/wing_commander_saga/environments/objects/debris/misc/{base_name}.glb"
+        else:
+            return f"campaigns/wing_commander_saga/environments/objects/misc/{base_name}.glb"

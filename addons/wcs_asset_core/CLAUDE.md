@@ -105,6 +105,26 @@ var kinetic_damage: float = armor.calculate_damage_taken(100.0, "kinetic")
 print("Kinetic resistance: %.1f%%" % ((1.0 - armor.get_damage_multiplier("kinetic")) * 100))
 ```
 
+### AsteroidData
+**Purpose**: Asteroid and space debris specifications with LOD models and destruction effects.
+
+**Responsibilities**:
+- Physical properties (hitpoints, max speed, explosion parameters)
+- Multiple LOD model references for distance-based rendering
+- Explosion effect configuration for area damage
+- Impact explosion settings for weapon hits
+
+**Usage**:
+```gdscript
+var asteroid: AsteroidData = WCSAssetLoader.load_asset("objects/asteroids/large_asteroid.tres")
+var model_path: String = asteroid.get_model_for_distance(camera_distance)
+print("Asteroid: %s, HP: %d" % [asteroid.get_display_name(), asteroid.hitpoints])
+if asteroid.has_explosion():
+    print("Explosion damage: %.1f" % asteroid.explosion_damage)
+```
+
+**Note**: Behavior logic is implemented in `scripts/object/asteroid_object.gd`, following the separation of data and behavior principles.
+
 ### AssetLoader (WCSAssetLoader Autoload)
 **Purpose**: Centralized asset loading with caching and performance optimization.
 

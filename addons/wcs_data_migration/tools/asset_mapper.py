@@ -115,7 +115,7 @@ class AssetMapper:
         entities = {}
         for table_file in table_files:
             table_type = self.entity_classifier.determine_table_type(table_file)
-            if table_type in [TableType.SHIPS, TableType.WEAPONS]:
+            if table_type in [TableType.SHIPS, TableType.WEAPONS, TableType.ASTEROID]:
                 try:
                     with open(table_file, 'r', encoding='utf-8', errors='ignore') as f:
                         content = f.read()
@@ -275,6 +275,7 @@ class AssetMapper:
             'statistics': {
                 'ships': len([m for m in self.asset_mappings.values() if m.entity_type == 'ship']),
                 'weapons': len([m for m in self.asset_mappings.values() if m.entity_type == 'weapon']),
+                'asteroids': len([m for m in self.asset_mappings.values() if m.entity_type == 'asteroid']),
                 'effects': len([m for m in self.asset_mappings.values() if m.entity_type == 'effect']),
                 'total_relationships': total_assets,
                 'duplicates_found': self.duplicates_found

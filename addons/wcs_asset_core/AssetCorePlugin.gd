@@ -67,6 +67,14 @@ func _register_custom_types() -> void:
 		preload("structures/armor_data.gd"),
 		preload("icons/armor_icon.svg")
 	)
+	
+	# Asteroid asset type
+	add_custom_type(
+		"AsteroidData",
+		"BaseAssetData",
+		preload("resources/object/asteroid_data.gd"),
+		preload("icons/asset_icon.svg")
+	)
 
 func _unregister_custom_types() -> void:
 	"""Unregister custom asset types from the editor."""
@@ -75,6 +83,7 @@ func _unregister_custom_types() -> void:
 	remove_custom_type("ShipData")
 	remove_custom_type("WeaponData")
 	remove_custom_type("ArmorData")
+	remove_custom_type("AsteroidData")
 
 ## Autoload management
 func _setup_autoloads() -> void:
