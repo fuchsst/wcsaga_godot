@@ -17,35 +17,33 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-#Scenes="*res://addons/scene_manager/scenes.gd"
-#Signal_Debugger="*res://addons/SignalVisualizer/Debugger/SignalDebugger.gd"
+Signal_Debugger="*res://addons/SignalVisualizer/Debugger/SignalDebugger.gd"
 GameStateManager="*res://autoload/game_state_manager.gd"
-PhysicsManager="*res://autoload/physics_manager.gd"
-InputManager="*res://autoload/input_manager.gd"
-ConfigurationManager="*res://autoload/configuration_manager.gd"
+PhysicsManager="res://autoload/physics_manager.gd"
+InputManager="res://autoload/input_manager.gd"
+ConfigurationManager="res://autoload/configuration_manager.gd"
 SaveGameManager="*res://autoload/SaveGameManager.gd"
-ObjectManager="*res://autoload/object_manager.gd"
-#SceneManager="*res://addons/scene_manager/SceneManager.tscn"
-VPResourceManager="*res://autoload/vp_resource_manager.gd"
-GraphicsRenderingEngine="*res://scripts/graphics/core/graphics_rendering_engine.gd"
+ObjectManager="res://autoload/object_manager.gd"
+VPResourceManager="res://autoload/vp_resource_manager.gd"
+GraphicsRenderingEngine="res://scripts/graphics/core/graphics_rendering_engine.gd"
 WCSAssetLoader="*res://addons/wcs_asset_core/loaders/asset_loader.gd"
 WCSAssetRegistry="*res://addons/wcs_asset_core/loaders/registry_manager.gd"
-WCSAssetValidator="*res://addons/wcs_asset_core/loaders/validation_manager.gd"
+WCSAssetValidator="res://addons/wcs_asset_core/loaders/validation_manager.gd"
 WCSConstants="*res://scripts/core/foundation/wcs_constants.gd"
 WCSPaths="*res://scripts/core/foundation/wcs_paths.gd"
-AIManager="*res://scripts/ai/core/ai_manager.gd"
-SexpManager="*res://addons/sexp/core/sexp_manager.gd"
-SceneManager="*res://addons/scene_manager/SceneManager.tscn"
+AIManager="res://scripts/ai/core/ai_manager.gd"
+SexpManager="res://addons/sexp/core/sexp_manager.gd"
+SceneManager="res://addons/scene_manager/SceneManager.tscn"
 
 [display]
 
-window/size/viewport_width=1024
-window/size/viewport_height=768
+window/size/viewport_width=1280
+window/size/viewport_height=960
 window/stretch/mode="canvas_items"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/godot_mcp/plugin.cfg", "res://addons/scene_manager/plugin.cfg", "res://addons/sexp/plugin.cfg", "res://addons/wcs_asset_core/plugin.cfg", "res://addons/gdUnit4/plugin.cfg")
+enabled=PackedStringArray("res://addons/gdUnit4/plugin.cfg", "res://addons/godot_mcp/plugin.cfg", "res://addons/scene_manager/plugin.cfg", "res://addons/sexp/plugin.cfg", "res://addons/wcs_asset_core/plugin.cfg", "res://addons/wcs_data_migration/plugin.cfg")
 
 [input]
 

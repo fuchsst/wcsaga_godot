@@ -1,0 +1,89 @@
+[gd_scene load_steps=2 format=3 uid="uid://dwsj7x1mnfkqv"]
+
+[ext_resource type="Script" uid="uid://fkto1hh6lb60" path="res://addons/wcs_data_migration/ui_components/wizard_step_extraction.gd" id="1_q2mfq"]
+
+[node name="WizardStepExtraction" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_q2mfq")
+step_number = 2
+step_title = "Extract VP Archives"
+step_description = "Scan for VP archive files and extract them to access campaign assets."
+
+[node name="StepHeader" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 80.0
+grow_horizontal = 2
+theme_override_constants/separation = 8
+
+[node name="StepTitle" type="Label" parent="StepHeader"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Step 2: Extract VP Archives"
+
+[node name="StepDescription" type="Label" parent="StepHeader"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "Scan for VP archive files and extract them to access campaign assets."
+autowrap_mode = 3
+
+[node name="ExtractionContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 90.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="ScanSection" type="VBoxContainer" parent="ExtractionContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ScanResultsLabel" type="Label" parent="ExtractionContainer/ScanSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "VP Files Found:"
+
+[node name="VPFilesList" type="ItemList" parent="ExtractionContainer/ScanSection"]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+size_flags_vertical = 3
+select_mode = 1
+
+[node name="ControlsSection" type="VBoxContainer" parent="ExtractionContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ExtractionControls" type="HBoxContainer" parent="ExtractionContainer/ControlsSection"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ScanVPButton" type="Button" parent="ExtractionContainer/ControlsSection/ExtractionControls"]
+custom_minimum_size = Vector2(120, 36)
+layout_mode = 2
+text = "Scan for VP Files"
+
+[node name="ExtractSelectedButton" type="Button" parent="ExtractionContainer/ControlsSection/ExtractionControls"]
+custom_minimum_size = Vector2(120, 36)
+layout_mode = 2
+disabled = true
+text = "Extract Selected"
+
+[node name="ExtractAllButton" type="Button" parent="ExtractionContainer/ControlsSection/ExtractionControls"]
+custom_minimum_size = Vector2(120, 36)
+layout_mode = 2
+disabled = true
+text = "Extract All"
+
+[node name="ExtractionProgress" type="ProgressBar" parent="ExtractionContainer/ControlsSection"]
+visible = false
+layout_mode = 2

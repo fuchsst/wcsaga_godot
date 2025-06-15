@@ -80,7 +80,7 @@ func test_asteroid_table_processing() -> void:
 	# Skip this test if Python is not available
 	var python_path: String = "target/venv/Scripts/python.exe"
 	if not FileAccess.file_exists(python_path):
-		skip_test("Python environment not available")
+		print("Skipping test - Python environment not available")
 		return
 	
 	# Run CLI tool

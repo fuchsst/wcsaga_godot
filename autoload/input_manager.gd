@@ -212,7 +212,8 @@ func _process(delta: float) -> void:
 	input_frame_time = frame_end_time - frame_start_time
 	
 	if input_frame_time > input_latency_target:
-		push_warning("InputManager: Input processing exceeded latency target: %.2fms > %.2fms" % [input_frame_time, input_latency_target])
+		pass
+		#push_warning("InputManager: Input processing exceeded latency target: %.2fms > %.2fms" % [input_frame_time, input_latency_target])
 
 func _input(event: InputEvent) -> void:
 	if not is_initialized or is_shutting_down or not input_enabled:

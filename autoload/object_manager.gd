@@ -220,7 +220,8 @@ func _physics_process(delta: float) -> void:
 	var frame_time: float = frame_end_time - frame_start_time
 	
 	if frame_time > update_time_budget:
-		push_warning("ObjectManager: Frame time exceeded budget: %.2fms > %.2fms" % [frame_time, update_time_budget])
+		pass
+		#push_warning("ObjectManager: Frame time exceeded budget: %.2fms > %.2fms" % [frame_time, update_time_budget])
 
 func _process_update_groups(delta: float) -> void:
 	# Process different update frequency groups

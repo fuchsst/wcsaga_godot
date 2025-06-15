@@ -2,47 +2,38 @@
 extends EditorPlugin
 
 ## WCS Data Migration & Conversion Tools Plugin
-## EPIC-003 Implementation - Complete asset conversion pipeline with Godot integration
+## EPIC-003 Implementation - Complete asset conversion pipeline with unified wizard interface
 
-const VPImportPlugin = preload("res://addons/wcs_data_migration/import_plugins/vp_import_plugin.gd")
-const POFImportPlugin = preload("res://addons/wcs_data_migration/import_plugins/pof_import_plugin.gd")
-const MissionImportPlugin = preload("res://addons/wcs_data_migration/import_plugins/mission_import_plugin.gd")
-const ConversionDock = preload("res://addons/wcs_data_migration/ui_components/conversion_dock.gd")
+const ConversionWizardMain = preload("res://addons/wcs_data_migration/ui_components/conversion_wizard_main.tscn")
 
-var vp_import_plugin: EditorImportPlugin
-var pof_import_plugin: EditorImportPlugin
-var mission_import_plugin: EditorImportPlugin
-var conversion_dock: Control
+var main_screen: Control
 
 func _enter_tree() -> void:
-	# Register import plugins
-	vp_import_plugin = VPImportPlugin.new()
-	pof_import_plugin = POFImportPlugin.new()
-	mission_import_plugin = MissionImportPlugin.new()
+	# Add main screen wizard
+	main_screen = ConversionWizardMain.instantiate()
+	get_editor_interface().get_editor_main_screen().add_child(main_screen)
+	main_screen.visible = false
 	
-	add_import_plugin(vp_import_plugin)
-	add_import_plugin(pof_import_plugin)
-	add_import_plugin(mission_import_plugin)
-	
-	# Add conversion dock
-	conversion_dock = ConversionDock.new()
-	add_control_to_dock(DOCK_SLOT_LEFT_UR, conversion_dock)
-	
-	print("WCS Data Migration & Conversion Tools activated")
+	print("WCS Asset Mapper activated")
 
 func _exit_tree() -> void:
-	# Remove import plugins
-	remove_import_plugin(vp_import_plugin)
-	remove_import_plugin(pof_import_plugin)
-	remove_import_plugin(mission_import_plugin)
+	# Remove main screen
+	if main_screen and is_instance_valid(main_screen):
+		get_editor_interface().get_editor_main_screen().remove_child(main_screen)
+		main_screen.free()
 	
-	# Remove conversion dock
-	remove_control_from_docks(conversion_dock)
-	
-	print("WCS Data Migration & Conversion Tools deactivated")
+	print("WCS Asset Mapper deactivated")
 
 func _has_main_screen() -> bool:
-	return false
+	return true
+
+func _make_visible(visible: bool) -> void:
+	if main_screen:
+		main_screen.visible = visible
 
 func _get_plugin_name() -> String:
-	return "WCS Data Migration"
+	return "WCS Asset Mapper"
+
+func _get_plugin_icon() -> Texture2D:
+	# Use built-in Godot icon for now
+	return get_editor_interface().get_base_control().get_theme_icon("ImportCheck", "EditorIcons")

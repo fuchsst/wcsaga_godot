@@ -369,10 +369,6 @@ func _on_state_enter(state: GameState) -> void:
 func _cleanup_mission_state() -> void:
 	# Clear mission-specific data
 	clear_mission_data()
-	
-	# Notify other systems
-	if ObjectManager:
-		ObjectManager.clear_all_objects()
 
 func _cleanup_briefing_state() -> void:
 	# Clean up briefing data

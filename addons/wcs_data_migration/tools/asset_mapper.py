@@ -19,6 +19,7 @@ import re
 import hashlib
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Any
+from datetime import datetime
 
 # Core addon imports
 from data_structures import AssetRelationship, AssetMapping

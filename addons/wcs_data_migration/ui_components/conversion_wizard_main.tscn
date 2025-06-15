@@ -1,0 +1,412 @@
+[gd_scene load_steps=11 format=3 uid="uid://bpq1ovmjemj7c"]
+
+[ext_resource type="Script" uid="uid://erxptmqd76vv" path="res://addons/wcs_data_migration/ui_components/conversion_wizard_controller.gd" id="1_xh4vw"]
+[ext_resource type="PackedScene" uid="uid://cmnqx7qhymr0n" path="res://addons/wcs_data_migration/ui_components/wizard_step_paths.tscn" id="2_a7xkr"]
+[ext_resource type="PackedScene" uid="uid://dwsj7x1mnfkqv" path="res://addons/wcs_data_migration/ui_components/wizard_step_extraction.tscn" id="3_mx1dg"]
+[ext_resource type="PackedScene" uid="uid://cvnsg8hq0olx7" path="res://addons/wcs_data_migration/ui_components/wizard_step_mapping.tscn" id="4_8c8dm"]
+[ext_resource type="PackedScene" uid="uid://bftj7cwh6wh6k" path="res://addons/wcs_data_migration/ui_components/wizard_step_conversion.tscn" id="5_eyhqk"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1"]
+bg_color = Color(0.2, 0.23, 0.31, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4, 0.47, 0.62, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.3)
+shadow_size = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2"]
+bg_color = Color(0.25, 0.28, 0.36, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4, 0.47, 0.62, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3"]
+bg_color = Color(0.3, 0.7, 1, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5"]
+bg_color = Color(0.4, 0.4, 0.4, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4"]
+bg_color = Color(0.5, 0.5, 0.5, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[node name="WCS Asset Mapper" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_xh4vw")
+
+[node name="Background" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Background"]
+layout_mode = 2
+offset_left = 24.0
+offset_top = 16.0
+offset_right = 1256.0
+offset_bottom = 904.0
+
+[node name="HeaderContainer" type="MarginContainer" parent="Background/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+
+[node name="HeaderCard" type="Panel" parent="Background/VBoxContainer/HeaderContainer"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1")
+
+[node name="HeaderVBox" type="VBoxContainer" parent="Background/VBoxContainer/HeaderContainer/HeaderCard"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 0
+theme_override_constants/separation = 12
+
+[node name="TitleRow" type="HBoxContainer" parent="Background/VBoxContainer/HeaderContainer/HeaderCard/HeaderVBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleIcon" type="TextureRect" parent="Background/VBoxContainer/HeaderContainer/HeaderCard/HeaderVBox/TitleRow"]
+texture_filter = 1
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="Background/VBoxContainer/HeaderContainer/HeaderCard/HeaderVBox/TitleRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "WCS to Godot Conversion Wizard"
+vertical_alignment = 1
+
+[node name="Spacer" type="Control" parent="Background/VBoxContainer/HeaderContainer/HeaderCard/HeaderVBox/TitleRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="StepCounter" type="Label" parent="Background/VBoxContainer/HeaderContainer/HeaderCard/HeaderVBox/TitleRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 14
+text = "Step 1 of 4"
+vertical_alignment = 1
+
+[node name="Description" type="Label" parent="Background/VBoxContainer/HeaderContainer/HeaderCard/HeaderVBox"]
+custom_minimum_size = Vector2(256, 32)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 16
+text = "Convert Wing Commander Saga assets to Godot-compatible formats"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="NavigationContainer" type="MarginContainer" parent="Background/VBoxContainer"]
+layout_mode = 2
+
+[node name="NavigationCard" type="Panel" parent="Background/VBoxContainer/NavigationContainer"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_2")
+
+[node name="NavigationFlow" type="VBoxContainer" parent="Background/VBoxContainer/NavigationContainer/NavigationCard"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 56.0
+grow_horizontal = 2
+size_flags_vertical = 0
+
+[node name="StatusLabel" type="Label" parent="Background/VBoxContainer/NavigationContainer/NavigationCard/NavigationFlow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+text = "Configure paths to begin conversion"
+horizontal_alignment = 1
+
+[node name="NavigationButtons" type="HBoxContainer" parent="Background/VBoxContainer/NavigationContainer/NavigationCard/NavigationFlow"]
+layout_mode = 2
+
+[node name="ButtonSpacer2" type="Control" parent="Background/VBoxContainer/NavigationContainer/NavigationCard/NavigationFlow/NavigationButtons"]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="Background/VBoxContainer/NavigationContainer/NavigationCard/NavigationFlow/NavigationButtons"]
+custom_minimum_size = Vector2(140, 32)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+disabled = true
+text = "← Back"
+
+[node name="ButtonSpacer" type="Control" parent="Background/VBoxContainer/NavigationContainer/NavigationCard/NavigationFlow/NavigationButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="NextButton" type="Button" parent="Background/VBoxContainer/NavigationContainer/NavigationCard/NavigationFlow/NavigationButtons"]
+custom_minimum_size = Vector2(140, 32)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+disabled = true
+text = "Next →"
+
+[node name="ButtonSpacer3" type="Control" parent="Background/VBoxContainer/NavigationContainer/NavigationCard/NavigationFlow/NavigationButtons"]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+
+[node name="ProgressContainer" type="MarginContainer" parent="Background/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+
+[node name="ProgressCard" type="Panel" parent="Background/VBoxContainer/ProgressContainer"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_2")
+
+[node name="StepsFlow" type="HBoxContainer" parent="Background/VBoxContainer/ProgressContainer/ProgressCard"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Step1Container" type="VBoxContainer" parent="Background/VBoxContainer/ProgressContainer/ProgressCard/StepsFlow"]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_constants/separation = 8
+
+[node name="Step1Circle" type="Panel" parent="Background/VBoxContainer/ProgressContainer/ProgressCard/StepsFlow/Step1Container"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_3")
+
+[node name="Step1Number" type="Label" parent="Background/VBoxContainer/ProgressContainer/ProgressCard/StepsFlow/Step1Container/Step1Circle"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -8.0
+offset_top = -11.0
+offset_right = 8.0
+offset_bottom = 11.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 16
+text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Step1Button" type="Button" parent="Background/VBoxContainer/ProgressContainer/ProgressCard/StepsFlow/Step1Container"]
+custom_minimum_size = Vector2(120, 28)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Set Paths"
+
+[node name="Connector1" type="Panel" parent="Background/VBoxContainer/ProgressContainer/ProgressCard/StepsFlow"]
+custom_minimum_size = Vector2(60, 4)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_5")
+
+[node name="Step2Container" type="VBoxContainer" parent="Background/VBoxContainer/ProgressContainer/ProgressCard/StepsFlow"]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_constants/separation = 8
+
+[node name="Step2Circle" type="Panel" parent="Background/VBoxContainer/ProgressContainer/ProgressCard/StepsFlow/Step2Container"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_4")
+
+[node name="Step2Number" type="Label" parent="Background/VBoxContainer/ProgressContainer/ProgressCard/StepsFlow/Step2Container/Step2Circle"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -8.0
+offset_top = -11.0
+offset_right = 8.0
+offset_bottom = 11.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 16
+text = "2"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Step2Button" type="Button" parent="Background/VBoxContainer/ProgressContainer/ProgressCard/StepsFlow/Step2Container"]
+custom_minimum_size = Vector2(120, 28)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+disabled = true
+text = "Extract Archives"
+flat = true
+
+[node name="Connector2" type="Panel" parent="Background/VBoxContainer/ProgressContainer/ProgressCard/StepsFlow"]
+custom_minimum_size = Vector2(60, 4)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_5")
+
+[node name="Step3Container" type="VBoxContainer" parent="Background/VBoxContainer/ProgressContainer/ProgressCard/StepsFlow"]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_constants/separation = 8
+
+[node name="Step3Circle" type="Panel" parent="Background/VBoxContainer/ProgressContainer/ProgressCard/StepsFlow/Step3Container"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_4")
+
+[node name="Step3Number" type="Label" parent="Background/VBoxContainer/ProgressContainer/ProgressCard/StepsFlow/Step3Container/Step3Circle"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -8.0
+offset_top = -11.0
+offset_right = 8.0
+offset_bottom = 11.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 16
+text = "3"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Step3Button" type="Button" parent="Background/VBoxContainer/ProgressContainer/ProgressCard/StepsFlow/Step3Container"]
+custom_minimum_size = Vector2(120, 28)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+disabled = true
+text = "Create Mapping"
+flat = true
+
+[node name="Connector3" type="Panel" parent="Background/VBoxContainer/ProgressContainer/ProgressCard/StepsFlow"]
+custom_minimum_size = Vector2(60, 4)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_5")
+
+[node name="Step4Container" type="VBoxContainer" parent="Background/VBoxContainer/ProgressContainer/ProgressCard/StepsFlow"]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_constants/separation = 8
+
+[node name="Step4Circle" type="Panel" parent="Background/VBoxContainer/ProgressContainer/ProgressCard/StepsFlow/Step4Container"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_4")
+
+[node name="Step4Number" type="Label" parent="Background/VBoxContainer/ProgressContainer/ProgressCard/StepsFlow/Step4Container/Step4Circle"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -8.0
+offset_top = -11.0
+offset_right = 8.0
+offset_bottom = 11.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 16
+text = "4"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Step4Button" type="Button" parent="Background/VBoxContainer/ProgressContainer/ProgressCard/StepsFlow/Step4Container"]
+custom_minimum_size = Vector2(120, 28)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+disabled = true
+text = "Convert Assets"
+flat = true
+
+[node name="ContentContainer" type="MarginContainer" parent="Background/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ContentCard" type="Panel" parent="Background/VBoxContainer/ContentContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1")
+
+[node name="ContentMargin" type="MarginContainer" parent="Background/VBoxContainer/ContentContainer/ContentCard"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 8
+
+[node name="WizardContent" type="Control" parent="Background/VBoxContainer/ContentContainer/ContentCard/ContentMargin"]
+layout_mode = 2
+
+[node name="Step1Panel" parent="Background/VBoxContainer/ContentContainer/ContentCard/ContentMargin/WizardContent" instance=ExtResource("2_a7xkr")]
+layout_mode = 1
+
+[node name="Step2Panel" parent="Background/VBoxContainer/ContentContainer/ContentCard/ContentMargin/WizardContent" instance=ExtResource("3_mx1dg")]
+visible = false
+layout_mode = 1
+
+[node name="Step3Panel" parent="Background/VBoxContainer/ContentContainer/ContentCard/ContentMargin/WizardContent" instance=ExtResource("4_8c8dm")]
+visible = false
+layout_mode = 1
+
+[node name="Step4Panel" parent="Background/VBoxContainer/ContentContainer/ContentCard/ContentMargin/WizardContent" instance=ExtResource("5_eyhqk")]
+visible = false
+layout_mode = 1

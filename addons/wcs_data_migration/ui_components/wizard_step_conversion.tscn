@@ -1,0 +1,97 @@
+[gd_scene load_steps=2 format=3 uid="uid://bftj7cwh6wh6k"]
+
+[ext_resource type="Script" uid="uid://bamlwjichnsya" path="res://addons/wcs_data_migration/ui_components/wizard_step_conversion.gd" id="1_j8c0j"]
+
+[node name="WizardStepConversion" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_j8c0j")
+step_number = 4
+step_title = "Convert Assets"
+step_description = "Select which asset types to convert and run the conversion process."
+
+[node name="StepHeader" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 80.0
+grow_horizontal = 2
+theme_override_constants/separation = 8
+
+[node name="StepTitle" type="Label" parent="StepHeader"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Step 4: Convert Assets"
+
+[node name="StepDescription" type="Label" parent="StepHeader"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "Select which asset types to convert and run the conversion process."
+autowrap_mode = 3
+
+[node name="ConversionContainer" type="HSplitContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 90.0
+grow_horizontal = 2
+grow_vertical = 2
+split_offset = 400
+
+[node name="OptionsPanel" type="VBoxContainer" parent="ConversionContainer"]
+custom_minimum_size = Vector2(350, 0)
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="ConversionOptionsLabel" type="Label" parent="ConversionContainer/OptionsPanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Conversion Options"
+
+[node name="AssetTypesList" type="ItemList" parent="ConversionContainer/OptionsPanel"]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+size_flags_vertical = 3
+select_mode = 1
+
+[node name="ConversionButtons" type="VBoxContainer" parent="ConversionContainer/OptionsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ConvertSelectedButton" type="Button" parent="ConversionContainer/OptionsPanel/ConversionButtons"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+disabled = true
+text = "Convert Selected Types"
+
+[node name="ConvertAllButton" type="Button" parent="ConversionContainer/OptionsPanel/ConversionButtons"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+disabled = true
+text = "Convert All Assets"
+
+[node name="LogPanel" type="VBoxContainer" parent="ConversionContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+
+[node name="ConversionLogLabel" type="Label" parent="ConversionContainer/LogPanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Conversion Log"
+
+[node name="ConversionLog" type="TextEdit" parent="ConversionContainer/LogPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+placeholder_text = "Conversion progress and results will appear here..."
+editable = false
+
+[node name="ConversionProgress" type="ProgressBar" parent="ConversionContainer/LogPanel"]
+visible = false
+layout_mode = 2
