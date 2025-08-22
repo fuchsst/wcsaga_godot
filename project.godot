@@ -13,7 +13,7 @@ config_version=5
 config/name="Wing Commander Saga"
 run/main_scene="res://scenes/main/bootstrap.tscn"
 config/features=PackedStringArray("4.4", "GL Compatibility")
-config/icon="res://icon.svg"
+config/icon="uid://cc58gpsbqci8y"
 
 [autoload]
 
@@ -28,11 +28,11 @@ VPResourceManager="res://autoload/vp_resource_manager.gd"
 GraphicsRenderingEngine="res://scripts/graphics/core/graphics_rendering_engine.gd"
 WCSAssetLoader="*res://addons/wcs_asset_core/loaders/asset_loader.gd"
 WCSAssetRegistry="*res://addons/wcs_asset_core/loaders/registry_manager.gd"
-WCSAssetValidator="res://addons/wcs_asset_core/loaders/validation_manager.gd"
+WCSAssetValidator="*res://addons/wcs_asset_core/loaders/validation_manager.gd"
 WCSConstants="*res://scripts/core/foundation/wcs_constants.gd"
 WCSPaths="*res://scripts/core/foundation/wcs_paths.gd"
 AIManager="res://scripts/ai/core/ai_manager.gd"
-SexpManager="res://addons/sexp/core/sexp_manager.gd"
+SexpManager="*res://addons/sexp/core/sexp_manager.gd"
 SceneManager="res://addons/scene_manager/SceneManager.tscn"
 
 [display]
@@ -41,9 +41,13 @@ window/size/viewport_width=1280
 window/size/viewport_height=960
 window/stretch/mode="canvas_items"
 
+[dotnet]
+
+project/assembly_name="Wing Commander Saga"
+
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/gdUnit4/plugin.cfg", "res://addons/godot_mcp/plugin.cfg", "res://addons/scene_manager/plugin.cfg", "res://addons/sexp/plugin.cfg", "res://addons/wcs_asset_core/plugin.cfg", "res://addons/wcs_data_migration/plugin.cfg")
+enabled=PackedStringArray("res://addons/sexp/plugin.cfg", "res://addons/wcs_asset_core/plugin.cfg", "res://addons/wcs_data_migration/plugin.cfg")
 
 [input]
 
