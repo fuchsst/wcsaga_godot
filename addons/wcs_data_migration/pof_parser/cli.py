@@ -13,10 +13,10 @@ import sys
 from pathlib import Path
 from typing import List, Optional
 
-from .pof_format_analyzer import POFFormatAnalyzer
 from .pof_data_extractor import POFDataExtractor
-from .pof_parser import POFParser
+from .pof_format_analyzer import POFFormatAnalyzer
 from .pof_mesh_converter import POFMeshConverter
+from .pof_parser import POFParser
 
 # Configure logging
 logging.basicConfig(

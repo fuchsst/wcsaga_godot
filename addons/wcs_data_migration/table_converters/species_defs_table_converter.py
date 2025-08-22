@@ -7,9 +7,10 @@ Handles Species_defs.tbl files for species properties.
 """
 
 import re
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 from .base_table_converter import BaseTableConverter, ParseState, TableType
+
 
 class SpeciesDefsTableConverter(BaseTableConverter):
     """Converts WCS Species_defs.tbl files to Godot species definition resources"""

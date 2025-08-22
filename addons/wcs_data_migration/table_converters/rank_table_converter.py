@@ -6,9 +6,10 @@ Single Responsibility: Player rank definitions parsing and conversion only.
 """
 
 import re
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 from .base_table_converter import BaseTableConverter, ParseState, TableType
+
 
 class RankTableConverter(BaseTableConverter):
     """Converts WCS rank.tbl files to Godot rank resources"""

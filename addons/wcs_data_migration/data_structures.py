@@ -11,7 +11,8 @@ Epic: EPIC-003 - Data Migration & Conversion Tools
 """
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
+
 
 @dataclass
 class AssetRelationship:

@@ -7,13 +7,13 @@ Creates multiple mesh versions with appropriate detail levels for different view
 """
 
 import logging
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
-from dataclasses import dataclass
 import math
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
-from .pof_parser import POFParser
 from .pof_data_extractor import POFDataExtractor
+from .pof_parser import POFParser
 
 
 @dataclass

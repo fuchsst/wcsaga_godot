@@ -7,14 +7,14 @@ Preserves gameplay accuracy while providing efficient collision detection for Go
 """
 
 import logging
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any, Set
+import math
 from dataclasses import dataclass
 from enum import Enum
-import math
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Set, Tuple
 
-from .pof_parser import POFParser
 from .pof_data_extractor import POFDataExtractor
+from .pof_parser import POFParser
 
 
 class CollisionType(Enum):
@@ -584,7 +584,7 @@ class CollisionMeshGenerator:
         """Save collision mesh data to file."""
         try:
             import json
-            
+
             # Convert collision data to serializable format
             collision_dict = {
                 'collision_type': collision_data.collision_type.value,

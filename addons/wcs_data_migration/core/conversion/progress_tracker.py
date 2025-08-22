@@ -8,9 +8,9 @@ Provides real-time progress updates and statistics.
 
 import logging
 import time
-from typing import Dict, List, Optional, Any, Callable
 from dataclasses import dataclass
 from threading import Lock
+from typing import Any, Callable, Dict, List, Optional
 
 from .job_manager import ConversionJob, JobStatus
 

@@ -6,15 +6,16 @@ Test suite for POF to Godot mesh conversion functionality.
 Tests the complete pipeline from POF to GLB with validation.
 """
 
-import unittest
-import tempfile
 import json
+import tempfile
+import unittest
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
 
-from .pof_obj_converter import POFOBJConverter, OBJConversionResult
 from .godot_import_generator import GodotImportGenerator
-from .pof_mesh_converter import POFMeshConverter, ConversionReport
+from .pof_mesh_converter import ConversionReport, POFMeshConverter
+from .pof_obj_converter import OBJConversionResult, POFOBJConverter
+
 
 class TestPOFOBJConverter(unittest.TestCase):
     """Test POF to OBJ conversion functionality."""

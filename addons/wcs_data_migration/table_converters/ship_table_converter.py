@@ -9,8 +9,10 @@ Single Responsibility: Ship table parsing and conversion only.
 """
 
 import re
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
+
 from .base_table_converter import BaseTableConverter, ParseState, TableType
+
 
 class ShipTableConverter(BaseTableConverter):
     """Converts WCS ships.tbl files to Godot ship resources"""
@@ -185,8 +187,9 @@ class ShipTableConverter(BaseTableConverter):
     
     def convert_to_godot_resources(self, entries: List[Dict[str, Any]], output_dir: str) -> Dict[str, Any]:
         """Convert parsed ship entries to Godot .tres resource files"""
-        from ..resource_generators.ship_class_generator import ShipClassGenerator
-        
+        from ..resource_generators.ship_class_generator import \
+            ShipClassGenerator
+
         # Create resource generator
         generator = ShipClassGenerator(output_dir)
         

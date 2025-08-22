@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 import logging
-from typing import BinaryIO, Dict, Any, List
+from typing import Any, BinaryIO, Dict, List
 
 # Import necessary helper functions from pof_chunks
-from .pof_chunks import read_int, read_float, read_vector
+from .pof_chunks import read_float, read_int, read_vector
+
 # Import Vector3D if needed for type hinting or direct use
 # from .vector3d import Vector3D
 

@@ -17,10 +17,10 @@ import os
 import re
 import shutil
 import winreg
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
 
 class ConfigType(Enum):

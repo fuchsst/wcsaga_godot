@@ -10,9 +10,9 @@ Based on WCS C++ analysis from source/code/model/modelinterp.cpp
 
 import logging
 import struct
-from pathlib import Path
-from typing import Dict, Any, List, Optional, Tuple, Set, BinaryIO
 from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any, BinaryIO, Dict, List, Optional, Set, Tuple
 
 from .pof_data_extractor import POFDataExtractor
 from .pof_misc_parser import parse_bsp_data

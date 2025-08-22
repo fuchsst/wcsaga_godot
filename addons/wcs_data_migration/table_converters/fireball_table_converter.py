@@ -7,8 +7,10 @@ Handles fireball.tbl files for visual effects configuration.
 """
 
 import re
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
+
 from .base_table_converter import BaseTableConverter, ParseState, TableType
+
 
 class FireballTableConverter(BaseTableConverter):
     """Converts WCS fireball.tbl files to Godot explosion effect resources"""

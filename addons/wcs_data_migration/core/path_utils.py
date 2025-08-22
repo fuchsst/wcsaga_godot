@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 from typing import List, Optional, Union
 
+
 def sanitize_filename(filename: str) -> str:
     """
     Sanitize filename for cross-platform compatibility.

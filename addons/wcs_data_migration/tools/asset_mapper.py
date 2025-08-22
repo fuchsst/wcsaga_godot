@@ -13,19 +13,19 @@ Story: DM-013 - Automated Asset Mapping from Table Data
 Epic: EPIC-003 - Data Migration & Conversion Tools
 """
 
+import hashlib
 import json
 import logging
 import re
-import hashlib
-from pathlib import Path
-from typing import Dict, List, Optional, Set, Any
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Set
 
-# Core addon imports
-from data_structures import AssetRelationship, AssetMapping
 from core.asset_discovery import AssetDiscoveryEngine
 from core.entity_classifier import EntityClassifier, EntityType, TableType
 from core.path_resolver import TargetPathResolver
+# Core addon imports
+from data_structures import AssetMapping, AssetRelationship
 
 logger = logging.getLogger(__name__)
 

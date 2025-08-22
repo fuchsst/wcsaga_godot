@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-import struct
 import math
+import struct
+
 
 class Vector3D:
     """Represents a 3D vector with x, y, z components."""

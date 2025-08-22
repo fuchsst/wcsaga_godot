@@ -6,9 +6,10 @@ Single Responsibility: Lightning and storm definitions parsing and conversion on
 """
 
 import re
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 from .base_table_converter import BaseTableConverter, ParseState, TableType
+
 
 class LightningTableConverter(BaseTableConverter):
     """Converts WCS lightning.tbl files to Godot lightning effect resources"""

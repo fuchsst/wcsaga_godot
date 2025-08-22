@@ -6,14 +6,14 @@ Transforms mission events and goals into GDScript equivalents preserving
 trigger conditions and action sequences from FS2 SEXP expressions.
 """
 
-import re
 import logging
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any, Set, Union
+import re
 from dataclasses import dataclass
 from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
-from .fs2_mission_parser import MissionEvent, MissionGoal, MissionData
+from .fs2_mission_parser import MissionData, MissionEvent, MissionGoal
 
 
 class SexpNodeType(Enum):

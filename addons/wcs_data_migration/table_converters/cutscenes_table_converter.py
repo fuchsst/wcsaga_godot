@@ -6,9 +6,10 @@ Single Responsibility: Cutscene definitions parsing and conversion only.
 """
 
 import re
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 from .base_table_converter import BaseTableConverter, ParseState, TableType
+
 
 class CutscenesTableConverter(BaseTableConverter):
     """Converts WCS cutscenes.tbl files to Godot cutscene resources"""

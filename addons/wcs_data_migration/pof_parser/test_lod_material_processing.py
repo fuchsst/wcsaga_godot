@@ -7,33 +7,30 @@ Tests all DM-006 components: LOD processor, material converter, collision genera
 shader mapper, mesh optimizer, and validation system.
 """
 
-import unittest
 import tempfile
-from pathlib import Path
-from typing import Dict, List, Any
+import unittest
 from dataclasses import asdict
+from pathlib import Path
+from typing import Any, Dict, List
 
-from .pof_lod_processor import POFLODProcessor, LODHierarchy, LODLevel, create_default_lod_hierarchy
-from .godot_material_converter import (
-    GodotMaterialConverter, WCSMaterialProperties, GodotMaterialProperties,
-    WCSRenderMode, create_example_wcs_materials
-)
-from .collision_mesh_generator import (
-    CollisionMeshGenerator, CollisionMeshSettings, CollisionType,
-    CollisionMeshData
-)
-from .wcs_shader_mapper import (
-    WCSShaderMapper, WCSShaderConfiguration, WCSShaderEffect,
-    ShaderMapping, GodotShaderType
-)
-from .mesh_optimization_tools import (
-    MeshOptimizer, OptimizationProfile, OptimizationTarget,
-    TextureOptimizer, MeshOptimizationResult
-)
-from .lod_material_validator import (
-    LODMaterialValidator, ValidationLevel, ValidationResult,
-    ValidationReport, PerformanceMetrics
-)
+from .collision_mesh_generator import (CollisionMeshData,
+                                       CollisionMeshGenerator,
+                                       CollisionMeshSettings, CollisionType)
+from .godot_material_converter import (GodotMaterialConverter,
+                                       GodotMaterialProperties,
+                                       WCSMaterialProperties, WCSRenderMode,
+                                       create_example_wcs_materials)
+from .lod_material_validator import (LODMaterialValidator, PerformanceMetrics,
+                                     ValidationLevel, ValidationReport,
+                                     ValidationResult)
+from .mesh_optimization_tools import (MeshOptimizationResult, MeshOptimizer,
+                                      OptimizationProfile, OptimizationTarget,
+                                      TextureOptimizer)
+from .pof_lod_processor import (LODHierarchy, LODLevel, POFLODProcessor,
+                                create_default_lod_hierarchy)
+from .wcs_shader_mapper import (GodotShaderType, ShaderMapping,
+                                WCSShaderConfiguration, WCSShaderEffect,
+                                WCSShaderMapper)
 
 
 class TestPOFLODProcessor(unittest.TestCase):

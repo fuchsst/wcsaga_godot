@@ -15,11 +15,11 @@ SOLID Principles Applied:
 
 import logging
 import re
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any, Union, Protocol
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
-from abc import ABC, abstractmethod
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Protocol, Tuple, Union
 
 logger = logging.getLogger(__name__)
 

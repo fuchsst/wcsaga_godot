@@ -6,8 +6,10 @@ Single Responsibility: IFF (Identification Friend or Foe) definitions parsing on
 """
 
 import re
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
+
 from .base_table_converter import BaseTableConverter, ParseState, TableType
+
 
 class IFFTableConverter(BaseTableConverter):
     """Converts WCS iff_defs.tbl files to Godot IFF resources"""

@@ -7,11 +7,11 @@ Provides vertex reduction, texture optimization, and efficient UV mapping for mo
 """
 
 import logging
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any, Set
+import math
 from dataclasses import dataclass
 from enum import Enum
-import math
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 from .pof_lod_processor import LODLevel
 

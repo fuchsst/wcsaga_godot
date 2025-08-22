@@ -21,17 +21,18 @@ import json
 import logging
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional, Any, Type
+from typing import Any, Dict, List, Optional, Type
 
 # Import all specialized table converters
 sys.path.append(str(Path(__file__).parent.parent))
 
-from table_converters.asteroid_table_converter import AsteroidTableConverter
-from table_converters.ship_table_converter import ShipTableConverter
-from table_converters.weapon_table_converter import WeaponTableConverter
-from table_converters.armor_table_converter import ArmorTableConverter
+from table_converters.ai_profiles_table_converter import \
+    AIProfilesTableConverter
 from table_converters.ai_table_converter import AITableConverter
-from table_converters.ai_profiles_table_converter import AIProfilesTableConverter
+from table_converters.armor_table_converter import ArmorTableConverter
+from table_converters.asteroid_table_converter import AsteroidTableConverter
+from table_converters.base_table_converter import (BaseTableConverter,
+                                                   ParseState, TableType)
 from table_converters.fireball_table_converter import FireballTableConverter
 from table_converters.iff_table_converter import IFFTableConverter
 from table_converters.lightning_table_converter import LightningTableConverter
@@ -39,12 +40,13 @@ from table_converters.medals_table_converter import MedalsTableConverter
 from table_converters.music_table_converter import MusicTableConverter
 from table_converters.rank_table_converter import RankTableConverter
 from table_converters.scripting_table_converter import ScriptingTableConverter
+from table_converters.ship_table_converter import ShipTableConverter
 from table_converters.sounds_table_converter import SoundsTableConverter
-from table_converters.species_defs_table_converter import SpeciesDefsTableConverter
+from table_converters.species_defs_table_converter import \
+    SpeciesDefsTableConverter
 from table_converters.species_table_converter import SpeciesTableConverter
 from table_converters.stars_table_converter import StarsTableConverter
-
-from table_converters.base_table_converter import BaseTableConverter, ParseState, TableType
+from table_converters.weapon_table_converter import WeaponTableConverter
 
 logger = logging.getLogger(__name__)
 
@@ -333,6 +335,7 @@ class TableConversionCLI:
     def _make_safe_filename(self, name: str) -> str:
         """Make a safe filename from object name."""
         import re
+
         # Replace spaces and special characters with underscores
         safe_name = re.sub(r'[^\w\-_]', '_', name.lower())
         # Remove multiple consecutive underscores

@@ -13,15 +13,17 @@ Epic: EPIC-003 - Data Migration & Conversion Tools
 
 import logging
 import re
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional, Set
-from dataclasses import dataclass, field
-from data_structures import AssetRelationship, AssetMapping
-from .entity_classifier import EntityType, EntityClassifier, TableType
-from .asset_discovery import AssetDiscoveryEngine
-from .path_resolver import TargetPathResolver
-from table_converters.sounds_table_converter import SoundsTableConverter
+
+from data_structures import AssetMapping, AssetRelationship
 from table_converters.base_table_converter import ParseState
+from table_converters.sounds_table_converter import SoundsTableConverter
+
+from .asset_discovery import AssetDiscoveryEngine
+from .entity_classifier import EntityClassifier, EntityType, TableType
+from .path_resolver import TargetPathResolver
 
 logger = logging.getLogger(__name__)
 

@@ -6,9 +6,10 @@ Single Responsibility: Medal definitions parsing and conversion only.
 """
 
 import re
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 from .base_table_converter import BaseTableConverter, ParseState, TableType
+
 
 class MedalsTableConverter(BaseTableConverter):
     """Converts WCS medals.tbl files to Godot medal resources"""

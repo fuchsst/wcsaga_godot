@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
-import struct
 import logging
-from typing import BinaryIO, Dict, Any, List, Tuple
+import struct
+from typing import Any, BinaryIO, Dict, List, Tuple
 
 # Import necessary helper functions and constants from pof_chunks
-from .pof_chunks import (
-    read_int, read_float, read_vector, read_string_len,
-    MAX_PROP_LEN, OP_EOF, OP_DEFPOINTS, OP_FLATPOLY, OP_TMAPPOLY,
-    OP_SORTNORM, OP_BOUNDBOX
-)
+from .pof_chunks import (MAX_PROP_LEN, OP_BOUNDBOX, OP_DEFPOINTS, OP_EOF,
+                         OP_FLATPOLY, OP_SORTNORM, OP_TMAPPOLY, read_float,
+                         read_int, read_string_len, read_vector)
 # Import Vector3D if needed for type hinting or direct use
 from .vector3d import Vector3D
 

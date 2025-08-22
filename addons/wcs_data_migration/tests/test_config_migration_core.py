@@ -11,17 +11,17 @@ Story: DM-009 - Configuration Migration
 Epic: EPIC-003 - Data Migration & Conversion Tools
 """
 
+import json
 import sys
 import tempfile
-import json
-import pytest
 from pathlib import Path
+
+import pytest
 
 # Import the module under test
 sys.path.append(str(Path(__file__).parent.parent))
-from config_migrator import (
-    ConfigMigrator, GraphicsSettings, AudioSettings, GameplaySettings
-)
+from config_migrator import (AudioSettings, ConfigMigrator, GameplaySettings,
+                             GraphicsSettings)
 
 
 class TestConfigMigrationCore:
@@ -144,5 +144,6 @@ AutoTargeting=true
     def test_migrate_config_cli_tool_import(self):
         """Test that the migrate_config CLI tool can be imported successfully."""
         from migrate_config import main
+
         # If import succeeds, that's sufficient for this test
         assert main is not None

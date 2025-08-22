@@ -6,9 +6,10 @@ Single Responsibility: AI profile definitions parsing and conversion only.
 """
 
 import re
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 from .base_table_converter import BaseTableConverter, ParseState, TableType
+
 
 class AIProfilesTableConverter(BaseTableConverter):
     """Converts WCS ai_profiles.tbl files to Godot AI profile resources"""

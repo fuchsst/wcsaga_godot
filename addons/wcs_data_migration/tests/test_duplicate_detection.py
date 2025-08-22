@@ -5,11 +5,11 @@ Test suite for duplicate asset detection functionality in ConversionManager.
 Tests DM-014: Duplicate Asset Detection and Handling
 """
 
+import hashlib
+import sys
 import tempfile
 import unittest
 from pathlib import Path
-import sys
-import hashlib
 from unittest.mock import Mock, patch
 
 # Add parent directory to path for imports

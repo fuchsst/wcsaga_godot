@@ -7,8 +7,10 @@ Single Responsibility: Weapon table parsing and conversion only.
 """
 
 import re
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
+
 from .base_table_converter import BaseTableConverter, ParseState, TableType
+
 
 class WeaponTableConverter(BaseTableConverter):
     """Converts WCS weapons.tbl files to Godot weapon resources"""
@@ -167,8 +169,9 @@ class WeaponTableConverter(BaseTableConverter):
     
     def convert_to_godot_resources(self, entries: List[Dict[str, Any]], output_dir: str) -> Dict[str, Any]:
         """Convert parsed weapon entries to Godot .tres resource files"""
-        from ..resource_generators.weapon_resource_generator import WeaponResourceGenerator
-        
+        from ..resource_generators.weapon_resource_generator import \
+            WeaponResourceGenerator
+
         # Create resource generator
         generator = WeaponResourceGenerator(output_dir)
         

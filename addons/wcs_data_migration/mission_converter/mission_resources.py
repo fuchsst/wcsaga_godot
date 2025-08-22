@@ -6,13 +6,14 @@ Creates Godot Resource files (.tres) containing mission metadata, objectives,
 and configuration data for runtime use. Follows EPIC-001/002 data-driven approach.
 """
 
-import logging
 import json
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
+import logging
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
-from .fs2_mission_parser import MissionData, MissionObject, MissionWing, MissionEvent, MissionGoal, MissionWaypoint
+from .fs2_mission_parser import (MissionData, MissionEvent, MissionGoal,
+                                 MissionObject, MissionWaypoint, MissionWing)
 from .mission_event_converter import ConvertedEvent
 
 
@@ -410,6 +411,7 @@ waypoints = [{", ".join(waypoint_positions)}]
     def _sanitize_filename(self, filename: str) -> str:
         """Sanitize filename for filesystem compatibility."""
         import re
+
         # Replace invalid characters
         sanitized = re.sub(r'[<>:"/\\|?*]', '_', filename)
         # Remove extra spaces and make lowercase

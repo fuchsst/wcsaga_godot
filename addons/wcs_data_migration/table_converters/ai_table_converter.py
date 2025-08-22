@@ -7,8 +7,10 @@ Handles ai.tbl files for AI ship behavior configuration.
 """
 
 import re
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
+
 from .base_table_converter import BaseTableConverter, ParseState, TableType
+
 
 class AITableConverter(BaseTableConverter):
     """Converts WCS ai.tbl files to Godot AI behavior resources"""

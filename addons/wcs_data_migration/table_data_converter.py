@@ -19,13 +19,13 @@ Original C++ Analysis:
 - Preserves all data fields and parsing behaviors from original implementation
 """
 
+import json
 import logging
 import re
-import json
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any, Union
 from dataclasses import dataclass, field
 from enum import Enum, IntEnum
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 logger = logging.getLogger(__name__)
 

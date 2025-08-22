@@ -7,12 +7,12 @@ Generates Godot-optimized materials with proper shader assignment, texture mappi
 and rendering properties based on WCS material specifications.
 """
 
-import logging
-from pathlib import Path
-from typing import Dict, List, Optional, Any, Union
-from dataclasses import dataclass, asdict
-from enum import Enum
 import json
+import logging
+from dataclasses import asdict, dataclass
+from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
 
 
 class WCSRenderMode(Enum):

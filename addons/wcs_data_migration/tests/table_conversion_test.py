@@ -8,14 +8,16 @@ Date: January 29, 2025
 Story: DM-008 - Asset Table Processing
 """
 
+import shutil
 import sys
 import tempfile
-import shutil
 from pathlib import Path
-import pytest
 
+import pytest
 # Import from same directory
-from table_data_converter import TableDataConverter, ParseState, ShipClassData, WeaponData, ArmorTypeData
+from table_data_converter import (ArmorTypeData, ParseState, ShipClassData,
+                                  TableDataConverter, WeaponData)
+
 
 def test_parse_state():
     """Test ParseState functionality"""

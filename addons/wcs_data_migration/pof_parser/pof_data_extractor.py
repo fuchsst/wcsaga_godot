@@ -9,9 +9,9 @@ Based on WCS C++ analysis from source/code/model/modelread.cpp
 """
 
 import logging
-from pathlib import Path
-from typing import Dict, Any, List, Optional, Tuple
 from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
 from .pof_parser import POFParser
 from .vector3d import Vector3D

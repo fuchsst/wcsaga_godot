@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-import struct
 import logging
-from typing import BinaryIO, Tuple, Dict, Any, List
+import struct
+from typing import Any, BinaryIO, Dict, List, Tuple
 
 from .vector3d import Vector3D
 

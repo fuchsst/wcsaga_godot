@@ -17,10 +17,10 @@ logger = logging.getLogger(__name__)
 def validate_imports():
     """Validate that all POF parser modules can be imported."""
     try:
-        from . import POFParser, POFFormatAnalyzer, POFDataExtractor
+        from . import POFDataExtractor, POFFormatAnalyzer, POFParser
         logger.info("✓ Successfully imported main classes")
         
-        from .pof_chunks import POF_HEADER_ID, PM_COMPATIBLE_VERSION
+        from .pof_chunks import PM_COMPATIBLE_VERSION, POF_HEADER_ID
         logger.info("✓ Successfully imported constants")
         
         from .cli import main as cli_main
@@ -38,7 +38,7 @@ def validate_imports():
 def validate_instantiation():
     """Validate that main classes can be instantiated."""
     try:
-        from . import POFParser, POFFormatAnalyzer, POFDataExtractor
+        from . import POFDataExtractor, POFFormatAnalyzer, POFParser
         
         parser = POFParser()
         logger.info("✓ POFParser instantiated successfully")
@@ -58,12 +58,12 @@ def validate_instantiation():
 def validate_constants():
     """Validate that constants are properly defined."""
     try:
-        from .pof_chunks import (
-            POF_HEADER_ID, PM_COMPATIBLE_VERSION, PM_OBJFILE_MAJOR_VERSION,
-            ID_OHDR, ID_SOBJ, ID_TXTR, ID_SPCL, ID_PATH, ID_GPNT, ID_MPNT,
-            ID_DOCK, ID_FUEL, ID_SHLD, ID_EYE, ID_INSG, ID_ACEN, ID_GLOW, ID_SLDC
-        )
-        
+        from .pof_chunks import (ID_ACEN, ID_DOCK, ID_EYE, ID_FUEL, ID_GLOW,
+                                 ID_GPNT, ID_INSG, ID_MPNT, ID_OHDR, ID_PATH,
+                                 ID_SHLD, ID_SLDC, ID_SOBJ, ID_SPCL, ID_TXTR,
+                                 PM_COMPATIBLE_VERSION,
+                                 PM_OBJFILE_MAJOR_VERSION, POF_HEADER_ID)
+
         # Validate some key constants
         assert POF_HEADER_ID == 0x4f505350, "POF_HEADER_ID constant incorrect"
         assert PM_COMPATIBLE_VERSION == 1900, "PM_COMPATIBLE_VERSION constant incorrect"

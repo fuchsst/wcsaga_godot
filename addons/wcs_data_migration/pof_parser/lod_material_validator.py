@@ -7,18 +7,20 @@ for LOD and material processing. Ensures converted materials maintain visual acc
 and performance characteristics while achieving optimization goals.
 """
 
-import logging
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any, Set
-from dataclasses import dataclass, asdict
-from enum import Enum
 import json
+import logging
 import math
+from dataclasses import asdict, dataclass
+from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Set, Tuple
 
-from .pof_lod_processor import LODHierarchy, LODLevel
-from .godot_material_converter import GodotMaterialProperties, WCSMaterialProperties
 from .collision_mesh_generator import CollisionMeshData
-from .mesh_optimization_tools import MeshOptimizationResult, OptimizationProfile
+from .godot_material_converter import (GodotMaterialProperties,
+                                       WCSMaterialProperties)
+from .mesh_optimization_tools import (MeshOptimizationResult,
+                                      OptimizationProfile)
+from .pof_lod_processor import LODHierarchy, LODLevel
 
 
 class ValidationLevel(Enum):

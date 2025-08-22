@@ -6,15 +6,15 @@ Main orchestrator for converting FS2 mission files into Godot scene format
 with proper object placement and event system integration.
 """
 
-import logging
 import json
+import logging
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
-from dataclasses import dataclass, asdict
+from typing import Any, Dict, List, Optional, Tuple
 
 from .fs2_mission_parser import FS2MissionParser, MissionData
 from .godot_scene_generator import GodotSceneGenerator
-from .mission_event_converter import MissionEventConverter, ConvertedEvent
+from .mission_event_converter import ConvertedEvent, MissionEventConverter
 from .mission_resources import MissionResourceGenerator
 
 
@@ -610,7 +610,7 @@ To validate the conversion accuracy:
             
             # Extract resource arrays from content
             import re
-            
+
             # Find ship resources array
             ship_match = re.search(r'ship_resources = \[(.*?)\]', content, re.DOTALL)
             if ship_match:
@@ -684,6 +684,7 @@ To validate the conversion accuracy:
     def _sanitize_filename(self, filename: str) -> str:
         """Sanitize filename for filesystem compatibility."""
         import re
+
         # Replace invalid characters
         sanitized = re.sub(r'[<>:"/\\|?*]', '_', filename)
         # Remove extra spaces and make lowercase

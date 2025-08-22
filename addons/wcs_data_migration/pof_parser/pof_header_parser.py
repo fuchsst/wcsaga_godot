@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 import logging
-from typing import BinaryIO, Dict, Any, List
+from typing import Any, BinaryIO, Dict, List
 
-from .pof_chunks import (
-    read_float, read_uint, read_int, read_vector,
-    MAX_MODEL_DETAIL_LEVELS, MAX_DEBRIS_OBJECTS
-)
+from .pof_chunks import (MAX_DEBRIS_OBJECTS, MAX_MODEL_DETAIL_LEVELS,
+                         read_float, read_int, read_uint, read_vector)
+
 # Import Vector3D if needed for type hinting or direct use, though read_vector returns it
 # from .vector3d import Vector3D
 

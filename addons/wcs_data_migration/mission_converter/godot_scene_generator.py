@@ -6,14 +6,15 @@ Generates Godot .tscn scene files with proper node hierarchy representing
 mission layout and object relationships from parsed FS2 mission data.
 """
 
-import logging
 import json
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any, Set
-from dataclasses import dataclass, asdict
+import logging
+from dataclasses import asdict, dataclass
 from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Set, Tuple
 
-from .fs2_mission_parser import MissionData, MissionObject, MissionWing, MissionWaypoint, ObjectType
+from .fs2_mission_parser import (MissionData, MissionObject, MissionWaypoint,
+                                 MissionWing, ObjectType)
 
 
 class GodotNodeType(Enum):
@@ -717,14 +718,14 @@ func is_mission_active() -> bool:
 # Import required module
 import re
 
-
 # Example usage and testing
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     
     # Test with sample mission data
-    from .fs2_mission_parser import MissionData, MissionInfo, MissionObject, MissionGoal, MissionEvent
-    
+    from .fs2_mission_parser import (MissionData, MissionEvent, MissionGoal,
+                                     MissionInfo, MissionObject)
+
     # Create test mission data
     test_mission = MissionData()
     test_mission.mission_info = MissionInfo(

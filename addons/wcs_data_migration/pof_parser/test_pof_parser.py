@@ -6,16 +6,16 @@ Comprehensive test suite for POF format analysis and parsing functionality.
 Tests format validation, chunk parsing, and data extraction capabilities.
 """
 
-import unittest
-import tempfile
 import struct
+import tempfile
+import unittest
 from pathlib import Path
 from typing import BinaryIO
 
-from .pof_format_analyzer import POFFormatAnalyzer, POFFormatInfo
+from .pof_chunks import ID_OHDR, ID_TXTR, POF_HEADER_ID
 from .pof_data_extractor import POFDataExtractor
+from .pof_format_analyzer import POFFormatAnalyzer, POFFormatInfo
 from .pof_parser import POFParser
-from .pof_chunks import POF_HEADER_ID, ID_OHDR, ID_TXTR
 
 
 class TestPOFFormatAnalyzer(unittest.TestCase):

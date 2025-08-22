@@ -11,11 +11,12 @@ Date: June 10, 2025
 Epic: EPIC-003 - Data Migration & Conversion Tools
 """
 
-import re
 import logging
+import re
 from pathlib import Path
 from typing import Dict, Optional
-from .entity_classifier import EntityType, EntityClassifier
+
+from .entity_classifier import EntityClassifier, EntityType
 
 logger = logging.getLogger(__name__)
 
@@ -335,7 +336,7 @@ class TargetPathResolver:
     def _extract_mission_number_from_filename(self, filename: str) -> Optional[int]:
         """Extract mission number from pilot voice filename"""
         import re
-        
+
         # Pattern: 01_greywolf_01.wav, 02_sandman_03.wav, etc.
         mission_pattern = re.compile(r'^(\d{2})_\w+_\d{2}\.')
         match = mission_pattern.match(filename)

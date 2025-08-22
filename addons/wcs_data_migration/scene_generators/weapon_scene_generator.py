@@ -7,8 +7,9 @@ Follows scene-based asset architecture instead of .tres resources.
 """
 
 import os
-from typing import Dict, List, Any
 from pathlib import Path
+from typing import Any, Dict, List
+
 
 class WeaponSceneGenerator:
     """Generates weapon scene files from parsed weapon table data"""

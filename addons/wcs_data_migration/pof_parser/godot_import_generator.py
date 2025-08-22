@@ -8,10 +8,10 @@ with ship-specific settings, collision generation, and material configuration.
 Based on EPIC-003 architecture and Godot import pipeline requirements.
 """
 
+import configparser
 import logging
 from pathlib import Path
-from typing import Dict, Any, Optional, List
-import configparser
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 

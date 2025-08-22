@@ -7,9 +7,10 @@ Handles Species.tbl files for in-game encyclopedia entries.
 """
 
 import re
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 from .base_table_converter import BaseTableConverter, ParseState, TableType
+
 
 class SpeciesTableConverter(BaseTableConverter):
     """Converts WCS Species.tbl files to Godot intel database resources"""

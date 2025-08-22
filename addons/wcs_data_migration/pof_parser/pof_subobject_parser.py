@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 import logging
-from typing import BinaryIO, Dict, Any
+from typing import Any, BinaryIO, Dict
 
 # Import necessary helper functions and constants from pof_chunks
 # We need read_int, read_float, read_vector, read_string_len
 # and constants MAX_NAME_LEN, MAX_PROP_LEN
-from .pof_chunks import (
-    read_int, read_float, read_vector, read_string_len,
-    MAX_NAME_LEN, MAX_PROP_LEN
-)
+from .pof_chunks import (MAX_NAME_LEN, MAX_PROP_LEN, read_float, read_int,
+                         read_string_len, read_vector)
+
 # Import Vector3D if needed for type hinting or direct use
 # from .vector3d import Vector3D
 

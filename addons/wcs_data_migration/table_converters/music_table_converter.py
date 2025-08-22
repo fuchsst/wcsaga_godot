@@ -6,9 +6,10 @@ Single Responsibility: Music definitions parsing and conversion only.
 """
 
 import re
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 from .base_table_converter import BaseTableConverter, ParseState, TableType
+
 
 class MusicTableConverter(BaseTableConverter):
     """Converts WCS music.tbl files to Godot music resources"""

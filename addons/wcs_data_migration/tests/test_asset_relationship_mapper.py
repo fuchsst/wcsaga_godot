@@ -5,11 +5,11 @@ Test suite for AssetRelationshipMapper functionality.
 Tests DM-013: Automated Asset Mapping from Table Data
 """
 
+import json
+import sys
 import tempfile
 import unittest
-import json
 from pathlib import Path
-import sys
 from unittest.mock import Mock, patch
 
 # Add parent directory to path for imports
@@ -17,6 +17,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # Mock problematic imports but preserve enums
 from enum import Enum
+
 
 class MockTableType(Enum):
     SHIPS = "ships"
@@ -30,7 +31,9 @@ mock_table_converter = Mock()
 mock_table_converter.TableType = MockTableType
 sys.modules['table_data_converter'] = mock_table_converter
 
-from asset_relationship_mapper import AssetRelationshipMapper, AssetRelationship, AssetMapping, HardcodedAssetMappings
+from asset_relationship_mapper import (AssetMapping, AssetRelationship,
+                                       AssetRelationshipMapper,
+                                       HardcodedAssetMappings)
 
 
 class TestAssetRelationshipMapper(unittest.TestCase):

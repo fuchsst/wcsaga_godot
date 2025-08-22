@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 import logging
 import struct
-import numpy as np
 from pathlib import Path
-from typing import Dict, Any, List, Tuple
+from typing import Any, Dict, List, Tuple
+
+import numpy as np
 
 # Assuming pygltflib is installed: pip install pygltflib
 try:
-    from pygltflib import (
-        GLTF2, Node, Mesh, Primitive, Attributes, Accessor, BufferView, Buffer, Material,
-        PbrMetallicRoughness, TextureInfo, Texture, Image as GltfImage, Sampler, Scene
-    )
+    from pygltflib import GLTF2, Accessor, Attributes, Buffer, BufferView
+    from pygltflib import Image as GltfImage
+    from pygltflib import (Material, Mesh, Node, PbrMetallicRoughness,
+                           Primitive, Sampler, Scene, Texture, TextureInfo)
     PYGLTFLIB_AVAILABLE = True
 except ImportError:
     GLTF2 = None # Define dummy classes if library is missing
@@ -18,7 +19,8 @@ except ImportError:
     PbrMetallicRoughness = TextureInfo = Texture = GltfImage = Sampler = Scene = None
     PYGLTFLIB_AVAILABLE = False
 
-from .pof_misc_parser import parse_bsp_data # Import the BSP parser
+from .pof_misc_parser import parse_bsp_data  # Import the BSP parser
+
 # NOTE: POFParser is used in the main pof_converter.py, not directly here usually.
 # If direct testing is needed, uncomment the POFParser import.
 # from .pof_parser import POFParser

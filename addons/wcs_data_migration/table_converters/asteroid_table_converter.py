@@ -6,9 +6,10 @@ Single Responsibility: Asteroid and debris definitions parsing and conversion on
 """
 
 import re
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 from .base_table_converter import BaseTableConverter, ParseState, TableType
+
 
 class AsteroidTableConverter(BaseTableConverter):
     """Converts WCS asteroid.tbl files to Godot asteroid resources"""

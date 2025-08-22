@@ -8,18 +8,17 @@ extracting detailed information about chunks, data organization, and format comp
 Based on WCS C++ analysis from source/code/model/modelread.cpp
 """
 
-import struct
 import logging
-from pathlib import Path
-from typing import Dict, Any, List, Optional, BinaryIO, Tuple
+import struct
 from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any, BinaryIO, Dict, List, Optional, Tuple
 
-from .pof_chunks import (
-    POF_HEADER_ID, PM_COMPATIBLE_VERSION, PM_OBJFILE_MAJOR_VERSION,
-    read_chunk_header, read_int, read_uint, read_float,
-    ID_OHDR, ID_SOBJ, ID_TXTR, ID_SPCL, ID_PATH, ID_GPNT, ID_MPNT,
-    ID_DOCK, ID_FUEL, ID_SHLD, ID_EYE, ID_INSG, ID_ACEN, ID_GLOW, ID_SLDC
-)
+from .pof_chunks import (ID_ACEN, ID_DOCK, ID_EYE, ID_FUEL, ID_GLOW, ID_GPNT,
+                         ID_INSG, ID_MPNT, ID_OHDR, ID_PATH, ID_SHLD, ID_SLDC,
+                         ID_SOBJ, ID_SPCL, ID_TXTR, PM_COMPATIBLE_VERSION,
+                         PM_OBJFILE_MAJOR_VERSION, POF_HEADER_ID,
+                         read_chunk_header, read_float, read_int, read_uint)
 
 logger = logging.getLogger(__name__)
 

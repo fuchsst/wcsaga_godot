@@ -18,28 +18,31 @@ Based on WCS C++ source analysis:
 - ship.cpp: Ship data integrity validation patterns
 """
 
+import hashlib
 import json
 import logging
-import time
-import threading
-import subprocess
 import statistics
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any, Union
-from dataclasses import dataclass, asdict
-from enum import Enum
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed
-import hashlib
-import numpy as np
-from PIL import Image, ImageChops
-import pytest
-
+import subprocess
 # Import existing validation components
 import sys
+import threading
+import time
+from concurrent.futures import (ProcessPoolExecutor, ThreadPoolExecutor,
+                                as_completed)
+from dataclasses import asdict, dataclass
+from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
+
+import numpy as np
+import pytest
+from PIL import Image, ImageChops
+
 sys.path.append(str(Path(__file__).parent.parent))
-from conversion_tools.validation.format_validator import FormatValidator, ValidationResult
-from conversion_tools.conversion_manager import ConversionManager
 from conversion_tools.asset_catalog import AssetCatalog
+from conversion_tools.conversion_manager import ConversionManager
+from conversion_tools.validation.format_validator import (FormatValidator,
+                                                          ValidationResult)
 
 logger = logging.getLogger(__name__)
 

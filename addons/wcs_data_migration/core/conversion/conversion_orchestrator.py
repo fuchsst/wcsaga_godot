@@ -7,13 +7,13 @@ Coordinates between different converters following SOLID principles.
 """
 
 import logging
-from pathlib import Path
-from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
-from .job_manager import JobManager, ConversionJob
-from .progress_tracker import ProgressTracker
 from ..catalog.asset_catalog import AssetCatalog
+from .job_manager import ConversionJob, JobManager
+from .progress_tracker import ProgressTracker
 
 logger = logging.getLogger(__name__)
 

@@ -13,18 +13,17 @@ Epic: EPIC-003 - Data Migration & Conversion Tools
 
 import json
 import os
+# Import the module under test
+import sys
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-# Import the module under test
-import sys
 sys.path.append(str(Path(__file__).parent.parent))
-from config_migrator import (
-    ConfigMigrator, ConfigType, ControlType, ControlBinding,
-    GraphicsSettings, AudioSettings, GameplaySettings, PilotProfile
-)
+from config_migrator import (AudioSettings, ConfigMigrator, ConfigType,
+                             ControlBinding, ControlType, GameplaySettings,
+                             GraphicsSettings, PilotProfile)
 
 
 class TestConfigurationMigration(unittest.TestCase):

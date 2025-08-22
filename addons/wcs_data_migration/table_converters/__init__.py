@@ -8,7 +8,8 @@ Each table type (ships, weapons, armor, etc.) has its own focused converter.
 from .ai_profiles_table_converter import AIProfilesTableConverter
 from .armor_table_converter import ArmorTableConverter
 from .asteroid_table_converter import AsteroidTableConverter
-from .base_table_converter import BaseTableConverter, ParseState, ParseError, TableType
+from .base_table_converter import (BaseTableConverter, ParseError, ParseState,
+                                   TableType)
 from .cutscenes_table_converter import CutscenesTableConverter
 from .iff_table_converter import IFFTableConverter
 from .lightning_table_converter import LightningTableConverter

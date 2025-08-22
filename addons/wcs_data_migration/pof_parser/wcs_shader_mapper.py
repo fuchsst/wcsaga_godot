@@ -6,14 +6,14 @@ Shader mapper for WCS-specific effects (glow, transparency, special modes).
 Maps WCS rendering effects to appropriate Godot shader equivalents and custom shaders.
 """
 
+import json
 import logging
-from pathlib import Path
-from typing import Dict, List, Optional, Any, Union
 from dataclasses import dataclass
 from enum import Enum
-import json
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
 
-from .godot_material_converter import WCSRenderMode, WCSMaterialProperties
+from .godot_material_converter import WCSMaterialProperties, WCSRenderMode
 
 
 class WCSShaderEffect(Enum):

@@ -13,9 +13,9 @@ Epic: EPIC-003 - Data Migration & Conversion Tools
 
 import logging
 import re
-from pathlib import Path
-from typing import Dict, Set, Optional, Tuple
 from enum import Enum
+from pathlib import Path
+from typing import Dict, Optional, Set, Tuple
 
 logger = logging.getLogger(__name__)
 

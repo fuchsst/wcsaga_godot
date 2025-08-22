@@ -8,12 +8,12 @@ events, goals, and briefing data with complete fidelity.
 Based on WCS source code analysis: source/code/mission/missionparse.cpp
 """
 
-import re
 import logging
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any, Union
+import re
 from dataclasses import dataclass, field
 from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 
 class MissionGameType(Enum):

@@ -7,8 +7,9 @@ Uses existing weapon system architecture - no custom logic.
 """
 
 import os
-from typing import Dict, List, Any
 from pathlib import Path
+from typing import Any, Dict, List
+
 
 class WeaponResourceGenerator:
     """Generates WeaponData .tres resource files from parsed weapon table data"""

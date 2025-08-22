@@ -6,31 +6,31 @@ Provides robust parsing of POF (Parallax Object Format) files with comprehensive
 chunk processing and error handling. Based on WCS C++ source analysis.
 """
 
-import struct
 import logging
+import struct
 from pathlib import Path
-from typing import BinaryIO, Dict, Any, List, Optional
-
-# Import chunk readers
-from .pof_header_parser import read_ohdr_chunk
-from .pof_subobject_parser import read_sobj_chunk
-from .pof_texture_parser import read_txtr_chunk
-from .pof_special_points_parser import read_spcl_chunk
-from .pof_path_parser import read_path_chunk
-from .pof_weapon_points_parser import read_gpnt_chunk, read_mpnt_chunk
-from .pof_docking_parser import read_dock_chunk
-from .pof_thruster_parser import read_fuel_chunk
-from .pof_shield_parser import read_shld_chunk, read_sldc_chunk
-from .pof_eye_parser import read_eye_chunk
-from .pof_insignia_parser import read_insg_chunk
-from .pof_misc_parser import read_acen_chunk, read_glow_chunk, read_unknown_chunk
+from typing import Any, BinaryIO, Dict, List, Optional
 
 # Import constants and utilities
-from .pof_chunks import (
-    read_chunk_header, POF_HEADER_ID, PM_COMPATIBLE_VERSION, PM_OBJFILE_MAJOR_VERSION,
-    ID_OHDR, ID_SOBJ, ID_TXTR, ID_SPCL, ID_PATH, ID_GPNT, ID_MPNT,
-    ID_DOCK, ID_FUEL, ID_SHLD, ID_EYE, ID_INSG, ID_ACEN, ID_GLOW, ID_SLDC
-)
+from .pof_chunks import (ID_ACEN, ID_DOCK, ID_EYE, ID_FUEL, ID_GLOW, ID_GPNT,
+                         ID_INSG, ID_MPNT, ID_OHDR, ID_PATH, ID_SHLD, ID_SLDC,
+                         ID_SOBJ, ID_SPCL, ID_TXTR, PM_COMPATIBLE_VERSION,
+                         PM_OBJFILE_MAJOR_VERSION, POF_HEADER_ID,
+                         read_chunk_header)
+from .pof_docking_parser import read_dock_chunk
+from .pof_eye_parser import read_eye_chunk
+# Import chunk readers
+from .pof_header_parser import read_ohdr_chunk
+from .pof_insignia_parser import read_insg_chunk
+from .pof_misc_parser import (read_acen_chunk, read_glow_chunk,
+                              read_unknown_chunk)
+from .pof_path_parser import read_path_chunk
+from .pof_shield_parser import read_shld_chunk, read_sldc_chunk
+from .pof_special_points_parser import read_spcl_chunk
+from .pof_subobject_parser import read_sobj_chunk
+from .pof_texture_parser import read_txtr_chunk
+from .pof_thruster_parser import read_fuel_chunk
+from .pof_weapon_points_parser import read_gpnt_chunk, read_mpnt_chunk
 
 logger = logging.getLogger(__name__)
 

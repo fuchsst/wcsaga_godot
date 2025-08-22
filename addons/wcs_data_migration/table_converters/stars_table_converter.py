@@ -7,9 +7,10 @@ Handles stars.tbl files for environment and celestial body configuration.
 """
 
 import re
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 from .base_table_converter import BaseTableConverter, ParseState, TableType
+
 
 class StarsTableConverter(BaseTableConverter):
     """Converts WCS stars.tbl files to Godot environment resources"""

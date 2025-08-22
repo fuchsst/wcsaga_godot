@@ -12,10 +12,11 @@ Epic: EPIC-003 - Data Migration & Conversion Tools
 
 import logging
 import re
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
-from dataclasses import dataclass
-from data_structures import AssetRelationship, AssetMapping
+
+from data_structures import AssetMapping, AssetRelationship
 
 logger = logging.getLogger(__name__)
 
