@@ -1,5 +1,0 @@
-[gd_resource type="BehaviorTree" format=3]
-
-[resource]
-description = "Combat behavior tree for capital ships. Focuses on coordinated attacks, turret management, and strategic positioning."
-root_task = null

@@ -1,5 +1,0 @@
-[gd_resource type="ImpactData" format=3]
-
-[resource]
-impact_explosion = "campaigns/wing_commander_saga/effects/explosions/expmissilehit1.tscn"
-impact_explosion_radius = 20.0
