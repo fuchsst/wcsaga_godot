@@ -1,0 +1,11 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/iff_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+name = "Non Combatant"
+display_color = Color(0, 0, 1, 1)
+attacks = []
+flags = ["exempt from all teams at war", "orders hidden", "wing name hidden"]
+default_ship_flags2 = ["no-subspace-drive"]

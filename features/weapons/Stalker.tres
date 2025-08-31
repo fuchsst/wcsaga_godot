@@ -1,0 +1,38 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://features/weapons/weapon_data.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+name = "Stalker"
+tech_title = ""
+tech_description = "XSTR(\"The Kilrathi version of the heat seeker uses the same simple and reliable technology deployed by the Terrans with all the attached pros and cons. The missile tracks down the thermal signature of the target's engines, and lock must be acquired from the rear. Heat-seekers, just like the Terrans, are the most common missile carried on Kilrathi fighters.\", -1)"
+model_file = "kim_stalker.pof"
+laser_bitmap = ""
+laser_glow = ""
+laser_color = Color( 1.0, 1.0, 1.0, 1.0 )
+laser_length = 0.0
+laser_head_radius = 0.0
+laser_tail_radius = 0.0
+mass = 3.2
+velocity = 312.0
+fire_wait = 4.5
+damage = 440.0
+armor_factor = 1.0
+shield_factor = 0.5
+subsystem_factor = 0.5
+lifetime = 3.2
+energy_consumed = 0.0
+cargo_size = 10.0
+homing = true
+launch_sound = 87
+impact_sound = 88
+impact_explosion = "expmissilehit1"
+impact_explosion_radius = 20.0
+icon = "empty"
+anim = "empty"
+player_allowed = false
+in_tech_database = true
+is_bomb = false
+is_huge = false
+weapon_type = 0

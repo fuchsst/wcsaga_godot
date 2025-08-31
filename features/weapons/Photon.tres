@@ -1,0 +1,38 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://features/weapons/weapon_data.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+name = "Photon"
+tech_title = "XSTR("Photon Cannon", -1)"
+tech_description = "XSTR(\"When Terran forces first went to war, the photon cannon was the most popular gun next to the standard laser. It emits laser pulses and solicits similar effects upon impact. However, the photon cannon drains more energy and has a slower refire rate. This gun requires little maintenance - the mirror robotics are the only adjustable component - and functions best in deep-space combat.\", -1)"
+model_file = "none"
+laser_bitmap = "Photon"
+laser_glow = "Photon_Glow"
+laser_color = Color( 0.8980392156862745, 0.8313725490196079, 0.07058823529411765, 1.0 )
+laser_length = 10.0
+laser_head_radius = 0.7
+laser_tail_radius = 0.7
+mass = 0.2
+velocity = 800.0
+fire_wait = 0.45
+damage = 30.0
+armor_factor = 1.0
+shield_factor = 1.0
+subsystem_factor = 0.4
+lifetime = 0.63
+energy_consumed = 3.2
+cargo_size = 0.0
+homing = false
+launch_sound = 86
+impact_sound = 85
+impact_explosion = "Lamprey_Impact"
+impact_explosion_radius = 1.9
+icon = "IconParticle"
+anim = "LoadoutPhoton"
+player_allowed = true
+in_tech_database = false
+is_bomb = false
+is_huge = false
+weapon_type = 0

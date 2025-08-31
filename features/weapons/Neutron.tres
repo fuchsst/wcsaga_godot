@@ -1,0 +1,38 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://features/weapons/weapon_data.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+name = "Neutron"
+tech_title = "XSTR("Neutron Gun", -1)"
+tech_description = "XSTR(\"Neutron guns do heavy damage, but only at close range. No other projectile weapon provides an equivalent level of destructive capability. The down side is that neutron guns heat up rapidly and eat up power at an alarming rate. Also, the neutron gun's lack of range had led many foolhardy and underskilled pilots into close-quarter combat for which they were ill-prepared. Some of these pilots never made it home.\", -1)"
+model_file = "none"
+laser_bitmap = "Neutron_Bitmap"
+laser_glow = "Neutron_Glow"
+laser_color = Color( 0.8980392156862745, 0.4196078431372549, 0.09803921568627451, 1.0 )
+laser_length = 5.0
+laser_head_radius = 0.95
+laser_tail_radius = 0.9
+mass = 0.2
+velocity = 675.0
+fire_wait = 0.35
+damage = 30.0
+armor_factor = 1.1
+shield_factor = 1.0
+subsystem_factor = 0.3
+lifetime = 1.5
+energy_consumed = 1.25
+cargo_size = 0.0
+homing = false
+launch_sound = 84
+impact_sound = 85
+impact_explosion = "Circe_Impact"
+impact_explosion_radius = 2.2
+icon = "IconNeutron"
+anim = "LoadoutNeutron"
+player_allowed = true
+in_tech_database = true
+is_bomb = false
+is_huge = false
+weapon_type = 0

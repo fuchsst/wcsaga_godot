@@ -1,0 +1,38 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://features/weapons/weapon_data.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+name = "Predator#LongRange"
+tech_title = ""
+tech_description = ""
+model_file = "kim_cruise_missile.pof"
+laser_bitmap = ""
+laser_glow = ""
+laser_color = Color( 1.0, 1.0, 1.0, 1.0 )
+laser_length = 0.0
+laser_head_radius = 0.0
+laser_tail_radius = 0.0
+mass = 6.0
+velocity = 156.0
+fire_wait = 40.6
+damage = 13200.0
+armor_factor = 1.0
+shield_factor = 1.0
+subsystem_factor = 0.6
+lifetime = 200.0
+energy_consumed = 0.0
+cargo_size = 40.0
+homing = true
+launch_sound = 97
+impact_sound = 88
+impact_explosion = "exp07"
+impact_explosion_radius = 45.0
+icon = ""
+anim = ""
+player_allowed = false
+in_tech_database = false
+is_bomb = true
+is_huge = true
+weapon_type = 3

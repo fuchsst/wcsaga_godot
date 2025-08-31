@@ -1,0 +1,38 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://features/weapons/weapon_data.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+name = "Light Tachyon"
+tech_title = "XSTR("Light Tachyon Gun", -1)"
+tech_description = "XSTR(\"A light version of power-hungry blaster, the light tachyon gun is one of the most devastating energy gun found on Terran fighters. It slows down tachyon particles, which naturally travel faster than the speed of light. Once these particles ore decelerated and forced into streams, their potential damage increases monumentally. In several documented cases, the powerful tachyon gun has been used to attack the shields of capital ships.\", -1)"
+model_file = "none"
+laser_bitmap = "tachyon"
+laser_glow = "tachyon_glow"
+laser_color = Color( 0.8980392156862745, 0.8980392156862745, 0.8980392156862745, 1.0 )
+laser_length = 14.0
+laser_head_radius = 0.75
+laser_tail_radius = 0.65
+mass = 0.3
+velocity = 855.0
+fire_wait = 0.35
+damage = 50.0
+armor_factor = 0.8
+shield_factor = 0.75
+subsystem_factor = 0.3
+lifetime = 0.88
+energy_consumed = 3.14
+cargo_size = 0.0
+homing = false
+launch_sound = 115
+impact_sound = 85
+impact_explosion = "MS_Impact"
+impact_explosion_radius = 1.2
+icon = "IconTachyon"
+anim = "LoadoutLightTachyon"
+player_allowed = true
+in_tech_database = false
+is_bomb = false
+is_huge = false
+weapon_type = 0

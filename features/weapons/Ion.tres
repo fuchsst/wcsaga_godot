@@ -1,0 +1,38 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://features/weapons/weapon_data.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+name = "Ion"
+tech_title = "XSTR("Ion Cannon", -1)"
+tech_description = "XSTR(\"Found mainly on fighters and also used as an anti-fighter cannon the ion cannon imparts energy and radiation damage to targets. Charged atomic particles are magnetically accelerated to high speeds, then discharged in pulses. This cannon delivers more damage than a laser and can cause severe pilot injuries. However, the ion cannon has higher energy consumption and a slower refire rate than the laser.\", -1)"
+model_file = "none"
+laser_bitmap = "Ion_Bitmap"
+laser_glow = "Ion_Glow"
+laser_color = Color( 0.8313725490196079, 0.06274509803921569, 0.8980392156862745, 1.0 )
+laser_length = 10.0
+laser_head_radius = 0.9
+laser_tail_radius = 0.9
+mass = 0.2
+velocity = 810.0
+fire_wait = 0.35
+damage = 30.0
+armor_factor = 1.0
+shield_factor = 1.2
+subsystem_factor = 0.7
+lifetime = 1.12
+energy_consumed = 3.5
+cargo_size = 0.0
+homing = false
+launch_sound = 80
+impact_sound = 85
+impact_explosion = "Mekhu_Impact"
+impact_explosion_radius = 1.8
+icon = "IconIon"
+anim = "LoadoutIon"
+player_allowed = true
+in_tech_database = true
+is_bomb = false
+is_huge = false
+weapon_type = 0

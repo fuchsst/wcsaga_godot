@@ -1,0 +1,38 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://features/weapons/weapon_data.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+name = "Porcupine"
+tech_title = ""
+tech_description = "XSTR(\"Mines are useful for booby-trapping areas that the enemy may pass through such as jump points, gaps in asteroid fields and pulsar shadows. The Confederation and Kilrathi's latest mines have simplified guidance systems that can seek out disabled ships. Since mines move so slowly and have a low radar cross signature, ship detection systems are hard pressed to track them with sensors or radar. This deadly device has limited homing capabilities and built-in proximity sensors, detonation does not require contact.\", -1)"
+model_file = "misc_ghostmissile.pof"
+laser_bitmap = ""
+laser_glow = ""
+laser_color = Color( 1.0, 1.0, 1.0, 1.0 )
+laser_length = 0.0
+laser_head_radius = 0.0
+laser_tail_radius = 0.0
+mass = 3.0
+velocity = 200.0
+fire_wait = 2.0
+damage = 0.0
+armor_factor = 0.0
+shield_factor = 0.0
+subsystem_factor = 0.0
+lifetime = 0.0
+energy_consumed = 0.0
+cargo_size = 10.0
+homing = false
+launch_sound = 87
+impact_sound = 107
+impact_explosion = ""
+impact_explosion_radius = 0.0
+icon = "IconPorcupine"
+anim = "LoadoutPorcupine"
+player_allowed = true
+in_tech_database = true
+is_bomb = false
+is_huge = false
+weapon_type = 0

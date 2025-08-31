@@ -1,0 +1,32 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://features/ships/confed_rapier/confed_rapier.gd" type="Script" id=1]
+[ext_resource path="res://features/ships/tcf_rapier.glb" type="PackedScene" id=2]
+
+[node name="ConfedRapier" type="Node3D"]
+script = ExtResource( 1 )
+
+[node name="ShipModel" type="Node3D" parent="."]
+# This would instance the 3D model
+# instance = ExtResource( 2 )
+
+[node name="WeaponHardpoints" type="Node3D" parent="."]
+# Weapon hardpoints would be children of this node
+
+[node name="Hardpoint1" type="Node3D" parent="WeaponHardpoints"]
+position = Vector3( 2.5, 0.5, 0.0 )
+
+[node name="Hardpoint2" type="Node3D" parent="WeaponHardpoints"]
+position = Vector3( -2.5, 0.5, 0.0 )
+
+[node name="Engines" type="Node3D" parent="."]
+# Engine nodes for effects
+
+[node name="Engine1" type="Node3D" parent="Engines"]
+position = Vector3( 0.0, 0.0, -5.0 )
+
+[node name="Engine2" type="Node3D" parent="Engines"]
+position = Vector3( 1.5, 0.0, -4.5 )
+
+[node name="Engine3" type="Node3D" parent="Engines"]
+position = Vector3( -1.5, 0.0, -4.5 )

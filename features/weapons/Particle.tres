@@ -1,0 +1,38 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://features/weapons/weapon_data.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+name = "Particle"
+tech_title = "XSTR("Particle Cannon", -1)"
+tech_description = "XSTR(\"The particle cannon is perhaps the most significant energy technology we possess. Prototypes were first developed three years into the war, when a similar cannon was extracted from a captured Kilrathi fighter. Engineers built a comparable version capable of hurling minute nuclear particles at high speeds. Any impact results in a small nuclear explosion that gives off blast, heat and radiation damage. This cannon is useless, however, in atmospheric conditions.\", -1)"
+model_file = "none"
+laser_bitmap = "Particle_Bitmap"
+laser_glow = "Particle_Glow"
+laser_color = Color( 0.8980392156862745, 0.6588235294117647, 0.0, 1.0 )
+laser_length = 5.0
+laser_head_radius = 2.0
+laser_tail_radius = 2.0
+mass = 0.4
+velocity = 945.0
+fire_wait = 0.4
+damage = 43.0
+armor_factor = 1.0
+shield_factor = 1.0
+subsystem_factor = 0.35
+lifetime = 0.89
+energy_consumed = 2.2
+cargo_size = 0.0
+homing = false
+launch_sound = 83
+impact_sound = 85
+impact_explosion = "Shivan_Impact01"
+impact_explosion_radius = 2.4
+icon = "IconParticle"
+anim = "LoadoutParticle"
+player_allowed = true
+in_tech_database = true
+is_bomb = false
+is_huge = false
+weapon_type = 0

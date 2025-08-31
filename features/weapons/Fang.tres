@@ -1,0 +1,38 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://features/weapons/weapon_data.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+name = "Fang"
+tech_title = ""
+tech_description = "XSTR(\"The Kilrathi's new IFF missile was first deployed during the violations of the False Peace. The new missile had a longer range and loitering time, more reliable tracking systems that were less likely to be duped by countermeasures, and the ability to re-lock on another target if the original lock was lost. The news of this new missile reached ConFleet Intel, who soon developed their own variant of this missile.\", -1)"
+model_file = "kim_fang.pof"
+laser_bitmap = ""
+laser_glow = ""
+laser_color = Color( 1.0, 1.0, 1.0, 1.0 )
+laser_length = 0.0
+laser_head_radius = 0.0
+laser_tail_radius = 0.0
+mass = 3.1
+velocity = 200.0
+fire_wait = 4.5
+damage = 253.0
+armor_factor = 1.0
+shield_factor = 0.5
+subsystem_factor = 0.5
+lifetime = 4.8
+energy_consumed = 0.0
+cargo_size = 10.0
+homing = true
+launch_sound = 87
+impact_sound = 88
+impact_explosion = "expmissilehit1"
+impact_explosion_radius = 20.0
+icon = "empty"
+anim = "empty"
+player_allowed = false
+in_tech_database = true
+is_bomb = false
+is_huge = false
+weapon_type = 0

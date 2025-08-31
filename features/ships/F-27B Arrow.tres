@@ -1,0 +1,41 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://features/ships/ship_data.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+name = "F-27B Arrow"
+short_name = "Arrow"
+species = "Terran"
+ship_type = "Light Fighter"
+tech_description = ""
+manufacturer = ""
+pof_file = "tcf_arrow.pof"
+pof_target_lod = 2
+max_velocity = 82.1
+maneuverability = Vector3( 80.0, 90.0, 90.0 )
+density = 1.0
+damp = 0.15
+rotdamp = 0.22
+shields = 800.0
+shield_color = Color( 0.39215686274509803, 0.39215686274509803, 1.0, 1.0 )
+armor_fore = 80.0
+armor_aft = 80.0
+armor_right = 60.0
+armor_left = 60.0
+hitpoints = 280.0
+power_output = 2.6
+shield_regen_rate = 0.04
+weapon_regen_rate = 0.14
+length = 20.0
+ai_class = "Captain"
+expl_inner_radius = 7.361403
+expl_outer_radius = 29.445612
+expl_damage = 15.0
+expl_blast = 150.0
+expl_propagates = false
+is_fighter = true
+is_player_ship = true
+is_bomber = false
+is_capital = false
+in_tech_database = true

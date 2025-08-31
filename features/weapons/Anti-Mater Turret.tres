@@ -1,0 +1,38 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://features/weapons/weapon_data.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+name = "Anti-Mater Turret"
+tech_title = ""
+tech_description = ""
+model_file = "none"
+laser_bitmap = "AMG_Bitmap"
+laser_glow = "Laser_Glow"
+laser_color = Color( 0.8980392156862745, 0.8156862745098039, 0.06274509803921569, 1.0 )
+laser_length = 20.0
+laser_head_radius = 8.5
+laser_tail_radius = 8.5
+mass = 2.2
+velocity = 750.0
+fire_wait = 2.1
+damage = 300.0
+armor_factor = 1.0
+shield_factor = 1.2
+subsystem_factor = 0.8
+lifetime = 4.0
+energy_consumed = 0.3
+cargo_size = 0.0
+homing = false
+launch_sound = 111
+impact_sound = 85
+impact_explosion = "expmissilehit1"
+impact_explosion_radius = 15.0
+icon = ""
+anim = ""
+player_allowed = false
+in_tech_database = false
+is_bomb = false
+is_huge = true
+weapon_type = 0

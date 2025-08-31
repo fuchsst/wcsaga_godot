@@ -1,0 +1,38 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://features/weapons/weapon_data.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+name = "Javelin HS"
+tech_title = "XSTR("Javelin Heat-Seeker", -1)"
+tech_description = "XSTR(\"The Javelin heat-seeker (HS) is an inexpensive, simple weapon that has served in various armed forces since the late 1900s. The engines of fighters and capital ships generate significant heat, a fact that the HS uses to its advantage. The operation is simple - the missile tracks down the thermal signature of the target's engines. This requires the lock to be acquired from the rear. Heat-seekers, along with dumbfire missiles, are the most common missile carried on fighters.\", -1)"
+model_file = "tcm_javelin.pof"
+laser_bitmap = ""
+laser_glow = ""
+laser_color = Color( 1.0, 1.0, 1.0, 1.0 )
+laser_length = 0.0
+laser_head_radius = 0.0
+laser_tail_radius = 0.0
+mass = 3.2
+velocity = 380.0
+fire_wait = 0.5
+damage = 440.0
+armor_factor = 1.0
+shield_factor = 0.5
+subsystem_factor = 0.7
+lifetime = 4.2
+energy_consumed = 0.0
+cargo_size = 10.0
+homing = true
+launch_sound = 87
+impact_sound = 88
+impact_explosion = "expmissilehit1"
+impact_explosion_radius = 20.0
+icon = "IconJavelin"
+anim = "LoadoutJavelin"
+player_allowed = true
+in_tech_database = true
+is_bomb = false
+is_huge = false
+weapon_type = 0

@@ -1,0 +1,41 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://features/ships/ship_data.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+name = "Default900"
+short_name = ""
+species = ""
+ship_type = ""
+tech_description = ""
+manufacturer = ""
+pof_file = ""
+pof_target_lod = 0
+max_velocity = 0.0
+maneuverability = Vector3( 0.0, 0.0, 0.0 )
+density = 1.0
+damp = 0.0
+rotdamp = 0.0
+shields = 0.0
+shield_color = Color( 0.39215686274509803, 0.39215686274509803, 1.0, 1.0 )
+armor_fore = 0.0
+armor_aft = 0.0
+armor_right = 0.0
+armor_left = 0.0
+hitpoints = 0.0
+power_output = 0.0
+shield_regen_rate = 0.0
+weapon_regen_rate = 0.0
+length = 0.0
+ai_class = "Captain"
+expl_inner_radius = 0.0
+expl_outer_radius = 0.0
+expl_damage = 0.0
+expl_blast = 0.0
+expl_propagates = false
+is_fighter = false
+is_player_ship = false
+is_bomber = false
+is_capital = false
+in_tech_database = false
