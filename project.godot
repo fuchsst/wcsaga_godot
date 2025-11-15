@@ -11,15 +11,14 @@ config_version=5
 [application]
 
 config/name="Wing Commander Saga"
-run/main_scene="res://scenes/main/bootstrap.tscn"
-config/features=PackedStringArray("4.4", "GL Compatibility")
+config/features=PackedStringArray("4.5", "GL Compatibility")
 config/icon="uid://cc58gpsbqci8y"
 
 [autoload]
 
 Signal_Debugger="*res://addons/SignalVisualizer/Debugger/SignalDebugger.gd"
 SceneManager="res://addons/scene_manager/SceneManager.tscn"
-IFFManager="*res://autoload/iff_manager.gd"
+GlobalIFFManager="*res://autoload/iff_manager.gd"
 
 [display]
 
@@ -33,7 +32,7 @@ project/assembly_name="Wing Commander Saga"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/sexp/plugin.cfg", "res://addons/wcs_asset_core/plugin.cfg", "res://addons/wcs_data_migration/plugin.cfg")
+enabled=PackedStringArray()
 
 [input]
 

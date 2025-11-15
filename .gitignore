@@ -2,6 +2,7 @@
 .godot/
 addons/gdUnit4
 addons/debug_console
+addons/limboai
 addons/SignalVisualizer
 
 # Python ignores
