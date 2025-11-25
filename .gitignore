@@ -42,7 +42,9 @@ venv.bak/
 **/*.log
 
 # Media ignores
+**/*.bin
 **/*.png
+**/*.glb
 **/*.ogg
 **/*.ogv
 **/*.wav
@@ -52,3 +54,6 @@ venv.bak/
 reports/
 asset_catalog.db
 hermes_campaign_mapping.json
+
+# TEMPORARY deactivate assets folder
+assets/
