@@ -7,124 +7,129 @@ extends WCSBaseResource
 
 # === IDENTITY AND CLASSIFICATION ===
 @export_group("Identity", "identity_")
-@export var weapon_class: String = ""                    # Military designation (@Ion)
-@export var display_name: String = ""                    # Display name (Ion Cannon)
-@export var weapon_family: String = ""                   # Weapon family classification
-@export var manufacturer_species: String = ""             # Cross-reference to SpeciesData
-@export var tech_level: int = 0                           # Technology era (0=WC1, 1=WC2, etc.)
-@export var weapon_type: int = 0                          # 0=Energy, 1=Ballistic, 2=Missile, 3=Special
-@export var is_player_allowed: bool = true               # Available to players
-@export var appears_in_tech_db: bool = false             # Shows in tech database
-@export var is_stealth_weapon: bool = false              # Undetectable when fired
+@export var weapon_class: String = "" # Military designation (@Ion)
+@export var display_name: String = "" # Display name (Ion Cannon)
+@export var weapon_family: String = "" # Weapon family classification
+@export var manufacturer_species: String = "" # Cross-reference to SpeciesData
+@export var tech_level: int = 0 # Technology era (0=WC1, 1=WC2, etc.)
+@export var weapon_type: int = 0 # 0=Energy, 1=Ballistic, 2=Missile, 3=Special
+@export var is_player_allowed: bool = true # Available to players
+@export var appears_in_tech_db: bool = false # Shows in tech database
+@export var is_stealth_weapon: bool = false # Undetectable when fired
+@export var is_beam: bool = false # Is a beam weapon
+@export var tech_description: String = "" # Technical description
 
 # === PHYSICAL PROPERTIES ===
 @export_group("Physics", "physics_")
-@export var projectile_mass_kg: float = 0.2              # Projectile mass in kilograms
-@export var muzzle_velocity_mps: float = 810.0           # Muzzle velocity in meters/second
-@export var effective_range_meters: float = 907.2        # Maximum effective range
-@export var projectile_lifetime: float = 1.12            # Projectile lifetime in seconds
-@export var fire_rate_hz: float = 2.86                   # Fire rate in shots per second
-@export var projectile_drag_coefficient: float = 0.0     # Air resistance (for atmospheric)
-@export var projectile_gravity_factor: float = 0.0       # Gravity influence
+@export var projectile_mass_kg: float = 0.2 # Projectile mass in kilograms
+@export var muzzle_velocity_mps: float = 810.0 # Muzzle velocity in meters/second
+@export var effective_range_meters: float = 907.2 # Maximum effective range
+@export var projectile_lifetime: float = 1.12 # Projectile lifetime in seconds
+@export var fire_rate_hz: float = 2.86 # Fire rate in shots per second
+@export var projectile_drag_coefficient: float = 0.0 # Air resistance (for atmospheric)
+@export var projectile_gravity_factor: float = 0.0 # Gravity influence
 
 # === DAMAGE MODELING ===
 @export_group("Damage", "damage_")
-@export var base_damage_energy: float = 30.0             # Base energy damage
-@export var damage_profile: String = ""                  # Cross-reference to damage profile
-@export var armor_penetration_factor: float = 1.0        # Armor penetration multiplier
-@export var shield_penetration_factor: float = 1.2        # Shield penetration multiplier
-@export var hull_penetration_factor: float = 1.0         # Hull penetration multiplier
-@export var subsystem_damage_factor: float = 0.7          # Subsystem damage multiplier
-@export var blast_radius: float = 0.0                    # Blast radius for explosive weapons
-@export var explosion_damage: float = 0.0                # Explosion damage at center
-@export var shockwave_speed: float = 0.0                 # Shockwave propagation speed
+@export var base_damage_energy: float = 30.0 # Base energy damage
+@export var damage_profile: String = "" # Cross-reference to damage profile
+@export var armor_penetration_factor: float = 1.0 # Armor penetration multiplier
+@export var shield_penetration_factor: float = 1.2 # Shield penetration multiplier
+@export var hull_penetration_factor: float = 1.0 # Hull penetration multiplier
+@export var subsystem_damage_factor: float = 0.7 # Subsystem damage multiplier
+@export var blast_radius: float = 0.0 # Blast radius for explosive weapons
+@export var explosion_damage: float = 0.0 # Explosion damage at center
+@export var shockwave_speed: float = 0.0 # Shockwave propagation speed
 
 # === SURFACE DAMAGE MULTIPLIERS ===
 @export_group("Surface Multipliers", "surface_")
-@export var fore_damage_multiplier: float = 1.0          # Damage to fore armor
-@export var aft_damage_multiplier: float = 1.0           # Damage to aft armor
-@export var left_damage_multiplier: float = 1.0          # Damage to left armor
-@export var right_damage_multiplier: float = 1.0         # Damage to right armor
-@export var top_damage_multiplier: float = 1.0           # Damage to top armor
-@export var bottom_damage_multiplier: float = 1.0        # Damage to bottom armor
+@export var fore_damage_multiplier: float = 1.0 # Damage to fore armor
+@export var aft_damage_multiplier: float = 1.0 # Damage to aft armor
+@export var left_damage_multiplier: float = 1.0 # Damage to left armor
+@export var right_damage_multiplier: float = 1.0 # Damage to right armor
+@export var top_damage_multiplier: float = 1.0 # Damage to top armor
+@export var bottom_damage_multiplier: float = 1.0 # Damage to bottom armor
 
 # === ENERGY CONSUMPTION ===
 @export_group("Energy", "energy_")
-@export var energy_per_shot: float = 3.5                 # Ship energy consumed per shot
-@export var heat_generated_per_shot: float = 5.0         # Heat units generated
-@export var overheat_threshold: float = 100.0            # Temperature to cause malfunction
-@export var cooling_rate: float = 10.0                   # Heat dissipation per second
-@export var heat_capacity: float = 200.0                 # Total heat capacity
-@export var thermal_efficiency: float = 0.95             # Energy to heat conversion
+@export var energy_per_shot: float = 3.5 # Ship energy consumed per shot
+@export var heat_generated_per_shot: float = 5.0 # Heat units generated
+@export var overheat_threshold: float = 100.0 # Temperature to cause malfunction
+@export var cooling_rate: float = 10.0 # Heat dissipation per second
+@export var heat_capacity: float = 200.0 # Total heat capacity
+@export var thermal_efficiency: float = 0.95 # Energy to heat conversion
 
 # === PROJECTILE VISUALS ===
 @export_group("Visual Effects", "visual_")
-@export var projectile_model: String = ""                 # Cross-reference to 3D model
-@export var laser_bitmap: String = ""                     # Cross-reference to 2D texture
-@export var laser_glow: String = ""                       # Cross-reference to glow effect
-@export var laser_length_meters: float = 10.0            # Visible laser length
-@export var laser_head_radius: float = 0.9               # Laser starting radius
-@export var laser_tail_radius: float = 0.9               # Laser ending radius
-@export var laser_primary_color: Color = Color(212, 16, 229)    # Primary laser color
-@export var laser_secondary_color: Color = Color(0, 0, 0)      # Secondary laser color
-@export var muzzle_flash_effect: String = ""              # Cross-reference to effect
-@export var impact_effect: String = ""                    # Cross-reference to effect
-@export var explosion_effect: String = ""                 # Cross-reference to effect
-@export var projectile_trail_effect: String = ""          # Cross-reference to trail effect
+@export var projectile_model: String = "" # Cross-reference to 3D model
+@export var laser_bitmap: String = "" # Cross-reference to 2D texture
+@export var laser_glow: String = "" # Cross-reference to glow effect
+@export var laser_length_meters: float = 10.0 # Visible laser length
+@export var laser_head_radius: float = 0.9 # Laser starting radius
+@export var laser_tail_radius: float = 0.9 # Laser ending radius
+@export var laser_primary_color: Color = Color(212, 16, 229) # Primary laser color
+@export var laser_secondary_color: Color = Color(0, 0, 0) # Secondary laser color
+@export var muzzle_flash_effect: String = "" # Cross-reference to effect
+@export var impact_effect: String = "" # Cross-reference to effect
+@export var explosion_effect: String = "" # Cross-reference to effect
+@export var projectile_trail_effect: String = "" # Cross-reference to trail effect
 
 # === AUTO-TARGETING SYSTEMS ===
 @export_group("Targeting", "targeting_")
-@export var homing_type: int = 0                          # 0=None, 1=Aspect, 2=Heat, 3=Image, 4=Friend/Foe
-@export var guidance_package: String = ""                 # Cross-reference to guidance system
-@export var lock_time_seconds: float = 0.0               # Time to achieve lock
-@export var lock_range_meters: float = 1500.0            # Maximum lock range
-@export var lock_field_of_view_degrees: float = 5.0      # FOV for target acquisition
-@export var max_turn_rate_dps: float = 0.0               # Maximum turn rate in degrees/second
-@export var max_seek_distance: float = 2000.0            # Maximum seek distance
-@export var seeking_duration_seconds: float = 10.0       # Seeking duration
-@export var decoy_resistance: float = 0.8                # Resistance to countermeasures
-@export var target_tracking_accuracy: float = 0.95       # Tracking accuracy (0.0-1.0)
+@export var homing_type: int = 0 # 0=None, 1=Aspect, 2=Heat, 3=Image, 4=Friend/Foe
+@export var guidance_package: String = "" # Cross-reference to guidance system
+@export var lock_time_seconds: float = 0.0 # Time to achieve lock
+@export var lock_range_meters: float = 1500.0 # Maximum lock range
+@export var lock_field_of_view_degrees: float = 5.0 # FOV for target acquisition
+@export var max_turn_rate_dps: float = 0.0 # Maximum turn rate in degrees/second
+@export var max_seek_distance: float = 2000.0 # Maximum seek distance
+@export var seeking_duration_seconds: float = 10.0 # Seeking duration
+@export var decoy_resistance: float = 0.8 # Resistance to countermeasures
+@export var target_tracking_accuracy: float = 0.95 # Tracking accuracy (0.0-1.0)
 
 # === BURST AND MULTI-SHOT ===
 @export_group("Burst Fire", "burst_")
-@export var shots_per_burst: int = 1                     # Number of shots in burst
-@export var burst_fire_delay: float = 0.0                # Delay between burst shots
-@export var burst_cooldown: float = 0.0                  # Cooldown after burst
-@export var multi_shot_count: int = 1                    # Projectiles per shot (swarm)
-@export var shot_spread_pattern: Vector2 = Vector2.ZERO   # Shot spread angles (horizontal, vertical)
+@export var shots_per_burst: int = 1 # Number of shots in burst
+@export var burst_fire_delay: float = 0.0 # Delay between burst shots
+@export var burst_cooldown: float = 0.0 # Cooldown after burst
+@export var multi_shot_count: int = 1 # Projectiles per shot (swarm)
+@export var shot_spread_pattern: Vector2 = Vector2.ZERO # Shot spread angles (horizontal, vertical)
 
 # === COUNTERMEASURE INTERACTION ===
 @export_group("Countermeasures", "cm_")
-@export var countermeasure_vulnerability: float = 0.0      # Vulnerability to countermeasures
-@export var chaff_effectiveness_multiplier: float = 1.0    # Chaff effectiveness
-@export var flare_effectiveness_multiplier: float = 1.0    # Flare effectiveness
-@export var stealth_detection_range_modifier: float = 1.0  # Stealth detection modification
+@export var countermeasure_vulnerability: float = 0.0 # Vulnerability to countermeasures
+@export var chaff_effectiveness_multiplier: float = 1.0 # Chaff effectiveness
+@export var flare_effectiveness_multiplier: float = 1.0 # Flare effectiveness
+@export var stealth_detection_range_modifier: float = 1.0 # Stealth detection modification
 
 # === SPECIAL CHARACTERISTICS ===
 @export_group("Special", "special_")
-@export var cargo_size_units: int = 1                    # Cargo space required
-@export var is_bomb_type: bool = false                   # Requires bombing bay
-@export var is_huge_weapon: bool = false                 # Requires capital ship mount
-@export var no_shield_piercing: bool = false            # Cannot penetrate shields
-@export var pierces_shields_only: bool = false           # Only damages shields
-@export var drains_energy_on_hit: float = 0.0            # Energy drained from target
-@export var disables_subsystems_chance: float = 0.0      # Chance to disable subsystems
+@export var cargo_size_units: int = 1 # Cargo space required
+@export var is_bomb_type: bool = false # Requires bombing bay
+@export var is_huge_weapon: bool = false # Requires capital ship mount
+@export var no_shield_piercing: bool = false # Cannot penetrate shields
+@export var pierces_shields_only: bool = false # Only damages shields
+@export var drains_energy_on_hit: float = 0.0 # Energy drained from target
+@export var disables_subsystems_chance: float = 0.0 # Chance to disable subsystems
 
 # === AUDIO SYSTEMS ===
 @export_group("Audio", "audio_")
-@export var launch_sound_resource: String = ""           # Cross-reference to audio
-@export var impact_sound_resource: String = ""           # Cross-reference to audio
-@export var flyby_sound_resource: String = ""            # Cross-reference to audio
-@export var lock_acquisition_sound: String = ""          # Cross-reference to audio
-@export var lock_lost_sound: String = ""                 # Cross-reference to audio
-@export var missile_tracking_sound: String = ""          # Cross-reference to audio
+@export var launch_sound_resource: String = "" # Cross-reference to audio
+@export var impact_sound_resource: String = "" # Cross-reference to audio
+@export var flyby_sound_resource: String = "" # Cross-reference to audio
+@export var lock_acquisition_sound: String = "" # Cross-reference to audio
+@export var lock_lost_sound: String = "" # Cross-reference to audio
+@export var missile_tracking_sound: String = "" # Cross-reference to audio
+@export var launch_sound_id: int = -1 # Raw sound ID from TBL
+@export var impact_sound_id: int = -1 # Raw sound ID from TBL
+@export var flyby_sound_id: int = -1 # Raw sound ID from TBL
 
 # === VISUALIZATION HELPERS ===
 @export_group("Visualization", "viz_")
-@export var display_icon: String = ""                     # Cross-reference to UI icon
-@export var tech_animation: String = ""                   # Cross-reference to tech animation
-@export var loadout_visual: String = ""                   # Cross-reference to loadout art
-@export var inventory_model: String = ""                  # Cross-reference to inventory model
+@export var display_icon: String = "" # Cross-reference to UI icon
+@export var tech_animation: String = "" # Cross-reference to tech animation
+@export var loadout_visual: String = "" # Cross-reference to loadout art
+@export var inventory_model: String = "" # Cross-reference to inventory model
 
 # Validation signals
 signal damage_calculation_changed()
@@ -288,7 +293,7 @@ func _validate_visual_effects() -> void:
 			add_cross_reference_dependency(effect_ref)
 
 	# Validate laser visual properties
-	if weapon_type == 0:  # Energy weapon
+	if weapon_type == 0: # Energy weapon
 		if laser_length_meters <= 0:
 			_add_validation_warning("Laser weapon has zero length")
 
@@ -300,7 +305,7 @@ func _validate_targeting_system() -> void:
 	if homing_type < 0 or homing_type > 4:
 		_add_validation_error("Homing type must be between 0 and 4")
 
-	if homing_type > 0:  # Any homing weapon
+	if homing_type > 0: # Any homing weapon
 		if lock_time_seconds < 0:
 			_add_validation_error("Lock time cannot be negative")
 
@@ -468,17 +473,17 @@ func get_surface_damage_multiplier(impact_point_local: Vector3) -> float:
 	var normalized_point = impact_point_local.normalized()
 
 	# Determine surface based on normal direction
-	if normalized_point.z > 0.5:  # Fore
+	if normalized_point.z > 0.5: # Fore
 		return fore_damage_multiplier
-	elif normalized_point.z < -0.5:  # Aft
+	elif normalized_point.z < -0.5: # Aft
 		return aft_damage_multiplier
-	elif normalized_point.x > 0.5:  # Right
+	elif normalized_point.x > 0.5: # Right
 		return right_damage_multiplier
-	elif normalized_point.x < -0.5:  # Left
+	elif normalized_point.x < -0.5: # Left
 		return left_damage_multiplier
-	elif normalized_point.y > 0.5:  # Top
+	elif normalized_point.y > 0.5: # Top
 		return top_damage_multiplier
-	elif normalized_point.y < -0.5:  # Bottom
+	elif normalized_point.y < -0.5: # Bottom
 		return bottom_damage_multiplier
 	else:
 		# Inconclusive - return average
@@ -503,7 +508,7 @@ func calculate_explosion_damage(target_position: Vector3, explosion_radius: floa
 	var damage_falloff = 1.0 - clamp(distance_from_center / blast_radius, 0.0, 1.0)
 
 	if damage_falloff <= 0:
-		return result  # Too far from explosion
+		return result # Too far from explosion
 
 	# Calculate explosion damage
 	var explosion_damage_amount = explosion_damage * damage_falloff

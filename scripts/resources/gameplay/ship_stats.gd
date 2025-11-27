@@ -7,31 +7,34 @@ extends WCSBaseResource
 
 # === IDENTITY AND CLASSIFICATION ===
 @export_group("Identity", "identity_")
-@export var ship_class: String = ""                    # Military designation (F-86C Hellcat V)
-@export var display_name: String = ""                  # Common name (Hellcat V)
-@export var ship_short_name: String = ""               # Short identifier (Hellcat)
-@export var ship_role: int = 0                         # 0=Fighter, 1=Bomber, 2=Capital, 3=Support
-@export var ship_category: String = ""                 # Light, Medium, Heavy
-@export var species_mnemonic: String = ""              # Cross-reference to SpeciesData
-@export var manufacturer: String = ""                  # Ship manufacturer
-@export var tech_level: int = 0                        # Technology era (0=WC1, 1=WC2, etc.)
-@export var is_player_ship: bool = false               # Can be flown by player
-@export var is_civilian: bool = false                  # Non-combat vessel
+@export var ship_class: String = "" # Military designation (F-86C Hellcat V)
+@export var display_name: String = "" # Common name (Hellcat V)
+@export var ship_short_name: String = "" # Short identifier (Hellcat)
+@export var ship_role: int = 0 # 0=Fighter, 1=Bomber, 2=Capital, 3=Support
+@export var ship_category: String = "" # Light, Medium, Heavy
+@export var species_mnemonic: String = "" # Cross-reference to SpeciesData
+@export var manufacturer: String = "" # Ship manufacturer
+@export var tech_level: int = 0 # Technology era (0=WC1, 1=WC2, etc.)
+@export var is_player_ship: bool = false # Can be flown by player
+@export var is_civilian: bool = false # Non-combat vessel
+@export var description: String = "" # Ship description
+@export var tech_description: String = "" # Technical description
+@export var density: float = 1.0 # Physics density
 
 # === VISUAL REPRESENTATION ===
 @export_group("Visual", "visual_")
-@export var model_file: String = ""                   # Cross-reference to POF resource
-@export var model_lod_target: int = 2                 # Level of detail target
-@export var shield_icon: String = ""                  # Cross-reference to UI resource
-@export var detail_distances: Array[int] = []         # LOD switch distances [0, 250, 375]
-@export var closeup_position: Vector3 = Vector3.ZERO   # Camera position for close-up view
-@export var closeup_zoom: float = 0.4                # Camera zoom factor
+@export var model_file: String = "" # Cross-reference to POF resource
+@export var model_lod_target: int = 2 # Level of detail target
+@export var shield_icon: String = "" # Cross-reference to UI resource
+@export var detail_distances: Array[int] = [] # LOD switch distances [0, 250, 375]
+@export var closeup_position: Vector3 = Vector3.ZERO # Camera position for close-up view
+@export var closeup_zoom: float = 0.4 # Camera zoom factor
 
 # === PHYSICAL SPECIFICATIONS ===
 @export_group("Physics", "physics_")
-@export var ship_length_meters: float = 0.0           # Ship length in meters
-@export var ship_mass_tons: float = 0.0               # Ship mass in tons
-@export var armor_thickness: Dictionary = {           # Armor thickness in cm
+@export var ship_length_meters: float = 0.0 # Ship length in meters
+@export var ship_mass_tons: float = 0.0 # Ship mass in tons
+@export var armor_thickness: Dictionary = { # Armor thickness in cm
 	"fore": 0.0,
 	"aft": 0.0,
 	"left": 0.0,
@@ -42,95 +45,95 @@ extends WCSBaseResource
 
 # === MOVEMENT AND PERFORMANCE ===
 @export_group("Movement", "movement_")
-@export var max_velocity: Vector3 = Vector3(0, 0, 66.31)        # m/s - X/Y/Z components
-@export var afterburner_velocity: Vector3 = Vector3(0, 0, 189.47)  # Afterburner max velocity
-@export var rotation_time: Vector3 = Vector3(6.0, 6.0, 6.0)    # Seconds for 360° in pitch/yaw/roll
-@export var movement_dampening: float = 0.6                   # Movement damping coefficient
-@export var rotational_dampening: float = 1.2                 # Rotation damping coefficient
-@export var forward_acceleration: float = 0.3734              # Forward acceleration
-@export var forward_deceleration: float = 0.7467              # Forward deceleration
-@export var slide_acceleration: float = 0.0                   # Lateral movement acceleration
-@export var slide_deceleration: float = 0.0                   # Lateral movement deceleration
-@export var glide_enabled: bool = false                       # Glide mode capability
-@export var rear_velocity: float = 0.0                        # Maximum reverse velocity
+@export var max_velocity: Vector3 = Vector3(0, 0, 66.31) # m/s - X/Y/Z components
+@export var afterburner_velocity: Vector3 = Vector3(0, 0, 189.47) # Afterburner max velocity
+@export var rotation_time: Vector3 = Vector3(6.0, 6.0, 6.0) # Seconds for 360° in pitch/yaw/roll
+@export var movement_dampening: float = 0.6 # Movement damping coefficient
+@export var rotational_dampening: float = 1.2 # Rotation damping coefficient
+@export var forward_acceleration: float = 0.3734 # Forward acceleration
+@export var forward_deceleration: float = 0.7467 # Forward deceleration
+@export var slide_acceleration: float = 0.0 # Lateral movement acceleration
+@export var slide_deceleration: float = 0.0 # Lateral movement deceleration
+@export var glide_enabled: bool = false # Glide mode capability
+@export var rear_velocity: float = 0.0 # Maximum reverse velocity
 
 # === SHIELD SYSTEMS ===
 @export_group("Shields", "shield_")
-@export var shield_strength: int = 880                      # Maximum shield hitpoints
-@export var shield_regen_rate: float = 0.05                 # Percent of max per second
-@export var shield_color_primary: Color = Color(0, 100, 255)   # Primary shield color
+@export var shield_strength: int = 880 # Maximum shield hitpoints
+@export var shield_regen_rate: float = 0.05 # Percent of max per second
+@export var shield_color_primary: Color = Color(0, 100, 255) # Primary shield color
 @export var shield_color_secondary: Color = Color(150, 200, 255) # Secondary shield color
-@export var shield_icon_name: String = ""                   # Cross-reference to icon resource
-@export var shield_regen_delay: float = 2.0                 # Seconds before regeneration starts
+@export var shield_icon_name: String = "" # Cross-reference to icon resource
+@export var shield_regen_delay: float = 2.0 # Seconds before regeneration starts
 
 # === HULL INTEGRITY ===
 @export_group("Hull", "hull_")
-@export var hull_hitpoints: int = 360                     # Total hull hitpoints
-@export var armor_rating: int = 100                       # Base armor rating
-@export var subsystem_hitpoints: Dictionary = {}          # Subsystem name -> hitpoints mapping
-@export var explosion_effect: String = ""                 # Cross-reference to effect resource
-@export var explosion_inner_radius: float = 8.54          # Inner explosion damage radius
-@export var explosion_outer_radius: float = 34.16         # Outer explosion damage radius
-@export var explosion_damage: float = 15.0                # Base explosion damage
-@export var explosion_blast: float = 150.0                # Explosion blast force
-@export var shockwave_speed: float = 68.32                # Shockwave propagation speed
-@export var shockwave_model: String = ""                  # Cross-reference to shockwave model
+@export var hull_hitpoints: int = 360 # Total hull hitpoints
+@export var armor_rating: int = 100 # Base armor rating
+@export var subsystem_hitpoints: Dictionary = {} # Subsystem name -> hitpoints mapping
+@export var explosion_effect: String = "" # Cross-reference to effect resource
+@export var explosion_inner_radius: float = 8.54 # Inner explosion damage radius
+@export var explosion_outer_radius: float = 34.16 # Outer explosion damage radius
+@export var explosion_damage: float = 15.0 # Base explosion damage
+@export var explosion_blast: float = 150.0 # Explosion blast force
+@export var shockwave_speed: float = 68.32 # Shockwave propagation speed
+@export var shockwave_model: String = "" # Cross-reference to shockwave model
 
 # === WEAPON SYSTEMS ===
 @export_group("Weapons", "weapon_")
-@export var allowed_primary_weapons: Array[String] = []     # Cross-references to WeaponData resources
-@export var allowed_secondary_weapons: Array[String] = []   # Cross-references to WeaponData resources
-@export var default_primary_loadouts: Array[String] = []    # Default primary weapon assignments
-@export var default_secondary_loadouts: Array[String] = []  # Default secondary weapon assignments
-@export var weapon_mounts: Array[WeaponMount] = []         # Detailed weapon mount specifications
-@export var max_weapon_energy: float = 60.0                # Maximum weapon energy capacity
-@export var weapon_energy_regen_rate: float = 0.14         # Weapon energy regeneration per second
-@export var weapon_regen_delay: float = 1.0                # Seconds before weapon energy regenerates
+@export var allowed_primary_weapons: Array[String] = [] # Cross-references to WeaponData resources
+@export var allowed_secondary_weapons: Array[String] = [] # Cross-references to WeaponData resources
+@export var default_primary_loadouts: Array[String] = [] # Default primary weapon assignments
+@export var default_secondary_loadouts: Array[String] = [] # Default secondary weapon assignments
+@export var weapon_mounts: Array[WeaponMount] = [] # Detailed weapon mount specifications
+@export var max_weapon_energy: float = 60.0 # Maximum weapon energy capacity
+@export var weapon_energy_regen_rate: float = 0.14 # Weapon energy regeneration per second
+@export var weapon_regen_delay: float = 1.0 # Seconds before weapon energy regenerates
 
 # === ENERGY AND POWER ===
 @export_group("Power", "power_")
-@export var max_afterburner_fuel: float = 250.0             # Maximum afterburner fuel
-@export var afterburner_fuel_regen_rate: float = 0.0        # Afterburner fuel regeneration
-@export var afterburner_burn_rate: float = 1.0              # Fuel consumption rate
-@export var reactor_type: String = ""                       # Cross-reference power system
-@export var power_output: float = 3.9                        # Total power output
+@export var max_afterburner_fuel: float = 250.0 # Maximum afterburner fuel
+@export var afterburner_fuel_regen_rate: float = 0.0 # Afterburner fuel regeneration
+@export var afterburner_burn_rate: float = 1.0 # Fuel consumption rate
+@export var reactor_type: String = "" # Cross-reference power system
+@export var power_output: float = 3.9 # Total power output
 
 # === AI BEHAVIOR PARAMETERS ===
 @export_group("AI", "ai_")
-@export var ai_aggressiveness: float = 0.5                  # 0.0-1.0 aggression level
-@export var ai_skill_level: float = 0.8                     # 0.0-1.0 skill level
-@export var ai_reaction_time: float = 0.5                   # Seconds to react to threats
-@export var ai_optimal_range: float = 600.0                 # Optimal combat range in meters
-@export var ai_class_level: String = ""                     # AI difficulty class (Captain, etc.)
-@export var scan_time_ms: int = 2000                        # Milliseconds to scan target
+@export var ai_aggressiveness: float = 0.5 # 0.0-1.0 aggression level
+@export var ai_skill_level: float = 0.8 # 0.0-1.0 skill level
+@export var ai_reaction_time: float = 0.5 # Seconds to react to threats
+@export var ai_optimal_range: float = 600.0 # Optimal combat range in meters
+@export var ai_class_level: String = "" # AI difficulty class (Captain, etc.)
+@export var scan_time_ms: int = 2000 # Milliseconds to scan target
 
 # === COUNTERMEASURES ===
 @export_group("Countermeasures", "cm_")
-@export var countermeasures_count: int = 24                 # Number of countermeasures
-@export var countermeasure_types: Array[String] = []        # Available countermeasure types
-@export var cm_effectiveness_multiplier: float = 1.0        # Effectiveness multiplier
+@export var countermeasures_count: int = 24 # Number of countermeasures
+@export var countermeasure_types: Array[String] = [] # Available countermeasure types
+@export var cm_effectiveness_multiplier: float = 1.0 # Effectiveness multiplier
 
 # === GAMEPLAY FLAGS ===
 @export_group("Gameplay", "gameplay_")
-@export var is_player_allowed: bool = true                  # Can be flown by player
-@export var appears_in_tech_database: bool = false          # Shows in tech database
-@export var is_stealth: bool = false                        # Has stealth capabilities
-@export var is_default_player_ship: bool = false            # Default player ship option
-@export var cargo_capacity: int = 0                         # Cargo space units
-@export var score_value: int = 10                           # Score value when destroyed
-@export var cargo_size_units: int = 1                       # Cargo size for loading
-@export var engine_sound_id: int = 126                      # Cross-reference to audio resource
+@export var is_player_allowed: bool = true # Can be flown by player
+@export var appears_in_tech_database: bool = false # Shows in tech database
+@export var is_stealth: bool = false # Has stealth capabilities
+@export var is_default_player_ship: bool = false # Default player ship option
+@export var cargo_capacity: int = 0 # Cargo space units
+@export var score_value: int = 10 # Score value when destroyed
+@export var cargo_size_units: int = 1 # Cargo size for loading
+@export var engine_sound_id: int = 126 # Cross-reference to audio resource
 
 # === SUBSYSTEM SPECIFICATIONS ===
 @export_group("Subsystems", "subsystem_")
-@export var engine_subsystems: Array[EngineSubsystem] = []  # Engine subsystem specifications
-@export var weapon_subsystems: Array[WeaponSubsystem] = []  # Weapon subsystem specifications
-@export var shield_subsystems: Array[ShieldSubsystem] = []  # Shield subsystem specifications
+@export var engine_subsystems: Array[EngineSubsystem] = [] # Engine subsystem specifications
+@export var weapon_subsystems: Array[WeaponSubsystem] = [] # Weapon subsystem specifications
+@export var shield_subsystems: Array[ShieldSubsystem] = [] # Shield subsystem specifications
 
 # === TURRET INFORMATION ===
 @export_group("Turrets", "turret_")
-@export_var turret_mounts: Array[TurretMount] = []        # Turret mounting specifications
-@export_var turret_rotation_limits: Dictionary = {}       # Turret rotation constraints
+@export_varturret_mounts: Array[TurretMount] = [] # Turret mounting specifications
+@export_varturret_rotation_limits: Dictionary = {} # Turret rotation constraints
 
 # Internal validation signals
 signal weapon_mounts_changed()
@@ -140,52 +143,52 @@ signal subsystem_configuration_changed()
 
 class WeaponMount extends Resource:
 	"""Detailed weapon mount specification"""
-	@export var mount_name: String = ""                     # Mount identifier
-	@export var mount_type: int = 0                         # 0=Primary, 1=Secondary, 2=Special
-	@export var position: Vector3 = Vector3.ZERO            # Local coordinates on model
-	@export var orientation: Vector3 = Vector3.FORWARD      # Firing direction
-	@export var weapon_class: String = ""                   # Allowed weapon categories
-	@export var fire_cooldown: float = 0.35                 # Cooldown between shots
-	@export var damage_multiplier: float = 1.0              # Damage output multiplier
-	@export var fire_arc_horizontal: float = 360.0          # Horizontal firing arc in degrees
-	@export var fire_arc_vertical: float = 360.0            # Vertical firing arc in degrees
-	@export var linked_mounts: Array[String] = []           # Other mounts that fire together
-	@export var is_gimballed: bool = false                  # Can track targets
-	@export var gimbal_range: float = 0.0                   # Gimbal tracking range
+	@export var mount_name: String = "" # Mount identifier
+	@export var mount_type: int = 0 # 0=Primary, 1=Secondary, 2=Special
+	@export var position: Vector3 = Vector3.ZERO # Local coordinates on model
+	@export var orientation: Vector3 = Vector3.FORWARD # Firing direction
+	@export var weapon_class: String = "" # Allowed weapon categories
+	@export var fire_cooldown: float = 0.35 # Cooldown between shots
+	@export var damage_multiplier: float = 1.0 # Damage output multiplier
+	@export var fire_arc_horizontal: float = 360.0 # Horizontal firing arc in degrees
+	@export var fire_arc_vertical: float = 360.0 # Vertical firing arc in degrees
+	@export var linked_mounts: Array[String] = [] # Other mounts that fire together
+	@export var is_gimballed: bool = false # Can track targets
+	@export var gimbal_range: float = 0.0 # Gimbal tracking range
 
 class EngineSubsystem extends Resource:
 	"""Engine subsystem configuration"""
-	@export var subsystem_name: String = ""                 # Subsystem name
-	@export var hitpoints: float = 15.0                     # Subsystem hitpoints
-	@export var max_hitpoints: float = 15.0                 # Maximum hitpoints
-	@export var damage_threshold: float = 0.0               # Damage threshold
-	@export var affects_performance: bool = true             # Damaged engine affects performance
-	@export_var thruster_effects: Array[String] = []       # Cross-references to effects
+	@export var subsystem_name: String = "" # Subsystem name
+	@export var hitpoints: float = 15.0 # Subsystem hitpoints
+	@export var max_hitpoints: float = 15.0 # Maximum hitpoints
+	@export var damage_threshold: float = 0.0 # Damage threshold
+	@export var affects_performance: bool = true # Damaged engine affects performance
+	@export_varthruster_effects: Array[String] = [] # Cross-references to effects
 
 class WeaponSubsystem extends Resource:
 	"""Weapon subsystem configuration"""
-	@export var subsystem_name: String = ""                 # Subsystem name
-	@export var hitpoints: float = 10.0                     # Subsystem hitpoints
-	@export var weapon_count: int = 0                       # Number of weapons affected
-	@export var affected_weapons: Array[int] = []           # Indices of affected weapon mounts
-	@export var damage_effect: float = 1.0                  # Performance degradation multiplier
+	@export var subsystem_name: String = "" # Subsystem name
+	@export var hitpoints: float = 10.0 # Subsystem hitpoints
+	@export var weapon_count: int = 0 # Number of weapons affected
+	@export var affected_weapons: Array[int] = [] # Indices of affected weapon mounts
+	@export var damage_effect: float = 1.0 # Performance degradation multiplier
 
 class ShieldSubsystem extends Resource:
 	"""Shield subsystem configuration"""
-	@export var subsystem_name: String = ""                 # Subsystem name
-	@export var shield_generator_type: String = ""          # Generator type
-	@export var hitpoints: float = 20.0                     # Subsystem hitpoints
-	@export var shield_regen_multiplier: float = 1.0        # Shield regeneration multiplier
+	@export var subsystem_name: String = "" # Subsystem name
+	@export var shield_generator_type: String = "" # Generator type
+	@export var hitpoints: float = 20.0 # Subsystem hitpoints
+	@export var shield_regen_multiplier: float = 1.0 # Shield regeneration multiplier
 
 class TurretMount extends Resource:
 	"""Turret mount specification"""
-	@export var turret_name: String = ""                    # Turret identifier
-	@export var base_position: Vector3 = Vector3.ZERO      # Base mount position
-	@export var barrel_length: float = 1.0                 # Turret barrel length
-	@export var rotation_speed: float = 45.0               # Degrees per second
+	@export var turret_name: String = "" # Turret identifier
+	@export var base_position: Vector3 = Vector3.ZERO # Base mount position
+	@export var barrel_length: float = 1.0 # Turret barrel length
+	@export var rotation_speed: float = 45.0 # Degrees per second
 	@export var elevation_limits: Vector2 = Vector2(-90, 90) # Min/max elevation angles
 	@export var azimuth_limits: Vector2 = Vector2(-180, 180) # Min/max azimuth angles
-	@export var weapon_class: String = ""                   # Allowed weapon type
+	@export var weapon_class: String = "" # Allowed weapon type
 
 # ================== VALIDATION METHODS ==================
 
