@@ -3,7 +3,7 @@
 # and cross-reference resolution for Wing Commander Saga ships
 
 class_name ShipStats
-extends WCSBaseResource
+extends "res://scripts/resources/core/wcs_base_resource.gd"
 
 # === IDENTITY AND CLASSIFICATION ===
 @export_group("Identity", "identity_")
@@ -132,7 +132,8 @@ extends WCSBaseResource
 
 # === TURRET INFORMATION ===
 @export_group("Turrets", "turret_")
-@export var turret_mounts: Array[TurretMount] = [] # Turret mounting specifications
+@export var turret_mounts: Array[TurretMount] = []
+ # Turret mounting specifications
 @export var turret_rotation_limits: Dictionary = {} # Turret rotation constraints
 
 # Internal validation signals

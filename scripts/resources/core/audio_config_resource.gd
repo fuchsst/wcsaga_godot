@@ -1,5 +1,5 @@
 class_name AudioConfigResource
-extends WCSBaseResource
+extends "res://scripts/resources/core/wcs_base_resource.gd"
 
 ## Audio Configuration Resource
 ##

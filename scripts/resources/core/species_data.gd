@@ -3,7 +3,7 @@
 # military, and technological characteristics for Wing Commander Saga
 
 class_name SpeciesData
-extends WCSBaseResource
+extends "res://scripts/resources/core/wcs_base_resource.gd"
 
 # === IDENTITY AND CULTURE ===
 @export_group("Identity", "identity_")
@@ -192,7 +192,7 @@ func _validate_identity() -> void:
 
 func _validate_military_doctrine() -> void:
 	"""Validate military doctrine properties"""
-	valid_doctrines = ["Aggressive", "Defensive", "Balanced", "Guerrilla", "Terror", ""]
+	var valid_doctrines = ["Aggressive", "Defensive", "Balanced", "Guerrilla", "Terror", ""]
 	if not military_doctrine in valid_doctrines:
 		_add_validation_error("Invalid military doctrine: %s" % military_doctrine)
 
@@ -202,11 +202,11 @@ func _validate_military_doctrine() -> void:
 	if retreat_threshold < 0 or retreat_threshold > 1:
 		_add_validation_error("Retreat threshold must be between 0.0 and 1.0")
 
-	valid_tactics = ["Swarm", "Hit-and-run", "Dogfighting", "Boom-and-Zoom", "Energy Fighting"]
+	var valid_tactics = ["Swarm", "Hit-and-run", "Dogfighting", "Boom-and-Zoom", "Energy Fighting"]
 	if not fighter_tactics in valid_tactics and not fighter_tactics.is_empty():
 		_add_validation_warning("Unknown fighter tactics: %s" % fighter_tactics)
 
-	valid_cap_tactics = ["Broadside", "Artillery", "Carrier-based", "Ramming", ""]
+	var valid_cap_tactics = ["Broadside", "Artillery", "Carrier-based", "Ramming", ""]
 	if not capital_ship_tactics in valid_cap_tactics and not capital_ship_tactics.is_empty():
 		_add_validation_warning("Unknown capital tactics: %s" % capital_ship_tactics)
 
@@ -233,7 +233,7 @@ func _validate_technology_levels() -> void:
 
 func _validate_shipbuilding_preferences() -> void:
 	"""Validate shipbuilding preferences"""
-	valid_tonnages = ["Light", "Medium", "Heavy", "Mixed", ""]
+	var valid_tonnages = ["Light", "Medium", "Heavy", "Mixed", ""]
 	if not preferred_ship_tonnage in valid_tonnages:
 		_add_validation_warning("Unknown ship tonnage preference: %s" % preferred_ship_tonnage)
 

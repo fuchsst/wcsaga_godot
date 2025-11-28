@@ -1,5 +1,5 @@
 class_name SSMResource
-extends WCSBaseResource
+extends "res://scripts/resources/core/wcs_base_resource.gd"
 
 ## Subspace Missile Resource
 ##

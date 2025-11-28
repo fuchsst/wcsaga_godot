@@ -1,5 +1,5 @@
 class_name MissionManifest
-extends WCSBaseResource
+extends "res://scripts/resources/core/wcs_base_resource.gd"
 
 ## Mission Manifest Resource
 ##
@@ -10,18 +10,18 @@ extends WCSBaseResource
 @export var mission_name: String = ""
 @export var source_file: String = ""
 
-# Full Mission Data (Data-only, no logic)
+# Full Mission Data
 @export var metadata: Dictionary = {}
-@export var objects: Array[Dictionary] = []
-@export var wings: Array[Dictionary] = []
-@export var events: Array[Dictionary] = []
-@export var messages: Array[Dictionary] = []
-@export var briefing: Dictionary = {}
-@export var debriefing: Dictionary = {}
-@export var command_briefing: Array[Dictionary] = []
+@export var objects: Array[MissionObject] = []
+@export var wings: Array[MissionWing] = []
+@export var events: Array[MissionEvent] = []
+@export var messages: Array[MissionMessage] = []
+@export var briefing: BriefingData = BriefingData.new()
+@export var debriefing: DebriefingData = DebriefingData.new()
+@export var command_briefing: Array[CommandBriefingStage] = []
 
 # Asset Dependencies
-@export var cutscenes: Array[Dictionary] = [] # { "path": "...", "type": "briefing|command" }
+@export var cutscenes: Array[VideoStream] = [] # List of video streams
 @export var audio: Array[Dictionary] = [] # { "path": "...", "usage": "..." }
 @export var animations: Array[Dictionary] = [] # { "path": "...", "usage": "..." }
 @export var models: Array[Dictionary] = [] # { "path": "...", "usage": "..." }
@@ -30,10 +30,10 @@ extends WCSBaseResource
 @export var fiction: Array[Dictionary] = [] # { "path": "...", "usage": "..." }
 
 # === LOGIC & ENVIRONMENT ===
-@export var sexp_variables: Array[Dictionary] = [] # { "name": "...", "default_value": "...", "type": "..." }
-@export var players: Dictionary = {} # { "starting_ship": "...", "ship_choices": [], "weaponry_pool": [] }
-@export var backgrounds: Dictionary = {} # { "suns": [], "bitmaps": [], "nebula": {}, "num_stars": 0, "ambient_light": 0 }
-@export var asteroid_fields: Array[Dictionary] = [] # List of asteroid field configs
+@export var sexp_variables: Array[SexpVariable] = []
+@export var players: PlayerData = PlayerData.new()
+@export var backgrounds: BackgroundData = BackgroundData.new()
+@export var asteroid_fields: Array[AsteroidField] = []
 
 func get_resource_type() -> String:
 	return "mission_manifest"

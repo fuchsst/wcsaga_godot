@@ -1,5 +1,5 @@
 class_name AutopilotResource
-extends WCSBaseResource
+extends "res://scripts/resources/core/wcs_base_resource.gd"
 
 ## Autopilot Resource
 ##

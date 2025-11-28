@@ -3,7 +3,7 @@
 # physics modeling and tactical impact analysis for Wing Commander Saga
 
 class_name NebulaData
-extends WCSBaseResource
+extends "res://scripts/resources/core/wcs_base_resource.gd"
 
 # === BASIC NEBULA PROPERTIES ===
 @export_group("Identity", "identity_")

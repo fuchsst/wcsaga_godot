@@ -3,7 +3,7 @@
 # for Wing Commander Saga asteroid belt and debris field environments
 
 class_name AsteroidData
-extends WCSBaseResource
+extends "res://scripts/resources/core/wcs_base_resource.gd"
 
 # === BASIC FIELD PROPERTIES ===
 @export_group("Field Identity", "field_")

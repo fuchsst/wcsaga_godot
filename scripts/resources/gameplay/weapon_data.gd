@@ -3,7 +3,7 @@
 # and cross-reference resolution for Wing Commander Saga weapons
 
 class_name WCSWeaponData
-extends WCSBaseResource
+extends "res://scripts/resources/core/wcs_base_resource.gd"
 
 # === IDENTITY AND CLASSIFICATION ===
 @export_group("Identity", "identity_")

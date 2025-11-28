@@ -1,5 +1,5 @@
 class_name HelpResource
-extends WCSBaseResource
+extends "res://scripts/resources/core/wcs_base_resource.gd"
 
 ## Help and Tips Resource
 ##

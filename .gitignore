@@ -3,6 +3,7 @@
 addons/gdUnit4
 addons/debug_console
 addons/limboai
+addons/scene_manager
 addons/SignalVisualizer
 
 # Python ignores

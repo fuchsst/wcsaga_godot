@@ -11,6 +11,7 @@ config_version=5
 [application]
 
 config/name="Wing Commander Saga"
+run/main_scene="uid://ddgh7610sax0p"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 config/icon="uid://cc58gpsbqci8y"
 

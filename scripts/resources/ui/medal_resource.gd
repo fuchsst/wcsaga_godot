@@ -1,5 +1,5 @@
 class_name MedalResource
-extends WCSBaseResource
+extends "res://scripts/resources/core/wcs_base_resource.gd"
 
 ## Medal Resource
 ##

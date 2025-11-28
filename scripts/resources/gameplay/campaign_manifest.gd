@@ -1,5 +1,5 @@
 class_name CampaignManifest
-extends WCSBaseResource
+extends "res://scripts/resources/core/wcs_base_resource.gd"
 
 ## Campaign Manifest Resource
 ##
@@ -28,7 +28,7 @@ extends WCSBaseResource
 
 # === MISSIONS ===
 @export_group("Missions", "mission_")
-@export var missions: Array[Dictionary] = [] # List of mission dictionaries
+@export var missions: Array[CampaignMission] = []
 
 func get_resource_type() -> String:
 	return "campaign_manifest"
