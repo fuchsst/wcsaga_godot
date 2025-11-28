@@ -132,8 +132,8 @@ extends WCSBaseResource
 
 # === TURRET INFORMATION ===
 @export_group("Turrets", "turret_")
-@export_varturret_mounts: Array[TurretMount] = [] # Turret mounting specifications
-@export_varturret_rotation_limits: Dictionary = {} # Turret rotation constraints
+@export var turret_mounts: Array[TurretMount] = [] # Turret mounting specifications
+@export var turret_rotation_limits: Dictionary = {} # Turret rotation constraints
 
 # Internal validation signals
 signal weapon_mounts_changed()
@@ -163,7 +163,7 @@ class EngineSubsystem extends Resource:
 	@export var max_hitpoints: float = 15.0 # Maximum hitpoints
 	@export var damage_threshold: float = 0.0 # Damage threshold
 	@export var affects_performance: bool = true # Damaged engine affects performance
-	@export_varthruster_effects: Array[String] = [] # Cross-references to effects
+	@export var thruster_effects: Array[String] = [] # Cross-references to effects
 
 class WeaponSubsystem extends Resource:
 	"""Weapon subsystem configuration"""

@@ -7,50 +7,50 @@ extends WCSBaseResource
 
 # === BASIC FIELD PROPERTIES ===
 @export_group("Field Identity", "field_")
-@export var field_name: String = ""                    # Field designation/name
-@export var field_classification: int = 0               # 0=Asteroid Belt, 1=Debris Field, 2=Rocky Nebula
-@export var field_density_coefficient: float = 0.3      # 0.0-1.0 density scale
-@export var field_diameter_km: float = 10.0            # Field diameter in kilometers
-@export var minimum_separation_distance: float = 1.0    # Minimum asteroid spacing (meters)
+@export var field_name: String = "" # Field designation/name
+@export var field_classification: int = 0 # 0=Asteroid Belt, 1=Debris Field, 2=Rocky Nebula
+@export var field_density_coefficient: float = 0.3 # 0.0-1.0 density scale
+@export var field_diameter_km: float = 10.0 # Field diameter in kilometers
+@export var minimum_separation_distance: float = 1.0 # Minimum asteroid spacing (meters)
 
 # === ASTEROID POPULATION ===
 @export_group("Size Distribution", "size_")
-@export var size_distribution_percentages: Dictionary = {  # Size category -> percentage
-	"tiny": 0.40,      # < 10m diameter
-	"small": 0.30,     # 10-50m diameter
-	"medium": 0.20,    # 50-200m diameter
-	"large": 0.08,     # 200-1000m diameter
-	"huge": 0.02       # > 1000m diameter
+@export var size_distribution_percentages: Dictionary = { # Size category -> percentage
+	"tiny": 0.40, # < 10m diameter
+	"small": 0.30, # 10-50m diameter
+	"medium": 0.20, # 50-200m diameter
+	"large": 0.08, # 200-1000m diameter
+	"huge": 0.02 # > 1000m diameter
 }
-@export var size_variance_factor: float = 0.2           # Random variance in each category
-@export var minimum_asteroid_diameter: float = 1.0      # Smallest possible asteroid (meters)
-@export var maximum_asteroid_diameter: float = 5000.0   # Largest possible asteroid (meters)
-@export var size_weighting_exponent: float = 1.0        # Non-linear size distribution
+@export var size_variance_factor: float = 0.2 # Random variance in each category
+@export var minimum_asteroid_diameter: float = 1.0 # Smallest possible asteroid (meters)
+@export var maximum_asteroid_diameter: float = 5000.0 # Largest possible asteroid (meters)
+@export var size_weighting_exponent: float = 1.0 # Non-linear size distribution
 
 # === MOVEMENT AND DYNAMICS ===
 @export_group("Movement", "movement_")
-@export var rotation_speed_range: Vector2 = Vector2(0.1, 2.0)    # Degrees per second
-@export var orbital_velocity_range: Vector2 = Vector2(0.0, 50.0)  # m/s relative to field center
-@export var orbital_motion_pattern: int = 0             # 0=Static, 1=Orbital, 2=Random, 3=Flowing
-@export var orbital_axis_primary: Vector3 = Vector3(0, 1, 0)    # Primary rotation axis
-@export var orbital_axis_secondary: Vector3 = Vector3(1, 0, 0)  # Secondary rotation axis
-@export var turbulence_intensity: float = 0.1           # Movement chaos factor
-@export var gravitational_perturbation: float = 0.0     # Gravitational irregularities
+@export var rotation_speed_range: Vector2 = Vector2(0.1, 2.0) # Degrees per second
+@export var orbital_velocity_range: Vector2 = Vector2(0.0, 50.0) # m/s relative to field center
+@export var orbital_motion_pattern: int = 0 # 0=Static, 1=Orbital, 2=Random, 3=Flowing
+@export var orbital_axis_primary: Vector3 = Vector3(0, 1, 0) # Primary rotation axis
+@export var orbital_axis_secondary: Vector3 = Vector3(1, 0, 0) # Secondary rotation axis
+@export var turbulence_intensity: float = 0.1 # Movement chaos factor
+@export var gravitational_perturbation: float = 0.0 # Gravitational irregularities
 
 # === COLLISION PHYSICS ===
 @export_group("Collision", "collision_")
-@export var collision_damage_scale: float = 1.0         # Base collision damage multiplier
-@export var inter_asteroid_collisions: bool = true      # Asteroids can destroy each other
-@export var ship_mass_damage_factor: float = 0.5        # Damage scales with ship mass
-@export var velocity_damage_exponent: float = 2.0       # Damage scaling with velocity (square law)
-@export var minimum_damage_velocity: float = 10.0       # m/s minimum for damage
-@export var collision_momentum_transfer: float = 0.8     # Energy transfer coefficient
-@export var collision_restitution_coefficient: float = 0.2  # Bounce factor
+@export var collision_damage_scale: float = 1.0 # Base collision damage multiplier
+@export var inter_asteroid_collisions: bool = true # Asteroids can destroy each other
+@export var ship_mass_damage_factor: float = 0.5 # Damage scales with ship mass
+@export var velocity_damage_exponent: float = 2.0 # Damage scaling with velocity (square law)
+@export var minimum_damage_velocity: float = 10.0 # m/s minimum for damage
+@export var collision_momentum_transfer: float = 0.8 # Energy transfer coefficient
+@export var collision_restitution_coefficient: float = 0.2 # Bounce factor
 
 # === MINING AND RESOURCES ===
 @export_group("Mining", "mining_")
-@export var supports_mining: bool = false                # Asteroids can be mined
-@export var mineral_composition_percentages: Dictionary = {  # Mineral -> percentage
+@export var supports_mining: bool = false # Asteroids can be mined
+@export var mineral_composition_percentages: Dictionary = { # Mineral -> percentage
 	"iron": 0.60,
 	"nickel": 0.25,
 	"cobalt": 0.05,
@@ -58,57 +58,57 @@ extends WCSBaseResource
 	"rare_earth": 0.03,
 	"radioactives": 0.01
 }
-@export var mining_difficulty_rating: float = 1.0       # Difficulty multiplier (1.0=normal)
-@export var base_mining_yield_value: float = 100.0      # Base resource extraction value
-@export var mining_equipment_requirements: Array[String] = []  # Equipment needed
-@export var mining_hazard_level: int = 0                 # 0=Safe, 1=Dangerous, 2=Extreme
-@export var mineral_market_values: Dictionary = {}      # Mineral -> market price
+@export var mining_difficulty_rating: float = 1.0 # Difficulty multiplier (1.0=normal)
+@export var base_mining_yield_value: float = 100.0 # Base resource extraction value
+@export var mining_equipment_requirements: Array[String] = [] # Equipment needed
+@export var mining_hazard_level: int = 0 # 0=Safe, 1=Dangerous, 2=Extreme
+@export var mineral_market_values: Dictionary = {} # Mineral -> market price
 
 # === ENVIRONMENTAL HAZARDS ===
 @export_group("Hazards", "hazard_")
-@export var radiation_level: float = 0.0                 # Background radiation level
-@export var radiation_damage_per_second: float = 0.0     # Hull damage from radiation
-@export var electromagnetic_interference: float = 0.0    # Sensor disruption (0.0-1.0)
-@export var communication_blackout_severity: float = 0.0  # Comms interference (0.0-1.0)
-@export var magnetic_field_disturbance: float = 0.0     # Navigation system interference
-@export var micro_meteorite_density: float = 0.0        # Micrometeorite collision chance
-@export var dust_cloud_density: float = 0.0             # Visual/sensor obstruction
+@export var radiation_level: float = 0.0 # Background radiation level
+@export var radiation_damage_per_second: float = 0.0 # Hull damage from radiation
+@export var electromagnetic_interference: float = 0.0 # Sensor disruption (0.0-1.0)
+@export var communication_blackout_severity: float = 0.0 # Comms interference (0.0-1.0)
+@export var magnetic_field_disturbance: float = 0.0 # Navigation system interference
+@export var micro_meteorite_density: float = 0.0 # Micrometeorite collision chance
+@export var dust_cloud_density: float = 0.0 # Visual/sensor obstruction
 
 # === VISUAL REPRESENTATION ===
 @export_group("Visual Effects", "visual_")
-@export var asteroid_model_references: Array[String] = []  # Cross-references to 3D models
-@export var asteroid_texture_variants: int = 5           # Number of different textures
-@export var destruction_effect_reference: String = ""     # Cross-reference to effect
-@export var impact_effect_reference: String = ""          # Cross-reference to effect
-@export var particle_field_density: float = 0.2          # Dust/debris density
-@export var field_luminosity_factor: float = 0.8         # Brightness modifier
-@export var asteroid_surface_reflectivity: float = 0.3    # Material shininess
+@export var asteroid_model_references: Array[String] = [] # Cross-references to 3D models
+@export var asteroid_texture_variants: int = 5 # Number of different textures
+@export var destruction_effect_reference: String = "" # Cross-reference to effect
+@export var impact_effect_reference: String = "" # Cross-reference to effect
+@export var particle_field_density: float = 0.2 # Dust/debris density
+@export var field_luminosity_factor: float = 0.8 # Brightness modifier
+@export var asteroid_surface_reflectivity: float = 0.3 # Material shininess
 
 # === NAVIGATION IMPACT ===
 @export_group("Navigation", "nav_")
-@export var plot_course_difficulty: float = 0.5          # Difficulty of navigation plotting
-@export var hyperspace_interference: float = 0.0         # Jump drive disruption
-@export var subspace_interference: float = 0.0           # Subspace comm disruption
-@export var astrogation_complexity: int = 0              # Navigation complexity level
-@export var recommended_safeties: Array[String] = []      # Recommended safety protocols
+@export var plot_course_difficulty: float = 0.5 # Difficulty of navigation plotting
+@export var hyperspace_interference: float = 0.0 # Jump drive disruption
+@export var subspace_interference: float = 0.0 # Subspace comm disruption
+@export var astrogation_complexity: int = 0 # Navigation complexity level
+@export var recommended_safeties: Array[String] = [] # Recommended safety protocols
 
 # === PERFORMANCE OPTIMIZATION ===
 @export_group("Performance", "perf_")
-@export var level_of_detail_distance_multiplier: float = 2.0  # Extended LOD distances
-@export var physics_simulation_detail: int = 2            # 0=Low, 1=Medium, 2=High, 3=Ultra
-@export var collision_mesh_complexity_level: int = 1       # 0=Sphere, 1=Convex, 2=Triangle mesh
-@export var maximum_visible_asteroids: int = 100          # Performance visibility limit
-@export var culling_distance_km: float = 5.0              # Distance beyond which asteroids culled
-@export var batch_rendering_groups: int = 4               # Number of batched rendering groups
+@export var level_of_detail_distance_multiplier: float = 2.0 # Extended LOD distances
+@export var physics_simulation_detail: int = 2 # 0=Low, 1=Medium, 2=High, 3=Ultra
+@export var collision_mesh_complexity_level: int = 1 # 0=Sphere, 1=Convex, 2=Triangle mesh
+@export var maximum_visible_asteroids: int = 100 # Performance visibility limit
+@export var culling_distance_km: float = 5.0 # Distance beyond which asteroids culled
+@export var batch_rendering_groups: int = 4 # Number of batched rendering groups
 
 # === FIELD GENERATION PARAMETERS ===
 @export_group("Generation", "gen_")
-@export var random_seed_offset: int = 0                   # Random generation seed offset
-@export var generation_algorithm: int = 0                # 0=Uniform, 1=Clustered, 2=Ring, 3=Spiral
-@export var cluster_density_levy_exponent: float = 1.0   # Clustering distribution parameter
-@export var ring_thickness_factor: float = 0.2           # For ring generation
-@export var spiral_arms_count: int = 2                   # For spiral generation
-@export var spiral_tightness: float = 1.0                # For spiral generation
+@export var random_seed_offset: int = 0 # Random generation seed offset
+@export var generation_algorithm: int = 0 # 0=Uniform, 1=Clustered, 2=Ring, 3=Spiral
+@export var cluster_density_levy_exponent: float = 1.0 # Clustering distribution parameter
+@export var ring_thickness_factor: float = 0.2 # For ring generation
+@export var spiral_arms_count: int = 2 # For spiral generation
+@export var spiral_tightness: float = 1.0 # For spiral generation
 
 # Validation signals
 signal field_properties_changed()
@@ -361,7 +361,7 @@ func calculate_estimated_asteroid_count() -> int:
 	Considers size distribution to account for space occupied by larger asteroids.
 	"""
 	var field_radius = field_diameter_km / 2.0
-	var field_volume_cubic_km = (4.0/3.0) * PI * pow(field_radius, 3.0)
+	var field_volume_cubic_km = (4.0 / 3.0) * PI * pow(field_radius, 3.0)
 	var density_per_cubic_km = field_density_coefficient * 10.0
 	var base_count = int(field_volume_cubic_km * density_per_cubic_km)
 
@@ -370,11 +370,11 @@ func calculate_estimated_asteroid_count() -> int:
 	for category in size_distribution_percentages.keys():
 		var percentage = size_distribution_percentages[category]
 		var typical_size = get_typical_size_for_category(category)
-		var space_factor = pow(typical_size / 100.0, 2.0)  # Approximate area scaling
-		space_adjustment_multiplier += (percentage * space_factor * 0.1)  # Weighted influence
+		var space_factor = pow(typical_size / 100.0, 2.0) # Approximate area scaling
+		space_adjustment_multiplier += (percentage * space_factor * 0.1) # Weighted influence
 
 	var adjusted_count = int(base_count / space_adjustment_multiplier)
-	return max(10, adjusted_count)  # Minimum reasonable count
+	return max(10, adjusted_count) # Minimum reasonable count
 
 func calculate_field_mass_estimate() -> float:
 	"""Calculate estimated total mass of the asteroid field in tons"""
@@ -392,13 +392,13 @@ func calculate_average_asteroid_mass() -> float:
 		if percentage > 0:
 			var size_range = get_category_size_range(category)
 			var typical_size = (size_range.x + size_range.y) / 2.0
-			var volume_cubic_meters = (4.0/3.0) * PI * pow(typical_size / 2.0, 3.0)
-			var mass_tons = volume_cubic_meters * 2.7  # Rough density of rock
+			var volume_cubic_meters = (4.0 / 3.0) * PI * pow(typical_size / 2.0, 3.0)
+			var mass_tons = volume_cubic_meters * 2.7 # Rough density of rock
 			total_mass_contribution += (mass_tons * percentage)
 			total_percentage += percentage
 
 	if total_percentage <= 0:
-		return 100.0  # Default fallback
+		return 100.0 # Default fallback
 
 	return total_mass_contribution / total_percentage
 
@@ -438,12 +438,12 @@ func calculate_collision_damage(
 	var angle_factor = abs(cos(deg_to_rad(impact_angle_degrees)))
 
 	# Scale with asteroid size
-	var size_factor = pow(cross_sectional_area, 0.5) / 10.0  # Normalize
+	var size_factor = pow(cross_sectional_area, 0.5) / 10.0 # Normalize
 
 	# Calculate final damage
 	var damage = (ship_kinetic_energy / 1000.0) * collision_damage_scale * size_factor * angle_factor
 	damage *= ship_mass_damage_factor
-	damage *= pow(impact_velocity_mps / 100.0, velocity_damage_exponent - 1.0)  # Extra velocity scaling
+	damage *= pow(impact_velocity_mps / 100.0, velocity_damage_exponent - 1.0) # Extra velocity scaling
 
 	return max(0.0, damage)
 
@@ -458,13 +458,13 @@ func calculate_mining_yield_from_asteroid(
 
 	# Calculate asteroid volume and total material
 	var asteroid_radius = asteroid_diameter_meters / 2.0
-	var volume_cubic_meters = (4.0/3.0) * PI * pow(asteroid_radius, 3.0)
-	var total_material_tons = volume_cubic_meters * 2.7  # Rock density
+	var volume_cubic_meters = (4.0 / 3.0) * PI * pow(asteroid_radius, 3.0)
+	var total_material_tons = volume_cubic_meters * 2.7 # Rock density
 
 	# Calculate effective mining yield
 	var efficiency = float(mining_equipment_tier) / mining_difficulty_rating
 	efficiency *= mining_skill_multiplier
-	efficiency = clamp(efficiency, 0.1, 1.0)  # Minimum 10% efficiency
+	efficiency = clamp(efficiency, 0.1, 1.0) # Minimum 10% efficiency
 
 	var total_yield_tons = total_material_tons * efficiency
 	var base_yield_value = base_mining_yield_value * (asteroid_diameter_meters / 100.0)
@@ -502,7 +502,7 @@ func get_hazard_severity_score() -> float:
 
 func is_safe_for_extended_operations() -> bool:
 	"""Determine if field is safe for prolonged mining/survey operations"""
-	return (radiation_damage_per_seconds if radiation_damage_per_second < 0.5 and
+	return (radiation_damage_per_second < 0.5 and
 		    mining_hazard_level <= 1 and
 		    electromagnetic_interference < 0.8 and
 		    communication_blackout_severity < 0.7 and

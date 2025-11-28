@@ -10,7 +10,7 @@ extends WCSBaseResource
 @export var entry_name: String = ""
 @export var filename: String = ""
 @export var volume: float = 1.0
-@export var preload: bool = false
+@export var preload_data: bool = false
 
 func get_resource_type() -> String:
 	return "audio_config"

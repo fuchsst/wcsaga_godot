@@ -2,7 +2,7 @@
 # Represents complete weapon definition from weapons.tbl with physics-based damage modeling
 # and cross-reference resolution for Wing Commander Saga weapons
 
-class_name WeaponData
+class_name WCSWeaponData
 extends WCSBaseResource
 
 # === IDENTITY AND CLASSIFICATION ===

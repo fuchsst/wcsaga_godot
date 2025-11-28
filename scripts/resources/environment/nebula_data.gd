@@ -7,115 +7,115 @@ extends WCSBaseResource
 
 # === BASIC NEBULA PROPERTIES ===
 @export_group("Identity", "identity_")
-@export var nebula_name: String = ""                     # Nebula designation/name
-@export var nebula_classification: int = 0               # 0=Gas Cloud, 1=Ion Storm, 2=Dust Cloud, 3=Radiation Field
-@export var primary_chemical_composition: String = ""     # Cross-reference to chemistry data
-@export var secondary_chemical_composition: String = ""   # Cross-reference to chemistry data
-@export var gas_density_normalized: float = 0.5           # 0.0-1.0 density scale
-@export var visual_opacity_coefficient: float = 0.3       # 0.0-1.0 visibility obstruction
-@export var nebula_tint_color: Color = Color(0.8, 0.6, 0.4, 0.3)  # Atmospheric color tint
+@export var nebula_name: String = "" # Nebula designation/name
+@export var nebula_classification: int = 0 # 0=Gas Cloud, 1=Ion Storm, 2=Dust Cloud, 3=Radiation Field
+@export var primary_chemical_composition: String = "" # Cross-reference to chemistry data
+@export var secondary_chemical_composition: String = "" # Cross-reference to chemistry data
+@export var gas_density_normalized: float = 0.5 # 0.0-1.0 density scale
+@export var visual_opacity_coefficient: float = 0.3 # 0.0-1.0 visibility obstruction
+@export var nebula_tint_color: Color = Color(0.8, 0.6, 0.4, 0.3) # Atmospheric color tint
 
 # === SHIP PERFORMANCE IMPACT ===
 @export_group("Ship Performance", "performance_")
-@export var max_velocity_reduction: float = 0.2           # Percent reduction in maximum velocity
-@export var maneuverability_reduction: float = 0.3        # Percent reduction in maneuverability
-@export var shield_effectiveness_multiplier: float = 0.9  # Shield effectiveness multiplier
-@export var weapon_range_modifier: float = 0.8            # Weapon range multiplier
-@export var weapon_damage_modifier: float = 1.0           # Weapon damage multiplier
-@export var energy_consumption_multiplier: float = 1.2     # Energy drain rate multiplier
-@export var fuel_consumption_increase: float = 0.1        # Additional fuel consumption
-@export var weapon_accuracy_penalty: float = 0.2          # Accuracy reduction (0.0-1.0)
-@export var subsystem_performance_degradation: float = 0.1  # System efficiency reduction
+@export var max_velocity_reduction: float = 0.2 # Percent reduction in maximum velocity
+@export var maneuverability_reduction: float = 0.3 # Percent reduction in maneuverability
+@export var shield_effectiveness_multiplier: float = 0.9 # Shield effectiveness multiplier
+@export var weapon_range_modifier: float = 0.8 # Weapon range multiplier
+@export var weapon_damage_modifier: float = 1.0 # Weapon damage multiplier
+@export var energy_consumption_multiplier: float = 1.2 # Energy drain rate multiplier
+@export var fuel_consumption_increase: float = 0.1 # Additional fuel consumption
+@export var weapon_accuracy_penalty: float = 0.2 # Accuracy reduction (0.0-1.0)
+@export var subsystem_performance_degradation: float = 0.1 # System efficiency reduction
 
 # === SENSOR AND COMMUNICATION ===
 @export_group("Sensors & Comms", "sensor_")
-@export var radar_sensor_range_reduction: float = 0.5      # Radar/contact range reduction
-@export var subspace_sensor_range_reduction: float = 0.3   # Subspace sensor interference
-@export var target_lock_difficulty_increase: float = 0.4   # Difficulty acquiring target locks
-@export var missile_tracking_interference: float = 0.6     # Missile guidance interference
-@export var communications_interference_severity: float = 0.7  # Communication disruption
-@export var stealth_effectiveness_boost: float = 0.5      # Additional stealth effectiveness
-@export var electronic_warfare_interference: float = 0.3   # ECM/ECCM interference
+@export var radar_sensor_range_reduction: float = 0.5 # Radar/contact range reduction
+@export var subspace_sensor_range_reduction: float = 0.3 # Subspace sensor interference
+@export var target_lock_difficulty_increase: float = 0.4 # Difficulty acquiring target locks
+@export var missile_tracking_interference: float = 0.6 # Missile guidance interference
+@export var communications_interference_severity: float = 0.7 # Communication disruption
+@export var stealth_effectiveness_boost: float = 0.5 # Additional stealth effectiveness
+@export var electronic_warfare_interference: float = 0.3 # ECM/ECCM interference
 
 # === SEVERE ENVIRONMENTAL EFFECTS ===
 @export_group("Severe Effects", "severe_")
-@export var causes_sensor_blackout: bool = false         # Complete sensor failure
-@export var actively_drains_shields: bool = false        # Actively drains shield energy
-@export var causes_weapon_malfunctions: bool = false     # Random weapon failures
-@export var blocks_beam_weapons: bool = false            # Stops beam weapon transmission
-@export var disrupts_navigation_systems: bool = false    # Causes navigation errors
-@export var disables_shield_generators: bool = false     # Shields cannot regenerate
-@export var affects_fighter_scale_only: bool = false     # Only affects smaller ships
-@export var affects_capital_scale_only: bool = false     # Only affects capital ships
+@export var causes_sensor_blackout: bool = false # Complete sensor failure
+@export var actively_drains_shields: bool = false # Actively drains shield energy
+@export var causes_weapon_malfunctions: bool = false # Random weapon failures
+@export var blocks_beam_weapons: bool = false # Stops beam weapon transmission
+@export var disrupts_navigation_systems: bool = false # Causes navigation errors
+@export var disables_shield_generators: bool = false # Shields cannot regenerate
+@export var affects_fighter_scale_only: bool = false # Only affects smaller ships
+@export var affects_capital_scale_only: bool = false # Only affects capital ships
 
 # === ENVIRONMENTAL DAMAGE ===
 @export_group("Environmental Damage", "damage_")
-@export var continuous_radiation_damage: float = 0.0     # Hull damage per second
-@export var shield_drain_rate_per_second: float = 0.0    # Shield drain per second
-@export var electrical_malfunction_rate: float = 0.01    # Per second subsystem malfunction chance
-@export var armor_corrosion_rate: float = 0.0           # Armor degradation per second
-@export var engine_degradation_rate: float = 0.0         # Engine efficiency loss per second
-@export var exposure_accumulation_rate: float = 0.02     # Damage accumulation rate
+@export var continuous_radiation_damage: float = 0.0 # Hull damage per second
+@export var shield_drain_rate_per_second: float = 0.0 # Shield drain per second
+@export var electrical_malfunction_rate: float = 0.01 # Per second subsystem malfunction chance
+@export var armor_corrosion_rate: float = 0.0 # Armor degradation per second
+@export var engine_degradation_rate: float = 0.0 # Engine efficiency loss per second
+@export var exposure_accumulation_rate: float = 0.02 # Damage accumulation rate
 
 # === WEATHER EFFECTS ===
 @export_group("Space Weather", "weather_")
-@export var ion_storm_intensity: float = 0.0             # Ion storm severity (0.0-1.0)
-@export var electromagnetic_pulse_frequency: float = 0.0  # EMP events per minute
-@export var cosmic_ray_intensity: float = 0.0            # High-energy particle flux
-@export var solar_wind_modifier: float = 1.0             # Solar wind intensity multiplier
-@export var magnetic_field_turbulence: float = 0.0       # Field disturbance level
-@export var gravity_wave_disturbance: float = 0.0        # Gravitational fluctuations
-@export var temporal_anomaly_severity: float = 0.0       # Time dilation effects
+@export var ion_storm_intensity: float = 0.0 # Ion storm severity (0.0-1.0)
+@export var electromagnetic_pulse_frequency: float = 0.0 # EMP events per minute
+@export var cosmic_ray_intensity: float = 0.0 # High-energy particle flux
+@export var solar_wind_modifier: float = 1.0 # Solar wind intensity multiplier
+@export var magnetic_field_turbulence: float = 0.0 # Field disturbance level
+@export var gravity_wave_disturbance: float = 0.0 # Gravitational fluctuations
+@export var temporal_anomaly_severity: float = 0.0 # Time dilation effects
 
 # === VISUAL EFFECTS ===
 @export_group("Visual Effects", "visual_")
-@export var particle_system_reference: String = ""       # Cross-reference to particle system
-@export var fog_system_reference: String = ""            # Cross-reference to fog system
-@export var lightning_effect_reference: String = ""      # Cross-reference to lightning effect
-@export var electrical_discharge_reference: String = ""  # Cross-reference to discharge effect
-@export var color_shift_intensity: float = 0.5           # Color distortion strength
-@export var parallax_effect_strength: float = 0.3        # Visual depth effect
-@export var particle_density_per_cubic_meter: int = 50   # Particle concentration
-@export var particle_velocity_vector: Vector3 = Vector3.ZERO  # Constant particle motion
-@export var turbulence_force_factor: float = 0.2         # Particle turbulence strength
+@export var particle_system_reference: String = "" # Cross-reference to particle system
+@export var fog_system_reference: String = "" # Cross-reference to fog system
+@export var lightning_effect_reference: String = "" # Cross-reference to lightning effect
+@export var electrical_discharge_reference: String = "" # Cross-reference to discharge effect
+@export var color_shift_intensity: float = 0.5 # Color distortion strength
+@export var parallax_effect_strength: float = 0.3 # Visual depth effect
+@export var particle_density_per_cubic_meter: int = 50 # Particle concentration
+@export var particle_velocity_vector: Vector3 = Vector3.ZERO # Constant particle motion
+@export var turbulence_force_factor: float = 0.2 # Particle turbulence strength
 
 # === TACTICAL IMPLICATIONS ===
 @export_group("Tactical", "tactical_")
-@export var ambush_effectiveness_bonus: float = 0.3      # Bonus to ambush success
-@export var pursuit_difficulty_increase: float = 0.4      # Difficulty of pursuit
-@export var formation_flying_penalty: float = 0.2         # Formation flying penalties
-@export var tactical_retreat_penalty: float = 0.1         # Retreat difficulty
-@export var resource_extraction_boost: float = 0.0        # Mining/survey bonuses
-@export var anomaly_research_bonus: float = 0.5          # Scientific research bonuses
-@export var navigation_hazard_multiplier: float = 1.5     # Plotting course difficulty
+@export var ambush_effectiveness_bonus: float = 0.3 # Bonus to ambush success
+@export var pursuit_difficulty_increase: float = 0.4 # Difficulty of pursuit
+@export var formation_flying_penalty: float = 0.2 # Formation flying penalties
+@export var tactical_retreat_penalty: float = 0.1 # Retreat difficulty
+@export var resource_extraction_boost: float = 0.0 # Mining/survey bonuses
+@export var anomaly_research_bonus: float = 0.5 # Scientific research bonuses
+@export var navigation_hazard_multiplier: float = 1.5 # Plotting course difficulty
 
 # === NAVIGATION HAZARDS ===
 @export_group("Navigation", "nav_")
-@export var asteroid_density_bonus: float = 0.0           # Additional asteroid chance
-@export var gravity_well_interference: float = 0.0        # Hyperspace jump interference
-@export var micro_debris_hazard: float = 0.0             # Micro-collision chance
-@export var ionization_static_interference: float = 0.0   # Navigation system static
-@export var localized_gravity_distortion: bool = false    # Gravity anomalies
-@export var recommended_safety_margins: Array[String] = []     # Recommended protocols
-@export var emergency_exit_routes: Array[Vector3] = []    # Safe exit vectors
+@export var asteroid_density_bonus: float = 0.0 # Additional asteroid chance
+@export var gravity_well_interference: float = 0.0 # Hyperspace jump interference
+@export var micro_debris_hazard: float = 0.0 # Micro-collision chance
+@export var ionization_static_interference: float = 0.0 # Navigation system static
+@export var localized_gravity_distortion: bool = false # Gravity anomalies
+@export var recommended_safety_margins: Array[String] = [] # Recommended protocols
+@export var emergency_exit_routes: Array[Vector3] = [] # Safe exit vectors
 
 # === PERFORMANCE AND SCALING ===
 @export_group("Performance", "perf_")
-@export var effect_rendering_distance_km: float = 5.0     # Max distance for effects
-@export var particle_culling_distance_km: float = 3.0     # Distance beyond which particles culled
-@export var lod_transition_distances: Array[float] = [1.0, 3.0, 8.0]  # Level of detail transitions
-@export var physics_optimization_level: int = 2            # 0=Low, 1=Medium, 2=High, 3=Ultra
-@export var cpu_performance_impact: float = 0.3            # Performance cost estimate
-@export var gpu_performance_impact: float = 0.4            # Rendering cost estimate
+@export var effect_rendering_distance_km: float = 5.0 # Max distance for effects
+@export var particle_culling_distance_km: float = 3.0 # Distance beyond which particles culled
+@export var lod_transition_distances: Array[float] = [1.0, 3.0, 8.0] # Level of detail transitions
+@export var physics_optimization_level: int = 2 # 0=Low, 1=Medium, 2=High, 3=Ultra
+@export var cpu_performance_impact: float = 0.3 # Performance cost estimate
+@export var gpu_performance_impact: float = 0.4 # Rendering cost estimate
 
 # === FIELD GENERATION ===
 @export_group("Generation", "gen_")
-@export var nebula_generation_seed: int = 0               # Random generation seed
-@export var turbulence_generation_method: int = 0          # 0=Simplex, 1=Perlin, 2=Cellular
-@export var field_geometry_type: int = 0                  # 0=Spherical, 1=Toroidal, 2=Cylindrical, 3=Amorphous
-@export var density_gradient_exponent: float = 1.0        # Falloff rate from center
-@export var fractal_noise_octaves: int = 4                # Detail level for noise
-@export var fractal_noise_frequency: float = 0.5          # Base frequency for noise
+@export var nebula_generation_seed: int = 0 # Random generation seed
+@export var turbulence_generation_method: int = 0 # 0=Simplex, 1=Perlin, 2=Cellular
+@export var field_geometry_type: int = 0 # 0=Spherical, 1=Toroidal, 2=Cylindrical, 3=Amorphous
+@export var density_gradient_exponent: float = 1.0 # Falloff rate from center
+@export var fractal_noise_octaves: int = 4 # Detail level for noise
+@export var fractal_noise_frequency: float = 0.5 # Base frequency for noise
 
 # Validation signals
 signal weather_conditions_changed()
@@ -276,7 +276,7 @@ func _validate_weather_effects() -> void:
 		_add_validation_error("Solar wind modifier cannot be negative")
 
 func _validate_visual_effects() -> void:
-"""Validate visual effect references"""
+	"""Validate visual effect references"""
 	var effect_refs = [
 		particle_system_reference,
 		fog_system_reference,
@@ -421,8 +421,8 @@ func calculate_environmental_impact(ship_stats: ShipStats) -> Dictionary:
 
 	# Apply ship size modifiers
 	if affects_fighter_scale_only:
-		if ship_stats.ship_role == 0:  # Fighter
-			pass  # Full effects
+		if ship_stats.ship_role == 0: # Fighter
+			pass # Full effects
 		else:
 			# Reduce effects for larger ships
 			var scale_factor = 0.3
@@ -431,8 +431,8 @@ func calculate_environmental_impact(ship_stats: ShipStats) -> Dictionary:
 					impact[key] *= scale_factor
 
 	elif affects_capital_scale_only:
-		if ship_stats.ship_role == 2:  # Capital
-			pass  # Full effects
+		if ship_stats.ship_role == 2: # Capital
+			pass # Full effects
 		else:
 			# Reduce effects for smaller ships
 			var scale_factor = 0.2
@@ -519,7 +519,7 @@ func get_visibility_concealment() -> float:
 	concealment += stealth_effectiveness_boost * 0.3
 
 	if causes_sensor_blackout:
-		concealment = 1.0  # Complete invisibility
+		concealment = 1.0 # Complete invisibility
 
 	return clamp(concealment, 0.0, 1.0)
 

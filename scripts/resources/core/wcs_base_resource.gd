@@ -7,45 +7,45 @@ extends Resource
 
 # === CORE METADATA - Required for all WCS resources ===
 @export_group("WCS Provenance", "wcs_")
-@export var wcs_source_file: String = ""           # Original TBL filename
-@export var wcs_data_version: String = ""         # Data format version (e.g., "1.0.0")
-@export var wcs_original_name: String = ""        # Original TBL entry name
-@export var wcs_resource_id: String = ""          # Unique resource identifier
-@export var wcs_glossary_category: String = ""    # Category for tech database
+@export var wcs_source_file: String = "" # Original TBL filename
+@export var wcs_data_version: String = "" # Data format version (e.g., "1.0.0")
+@export var wcs_original_name: String = "" # Original TBL entry name
+@export var wcs_resource_id: String = "" # Unique resource identifier
+@export var wcs_glossary_category: String = "" # Category for tech database
 
 # === CONVERSION METADATA - Migration tracking ===
 @export_group("Conversion Tracking", "conversion_")
-@export var conversion_timestamp: int = 0         # Unix timestamp of conversion
-@export var conversion_tool_version: String = ""  # Migration tool version
-@export var conversion_author: String = ""        # Developer who performed conversion
+@export var conversion_timestamp: int = 0 # Unix timestamp of conversion
+@export var conversion_tool_version: String = "" # Migration tool version
+@export var conversion_author: String = "" # Developer who performed conversion
 @export var conversion_notes: Array[String] = [] # Human-readable conversion notes
-@export var conversion_metadata: Dictionary = {}  # Additional conversion metadata
+@export var conversion_metadata: Dictionary = {} # Additional conversion metadata
 
 # === VALIDATION SYSTEM - Data integrity tracking ===
 @export_group("Validation Status", "validation_")
-@export var validation_errors: Array[String] = []      # Critical validation errors
-@export var validation_warnings: Array[String] = []    # Non-critical warnings
-@export var is_valid: bool = true                       # Overall validity flag
-@export var last_validation_time: int = 0              # Timestamp of last validation
-@export var validation_checksum: String = ""           # Data integrity checksum
+@export var validation_errors: Array[String] = [] # Critical validation errors
+@export var validation_warnings: Array[String] = [] # Non-critical warnings
+@export var is_valid: bool = true # Overall validity flag
+@export var last_validation_time: int = 0 # Timestamp of last validation
+@export var validation_checksum: String = "" # Data integrity checksum
 
 # === CROSS-REFERENCE INTEGRITY - Resource linking ===
 @export_group("Cross-References", "xref_")
 @export var cross_reference_dependencies: Array[String] = [] # Resources this depends on
-@export var cross_reference_dependents: Array[String] = []   # Resources depending on this
+@export var cross_reference_dependents: Array[String] = [] # Resources depending on this
 @export var xref_resolution_status: int = 0 # 0=Unresolved, 1=Partial, 2=Complete
 
 # === RESOURCE CACHING - Performance optimization ===
 @export_group("Caching", "cache_")
-@export var cache_enabled: bool = true          # Enable resource caching
-@export var cache_ttl_seconds: int = 3600       # Time-to-live in seconds
-@export var last_cache_update: int = 0          # Last cache refresh timestamp
+@export var cache_enabled: bool = true # Enable resource caching
+@export var cache_ttl_seconds: int = 3600 # Time-to-live in seconds
+@export var last_cache_update: int = 0 # Last cache refresh timestamp
 
 # === SIGNALS - Godot event system integration ===
-signal data_changed()                                           # Emitted when core data changes
-signal validation_status_changed(is_valid: bool)                # Emitted when validation status changes
-signal cross_reference_resolved(ref_name: String, status: int)  # Emitted when xrefs are updated
-signal cache_invalidated()                                      # Emitted when cache is cleared
+signal data_changed() # Emitted when core data changes
+signal validation_status_changed(is_valid: bool) # Emitted when validation status changes
+signal cross_reference_resolved(ref_name: String, status: int) # Emitted when xrefs are updated
+signal cache_invalidated() # Emitted when cache is cleared
 signal property_validated(property_name: String, is_valid: bool) # Emitted during property validation
 
 func _init():
@@ -110,28 +110,28 @@ func _validate_property(property_name: String, property_value: Variant) -> bool:
 	Validate a specific property value.
 	Override in subclasses for property-specific validation.
 	"""
-	match property_value:
-		null:
-			_add_validation_error("Property '%s' cannot be null" % property_name)
+	if property_value == null:
+		_add_validation_error("Property '%s' cannot be null" % property_name)
+		return false
+
+	if typeof(property_value) == TYPE_STRING:
+		if property_value == "" and property_name.find("required_") != -1:
+			_add_validation_error("Required property '%s' cannot be empty" % property_name)
 			return false
-		"":
-			if property_name.find("required_") != -1:
-				_add_validation_error("Required property '%s' cannot be empty" % property_name)
-				return false
-			type_name(property_value) == "String":
-				if property_value.begins_with(" ") or property_value.ends_with(" "):
-					_add_validation_warning("Property '%s' has leading/trailing whitespace" % property_name)
-				return true  # String validation passed
-			type_name(property_value) == "float":
-				if property_value != property_value:  # NaN check
-					_add_validation_error("Property '%s' cannot be NaN" % property_name)
-					return false
-				if property_value == INF or property_value == -INF:
-					_add_validation_error("Property '%s' cannot be infinite" % property_name)
-					return false
-				return true  # Float validation passed
-		_
-			return true  # Default validation passed
+		if property_value.begins_with(" ") or property_value.ends_with(" "):
+			_add_validation_warning("Property '%s' has leading/trailing whitespace" % property_name)
+		return true
+
+	if typeof(property_value) == TYPE_FLOAT:
+		if is_nan(property_value):
+			_add_validation_error("Property '%s' cannot be NaN" % property_name)
+			return false
+		if is_inf(property_value):
+			_add_validation_error("Property '%s' cannot be infinite" % property_name)
+			return false
+		return true
+
+	return true
 
 func _add_validation_error(error_message: String) -> void:
 	"""Add a validation error and mark resource as invalid"""
@@ -165,7 +165,7 @@ func to_dictionary() -> Dictionary:
 	for property_info in property_list:
 		var property_name = property_info["name"]
 		if property_name.begins_with("__"):
-			continue  # Skip internal properties
+			continue # Skip internal properties
 
 		var property_value = get(property_name)
 		result[property_name] = property_value
@@ -199,7 +199,7 @@ func resolve_cross_references(available_resources: Array[String]) -> int:
 	var total_count = cross_reference_dependencies.size()
 
 	if total_count == 0:
-		xref_resolution_status = 2  # Complete
+		xref_resolution_status = 2 # Complete
 		return 0
 
 	for ref_path in cross_reference_dependencies:
@@ -211,11 +211,11 @@ func resolve_cross_references(available_resources: Array[String]) -> int:
 
 	# Update resolution status
 	if resolved_count == total_count:
-		xref_resolution_status = 2  # Complete
+		xref_resolution_status = 2 # Complete
 	elif resolved_count > 0:
-		xref_resolution_status = 1  # Partial
+		xref_resolution_status = 1 # Partial
 	else:
-		xref_resolution_status = 0  # Unresolved
+		xref_resolution_status = 0 # Unresolved
 
 	return resolved_count
 
@@ -223,7 +223,7 @@ func add_cross_reference_dependency(resource_path: String) -> void:
 	"""Add a cross-reference dependency to another resource"""
 	if not cross_reference_dependencies.has(resource_path):
 		cross_reference_dependencies.append(resource_path)
-		xref_resolution_status = 0  # Mark as needing resolution
+		xref_resolution_status = 0 # Mark as needing resolution
 
 func remove_cross_reference_dependency(resource_path: String) -> void:
 	"""Remove a cross-reference dependency"""
