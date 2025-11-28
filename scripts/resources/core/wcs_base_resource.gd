@@ -105,7 +105,7 @@ func validate() -> bool:
 
 	return is_valid
 
-func _validate_property(property_name: String, property_value: Variant) -> bool:
+func _validate_wcs_property(property_name: String, property_value: Variant) -> bool:
 	"""
 	Validate a specific property value.
 	Override in subclasses for property-specific validation.

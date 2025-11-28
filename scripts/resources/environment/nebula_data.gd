@@ -47,6 +47,7 @@ extends WCSBaseResource
 @export var disables_shield_generators: bool = false # Shields cannot regenerate
 @export var affects_fighter_scale_only: bool = false # Only affects smaller ships
 @export var affects_capital_scale_only: bool = false # Only affects capital ships
+@export var has_cloaking_technology: bool = false # Enables advanced stealth capabilities
 
 # === ENVIRONMENTAL DAMAGE ===
 @export_group("Environmental Damage", "damage_")
@@ -368,7 +369,7 @@ func _validate_performance_settings() -> void:
 
 func _validate_generation_parameters() -> void:
 	"""Validate field generation parameters"""
-	valid_generation_methods = [0, 1, 2]
+	var valid_generation_methods = [0, 1, 2]
 	if not turbulence_generation_method in valid_generation_methods:
 		_add_validation_error("Turbulence generation method must be 0, 1, or 2")
 
@@ -662,27 +663,27 @@ func is_mission_compatible(mission_type: String) -> Dictionary:
 				compatibility["warnings"].append("Sensor interference too severe for recon")
 			compatibility["recommended_approach"] = "Close-range visual scanning"
 
-			"Dogfighting":
-		if calculate_tactical_severity() > 0.6:
-		compatibility["warnings"].append("High tactical severity affects dogfighting")
-		compatibility["recommended_approach"] = "Short-range energy weapons only"
+		"Dogfighting":
+			if calculate_tactical_severity() > 0.6:
+				compatibility["warnings"].append("High tactical severity affects dogfighting")
+			compatibility["recommended_approach"] = "Short-range energy weapons only"
 
-	"Bomber Strike":
-		if blocks_beam_weapons and weapon_range_modifier < 0.7:
-			compatibility["warnings"].append("Long-range weapons severely limited")
+		"Bomber Strike":
+			if blocks_beam_weapons and weapon_range_modifier < 0.7:
+				compatibility["warnings"].append("Long-range weapons severely limited")
 			compatibility["recommended_approach"] = "Close-range bombing run"
 
 		"Sniper Mission":
-	if radar_sensor_range_reduction > 0.5 or weapon_range_modifier < 0.8:
-			compatibility["compatible"] = false
-			compatibility["warnings"].append("Range and sensors too compromised for sniper role")
+			if radar_sensor_range_reduction > 0.5 or weapon_range_modifier < 0.8:
+				compatibility["compatible"] = false
+				compatibility["warnings"].append("Range and sensors too compromised for sniper role")
 
 		"Escort":
-	if formation_flying_penalty > 0.3:
-		compatibility["warnings"].append("Formation flying severely penalized")
+			if formation_flying_penalty > 0.3:
+				compatibility["warnings"].append("Formation flying severely penalized")
 
-	_:
-		compatibility["warnings"].append("Mission compatibility analysis incomplete")
+		_:
+			compatibility["warnings"].append("Mission compatibility analysis incomplete")
 
 	compatibility["difficulty_modification"] = 1.0 + (calculate_tactical_severity() * 0.5)
 
