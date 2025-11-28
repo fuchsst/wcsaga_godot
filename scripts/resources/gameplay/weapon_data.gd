@@ -7,7 +7,32 @@ extends WCSBaseResource
 
 # === IDENTITY AND CLASSIFICATION ===
 @export_group("Identity", "identity_")
-@export var weapon_class: String = "" # Military designation (@Ion)
+@export var weapon_class: String = "" # Allowed weapon type
+
+class BeamConfiguration extends Resource:
+	"""Beam weapon specific configuration"""
+	@export var beam_type: int = 0 # 0=Standard, 1=Slash
+	@export var beam_life: float = 0.0 # Duration of beam
+	@export var beam_warmup: float = 0.0 # Warmup time
+	@export var beam_warmdown: float = 0.0 # Warmdown time
+	@export var beam_width: float = 1.0 # Width of the beam
+	@export var beam_glow_factor: float = 1.0 # Glow intensity
+	@export var beam_color: Color = Color.WHITE # Core color
+	@export var beam_outer_color: Color = Color.BLUE # Outer glow color
+	@export var beam_texture: String = "" # Texture path
+	@export var beam_sections: int = 1 # Number of sections
+	@export var range_multiplier: float = 1.0 # Range multiplier
+
+class ParticleSpew extends Resource:
+	"""Particle spew configuration"""
+	@export var count: int = 1 # Number of particles
+	@export var time: int = 1 # Duration/Frequency
+	@export var velocity: float = 0.0 # Particle velocity
+	@export var radius: float = 0.0 # Emitter radius
+	@export var lifetime: float = 0.0 # Particle lifetime
+	@export var scale: float = 1.0 # Particle scale
+	@export var bitmap: String = "" # Particle texture
+
 @export var display_name: String = "" # Display name (Ion Cannon)
 @export var weapon_family: String = "" # Weapon family classification
 @export var manufacturer_species: String = "" # Cross-reference to SpeciesData
@@ -73,6 +98,14 @@ extends WCSBaseResource
 @export var impact_effect: String = "" # Cross-reference to effect
 @export var explosion_effect: String = "" # Cross-reference to effect
 @export var projectile_trail_effect: String = "" # Cross-reference to trail effect
+
+# === BEAM WEAPON CONFIGURATION ===
+@export_group("Beam Configuration", "beam_")
+@export var beam_config: BeamConfiguration
+
+# === PARTICLE SPEW CONFIGURATION ===
+@export_group("Particle Spew", "pspew_")
+@export var particle_spew: ParticleSpew
 
 # === AUTO-TARGETING SYSTEMS ===
 @export_group("Targeting", "targeting_")

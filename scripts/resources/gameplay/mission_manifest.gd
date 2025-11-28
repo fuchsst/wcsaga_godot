@@ -29,5 +29,11 @@ extends WCSBaseResource
 ## List of fiction/text files
 @export var fiction: Array[Dictionary] = [] # { "path": "...", "usage": "..." }
 
+# === LOGIC & ENVIRONMENT ===
+@export var sexp_variables: Array[Dictionary] = [] # { "name": "...", "default_value": "...", "type": "..." }
+@export var players: Dictionary = {} # { "starting_ship": "...", "ship_choices": [], "weaponry_pool": [] }
+@export var backgrounds: Dictionary = {} # { "suns": [], "bitmaps": [], "nebula": {}, "num_stars": 0, "ambient_light": 0 }
+@export var asteroid_fields: Array[Dictionary] = [] # List of asteroid field configs
+
 func get_resource_type() -> String:
 	return "mission_manifest"
