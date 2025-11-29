@@ -1,0 +1,45 @@
+[gd_resource type="Resource" script_class="AIProfileResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/gameplay/ai_profile_resource.gd" id="1_hqsne"]
+
+[resource]
+script = ExtResource("1_hqsne")
+difficulty_level = "1_very_easy"
+profile_name = "1_very_easy"
+disable_linked_fire_penalty = true
+disable_weapon_damage_scaling = true
+use_newtonian_dampening = true
+smart_primary_weapon_selection = true
+smart_secondary_weapon_selection = true
+smart_shield_management = true
+smart_afterburner_management = true
+huge_turret_weapons_ignore_bombs = true
+smart_subsystem_targeting_for_turrets = true
+prevent_turrets_targeting_too_distant_bombs = true
+use_only_single_fov_for_turrets = true
+multi_allow_empty_secondaries = true
+fix_linked_primary_weapon_decision_bug = true
+fix_heat_seekers_homing_on_stealth_ships_bug = true
+fix_ai_class_bug = true
+player_afterburner_recharge_scale = 2.0
+player_countermeasure_life_scale = 2.0
+player_shield_recharge_scale = 4.0
+player_weapon_recharge_scale = 2.5
+player_damage_factor = 0.25
+player_subsys_damage_factor = 0.2
+ai_countermeasure_firing_chance = 0.2
+ai_in_range_time = 1.5
+ai_shield_manage_delay = 6.0
+ai_turn_time_scale = 3.0
+predict_position_delay = 2.0
+ai_always_links_ammo_weapons = 95.0
+ai_maybe_links_ammo_weapons = 90.0
+ai_always_links_energy_weapons = 50.0
+ai_maybe_links_energy_weapons = 33.0
+friendly_ai_fire_delay_scale = 2.0
+hostile_ai_fire_delay_scale = 4.0
+friendly_ai_secondary_fire_delay_scale = 15.0
+hostile_ai_secondary_fire_delay_scale = 1.4
+max_missles_locked_on_player = 2
+max_incoming_asteroids = 3
+repair_penalty = 10

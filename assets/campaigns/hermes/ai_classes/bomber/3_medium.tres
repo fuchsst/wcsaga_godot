@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="AIClassResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/gameplay/ai_class_resource.gd" id="1_mdsi0"]
+
+[resource]
+script = ExtResource("1_mdsi0")
+ai_class_name = "Bomber"
+difficulty_level = "3_medium"
+accuracy = 1.0
+evasion = 40.0
+courage = 100.0
+ai_countermeasure_firing_chance = 0.45
+friendly_ai_secondary_fire_delay_scale = 31.0

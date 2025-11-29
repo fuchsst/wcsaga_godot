@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="AIClassResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/gameplay/ai_class_resource.gd" id="1_6e1bo"]
+
+[resource]
+script = ExtResource("1_6e1bo")
+ai_class_name = "Lieutenant"
+difficulty_level = "5_insane"
+accuracy = 0.6
+evasion = 40.0
+courage = 40.0
+patience = 40.0
+ai_countermeasure_firing_chance = 0.22
+ai_shield_manage_delay = 0.33
+friendly_ai_secondary_fire_delay_scale = 64.5
+hostile_ai_secondary_fire_delay_scale = 4.1

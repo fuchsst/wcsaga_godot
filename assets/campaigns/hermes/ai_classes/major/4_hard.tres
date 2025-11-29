@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="AIClassResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/gameplay/ai_class_resource.gd" id="1_q0nub"]
+
+[resource]
+script = ExtResource("1_q0nub")
+ai_class_name = "Major"
+difficulty_level = "4_hard"
+accuracy = 0.75
+ai_countermeasure_firing_chance = 0.36
+ai_shield_manage_delay = 2.67
+friendly_ai_secondary_fire_delay_scale = 48.5
+hostile_ai_secondary_fire_delay_scale = 3.3

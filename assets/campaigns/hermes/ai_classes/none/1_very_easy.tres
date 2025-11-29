@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="AIClassResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/gameplay/ai_class_resource.gd" id="1_lkx7l"]
+
+[resource]
+script = ExtResource("1_lkx7l")
+ai_class_name = "None"
+difficulty_level = "1_very_easy"
+accuracy = 0.0
+evasion = 0.0
+courage = 0.0
+patience = 0.0
+ai_countermeasure_firing_chance = 0.02
+ai_shield_manage_delay = 22.0
+friendly_ai_fire_delay_scale = 2.5
+hostile_ai_fire_delay_scale = 5.0
+friendly_ai_secondary_fire_delay_scale = 20.0
+hostile_ai_secondary_fire_delay_scale = 5.4

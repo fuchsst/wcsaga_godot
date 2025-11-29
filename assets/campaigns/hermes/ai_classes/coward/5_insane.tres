@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AIClassResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/gameplay/ai_class_resource.gd" id="1_pnwlo"]
+
+[resource]
+script = ExtResource("1_pnwlo")
+ai_class_name = "Coward"
+difficulty_level = "5_insane"
+accuracy = 1.0
+evasion = 100.0
+patience = 100.0
+ai_countermeasure_firing_chance = 0.0
+ai_shield_manage_delay = 0.4
+friendly_ai_secondary_fire_delay_scale = 65.5
+hostile_ai_secondary_fire_delay_scale = 5.1

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="AIClassResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/gameplay/ai_class_resource.gd" id="1_ct3r2"]
+
+[resource]
+script = ExtResource("1_ct3r2")
+ai_class_name = "CS#Skipper"
+difficulty_level = "4_hard"
+accuracy = 0.2
+evasion = 10.0
+courage = 10.0
+patience = 10.0
+ai_countermeasure_firing_chance = 0.18
+ai_shield_manage_delay = 3.33
+friendly_ai_fire_delay_scale = 2.5
+hostile_ai_fire_delay_scale = 1.2
+friendly_ai_secondary_fire_delay_scale = 49.5
+hostile_ai_secondary_fire_delay_scale = 4.3

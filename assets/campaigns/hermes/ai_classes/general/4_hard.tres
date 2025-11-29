@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AIClassResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/gameplay/ai_class_resource.gd" id="1_5wg1h"]
+
+[resource]
+script = ExtResource("1_5wg1h")
+ai_class_name = "General"
+difficulty_level = "4_hard"
+accuracy = 0.95
+evasion = 80.0
+courage = 80.0
+patience = 80.0
+ai_countermeasure_firing_chance = 0.54
+friendly_ai_secondary_fire_delay_scale = 47.5
+hostile_ai_secondary_fire_delay_scale = 2.3

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="AIClassResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/gameplay/ai_class_resource.gd" id="1_qt1e0"]
+
+[resource]
+script = ExtResource("1_qt1e0")
+ai_class_name = "Wingman#M8"
+difficulty_level = "1_very_easy"
+accuracy = 0.9
+evasion = 100.0
+courage = 100.0
+patience = 40.0
+ai_countermeasure_firing_chance = 0.2
+ai_shield_manage_delay = 6.0
+friendly_ai_fire_delay_scale = 2.0
+hostile_ai_fire_delay_scale = 4.0
+friendly_ai_secondary_fire_delay_scale = 20.0
+hostile_ai_secondary_fire_delay_scale = 1.4
