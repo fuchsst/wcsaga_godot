@@ -4,8 +4,8 @@ extends RefCounted
 ## Generates Asteroid Scenes from parsed TBL data
 ## Handles creation of AsteroidData resources, AsteroidBehavior nodes, and GLTF model instantiation.
 
-const AsteroidData = preload("res://scripts/resources/environment/asteroid_data.gd")
-const Asteroid = preload("res://scripts/entities/asteroid.gd")
+const AsteroidData = preload("res://scripts/resources/asteroids/asteroid_data.gd")
+const Asteroid = preload("res://scripts/entities/asteroid/asteroid.gd")
 
 func generate(data: Dictionary, output_dir: String) -> bool:
 	var asteroid_id = data.get("resource_identifier", "unknown")

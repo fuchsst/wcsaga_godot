@@ -1,6 +1,7 @@
 extends Resource
 class_name BackgroundSet
-
+const SunData = preload("res://scripts/resources/missions/sun_data.gd")
+const StarBitmapData = preload("res://scripts/resources/environment/stars/star_bitmap_data.gd")
 ## A set of background elements (suns + star bitmaps)
 ## Multiple sets can exist in a mission
 

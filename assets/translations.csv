@@ -1,0 +1,604 @@
+keys,en,de,fr
+XSTR_0,"For Volition, Inc.","(gr)For Volition, Inc.","(fr)For Volition, Inc."
+XSTR_1,Original Design,(gr)Original Design,(fr)Original Design
+XSTR_2,Programming,(gr)Programming,(fr)Programming
+XSTR_3,Real-time Art,(gr)Real-time Art,(fr)Real-time Art
+XSTR_4,Cutscene Art & Animation,(gr)Cutscene Art & Animation,(fr)Cutscene Art & Animation
+XSTR_5,Mission Design,(gr)Mission Design,(fr)Mission Design
+XSTR_6,Silent Threat Mission Design,(gr)Silent Threat Mission Design,(fr)Silent Threat Mission Design
+XSTR_7,Third Party Missions,(gr)Third Party Missions,(fr)Third Party Missions
+XSTR_8,Music & Sound Effects,(gr)Music & Sound Effects,(fr)Music & Sound Effects
+XSTR_9,Cutscene Scoring,(gr)Cutscene Scoring,(fr)Cutscene Scoring
+XSTR_10,Story & Writing,(gr)Story & Writing,(fr)Story & Writing
+XSTR_11,Silent Threat Writing,(gr)Silent Threat Writing,(fr)Silent Threat Writing
+XSTR_12,"Mission Editor, PXO & Tools","(gr)Mission Editor, PXO & Tools","(fr)Mission Editor, PXO & Tools"
+XSTR_13,Real-time Voice Technology,(gr)Real-time Voice Technology,(fr)Real-time Voice Technology
+XSTR_14,Voice Actors,(gr)Voice Actors,(fr)Voice Actors
+XSTR_15,Administrative & Technical Support,(gr)Administrative & Technical Support,(fr)Administrative & Technical Support
+XSTR_16,German Localization Assistance,(gr)German Localization Assistance,(fr)German Localization Assistance
+XSTR_17,Testers,(gr)Testers,(fr)Testers
+XSTR_18,Special Thanks,(gr)Special Thanks,(fr)Special Thanks
+XSTR_19,Visit us at www.volition-inc.com,(gr)Visit us at www.volition-inc.com,(fr)Visit us at www.volition-inc.com
+XSTR_20,For Interplay Productions,(gr)For Interplay Productions,(fr)For Interplay Productions
+XSTR_21,Vice President of Development,(gr)Vice President of Development,(fr)Vice President of Development
+XSTR_22,Producer,(gr)Producer,(fr)Producer
+XSTR_23,Movie Compression Technology,(gr)Movie Compression Technology,(fr)Movie Compression Technology
+XSTR_24,Director of Quality Assurance,(gr)Director of Quality Assurance,(fr)Director of Quality Assurance
+XSTR_25,QA Managers,(gr)QA Managers,(fr)QA Managers
+XSTR_26,Director of Compatibility,(gr)Director of Compatibility,(fr)Director of Compatibility
+XSTR_27,IS/Compatibility Manager,(gr)IS/Compatibility Manager,(fr)IS/Compatibility Manager
+XSTR_28,QA Project Supervisor,(gr)QA Project Supervisor,(fr)QA Project Supervisor
+XSTR_29,Assisting QA Project Supervisors,(gr)Assisting QA Project Supervisors,(fr)Assisting QA Project Supervisors
+XSTR_30,Compatibility Technicians,(gr)Compatibility Technicians,(fr)Compatibility Technicians
+XSTR_31,Silent Threat Testers,(gr)Silent Threat Testers,(fr)Silent Threat Testers
+XSTR_32,Senior IS Technician,(gr)Senior IS Technician,(fr)Senior IS Technician
+XSTR_33,IS Technicians,(gr)IS Technicians,(fr)IS Technicians
+XSTR_34,Director Of Marketing,(gr)Director Of Marketing,(fr)Director Of Marketing
+XSTR_35,Product Marketing Managers,(gr)Product Marketing Managers,(fr)Product Marketing Managers
+XSTR_36,Communications Manager,(gr)Communications Manager,(fr)Communications Manager
+XSTR_37,Traffic Manager,(gr)Traffic Manager,(fr)Traffic Manager
+XSTR_38,Package Design,(gr)Package Design,(fr)Package Design
+XSTR_40,The ancients discover subspace and begin their empire.,(gr)The ancients discover subspace and begin their empire.,(fr)The ancients discover subspace and begin their empire.
+XSTR_43,Strange and powerful forces attack the ancients.,(gr)Strange and powerful forces attack the ancients.,(fr)Strange and powerful forces attack the ancients.
+XSTR_45,The ancients begin their final struggle.,(gr)The ancients begin their final struggle.,(fr)The ancients begin their final struggle.
+XSTR_46,The ancients understand their destruction.,(gr)The ancients understand their destruction.,(fr)The ancients understand their destruction.
+XSTR_49,For having attained an outstanding number of confirmed kills you are hereby awarded the Ace.,(gr)For having attained an outstanding number of confirmed kills you are hereby awarded the Ace.,(fr)For having attained an outstanding number of confirmed kills you are hereby awarded the Ace.
+XSTR_50,"For your fine accomplishments as a skilled pilot and for your considerable number of enemy kills, it is an honor to present you the Double Ace.","(gr)For your fine accomplishments as a skilled pilot and for your considerable number of enemy kills, it is an honor to present you the Double Ace.","(fr)For your fine accomplishments as a skilled pilot and for your considerable number of enemy kills, it is an honor to present you the Double Ace."
+XSTR_51,"For your truly impressive ability as a pilot and for the exceptional number of confirmed enemy kills, it is a rare honor to present you the Triple Ace.  Few pilots are so distinguished.","(gr)For your truly impressive ability as a pilot and for the exceptional number of confirmed enemy kills, it is a rare honor to present you the Triple Ace.  Few pilots are so distinguished.","(fr)For your truly impressive ability as a pilot and for the exceptional number of confirmed enemy kills, it is a rare honor to present you the Triple Ace.  Few pilots are so distinguished."
+XSTR_52,Is that the best they can do?,(gr)Is that the best they can do?,(fr)Is that the best they can do?
+XSTR_53,Radar's clean and clear.,(gr)Radar's clean and clear.,(fr)Radar's clean and clear.
+XSTR_54,Glad that's over.,(gr)Glad that's over.,(fr)Glad that's over.
+XSTR_55,Area secured.,(gr)Area secured.,(fr)Area secured.
+XSTR_56,I think that's all of them.,(gr)I think that's all of them.,(fr)I think that's all of them.
+XSTR_57,Enemy wing just arrived!,(gr)Enemy wing just arrived!,(fr)Enemy wing just arrived!
+XSTR_58,Heads up we have company!,(gr)Heads up we have company!,(fr)Heads up we have company!
+XSTR_59,"Heads up, we've got visitors!","(gr)Heads up, we've got visitors!","(fr)Heads up, we've got visitors!"
+XSTR_60,New bandits in the area.,(gr)New bandits in the area.,(fr)New bandits in the area.
+XSTR_61,New hostiles in the area!,(gr)New hostiles in the area!,(fr)New hostiles in the area!
+XSTR_62,Enemy presence detected.,(gr)Enemy presence detected.,(fr)Enemy presence detected.
+XSTR_63,Enemy wing has just arrived!,(gr)Enemy wing has just arrived!,(fr)Enemy wing has just arrived!
+XSTR_64,Breaking to attack!,(gr)Breaking to attack!,(fr)Breaking to attack!
+XSTR_65,"Affirmative Sir, attacking your target!","(gr)Affirmative Sir, attacking your target!","(fr)Affirmative Sir, attacking your target!"
+XSTR_66,Attacking your target!,(gr)Attacking your target!,(fr)Attacking your target!
+XSTR_67,Attacking now Sir.,(gr)Attacking now Sir.,(fr)Attacking now Sir.
+XSTR_68,Target aquired.,(gr)Target aquired.,(fr)Target aquired.
+XSTR_69,Reinforcements awaiting orders.,(gr)Reinforcements awaiting orders.,(fr)Reinforcements awaiting orders.
+XSTR_70,"Reinforcements here Sir, awaiting orders.","(gr)Reinforcements here Sir, awaiting orders.","(fr)Reinforcements here Sir, awaiting orders."
+XSTR_71,Reinforcements here Sir.,(gr)Reinforcements here Sir.,(fr)Reinforcements here Sir.
+XSTR_72,"Beta wing has arrived, awaiting orders.","(gr)Beta wing has arrived, awaiting orders.","(fr)Beta wing has arrived, awaiting orders."
+XSTR_73,Beta wing has arrived.,(gr)Beta wing has arrived.,(fr)Beta wing has arrived.
+XSTR_74,You've got a bogie on your tail!,(gr)You've got a bogie on your tail!,(fr)You've got a bogie on your tail!
+XSTR_75,Check your six pilot!,(gr)Check your six pilot!,(fr)Check your six pilot!
+XSTR_76,Fighter on your tail Sir!,(gr)Fighter on your tail Sir!,(fr)Fighter on your tail Sir!
+XSTR_77,Watch your back Sir!,(gr)Watch your back Sir!,(fr)Watch your back Sir!
+XSTR_78,Aaaaaaaah!!!,(gr)Aaaaaaaah!!!,(fr)Aaaaaaaah!!!
+XSTR_79,Noooooooo!!!,(gr)Noooooooo!!!,(fr)Noooooooo!!!
+XSTR_80,Damn it!!,(gr)Damn it!!,(fr)Damn it!!
+XSTR_81,Nooooooooo!!!,(gr)Nooooooooo!!!,(fr)Nooooooooo!!!
+XSTR_82,Our flame will not be extinguished!,(gr)Our flame will not be extinguished!,(fr)Our flame will not be extinguished!
+XSTR_83,"Delta wing has arrived, awaiting orders.","(gr)Delta wing has arrived, awaiting orders.","(fr)Delta wing has arrived, awaiting orders."
+XSTR_84,"Yes Sir, leaving battle area.","(gr)Yes Sir, leaving battle area.","(fr)Yes Sir, leaving battle area."
+XSTR_85,I'm outta here.,(gr)I'm outta here.,(fr)I'm outta here.
+XSTR_86,Subspace node activated.,(gr)Subspace node activated.,(fr)Subspace node activated.
+XSTR_87,"That's affirmative Sir, departing now.","(gr)That's affirmative Sir, departing now.","(fr)That's affirmative Sir, departing now."
+XSTR_88,"Roger Sir, entering subspace.","(gr)Roger Sir, entering subspace.","(fr)Roger Sir, entering subspace."
+XSTR_89,Entering subspace.,(gr)Entering subspace.,(fr)Entering subspace.
+XSTR_90,"Roger, disabling your target.","(gr)Roger, disabling your target.","(fr)Roger, disabling your target."
+XSTR_91,"Yes Sir, disabling target.","(gr)Yes Sir, disabling target.","(fr)Yes Sir, disabling target."
+XSTR_92,"Affirmative, targeting the engine.","(gr)Affirmative, targeting the engine.","(fr)Affirmative, targeting the engine."
+XSTR_93,"Affirmative, targeting the engines.","(gr)Affirmative, targeting the engines.","(fr)Affirmative, targeting the engines."
+XSTR_94,"Affirmative Sir, disarming your target.","(gr)Affirmative Sir, disarming your target.","(fr)Affirmative Sir, disarming your target."
+XSTR_95,Disarming target Sir.,(gr)Disarming target Sir.,(fr)Disarming target Sir.
+XSTR_96,"Roger Sir, disarming your target.","(gr)Roger Sir, disarming your target.","(fr)Roger Sir, disarming your target."
+XSTR_97,"Affirmative, disarming your target.","(gr)Affirmative, disarming your target.","(fr)Affirmative, disarming your target."
+XSTR_98,Engaging enemy.,(gr)Engaging enemy.,(fr)Engaging enemy.
+XSTR_99,Engaging now Sir.,(gr)Engaging now Sir.,(fr)Engaging now Sir.
+XSTR_100,Breaking to attack.,(gr)Breaking to attack.,(fr)Breaking to attack.
+XSTR_101,"Epsilon wing has arrived, awaiting orders.","(gr)Epsilon wing has arrived, awaiting orders.","(fr)Epsilon wing has arrived, awaiting orders."
+XSTR_102,Epsilon wing has arrived.,(gr)Epsilon wing has arrived.,(fr)Epsilon wing has arrived.
+XSTR_103,"Gamma Wing has arrived, awaiting orders.","(gr)Gamma Wing has arrived, awaiting orders.","(fr)Gamma Wing has arrived, awaiting orders."
+XSTR_104,Gamma Wing has arrived.,(gr)Gamma Wing has arrived.,(fr)Gamma Wing has arrived.
+XSTR_105,"Taking damage, request cover!","(gr)Taking damage, request cover!","(fr)Taking damage, request cover!"
+XSTR_106,Could one of you flyboys give me some cover?,(gr)Could one of you flyboys give me some cover?,(fr)Could one of you flyboys give me some cover?
+XSTR_107,Hull taking serious damage!,(gr)Hull taking serious damage!,(fr)Hull taking serious damage!
+XSTR_108,"I'm losing systems, help me out!","(gr)I'm losing systems, help me out!","(fr)I'm losing systems, help me out!"
+XSTR_109,Taking severe damage.,(gr)Taking severe damage.,(fr)Taking severe damage.
+XSTR_110,"Yes Sir, disregarding target.","(gr)Yes Sir, disregarding target.","(fr)Yes Sir, disregarding target."
+XSTR_111,"Roger Sir, ignoring your target.","(gr)Roger Sir, ignoring your target.","(fr)Roger Sir, ignoring your target."
+XSTR_112,Roger disregarding your target.,(gr)Roger disregarding your target.,(fr)Roger disregarding your target.
+XSTR_113,"Yes Sir, ignoring target.","(gr)Yes Sir, ignoring target.","(fr)Yes Sir, ignoring target."
+XSTR_114,Ignoring target.,(gr)Ignoring target.,(fr)Ignoring target.
+XSTR_115,"Sorry Sir, I can't do that.","(gr)Sorry Sir, I can't do that.","(fr)Sorry Sir, I can't do that."
+XSTR_116,Not here Sir.,(gr)Not here Sir.,(fr)Not here Sir.
+XSTR_117,I cannot comply Sir.,(gr)I cannot comply Sir.,(fr)I cannot comply Sir.
+XSTR_118,Cannot comply Sir.,(gr)Cannot comply Sir.,(fr)Cannot comply Sir.
+XSTR_119,No can do Sir.,(gr)No can do Sir.,(fr)No can do Sir.
+XSTR_120,I cannot do that.,(gr)I cannot do that.,(fr)I cannot do that.
+XSTR_121,Select a target Sir!,(gr)Select a target Sir!,(fr)Select a target Sir!
+XSTR_122,You have nothing targeted Sir.,(gr)You have nothing targeted Sir.,(fr)You have nothing targeted Sir.
+XSTR_123,Which target Sir?,(gr)Which target Sir?,(fr)Which target Sir?
+XSTR_124,Target? What target?,(gr)Target? What target?,(fr)Target? What target?
+XSTR_125,We require target data.,(gr)We require target data.,(fr)We require target data.
+XSTR_126,Cease firing on friendly craft.,(gr)Cease firing on friendly craft.,(fr)Cease firing on friendly craft.
+XSTR_127,Aim at the hostiles pilot.,(gr)Aim at the hostiles pilot.,(fr)Aim at the hostiles pilot.
+XSTR_128,I'm on your side pilot.,(gr)I'm on your side pilot.,(fr)I'm on your side pilot.
+XSTR_129,"Damn it, don't shoot me.","(gr)Damn it, don't shoot me.","(fr)Damn it, don't shoot me."
+XSTR_130,"Hey, I'm on your side pilot.","(gr)Hey, I'm on your side pilot.","(fr)Hey, I'm on your side pilot."
+XSTR_131,Firing upon us negates the treaty Terran.,(gr)Firing upon us negates the treaty Terran.,(fr)Firing upon us negates the treaty Terran.
+XSTR_132,You are firing on friendly targets pilot.,(gr)You are firing on friendly targets pilot.,(fr)You are firing on friendly targets pilot.
+XSTR_133,Ship down! Ship down!,(gr)Ship down! Ship down!,(fr)Ship down! Ship down!
+XSTR_134,"Alpha one, please respond!","(gr)Alpha one, please respond!","(fr)Alpha one, please respond!"
+XSTR_135,We've lost Alpha 1!,(gr)We've lost Alpha 1!,(fr)We've lost Alpha 1!
+XSTR_136,Alpha one is down!,(gr)Alpha one is down!,(fr)Alpha one is down!
+XSTR_137,We've lost a friendly.,(gr)We've lost a friendly.,(fr)We've lost a friendly.
+XSTR_138,"The blood you draw, is your own!!","(gr)The blood you draw, is your own!!","(fr)The blood you draw, is your own!!"
+XSTR_139,Great shot!,(gr)Great shot!,(fr)Great shot!
+XSTR_140,Good kill!,(gr)Good kill!,(fr)Good kill!
+XSTR_141,Impressive pilot!,(gr)Impressive pilot!,(fr)Impressive pilot!
+XSTR_142,Excellent job pilot!,(gr)Excellent job pilot!,(fr)Excellent job pilot!
+XSTR_143,Impressive for a Terran.,(gr)Impressive for a Terran.,(fr)Impressive for a Terran.
+XSTR_144,I'm out of missles! Calling in a support ship!,(gr)I'm out of missles! Calling in a support ship!,(fr)I'm out of missles! Calling in a support ship!
+XSTR_145,I need to rearm! Calling in a support ship.,(gr)I need to rearm! Calling in a support ship.,(fr)I need to rearm! Calling in a support ship.
+XSTR_146,I need to rearm! Calling in some support.,(gr)I need to rearm! Calling in some support.,(fr)I need to rearm! Calling in some support.
+XSTR_147,I need to rearm.,(gr)I need to rearm.,(fr)I need to rearm.
+XSTR_148,"I need to rearm, calling in support.","(gr)I need to rearm, calling in support.","(fr)I need to rearm, calling in support."
+XSTR_149,"Weapons array diminished, Calling in for support.","(gr)Weapons array diminished, Calling in for support.","(fr)Weapons array diminished, Calling in for support."
+XSTR_150,"Sir, calling in for repair!","(gr)Sir, calling in for repair!","(fr)Sir, calling in for repair!"
+XSTR_151,"Taking heavy damage, need to repair.","(gr)Taking heavy damage, need to repair.","(fr)Taking heavy damage, need to repair."
+XSTR_152,"This crate's about to blow, calling in for support.","(gr)This crate's about to blow, calling in for support.","(fr)This crate's about to blow, calling in for support."
+XSTR_153,Sir I need a repair ship.,(gr)Sir I need a repair ship.,(fr)Sir I need a repair ship.
+XSTR_154,"This crate's about to blow, calling in for repair!","(gr)This crate's about to blow, calling in for repair!","(fr)This crate's about to blow, calling in for repair!"
+XSTR_155,Your straying too far from mission objectives!,(gr)Your straying too far from mission objectives!,(fr)Your straying too far from mission objectives!
+XSTR_156,Where are you going pilot?,(gr)Where are you going pilot?,(fr)Where are you going pilot?
+XSTR_157,Where are you going Terran?,(gr)Where are you going Terran?,(fr)Where are you going Terran?
+XSTR_158,You'll pay for that traitor.,(gr)You'll pay for that traitor.,(fr)You'll pay for that traitor.
+XSTR_159,You'll pay for your treason pilot.,(gr)You'll pay for your treason pilot.,(fr)You'll pay for your treason pilot.
+XSTR_160,You will pay for your treason pilot.,(gr)You will pay for your treason pilot.,(fr)You will pay for your treason pilot.
+XSTR_161,You have tested our patience long enough Terran.,(gr)You have tested our patience long enough Terran.,(fr)You have tested our patience long enough Terran.
+XSTR_162,"All Terran pilots, shoot to kill Alpha One.","(gr)All Terran pilots, shoot to kill Alpha One.","(fr)All Terran pilots, shoot to kill Alpha One."
+XSTR_163,Affirmative Sir.,(gr)Affirmative Sir.,(fr)Affirmative Sir.
+XSTR_164,I'm on it.,(gr)I'm on it.,(fr)I'm on it.
+XSTR_165,Roger that Sir.,(gr)Roger that Sir.,(fr)Roger that Sir.
+XSTR_166,Yes Sir.,(gr)Yes Sir.,(fr)Yes Sir.
+XSTR_167,As you wish.,(gr)As you wish.,(fr)As you wish.
+XSTR_168,"Roger Sir, on our way.","(gr)Roger Sir, on our way.","(fr)Roger Sir, on our way."
+XSTR_169,"We're already on our way, Sir.","(gr)We're already on our way, Sir.","(fr)We're already on our way, Sir."
+XSTR_170,Support ship being deployed.,(gr)Support ship being deployed.,(fr)Support ship being deployed.
+XSTR_171,"Rearming complete, Sir.","(gr)Rearming complete, Sir.","(fr)Rearming complete, Sir."
+XSTR_172,Rearming sequence aborted.,(gr)Rearming sequence aborted.,(fr)Rearming sequence aborted.
+XSTR_173,Support has been destroyed.,(gr)Support has been destroyed.,(fr)Support has been destroyed.
+XSTR_174,Alpha1 your all alone. No reinforcements available.,(gr)Alpha1 your all alone. No reinforcements available.,(fr)Alpha1 your all alone. No reinforcements available.
+XSTR_175,Have you lost your mind?  Training is terminated!  Return to base.,(gr)Have you lost your mind?  Training is terminated!  Return to base.,(fr)Have you lost your mind?  Training is terminated!  Return to base.
+XSTR_176,You are ordered to return at once pilot.,(gr)You are ordered to return at once pilot.,(fr)You are ordered to return at once pilot.
+XSTR_177,"Pilot, you are being removed from battle because of your insubordination.","(gr)Pilot, you are being removed from battle because of your insubordination.","(fr)Pilot, you are being removed from battle because of your insubordination."
+XSTR_178,"Dang, you're still an ensign!  You must have gotten busted!","(gr)Dang, you're still an ensign!  You must have gotten busted!","(fr)Dang, you're still an ensign!  You must have gotten busted!"
+XSTR_179,Congratulations.  Your achievements have been noted and you are duly awarded the rank Lieutenant Junior Grade.,(gr)Congratulations.  Your achievements have been noted and you are duly awarded the rank Lieutenant Junior Grade.,(fr)Congratulations.  Your achievements have been noted and you are duly awarded the rank Lieutenant Junior Grade.
+XSTR_180,Per GTAR 64-2a you are hereby promoted to the rank of Lieutenant.  Congratulations.,(gr)Per GTAR 64-2a you are hereby promoted to the rank of Lieutenant.  Congratulations.,(fr)Per GTAR 64-2a you are hereby promoted to the rank of Lieutenant.  Congratulations.
+XSTR_181,"Congratulations, your achievements have been noted and you are duly awarded the rank of Lieutenant Commander.","(gr)Congratulations, your achievements have been noted and you are duly awarded the rank of Lieutenant Commander.","(fr)Congratulations, your achievements have been noted and you are duly awarded the rank of Lieutenant Commander."
+XSTR_182,"Because of your consistent sense of duty and obvious skill as a leader, you have been promoted to the rank of Commander.","(gr)Because of your consistent sense of duty and obvious skill as a leader, you have been promoted to the rank of Commander.","(fr)Because of your consistent sense of duty and obvious skill as a leader, you have been promoted to the rank of Commander."
+XSTR_183,For displaying a commanding nature and the ability to lead others you are hereby promoted to Captain.  Congratulations!,(gr)For displaying a commanding nature and the ability to lead others you are hereby promoted to Captain.  Congratulations!,(fr)For displaying a commanding nature and the ability to lead others you are hereby promoted to Captain.  Congratulations!
+XSTR_184,"For outstanding service through the war, leading many successful missions, and promoting a sense of honor and pride in the Alliance you have been promoted to the rank of Commodore. ","(gr)For outstanding service through the war, leading many successful missions, and promoting a sense of honor and pride in the Alliance you have been promoted to the rank of Commodore. ","(fr)For outstanding service through the war, leading many successful missions, and promoting a sense of honor and pride in the Alliance you have been promoted to the rank of Commodore. "
+XSTR_185,"We aren't sure how you've done it, but you are hereby promoted to the prestigious rank of Rear Admiral.  (We think you cheated.)","(gr)We aren't sure how you've done it, but you are hereby promoted to the prestigious rank of Rear Admiral.  (We think you cheated.)","(fr)We aren't sure how you've done it, but you are hereby promoted to the prestigious rank of Rear Admiral.  (We think you cheated.)"
+XSTR_186,You really must have cheated to get this rank!  Do you want to sit behind a desk or something?  That is what Vice Admirals do.,(gr)You really must have cheated to get this rank!  Do you want to sit behind a desk or something?  That is what Vice Admirals do.,(fr)You really must have cheated to get this rank!  Do you want to sit behind a desk or something?  That is what Vice Admirals do.
+XSTR_188,Advanced Space Superiority,(gr)Advanced Space Superiority,(fr)Advanced Space Superiority
+XSTR_189,Excellent,(gr)Excellent,(fr)Excellent
+XSTR_190,Light,(gr)Light,(fr)Light
+XSTR_191,Triton Dynamics,(gr)Triton Dynamics,(fr)Triton Dynamics
+XSTR_193,"Developed in a joint operation by the Vasudan and Terran governments, the GTF Ulysses is an Excellent all-around fighter.  It offers superior maneuverability and a high top speed.","(gr)Developed in a joint operation by the Vasudan and Terran governments, the GTF Ulysses is an Excellent all-around fighter.  It offers superior maneuverability and a high top speed.","(fr)Developed in a joint operation by the Vasudan and Terran governments, the GTF Ulysses is an Excellent all-around fighter.  It offers superior maneuverability and a high top speed."
+XSTR_194,Space Superiority,(gr)Space Superiority,(fr)Space Superiority
+XSTR_195,Fair,(gr)Fair,(fr)Fair
+XSTR_196,Medium,(gr)Medium,(fr)Medium
+XSTR_197,Han-Ronald Corp.,(gr)Han-Ronald Corp.,(fr)Han-Ronald Corp.
+XSTR_199,"The Apollo is the most common GTA fighter.  It is highly versatile and can perform multiple roles, including space superiority, interception and assault.","(gr)The Apollo is the most common GTA fighter.  It is highly versatile and can perform multiple roles, including space superiority, interception and assault.","(fr)The Apollo is the most common GTA fighter.  It is highly versatile and can perform multiple roles, including space superiority, interception and assault."
+XSTR_200,Interceptor,(gr)Interceptor,(fr)Interceptor
+XSTR_201,Good,(gr)Good,(fr)Good
+XSTR_203,"Using the old GTF Angel Scout Fighter as a template, the GTA created the Valkyrie Interceptor Fighter.  It has two additional engines, as well as an additional set of primary hardpoints.  This makes the Valkyrie the best bomber interceptor in the fleet.  Its speed is unmatched in the GTA, and its maneuverability is above average.  Its only drawbacks are a small secondary payload and weak hull.","(gr)Using the old GTF Angel Scout Fighter as a template, the GTA created the Valkyrie Interceptor Fighter.  It has two additional engines, as well as an additional set of primary hardpoints.  This makes the Valkyrie the best bomber interceptor in the fleet.  Its speed is unmatched in the GTA, and its maneuverability is above average.  Its only drawbacks are a small secondary payload and weak hull.","(fr)Using the old GTF Angel Scout Fighter as a template, the GTA created the Valkyrie Interceptor Fighter.  It has two additional engines, as well as an additional set of primary hardpoints.  This makes the Valkyrie the best bomber interceptor in the fleet.  Its speed is unmatched in the GTA, and its maneuverability is above average.  Its only drawbacks are a small secondary payload and weak hull."
+XSTR_204,Heavy Assault,(gr)Heavy Assault,(fr)Heavy Assault
+XSTR_205,Average,(gr)Average,(fr)Average
+XSTR_206,Han-Ronald Corp,(gr)Han-Ronald Corp,(fr)Han-Ronald Corp
+XSTR_208,"The Hercules is the slowest and most unmanageable fighter in the fleet.  This is offset, however, by its overpowering weaponry and shielding.  It carries 6 primary weapons, as well as two full secondary banks.  This heavy assault fighter is best suited for small target attacks and bomber escort.","(gr)The Hercules is the slowest and most unmanageable fighter in the fleet.  This is offset, however, by its overpowering weaponry and shielding.  It carries 6 primary weapons, as well as two full secondary banks.  This heavy assault fighter is best suited for small target attacks and bomber escort.","(fr)The Hercules is the slowest and most unmanageable fighter in the fleet.  This is offset, however, by its overpowering weaponry and shielding.  It carries 6 primary weapons, as well as two full secondary banks.  This heavy assault fighter is best suited for small target attacks and bomber escort."
+XSTR_209,Recon,(gr)Recon,(fr)Recon
+XSTR_210,High,(gr)High,(fr)High
+XSTR_211,Low,(gr)Low,(fr)Low
+XSTR_213,"Designed by GTI engineers, the Loki is undoubtedly the best reconaissance craft in Terran or Vasudan service.  Its hull shape and shielded reactor chamber lends itself to providing a low sensor profile, and is yet capable of very high speed maneuvers.  Its relatively light armament and low armor rating make it unsuitable for extended firefights, however.","(gr)Designed by GTI engineers, the Loki is undoubtedly the best reconaissance craft in Terran or Vasudan service.  Its hull shape and shielded reactor chamber lends itself to providing a low sensor profile, and is yet capable of very high speed maneuvers.  Its relatively light armament and low armor rating make it unsuitable for extended firefights, however.","(fr)Designed by GTI engineers, the Loki is undoubtedly the best reconaissance craft in Terran or Vasudan service.  Its hull shape and shielded reactor chamber lends itself to providing a low sensor profile, and is yet capable of very high speed maneuvers.  Its relatively light armament and low armor rating make it unsuitable for extended firefights, however."
+XSTR_214,Light Bomber,(gr)Light Bomber,(fr)Light Bomber
+XSTR_215,Dynamic Metamer,(gr)Dynamic Metamer,(fr)Dynamic Metamer
+XSTR_217,"The smallest bomber in the fleet, the Athena has oftentimes been mistaken for a fighter.  However, one should not be fooled by its small size.  The Athena can carry light bombs, and most missiles.  It also has the ability to dogfight well.  Its strong shielding and hull make it the favored Lightning Bomber of the GTA.","(gr)The smallest bomber in the fleet, the Athena has oftentimes been mistaken for a fighter.  However, one should not be fooled by its small size.  The Athena can carry light bombs, and most missiles.  It also has the ability to dogfight well.  Its strong shielding and hull make it the favored Lightning Bomber of the GTA.","(fr)The smallest bomber in the fleet, the Athena has oftentimes been mistaken for a fighter.  However, one should not be fooled by its small size.  The Athena can carry light bombs, and most missiles.  It also has the ability to dogfight well.  Its strong shielding and hull make it the favored Lightning Bomber of the GTA."
+XSTR_218,Heavy Bomber,(gr)Heavy Bomber,(fr)Heavy Bomber
+XSTR_219,Poor,(gr)Poor,(fr)Poor
+XSTR_220,Heavy,(gr)Heavy,(fr)Heavy
+XSTR_222,"The Medusa is the standard attack bomber in the GTA.  Its strong shielding and large secondary capacity make it the favored attack craft against cruiser class targets.  As the first bomber to carry the Tsunami bomb, the Medusa is considered the staple of any bomber pilots career.","(gr)The Medusa is the standard attack bomber in the GTA.  Its strong shielding and large secondary capacity make it the favored attack craft against cruiser class targets.  As the first bomber to carry the Tsunami bomb, the Medusa is considered the staple of any bomber pilots career.","(fr)The Medusa is the standard attack bomber in the GTA.  Its strong shielding and large secondary capacity make it the favored attack craft against cruiser class targets.  As the first bomber to carry the Tsunami bomb, the Medusa is considered the staple of any bomber pilots career."
+XSTR_223,Assault Bomber,(gr)Assault Bomber,(fr)Assault Bomber
+XSTR_224,Very Poor,(gr)Very Poor,(fr)Very Poor
+XSTR_226,The Ursa is the first bomber designed specifically for the purpose of annihilating capital ships.  It carries a massive payload and is the only bomber in the GTA which can equip the Harbinger Bomb.  Strong shielding and hull make the Ursa very difficult to destroy.,(gr)The Ursa is the first bomber designed specifically for the purpose of annihilating capital ships.  It carries a massive payload and is the only bomber in the GTA which can equip the Harbinger Bomb.  Strong shielding and hull make the Ursa very difficult to destroy.,(fr)The Ursa is the first bomber designed specifically for the purpose of annihilating capital ships.  It carries a massive payload and is the only bomber in the GTA which can equip the Harbinger Bomb.  Strong shielding and hull make the Ursa very difficult to destroy.
+XSTR_227,Stealth Bomber,(gr)Stealth Bomber,(fr)Stealth Bomber
+XSTR_229,"Another product of GTI R&D, the Zeus strike bomber is a worthy successor to the Athena.  It's balanced design and increased reactor capacity give it remarkable speed for a bomber, yet still remains capable of carrying the powerful Tsunami bombs.  These features will make the Zeus a versatile and effective weapon against capital ships.","(gr)Another product of GTI R&D, the Zeus strike bomber is a worthy successor to the Athena.  It's balanced design and increased reactor capacity give it remarkable speed for a bomber, yet still remains capable of carrying the powerful Tsunami bombs.  These features will make the Zeus a versatile and effective weapon against capital ships.","(fr)Another product of GTI R&D, the Zeus strike bomber is a worthy successor to the Athena.  It's balanced design and increased reactor capacity give it remarkable speed for a bomber, yet still remains capable of carrying the powerful Tsunami bombs.  These features will make the Zeus a versatile and effective weapon against capital ships."
+XSTR_230,"The Amazon is a simple drone, used for basic combat training.  They are unmanned, and carry only the weakest of weaponry.","(gr)The Amazon is a simple drone, used for basic combat training.  They are unmanned, and carry only the weakest of weaponry.","(fr)The Amazon is a simple drone, used for basic combat training.  They are unmanned, and carry only the weakest of weaponry."
+XSTR_231,"The Advanced Amazon is a larger drone, used by the GTA for subsystem and large target training.  They are unmanned and inexpensive.","(gr)The Advanced Amazon is a larger drone, used by the GTA for subsystem and large target training.  They are unmanned and inexpensive.","(fr)The Advanced Amazon is a larger drone, used by the GTA for subsystem and large target training.  They are unmanned and inexpensive."
+XSTR_232,"The Centaur support ship is designed to get in and out of battle as quick as possible.  It is fast, and quite maneuverable, allowing it to dock with fighters in a minimum amount of time.  Most notable about the Centaur, however, is its extremely large explosion radius.  The amount of warheads carried on a support ship makes it very dangerous to be close to an exploding Centaur.","(gr)The Centaur support ship is designed to get in and out of battle as quick as possible.  It is fast, and quite maneuverable, allowing it to dock with fighters in a minimum amount of time.  Most notable about the Centaur, however, is its extremely large explosion radius.  The amount of warheads carried on a support ship makes it very dangerous to be close to an exploding Centaur.","(fr)The Centaur support ship is designed to get in and out of battle as quick as possible.  It is fast, and quite maneuverable, allowing it to dock with fighters in a minimum amount of time.  Most notable about the Centaur, however, is its extremely large explosion radius.  The amount of warheads carried on a support ship makes it very dangerous to be close to an exploding Centaur."
+XSTR_233,"The Poseidon is the standard military freighter in the GTA.  It is designed to protect its cargo from any kind of attack, and has four turrets with which to do so.","(gr)The Poseidon is the standard military freighter in the GTA.  It is designed to protect its cargo from any kind of attack, and has four turrets with which to do so.","(fr)The Poseidon is the standard military freighter in the GTA.  It is designed to protect its cargo from any kind of attack, and has four turrets with which to do so."
+XSTR_234,"The TC2 is the standard issue cargo container in the GTA for deep space cargo transport.  It has all the electronics and systems needed to preserve any cargo within it at whatever conditions are necessary.  TC2s are cheap to manufacture, and heavily used throughout the Alliance.","(gr)The TC2 is the standard issue cargo container in the GTA for deep space cargo transport.  It has all the electronics and systems needed to preserve any cargo within it at whatever conditions are necessary.  TC2s are cheap to manufacture, and heavily used throughout the Alliance.","(fr)The TC2 is the standard issue cargo container in the GTA for deep space cargo transport.  It has all the electronics and systems needed to preserve any cargo within it at whatever conditions are necessary.  TC2s are cheap to manufacture, and heavily used throughout the Alliance."
+XSTR_235,"The Chronos is a freighter of civilian design.  As the Terran Vasudan war dragged on, more and more of these vessels were commissioned by the GTA for use in military operations.  These vessels are slow but strong.","(gr)The Chronos is a freighter of civilian design.  As the Terran Vasudan war dragged on, more and more of these vessels were commissioned by the GTA for use in military operations.  These vessels are slow but strong.","(fr)The Chronos is a freighter of civilian design.  As the Terran Vasudan war dragged on, more and more of these vessels were commissioned by the GTA for use in military operations.  These vessels are slow but strong."
+XSTR_236,"The TAC 1 (Called the TacOne by most pilots) is a heavily armored container, usually for carrying volatile or dangerous substances.  It is also the preferred supply container for use in front line operations.","(gr)The TAC 1 (Called the TacOne by most pilots) is a heavily armored container, usually for carrying volatile or dangerous substances.  It is also the preferred supply container for use in front line operations.","(fr)The TAC 1 (Called the TacOne by most pilots) is a heavily armored container, usually for carrying volatile or dangerous substances.  It is also the preferred supply container for use in front line operations."
+XSTR_237,"The TTC 1 is another example of civilian equipment used by the GTA League of Defense.  It is primarily a Tech Container, used for research purposes, especially Zero-G development operations.  It is not very strong, however, and is often a target of enemy attacks.","(gr)The TTC 1 is another example of civilian equipment used by the GTA League of Defense.  It is primarily a Tech Container, used for research purposes, especially Zero-G development operations.  It is not very strong, however, and is often a target of enemy attacks.","(fr)The TTC 1 is another example of civilian equipment used by the GTA League of Defense.  It is primarily a Tech Container, used for research purposes, especially Zero-G development operations.  It is not very strong, however, and is often a target of enemy attacks."
+XSTR_238,"The mainstay of the Terran Fleet, these vessels have served in both strike and defense purposes.  From nose to tail it measures 260 meters.  With a full array of weapon systems and a strong enough hull to withstand the strongest enemy warheads, a Fenris Cruiser can be found in almost any system that the GTA is operating in.  The Fenris cruiser was originally designed as a strike weapon, hence its fast speed and decent turning rate.  It was later decided that a second line of cruisers would be produced, for defensive purposes, once it became apparent that the V-T war wouldn't be over in a few months.","(gr)The mainstay of the Terran Fleet, these vessels have served in both strike and defense purposes.  From nose to tail it measures 260 meters.  With a full array of weapon systems and a strong enough hull to withstand the strongest enemy warheads, a Fenris Cruiser can be found in almost any system that the GTA is operating in.  The Fenris cruiser was originally designed as a strike weapon, hence its fast speed and decent turning rate.  It was later decided that a second line of cruisers would be produced, for defensive purposes, once it became apparent that the V-T war wouldn't be over in a few months.","(fr)The mainstay of the Terran Fleet, these vessels have served in both strike and defense purposes.  From nose to tail it measures 260 meters.  With a full array of weapon systems and a strong enough hull to withstand the strongest enemy warheads, a Fenris Cruiser can be found in almost any system that the GTA is operating in.  The Fenris cruiser was originally designed as a strike weapon, hence its fast speed and decent turning rate.  It was later decided that a second line of cruisers would be produced, for defensive purposes, once it became apparent that the V-T war wouldn't be over in a few months."
+XSTR_239,"After the Vasudans began making incursions into GTA space, command decided that it needed a new defensive cruiser.  Changes to the Fenris led to the GTC Leviathan line of cruisers, produced as mobile defense battleships.  Their speed and maneuverability were greatly reduced in tradeoff for more powerful weapons and a stronger hull.  Production was discontinued when the GTA thought they would win the Vasudan war after the Battle of Gulnara, and then the production was started up again after the defeat at the Talania system.  Because of the on-again off-again nature of this vessel's production, almost all of the Leviathan Cruisers have different armaments, but all have consistent hulls and speeds.","(gr)After the Vasudans began making incursions into GTA space, command decided that it needed a new defensive cruiser.  Changes to the Fenris led to the GTC Leviathan line of cruisers, produced as mobile defense battleships.  Their speed and maneuverability were greatly reduced in tradeoff for more powerful weapons and a stronger hull.  Production was discontinued when the GTA thought they would win the Vasudan war after the Battle of Gulnara, and then the production was started up again after the defeat at the Talania system.  Because of the on-again off-again nature of this vessel's production, almost all of the Leviathan Cruisers have different armaments, but all have consistent hulls and speeds.","(fr)After the Vasudans began making incursions into GTA space, command decided that it needed a new defensive cruiser.  Changes to the Fenris led to the GTC Leviathan line of cruisers, produced as mobile defense battleships.  Their speed and maneuverability were greatly reduced in tradeoff for more powerful weapons and a stronger hull.  Production was discontinued when the GTA thought they would win the Vasudan war after the Battle of Gulnara, and then the production was started up again after the defeat at the Talania system.  Because of the on-again off-again nature of this vessel's production, almost all of the Leviathan Cruisers have different armaments, but all have consistent hulls and speeds."
+XSTR_240,"The Faustus Science vessel was, and still is, a civilian craft. However, in the 14 years since the Terran-Vasudan war began, more and more of these were commissioned by the GTA in order to pursue military research.  However, its obvious value, poor fighting capabilities, and lack of speed make it a prime target for enemy ships. Hence, you will rarely find many of these anywhere near the front lines of battle.","(gr)The Faustus Science vessel was, and still is, a civilian craft. However, in the 14 years since the Terran-Vasudan war began, more and more of these were commissioned by the GTA in order to pursue military research.  However, its obvious value, poor fighting capabilities, and lack of speed make it a prime target for enemy ships. Hence, you will rarely find many of these anywhere near the front lines of battle.","(fr)The Faustus Science vessel was, and still is, a civilian craft. However, in the 14 years since the Terran-Vasudan war began, more and more of these were commissioned by the GTA in order to pursue military research.  However, its obvious value, poor fighting capabilities, and lack of speed make it a prime target for enemy ships. Hence, you will rarely find many of these anywhere near the front lines of battle."
+XSTR_241,"The Orion is the capital ship of the GTA.  Measuring a frightening 2.1 kilometers in length, the cost to build one of these far outweighs the cost of paying the crew of this ship for 3 years.  There is no more important symbol of Terran Pride than a ship like the Galatea or the Intrepid cruising past a colonized planet, patrolling the system and ensuring safety.  In the course of the 14 year war, very few of these have ever been lost, making the destruction of an Orion a truly horrible defeat.","(gr)The Orion is the capital ship of the GTA.  Measuring a frightening 2.1 kilometers in length, the cost to build one of these far outweighs the cost of paying the crew of this ship for 3 years.  There is no more important symbol of Terran Pride than a ship like the Galatea or the Intrepid cruising past a colonized planet, patrolling the system and ensuring safety.  In the course of the 14 year war, very few of these have ever been lost, making the destruction of an Orion a truly horrible defeat.","(fr)The Orion is the capital ship of the GTA.  Measuring a frightening 2.1 kilometers in length, the cost to build one of these far outweighs the cost of paying the crew of this ship for 3 years.  There is no more important symbol of Terran Pride than a ship like the Galatea or the Intrepid cruising past a colonized planet, patrolling the system and ensuring safety.  In the course of the 14 year war, very few of these have ever been lost, making the destruction of an Orion a truly horrible defeat."
+XSTR_242,Nothing much is known about the GTD Hades.  It seems to be the GTI's top project.  We believe the goal of the project is to recreate the SD Lucifer.  The GTD Hades should be considered a Class A threat.,(gr)Nothing much is known about the GTD Hades.  It seems to be the GTI's top project.  We believe the goal of the project is to recreate the SD Lucifer.  The GTD Hades should be considered a Class A threat.,(fr)Nothing much is known about the GTD Hades.  It seems to be the GTI's top project.  We believe the goal of the project is to recreate the SD Lucifer.  The GTD Hades should be considered a Class A threat.
+XSTR_243,"Early Terran space stations were constructed much smaller, and were mostly used for Zero-G research purposes.  Later on, with advancements in space construction technologies, stations grew bigger and bigger.  When the first Arcadia-class station was commissioned, GTA decided to rename it to an Installation rather than a Space Station.  Used for a variety of purposes, almost all major systems are home to at least one Installation, which is often used as the center of trade and communications.  Home to scores of small ship, including repair vessels, fighters, and transports, an Arcadia class Installation is always a safe haven for a convoy of attack ships, returning from battle.  Where the Orion is the symbol of Terran power, the Arcadia is the shining beacon of stability.","(gr)Early Terran space stations were constructed much smaller, and were mostly used for Zero-G research purposes.  Later on, with advancements in space construction technologies, stations grew bigger and bigger.  When the first Arcadia-class station was commissioned, GTA decided to rename it to an Installation rather than a Space Station.  Used for a variety of purposes, almost all major systems are home to at least one Installation, which is often used as the center of trade and communications.  Home to scores of small ship, including repair vessels, fighters, and transports, an Arcadia class Installation is always a safe haven for a convoy of attack ships, returning from battle.  Where the Orion is the symbol of Terran power, the Arcadia is the shining beacon of stability.","(fr)Early Terran space stations were constructed much smaller, and were mostly used for Zero-G research purposes.  Later on, with advancements in space construction technologies, stations grew bigger and bigger.  When the first Arcadia-class station was commissioned, GTA decided to rename it to an Installation rather than a Space Station.  Used for a variety of purposes, almost all major systems are home to at least one Installation, which is often used as the center of trade and communications.  Home to scores of small ship, including repair vessels, fighters, and transports, an Arcadia class Installation is always a safe haven for a convoy of attack ships, returning from battle.  Where the Orion is the symbol of Terran power, the Arcadia is the shining beacon of stability."
+XSTR_244,"Since the start of space colonization, this standard transport has been used by everyone, both civilian and military.  While it has undergone minor changes time and again, it remains a simple design: A vehicle meant to transport personnel from one place to another.","(gr)Since the start of space colonization, this standard transport has been used by everyone, both civilian and military.  While it has undergone minor changes time and again, it remains a simple design: A vehicle meant to transport personnel from one place to another.","(fr)Since the start of space colonization, this standard transport has been used by everyone, both civilian and military.  While it has undergone minor changes time and again, it remains a simple design: A vehicle meant to transport personnel from one place to another."
+XSTR_245,The Watchdog is the standard unmanned defensive sentry turret for the GTA.  It fires two standard plasma bursts at any nearby hostile targets.,(gr)The Watchdog is the standard unmanned defensive sentry turret for the GTA.  It fires two standard plasma bursts at any nearby hostile targets.,(fr)The Watchdog is the standard unmanned defensive sentry turret for the GTA.  It fires two standard plasma bursts at any nearby hostile targets.
+XSTR_246,"The Cerberus is an advanced version of the Watchdog, with stronger weaponry and the ability to withstand more damage.","(gr)The Cerberus is an advanced version of the Watchdog, with stronger weaponry and the ability to withstand more damage.","(fr)The Cerberus is an advanced version of the Watchdog, with stronger weaponry and the ability to withstand more damage."
+XSTR_247,The Hermes Escape pod has been used since the destruction of the GTD Goliath over 12 years ago.  They are used by the crews of destroyers and installations to escape destruction.  It is always best to be prepared.,(gr)The Hermes Escape pod has been used since the destruction of the GTD Goliath over 12 years ago.  They are used by the crews of destroyers and installations to escape destruction.  It is always best to be prepared.,(fr)The Hermes Escape pod has been used since the destruction of the GTD Goliath over 12 years ago.  They are used by the crews of destroyers and installations to escape destruction.  It is always best to be prepared.
+XSTR_248,Light Skirmish,(gr)Light Skirmish,(fr)Light Skirmish
+XSTR_249,PVN,(gr)PVN,(fr)PVN
+XSTR_252,Heavy Fighter,(gr)Heavy Fighter,(fr)Heavy Fighter
+XSTR_255,Very Good,(gr)Very Good,(fr)Very Good
+XSTR_258,PVN/Hammer Of Light,(gr)PVN/Hammer Of Light,(fr)PVN/Hammer Of Light
+XSTR_261,Bomber,(gr)Bomber,(fr)Bomber
+XSTR_266,"The Scarab is very similar to our Centaur: We believe the Vasudans stole the design of this ship from us.  It is used for in flight rearming of fighters and bombers.  In longer engagements, these ships can mean the difference between victory and defeat.  The major difference between this ship and the Centaur is that the Scarab is unmanned.","(gr)The Scarab is very similar to our Centaur: We believe the Vasudans stole the design of this ship from us.  It is used for in flight rearming of fighters and bombers.  In longer engagements, these ships can mean the difference between victory and defeat.  The major difference between this ship and the Centaur is that the Scarab is unmanned.","(fr)The Scarab is very similar to our Centaur: We believe the Vasudans stole the design of this ship from us.  It is used for in flight rearming of fighters and bombers.  In longer engagements, these ships can mean the difference between victory and defeat.  The major difference between this ship and the Centaur is that the Scarab is unmanned."
+XSTR_267,"The Isis transport is quite fast and maneuverable for a ship of its size.  Most often it is used for personnel transfer, although occasionally they have been known to act as repair ships and tugboats.  It is well protected with its turrets, and it is not unheard of for the PVN to use a wing of Isises to conduct an assault on a fortified position.","(gr)The Isis transport is quite fast and maneuverable for a ship of its size.  Most often it is used for personnel transfer, although occasionally they have been known to act as repair ships and tugboats.  It is well protected with its turrets, and it is not unheard of for the PVN to use a wing of Isises to conduct an assault on a fortified position.","(fr)The Isis transport is quite fast and maneuverable for a ship of its size.  Most often it is used for personnel transfer, although occasionally they have been known to act as repair ships and tugboats.  It is well protected with its turrets, and it is not unheard of for the PVN to use a wing of Isises to conduct an assault on a fortified position."
+XSTR_268,"The Bast freighter is unarmed, and considered a non threat.  We believe that it is mainly used by Vasudan civilians, but we have seen some in front line operations.  It has very low target value, but should be destroyed, as any kind of resupply ship is a danger to the GTA.","(gr)The Bast freighter is unarmed, and considered a non threat.  We believe that it is mainly used by Vasudan civilians, but we have seen some in front line operations.  It has very low target value, but should be destroyed, as any kind of resupply ship is a danger to the GTA.","(fr)The Bast freighter is unarmed, and considered a non threat.  We believe that it is mainly used by Vasudan civilians, but we have seen some in front line operations.  It has very low target value, but should be destroyed, as any kind of resupply ship is a danger to the GTA."
+XSTR_269,"The standard Vasudan cargo container is only slightly different from our own.  The primary difference is that the Vasudan cargo containers are atmospheric as well as deep-space.  Vasudans used cargo containers well before we did, as they needed to transport raw materials from other systems to their own barren world.  Our cargo container was modelled after theirs, although ours is slightly superior in durability.","(gr)The standard Vasudan cargo container is only slightly different from our own.  The primary difference is that the Vasudan cargo containers are atmospheric as well as deep-space.  Vasudans used cargo containers well before we did, as they needed to transport raw materials from other systems to their own barren world.  Our cargo container was modelled after theirs, although ours is slightly superior in durability.","(fr)The standard Vasudan cargo container is only slightly different from our own.  The primary difference is that the Vasudan cargo containers are atmospheric as well as deep-space.  Vasudans used cargo containers well before we did, as they needed to transport raw materials from other systems to their own barren world.  Our cargo container was modelled after theirs, although ours is slightly superior in durability."
+XSTR_270,"With three turrets, the Ma'at is a hairy target for GTA pilots to attack.  However, it is slow enough that it can be destroyed with enough patience.  As always, supply ships for the PVN are considered to be valid targets.","(gr)With three turrets, the Ma'at is a hairy target for GTA pilots to attack.  However, it is slow enough that it can be destroyed with enough patience.  As always, supply ships for the PVN are considered to be valid targets.","(fr)With three turrets, the Ma'at is a hairy target for GTA pilots to attack.  However, it is slow enough that it can be destroyed with enough patience.  As always, supply ships for the PVN are considered to be valid targets."
+XSTR_271,"the VAC 4 series of cargo is much like its normal counterpart, only it has much more plating.  However, this container is no more dangerous than the standard version, and is nothing more than ML-16 bait without protection of some kind.","(gr)the VAC 4 series of cargo is much like its normal counterpart, only it has much more plating.  However, this container is no more dangerous than the standard version, and is nothing more than ML-16 bait without protection of some kind.","(fr)the VAC 4 series of cargo is much like its normal counterpart, only it has much more plating.  However, this container is no more dangerous than the standard version, and is nothing more than ML-16 bait without protection of some kind."
+XSTR_275,"The Ankh is the standard Vasudan sentry gun.  Its most common usage is guarding supply depots.  However, since the development of the Anubis, its usage has dropped off significantly.","(gr)The Ankh is the standard Vasudan sentry gun.  Its most common usage is guarding supply depots.  However, since the development of the Anubis, its usage has dropped off significantly.","(fr)The Ankh is the standard Vasudan sentry gun.  Its most common usage is guarding supply depots.  However, since the development of the Anubis, its usage has dropped off significantly."
+XSTR_276,The Ra has been used by Vasudans since our first encounter with them.  Every Vasudan capital ship has a few of these lifeboats.,(gr)The Ra has been used by Vasudans since our first encounter with them.  Every Vasudan capital ship has a few of these lifeboats.,(fr)The Ra has been used by Vasudans since our first encounter with them.  Every Vasudan capital ship has a few of these lifeboats.
+XSTR_283,"The new Seraphim class bomber is the Shivan's latest threat.  It is three times larger than a Nephilim, and carries a massive payload at least 150% the size of the Nephilim.  With strong hulls and almost impenetrable shield system, the Seraphim is easily the most dangerous bomber we have yet encountered.  The Seraphim has been designated a Class A threat to GTA destroyers and cruisers.  In unpopulated systems, it is to be considered a Class B threat.","(gr)The new Seraphim class bomber is the Shivan's latest threat.  It is three times larger than a Nephilim, and carries a massive payload at least 150% the size of the Nephilim.  With strong hulls and almost impenetrable shield system, the Seraphim is easily the most dangerous bomber we have yet encountered.  The Seraphim has been designated a Class A threat to GTA destroyers and cruisers.  In unpopulated systems, it is to be considered a Class B threat.","(fr)The new Seraphim class bomber is the Shivan's latest threat.  It is three times larger than a Nephilim, and carries a massive payload at least 150% the size of the Nephilim.  With strong hulls and almost impenetrable shield system, the Seraphim is easily the most dangerous bomber we have yet encountered.  The Seraphim has been designated a Class A threat to GTA destroyers and cruisers.  In unpopulated systems, it is to be considered a Class B threat."
+XSTR_284,"The Azrael is most likely a Shivan transport.  While we are not completely sure of its uses, we do know that they can house many Shivans.  It is not very heavily armored, and its weaponry is not too strong.  This makes the Azrael the most common target for capture attempts.","(gr)The Azrael is most likely a Shivan transport.  While we are not completely sure of its uses, we do know that they can house many Shivans.  It is not very heavily armored, and its weaponry is not too strong.  This makes the Azrael the most common target for capture attempts.","(fr)The Azrael is most likely a Shivan transport.  While we are not completely sure of its uses, we do know that they can house many Shivans.  It is not very heavily armored, and its weaponry is not too strong.  This makes the Azrael the most common target for capture attempts."
+XSTR_285,The Mephisto freighter behaves much like one of our own.  Only it is far more powerful and dangerous.  Very little data is available on this ship class.,(gr)The Mephisto freighter behaves much like one of our own.  Only it is far more powerful and dangerous.  Very little data is available on this ship class.,(fr)The Mephisto freighter behaves much like one of our own.  Only it is far more powerful and dangerous.  Very little data is available on this ship class.
+XSTR_286,We believe that the Shivans use cargo containers such as these as storage depots.  We have yet to see a Shivan land on a planet.  This leads us to believe that the Shivans plan on keeping all of their materials and resources in deep space.,(gr)We believe that the Shivans use cargo containers such as these as storage depots.  We have yet to see a Shivan land on a planet.  This leads us to believe that the Shivans plan on keeping all of their materials and resources in deep space.,(fr)We believe that the Shivans use cargo containers such as these as storage depots.  We have yet to see a Shivan land on a planet.  This leads us to believe that the Shivans plan on keeping all of their materials and resources in deep space.
+XSTR_287,Almost no data is available on the Asmodeus freighter.  We are aware that it has a strong hull and four turrets.  Any further data on this ship should be immediately delivered to Terran Intelligence.,(gr)Almost no data is available on the Asmodeus freighter.  We are aware that it has a strong hull and four turrets.  Any further data on this ship should be immediately delivered to Terran Intelligence.,(fr)Almost no data is available on the Asmodeus freighter.  We are aware that it has a strong hull and four turrets.  Any further data on this ship should be immediately delivered to Terran Intelligence.
+XSTR_288,What we have dubbed the Sac-2 is simply a more heavily armored form of the standard Shivan cargo container.  We believe that this is where the Shivans keep their more precious supplies.  Sac-2s are to be captured or destroyed at every opportunity.,(gr)What we have dubbed the Sac-2 is simply a more heavily armored form of the standard Shivan cargo container.  We believe that this is where the Shivans keep their more precious supplies.  Sac-2s are to be captured or destroyed at every opportunity.,(fr)What we have dubbed the Sac-2 is simply a more heavily armored form of the standard Shivan cargo container.  We believe that this is where the Shivans keep their more precious supplies.  Sac-2s are to be captured or destroyed at every opportunity.
+XSTR_293,"We believe that the sole purpose of the Trident is to guard Shivan repair and supply depots.  It is not too strong, but in mass quantities, can be dangerous.","(gr)We believe that the sole purpose of the Trident is to guard Shivan repair and supply depots.  It is not too strong, but in mass quantities, can be dangerous.","(fr)We believe that the sole purpose of the Trident is to guard Shivan repair and supply depots.  It is not too strong, but in mass quantities, can be dangerous."
+XSTR_297,Create pilot,(gr)Create pilot,(fr)Create pilot
+XSTR_298,Accept,(gr)Accept,(fr)Accept
+XSTR_299,Help,(gr)Help,(fr)Help
+XSTR_300,Options,(gr)Options,(fr)Options
+XSTR_301,Medals,(gr)Medals,(fr)Medals
+XSTR_302,Remove,(gr)Remove,(fr)Remove
+XSTR_303,Set Active,(gr)Set Active,(fr)Set Active
+XSTR_304,Clone pilot,(gr)Clone pilot,(fr)Clone pilot
+XSTR_305,Single Player,(gr)Single Player,(fr)Single Player
+XSTR_306,Multi Player,(gr)Multi Player,(fr)Multi Player
+XSTR_307,Convert pilot,(gr)Convert pilot,(fr)Convert pilot
+XSTR_308,Barracks,(gr)Barracks,(fr)Barracks
+XSTR_309,Pilot Stats,(gr)Pilot Stats,(fr)Pilot Stats
+XSTR_310,Briefing,(gr)Briefing,(fr)Briefing
+XSTR_311,Ship Selection,(gr)Ship Selection,(fr)Ship Selection
+XSTR_312,Weapons Loadout,(gr)Weapons Loadout,(fr)Weapons Loadout
+XSTR_313,Commit,(gr)Commit,(fr)Commit
+XSTR_314,@Close,(gr)@Close,(fr)@Close
+XSTR_315,Clone Pilot,(gr)Clone Pilot,(fr)Clone Pilot
+XSTR_316,Choose Pilot,(gr)Choose Pilot,(fr)Choose Pilot
+XSTR_317,Select,(gr)Select,(fr)Select
+XSTR_318,Restart Campaign,(gr)Restart Campaign,(fr)Restart Campaign
+XSTR_319,Campaigns,(gr)Campaigns,(fr)Campaigns
+XSTR_320,Campaign Information,(gr)Campaign Information,(fr)Campaign Information
+XSTR_321,Continue,(gr)Continue,(fr)Continue
+XSTR_322,GTA Command Briefing,(gr)GTA Command Briefing,(fr)GTA Command Briefing
+XSTR_323,Targeting,(gr)Targeting,(fr)Targeting
+XSTR_324,Ship,(gr)Ship,(fr)Ship
+XSTR_325,Weapons,(gr)Weapons,(fr)Weapons
+XSTR_326,Miscellaneous,(gr)Miscellaneous,(fr)Miscellaneous
+XSTR_327,Alt,(gr)Alt,(fr)Alt
+XSTR_328,Shift,(gr)Shift,(fr)Shift
+XSTR_329,Enable,(gr)Enable,(fr)Enable
+XSTR_330,Invert,(gr)Invert,(fr)Invert
+XSTR_331,Cancel,(gr)Cancel,(fr)Cancel
+XSTR_332,Undo,(gr)Undo,(fr)Undo
+XSTR_333,Reset Defaults,(gr)Reset Defaults,(fr)Reset Defaults
+XSTR_334,Search Mode,(gr)Search Mode,(fr)Search Mode
+XSTR_335,Bind Mode,(gr)Bind Mode,(fr)Bind Mode
+XSTR_336,@Conflict,(gr)@Conflict,(fr)@Conflict
+XSTR_337,Clear Conflict,(gr)Clear Conflict,(fr)Clear Conflict
+XSTR_338,Clear All,(gr)Clear All,(fr)Clear All
+XSTR_339,Clear Selected,(gr)Clear Selected,(fr)Clear Selected
+XSTR_340,Technical Database,(gr)Technical Database,(fr)Technical Database
+XSTR_341,Mission Simulator,(gr)Mission Simulator,(fr)Mission Simulator
+XSTR_342,Cutscenes,(gr)Cutscenes,(fr)Cutscenes
+XSTR_343,Credits,(gr)Credits,(fr)Credits
+XSTR_344,Exit,(gr)Exit,(fr)Exit
+XSTR_345,Debriefing,(gr)Debriefing,(fr)Debriefing
+XSTR_346,Statistics,(gr)Statistics,(fr)Statistics
+XSTR_347,Replay Mission,(gr)Replay Mission,(fr)Replay Mission
+XSTR_348,Recommendations,(gr)Recommendations,(fr)Recommendations
+XSTR_349,@.Medal,(gr)@.Medal,(fr)@.Medal
+XSTR_350,@.Rank,(gr)@.Rank,(fr)@.Rank
+XSTR_351,@.Badge,(gr)@.Badge,(fr)@.Badge
+XSTR_352,Pilot Info,(gr)Pilot Info,(fr)Pilot Info
+XSTR_353,@Medal,(gr)@Medal,(fr)@Medal
+XSTR_354,@Rank,(gr)@Rank,(fr)@Rank
+XSTR_355,@Badge,(gr)@Badge,(fr)@Badge
+XSTR_356,Kick,(gr)Kick,(fr)Kick
+XSTR_357,Clear,(gr)Clear,(fr)Clear
+XSTR_358,Reset,(gr)Reset,(fr)Reset
+XSTR_359,Hotkey Assignment,(gr)Hotkey Assignment,(fr)Hotkey Assignment
+XSTR_360,Key Group,(gr)Key Group,(fr)Key Group
+XSTR_361,Amber,(gr)Amber,(fr)Amber
+XSTR_362,Blue,(gr)Blue,(fr)Blue
+XSTR_363,Green,(gr)Green,(fr)Green
+XSTR_364,On,(gr)On,(fr)On
+XSTR_365,Off,(gr)Off,(fr)Off
+XSTR_366,Popup,(gr)Popup,(fr)Popup
+XSTR_367,HUD Config,(gr)HUD Config,(fr)HUD Config
+XSTR_368,Brightness,(gr)Brightness,(fr)Brightness
+XSTR_369,Single Missions,(gr)Single Missions,(fr)Single Missions
+XSTR_370,Campaign Missions,(gr)Campaign Missions,(fr)Campaign Missions
+XSTR_371,Mission,(gr)Mission,(fr)Mission
+XSTR_372,Filename,(gr)Filename,(fr)Filename
+XSTR_373,Messages,(gr)Messages,(fr)Messages
+XSTR_374,Events,(gr)Events,(fr)Events
+XSTR_375,Objectives,(gr)Objectives,(fr)Objectives
+XSTR_376,Complete,(gr)Complete,(fr)Complete
+XSTR_377,Incomplete,(gr)Incomplete,(fr)Incomplete
+XSTR_378,Failed,(gr)Failed,(fr)Failed
+XSTR_379,Mission Log,(gr)Mission Log,(fr)Mission Log
+XSTR_380,Missions,(gr)Missions,(fr)Missions
+XSTR_381,Close,(gr)Close,(fr)Close
+XSTR_382,All,(gr)All,(fr)All
+XSTR_383,Coop,(gr)Coop,(fr)Coop
+XSTR_384,Team,(gr)Team,(fr)Team
+XSTR_385,Dogfight,(gr)Dogfight,(fr)Dogfight
+XSTR_386,Create Game,(gr)Create Game,(fr)Create Game
+XSTR_387,Players,(gr)Players,(fr)Players
+XSTR_388,Pilot Information,(gr)Pilot Information,(fr)Pilot Information
+XSTR_389,Host Options,(gr)Host Options,(fr)Host Options
+XSTR_390,Highest Rank,(gr)Highest Rank,(fr)Highest Rank
+XSTR_391,Team Leader,(gr)Team Leader,(fr)Team Leader
+XSTR_392,Any Player,(gr)Any Player,(fr)Any Player
+XSTR_393,Host,(gr)Host,(fr)Host
+XSTR_394,AI Orders,(gr)AI Orders,(fr)AI Orders
+XSTR_395,End Mission,(gr)End Mission,(fr)End Mission
+XSTR_396,Skill Level,(gr)Skill Level,(fr)Skill Level
+XSTR_397,Observers,(gr)Observers,(fr)Observers
+XSTR_398,Time Limit,(gr)Time Limit,(fr)Time Limit
+XSTR_399,Respawn Limit,(gr)Respawn Limit,(fr)Respawn Limit
+XSTR_400,Kill Limit,(gr)Kill Limit,(fr)Kill Limit
+XSTR_401,Voice Transmission,(gr)Voice Transmission,(fr)Voice Transmission
+XSTR_402,Voice Quality,(gr)Voice Quality,(fr)Voice Quality
+XSTR_403,Message Duration,(gr)Message Duration,(fr)Message Duration
+XSTR_404,Per Player Voice Wait,(gr)Per Player Voice Wait,(fr)Per Player Voice Wait
+XSTR_405,Host Modifies Ships,(gr)Host Modifies Ships,(fr)Host Modifies Ships
+XSTR_406,Host Setup,(gr)Host Setup,(fr)Host Setup
+XSTR_407,Join,(gr)Join,(fr)Join
+XSTR_408,Select Ship,(gr)Select Ship,(fr)Select Ship
+XSTR_409,Name,(gr)Name,(fr)Name
+XSTR_410,Class,(gr)Class,(fr)Class
+XSTR_411,Hull,(gr)Hull,(fr)Hull
+XSTR_412,Shield,(gr)Shield,(fr)Shield
+XSTR_413,Refresh,(gr)Refresh,(fr)Refresh
+XSTR_414,Status,(gr)Status,(fr)Status
+XSTR_415,Server,(gr)Server,(fr)Server
+XSTR_416,Ping,(gr)Ping,(fr)Ping
+XSTR_417,Join as Observer,(gr)Join as Observer,(fr)Join as Observer
+XSTR_418,Join Game,(gr)Join Game,(fr)Join Game
+XSTR_419,Team 1,(gr)Team 1,(fr)Team 1
+XSTR_420,Team 2,(gr)Team 2,(fr)Team 2
+XSTR_421,Open,(gr)Open,(fr)Open
+XSTR_422,Closed,(gr)Closed,(fr)Closed
+XSTR_423,Password Protected,(gr)Password Protected,(fr)Password Protected
+XSTR_424,Restricted,(gr)Restricted,(fr)Restricted
+XSTR_425,Allow Rank,(gr)Allow Rank,(fr)Allow Rank
+XSTR_426,Or Below,(gr)Or Below,(fr)Or Below
+XSTR_427,Or Above,(gr)Or Above,(fr)Or Above
+XSTR_428,Title,(gr)Title,(fr)Title
+XSTR_429,Game Type,(gr)Game Type,(fr)Game Type
+XSTR_430,@Launch,(gr)@Launch,(fr)@Launch
+XSTR_431,Multi,(gr)Multi,(fr)Multi
+XSTR_432,Detail,(gr)Detail,(fr)Detail
+XSTR_433,Exit Game,(gr)Exit Game,(fr)Exit Game
+XSTR_434,Controls Config,(gr)Controls Config,(fr)Controls Config
+XSTR_435,Very High,(gr)Very High,(fr)Very High
+XSTR_436,Custom,(gr)Custom,(fr)Custom
+XSTR_437,Engine Glow,(gr)Engine Glow,(fr)Engine Glow
+XSTR_438,off,(gr)off,(fr)off
+XSTR_439,on,(gr)on,(fr)on
+XSTR_440,Nebulas,(gr)Nebulas,(fr)Nebulas
+XSTR_441,Target View Rendering,(gr)Target View Rendering,(fr)Target View Rendering
+XSTR_442,Effects Alpha Blending,(gr)Effects Alpha Blending,(fr)Effects Alpha Blending
+XSTR_443,Preset Detail Levels,(gr)Preset Detail Levels,(fr)Preset Detail Levels
+XSTR_444,Model Detail,(gr)Model Detail,(fr)Model Detail
+XSTR_445,Model Update,(gr)Model Update,(fr)Model Update
+XSTR_446,3D Hardware Textures,(gr)3D Hardware Textures,(fr)3D Hardware Textures
+XSTR_447,Weapon Rendering,(gr)Weapon Rendering,(fr)Weapon Rendering
+XSTR_448,Impact Effects,(gr)Impact Effects,(fr)Impact Effects
+XSTR_449,Shield Hit Effect,(gr)Shield Hit Effect,(fr)Shield Hit Effect
+XSTR_450,Stars,(gr)Stars,(fr)Stars
+XSTR_451,Particles,(gr)Particles,(fr)Particles
+XSTR_452,Lighting,(gr)Lighting,(fr)Lighting
+XSTR_453,Briefing Voice,(gr)Briefing Voice,(fr)Briefing Voice
+XSTR_454,Volume,(gr)Volume,(fr)Volume
+XSTR_455,Effects,(gr)Effects,(fr)Effects
+XSTR_456,Music,(gr)Music,(fr)Music
+XSTR_457,Voice,(gr)Voice,(fr)Voice
+XSTR_458,Joystick,(gr)Joystick,(fr)Joystick
+XSTR_459,Sensitivity,(gr)Sensitivity,(fr)Sensitivity
+XSTR_460,Dead Zone,(gr)Dead Zone,(fr)Dead Zone
+XSTR_461,Mouse,(gr)Mouse,(fr)Mouse
+XSTR_462,Add,(gr)Add,(fr)Add
+XSTR_463,Yes,(gr)Yes,(fr)Yes
+XSTR_464,No,(gr)No,(fr)No
+XSTR_465,VMT,(gr)VMT,(fr)VMT
+XSTR_466,General,(gr)General,(fr)General
+XSTR_467,/Multidata,(gr)/Multidata,(fr)/Multidata
+XSTR_468,/Missions,(gr)/Missions,(fr)/Missions
+XSTR_469,Never,(gr)Never,(fr)Never
+XSTR_470,Before Game,(gr)Before Game,(fr)Before Game
+XSTR_471,IP Address,(gr)IP Address,(fr)IP Address
+XSTR_472,Broadcast Locally,(gr)Broadcast Locally,(fr)Broadcast Locally
+XSTR_473,Login,(gr)Login,(fr)Login
+XSTR_474,Password,(gr)Password,(fr)Password
+XSTR_475,Object Update,(gr)Object Update,(fr)Object Update
+XSTR_476,Pilot / Squad Images,(gr)Pilot / Squad Images,(fr)Pilot / Squad Images
+XSTR_477,Transfer Missions,(gr)Transfer Missions,(fr)Transfer Missions
+XSTR_478,Flush Cache,(gr)Flush Cache,(fr)Flush Cache
+XSTR_479,Mute,(gr)Mute,(fr)Mute
+XSTR_480,Mic Test,(gr)Mic Test,(fr)Mic Test
+XSTR_481,Quality,(gr)Quality,(fr)Quality
+XSTR_482,Ignore,(gr)Ignore,(fr)Ignore
+XSTR_483,Enter Password,(gr)Enter Password,(fr)Enter Password
+XSTR_484,Exit Mission,(gr)Exit Mission,(fr)Exit Mission
+XSTR_485,Mission Paused,(gr)Mission Paused,(fr)Mission Paused
+XSTR_486,Stats,(gr)Stats,(fr)Stats
+XSTR_487,Available Ships,(gr)Available Ships,(fr)Available Ships
+XSTR_488,Type,(gr)Type,(fr)Type
+XSTR_489,Length,(gr)Length,(fr)Length
+XSTR_490,Max Velocity,(gr)Max Velocity,(fr)Max Velocity
+XSTR_491,Maneuverability,(gr)Maneuverability,(fr)Maneuverability
+XSTR_492,Armor,(gr)Armor,(fr)Armor
+XSTR_493,Gun Mounts,(gr)Gun Mounts,(fr)Gun Mounts
+XSTR_494,Missile Banks,(gr)Missile Banks,(fr)Missile Banks
+XSTR_495,Manufacturer,(gr)Manufacturer,(fr)Manufacturer
+XSTR_496,@ship_name,(gr)@ship_name,(fr)@ship_name
+XSTR_497,@ship_Type,(gr)@ship_Type,(fr)@ship_Type
+XSTR_498,@ship_Maneuverability,(gr)@ship_Maneuverability,(fr)@ship_Maneuverability
+XSTR_499,@ship_Armor,(gr)@ship_Armor,(fr)@ship_Armor
+XSTR_500,@ship_Manufacturer,(gr)@ship_Manufacturer,(fr)@ship_Manufacturer
+XSTR_501,@ship_desc,(gr)@ship_desc,(fr)@ship_desc
+XSTR_502,Lock Players,(gr)Lock Players,(fr)Lock Players
+XSTR_503,Ship Information,(gr)Ship Information,(fr)Ship Information
+XSTR_504,Alpha,(gr)Alpha,(fr)Alpha
+XSTR_505,Beta,(gr)Beta,(fr)Beta
+XSTR_506,Gamma,(gr)Gamma,(fr)Gamma
+XSTR_507,Ships,(gr)Ships,(fr)Ships
+XSTR_508,Species,(gr)Species,(fr)Species
+XSTR_509,GTA Technical Database,(gr)GTA Technical Database,(fr)GTA Technical Database
+XSTR_510,Play,(gr)Play,(fr)Play
+XSTR_511,Cutscene Description,(gr)Cutscene Description,(fr)Cutscene Description
+XSTR_512,@weapon_name,(gr)@weapon_name,(fr)@weapon_name
+XSTR_513,@weapon_desc,(gr)@weapon_desc,(fr)@weapon_desc
+XSTR_514,"Willfully firing on allied ships is a capital offense, punishable by death.  You are hereby stripped of your rank and your citizenship in the GTA.  You will appear at 0700 hours at the League of Defense Justice Ministry for your court martial.","(gr)Willfully firing on allied ships is a capital offense, punishable by death.  You are hereby stripped of your rank and your citizenship in the GTA.  You will appear at 0700 hours at the League of Defense Justice Ministry for your court martial.","(fr)Willfully firing on allied ships is a capital offense, punishable by death.  You are hereby stripped of your rank and your citizenship in the GTA.  You will appear at 0700 hours at the League of Defense Justice Ministry for your court martial."
+XSTR_515,Don't fire upon friendly ships.,(gr)Don't fire upon friendly ships.,(fr)Don't fire upon friendly ships.
+XSTR_516,GTW ML-16 Laser,(gr)GTW ML-16 Laser,(fr)GTW ML-16 Laser
+XSTR_519,GTW-41 Disruptor Cannon,(gr)GTW-41 Disruptor Cannon,(fr)GTW-41 Disruptor Cannon
+XSTR_522,GTW-41x Advanced Disruptor,(gr)GTW-41x Advanced Disruptor,(fr)GTW-41x Advanced Disruptor
+XSTR_525,GTW-15 Avenger Cannon,(gr)GTW-15 Avenger Cannon,(fr)GTW-15 Avenger Cannon
+XSTR_528,GTW-32 Flail Rifle,(gr)GTW-32 Flail Rifle,(fr)GTW-32 Flail Rifle
+XSTR_531,GTW-5 Prometheus Cannon,(gr)GTW-5 Prometheus Cannon,(fr)GTW-5 Prometheus Cannon
+XSTR_534,GTW-7 Banshee,(gr)GTW-7 Banshee,(fr)GTW-7 Banshee
+XSTR_537,GTW-99 Shield Breaker,(gr)GTW-99 Shield Breaker,(fr)GTW-99 Shield Breaker
+XSTR_540,GTW-43 Leech Cannon,(gr)GTW-43 Leech Cannon,(fr)GTW-43 Leech Cannon
+XSTR_542,GTM MX-50,(gr)GTM MX-50,(fr)GTM MX-50
+XSTR_545,GTM-31 Disruptor Missile,(gr)GTM-31 Disruptor Missile,(fr)GTM-31 Disruptor Missile
+XSTR_548,GTM-3 Fury Missile,(gr)GTM-3 Fury Missile,(fr)GTM-3 Fury Missile
+XSTR_551,GTM-4 Hornet Swarm Missile,(gr)GTM-4 Hornet Swarm Missile,(fr)GTM-4 Hornet Swarm Missile
+XSTR_554,GTM-9 Interceptor,(gr)GTM-9 Interceptor,(fr)GTM-9 Interceptor
+XSTR_557,GTM Phoenix V,(gr)GTM Phoenix V,(fr)GTM Phoenix V
+XSTR_560,GTM-1 Synaptic Bomb,(gr)GTM-1 Synaptic Bomb,(fr)GTM-1 Synaptic Bomb
+XSTR_563,GTM-43 Stiletto,(gr)GTM-43 Stiletto,(fr)GTM-43 Stiletto
+XSTR_566,GTM-86 Cluster Bomb,(gr)GTM-86 Cluster Bomb,(fr)GTM-86 Cluster Bomb
+XSTR_569,GTM-3 Tsunami Bomb,(gr)GTM-3 Tsunami Bomb,(fr)GTM-3 Tsunami Bomb
+XSTR_572,GTM-N1 Harbinger Bomb,(gr)GTM-N1 Harbinger Bomb,(fr)GTM-N1 Harbinger Bomb
+XSTR_575,GTM-11 EM Pulse,(gr)GTM-11 EM Pulse,(fr)GTM-11 EM Pulse
+XSTR_578,GTM-84 Corkscrew Missile,(gr)GTM-84 Corkscrew Missile,(fr)GTM-84 Corkscrew Missile
+XSTR_579,Wacky fun corkscrew missiles,(gr)Wacky fun corkscrew missiles,(fr)Wacky fun corkscrew missiles
+XSTR_580,Developed by the GTI for Silent Threat. Deemed too wacky for final release.,(gr)Developed by the GTI for Silent Threat. Deemed too wacky for final release.,(fr)Developed by the GTI for Silent Threat. Deemed too wacky for final release.
+"When you see Kilrathi stealth fighters, be careful. When you don't see them, be twice as careful. ","When you see Kilrathi stealth fighters, be careful. When you don't see them, be twice as careful. ",,
+"Mortally wounded Kilrathi fighters might try to kamikaze with you. Try staying out of their way, if possible.","Mortally wounded Kilrathi fighters might try to kamikaze with you. Try staying out of their way, if possible.",,
+"Capship Anti-Matter batteries typically aren't fast enough to target you, but their tachyon batteries can. They are the white bolts that strip away your shields after a few hits.","Capship Anti-Matter batteries typically aren't fast enough to target you, but their tachyon batteries can. They are the white bolts that strip away your shields after a few hits.",,
+Getting hit by missiles is a bad thing. ,Getting hit by missiles is a bad thing. ,,
+Please try to keep your wingmen alive. It gives the Kilrathi another target to shoot at.,Please try to keep your wingmen alive. It gives the Kilrathi another target to shoot at.,,
+Incoming fire works both ways.,Incoming fire works both ways.,,
+"Attacking heavy fighters and torpedo bombers from the rear probably isn't the best approach of attack, since they got rear turrets and all.","Attacking heavy fighters and torpedo bombers from the rear probably isn't the best approach of attack, since they got rear turrets and all.",,
+"Take care of your capship, and your capship will take care of you.","Take care of your capship, and your capship will take care of you.",,
+"If your radar is jammed, there's probably an electronic warfare craft loitering around.","If your radar is jammed, there's probably an electronic warfare craft loitering around.",,
+The Kilrathi is never as dumb as you hoped.,The Kilrathi is never as dumb as you hoped.,,
+There is no such thing as too many missiles.,There is no such thing as too many missiles.,,
+There are never enough decoys.,There are never enough decoys.,,
+"Enemy capships have point defense systems that can shoot down torpedoes. Release your warheads appropriately. Oh, and try not to get caught up in the blast will ya?","Enemy capships have point defense systems that can shoot down torpedoes. Release your warheads appropriately. Oh, and try not to get caught up in the blast will ya?",,
+"Kilrathi Aces are generally not social and friendly folk, and should be treated accordingly.","Kilrathi Aces are generally not social and friendly folk, and should be treated accordingly.",,
+"When you see a Kilrathi dreadnought, RUN!","When you see a Kilrathi dreadnought, RUN!",,
+"If you spend way too much time trying to chase down a light fighter, chances are his buddy is sneaking up on you.","If you spend way too much time trying to chase down a light fighter, chances are his buddy is sneaking up on you.",,
+"If you're in a light fighter, don't fight head on with a heavy fighter. You won't win.","If you're in a light fighter, don't fight head on with a heavy fighter. You won't win.",,
+"If the Kilrathi are in missile range, so are you!","If the Kilrathi are in missile range, so are you!",,
+The easy nav route is always mined.,The easy nav route is always mined.,,
+All warfare is based on deception. The main challenge is being able to fool the Kilrathi and not yourself.,All warfare is based on deception. The main challenge is being able to fool the Kilrathi and not yourself.,,
+Your shields failing is usually a sign that you're being fired upon.,Your shields failing is usually a sign that you're being fired upon.,,
+"The bigger the carrier, the more torpedoes the Kilrathi will launch at it.","The bigger the carrier, the more torpedoes the Kilrathi will launch at it.",,
+"Don't think of it as being outnumbered, Think of it as having a wider target selection.","Don't think of it as being outnumbered, Think of it as having a wider target selection.",,
+A retreating Kilrathi squadron is really falling back and regrouping... and calling in for backup.,A retreating Kilrathi squadron is really falling back and regrouping... and calling in for backup.,,
+"When you have plenty of missiles, you never miss. When you're low on missiles, you can't hit the broadside of a dreadnought.","When you have plenty of missiles, you never miss. When you're low on missiles, you can't hit the broadside of a dreadnought.",,
+"There's always a way to defeat the Kilrathi, and it normally doesn't work.","There's always a way to defeat the Kilrathi, and it normally doesn't work.",,
+Ejecting right before the Kilrathi destroys your fighter typically means you have 10 more seconds to live.,Ejecting right before the Kilrathi destroys your fighter typically means you have 10 more seconds to live.,,
+The cavalry doesn't always come to the rescue.,The cavalry doesn't always come to the rescue.,,
+The capship that usually blows up when you need it most is the carrier.,The capship that usually blows up when you need it most is the carrier.,,
+"If your ambush is properly set, the Kilrathi won't fly into it.","If your ambush is properly set, the Kilrathi won't fly into it.",,
+"If your attack is going well, it is an ambush.","If your attack is going well, it is an ambush.",,
+"When unsure of the enemy fighter's location, look behind you.","When unsure of the enemy fighter's location, look behind you.",,
+The Kilrathi always attacks on two occasions. One is when you're ready. The second is when you aren't.,The Kilrathi always attacks on two occasions. One is when you're ready. The second is when you aren't.,,
+Try to look unimportant. They may be low on missiles.,Try to look unimportant. They may be low on missiles.,,
+"Anything you do can get you killed, including nothing.","Anything you do can get you killed, including nothing.",,
+"The only thing more accurate then incoming enemy fire, is incoming friendly fire.","The only thing more accurate then incoming enemy fire, is incoming friendly fire.",,
+No combat ready squadron has passed inspection.,No combat ready squadron has passed inspection.,,
+No inspection ready squadron has passed combat.,No inspection ready squadron has passed combat.,,
+Shipkiller torpedoes are very accurate. They always hit the Kilrathi's point defense laser blasts.,Shipkiller torpedoes are very accurate. They always hit the Kilrathi's point defense laser blasts.,,
+"Don't look conspicuous, it draws fire.","Don't look conspicuous, it draws fire.",,
+Never draw fire. It irritates everyone around you.,Never draw fire. It irritates everyone around you.,,
+"If you're short of everything but the enemy, you're in a combat zone.","If you're short of everything but the enemy, you're in a combat zone.",,
+Friendly fire isn't.,Friendly fire isn't.,,
+Incoming fire has the right of way.,Incoming fire has the right of way.,,
+Your fighter was bought by the lowest bidder.,Your fighter was bought by the lowest bidder.,,
+WING COMMANDER SAGA: THE DARKEST DAWN,WING COMMANDER SAGA: THE DARKEST DAWN,,
+Producers,Producers,,
+Technical Managers,Technical Managers,,
+Lead Writer,Lead Writer,,
+Writers,Writers,,
+Assisting Writers,Assisting Writers,,
+Lead Mission Designer,Lead Mission Designer,,
+Mission Designer,Mission Designer,,
+Assisting Mission Designers,Assisting Mission Designers,,
+Lead Programmer,Lead Programmer,,
+Programmer,Programmer,,
+Lead 3D Artist,Lead 3D Artist,,
+3D Artists,3D Artists,,
+Assisting 3D Artists,Assisting 3D Artists,,
+Lead 2D Artist,Lead 2D Artist,,
+2D Artists,2D Artists,,
+Assisting 2D Artists,Assisting 2D Artists,,
+Lead Cinematic Animator,Lead Cinematic Animator,,
+Cinematic Animators,Cinematic Animators,,
+Lead Audio Designer,Lead Audio Designer,,
+Audio Designers,Audio Designers,,
+Lead Composers,Lead Composers,,
+Composers,Composers,,
+Assisting Composer,Assisting Composer,,
+Voice Casting Coordinator,Voice Casting Coordinator,,
+Dialog Project Manager,Dialog Project Manager,,
+Additional Artwork,Additional Artwork,,
+Lead Quality Assurance Manager,Lead Quality Assurance Manager,,
+Quality Assurance Manager,Quality Assurance Manager,,
+Lead Quality Assurance Tester,Lead Quality Assurance Tester,,
+Quality Assurance Testers,Quality Assurance Testers,,
+Lead Community Manager,Lead Community Manager,,
+Community Manager,Community Manager,,
+Wing Commander Saga Cast,Wing Commander Saga Cast,,
+David 'Sandman' Markham,David 'Sandman' Markham,,
+Kenny 'Kettle' Baws,Kenny 'Kettle' Baws,,
+John 'Little John' Gerhardt,John 'Little John' Gerhardt,,
+Shane 'Ranger' Walker,Shane 'Ranger' Walker,,
+Jason 'Codiene' Delaney,Jason 'Codiene' Delaney,,
+Johann 'Mastermind' Ramius,Johann 'Mastermind' Ramius,,
+Nick 'Venom' Jones,Nick 'Venom' Jones,,
+William 'Tresh' Klier,William 'Tresh' Klier,,
+Marcus 'Viking' Snyder,Marcus 'Viking' Snyder,,
+Jonathan 'Assassin' Chaplin,Jonathan 'Assassin' Chaplin,,
+Alec 'Ninja' Crisologo,Alec 'Ninja' Crisologo,,
+Justin 'Phalanx' Sanger,Justin 'Phalanx' Sanger,,
+Danny 'Psychopath' Liu,Danny 'Psychopath' Liu,,
+Bradley 'Avatarr' Alistar,Bradley 'Avatarr' Alistar,,
+Robert 'Greywolf' McDermott,Robert 'Greywolf' McDermott,,
+Haley 'Honeybear' Hasselbeck,Haley 'Honeybear' Hasselbeck,,
+Gregory 'M.D.' House,Gregory 'M.D.' House,,
+Marianne 'Twilight' Anderson,Marianne 'Twilight' Anderson,,
+Jessica 'Valkyrie' Wagner,Jessica 'Valkyrie' Wagner,,
+Kramm 'Deathfang' nar Caxki,Kramm 'Deathfang' nar Caxki,,
+Kate Sweeney,Kate Sweeney,,
+Michael Moran,Michael Moran,,
+John 'Jack' Rumley III,John 'Jack' Rumley III,,
+Additional voices,Additional voices,,
+Wing Commander Saga Special Thanks,Wing Commander Saga Special Thanks,,
+Very Special Thanks,Very Special Thanks,,
+Very Very Special Thanks,Very Very Special Thanks,,
+All marks and trademarks are the property of their respective owners.,All marks and trademarks are the property of their respective owners.,,

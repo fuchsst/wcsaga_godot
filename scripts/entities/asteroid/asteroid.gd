@@ -5,7 +5,7 @@ extends RigidBody3D
 ## Handles LOD switching, physics, and damage logic
 ## Attached to the root RigidBody3D of the asteroid scene
 
-const AsteroidData = preload("res://scripts/resources/environment/asteroid_data.gd")
+const AsteroidData = preload("res://scripts/resources/asteroids/asteroid_data.gd")
 
 @export var asteroid_data: AsteroidData ## The data resource for this asteroid
 @export var variations: Array[Node3D] = [] ## References to variation child nodes

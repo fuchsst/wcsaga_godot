@@ -3,7 +3,7 @@ extends "res://addons/wcs_import/parsers/base_parser.gd"
 
 ## Parser for weapons.tbl files.
 ## Converts weapon data into WeaponData resources.
-
+const WCSWeaponData = preload("res://scripts/resources/weapons/weapon_data.gd")
 func _parse_content() -> Variant:
 	var weapons: Array[WCSWeaponData] = []
 	

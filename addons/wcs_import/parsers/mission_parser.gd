@@ -4,10 +4,11 @@ extends "res://addons/wcs_import/parsers/base_parser.gd"
 ## Parser for Freespace 2 mission files (.fs2).
 ## Converts mission data into MissionManifest resources.
 
-const MissionObject = preload("res://scripts/resources/gameplay/mission/mission_object.gd")
-const MissionWing = preload("res://scripts/resources/gameplay/mission/mission_wing.gd")
-const MissionEvent = preload("res://scripts/resources/gameplay/mission/mission_event.gd")
-const MissionMessage = preload("res://scripts/resources/gameplay/mission/mission_message.gd")
+const MissionObject = preload("res://scripts/resources/missions/mission_object.gd")
+const MissionWing = preload("res://scripts/resources/missions/mission_wing.gd")
+const MissionEvent = preload("res://scripts/resources/missions/mission_event.gd")
+const MissionMessage = preload("res://scripts/resources/missions/mission_message.gd")
+const MissionManifest = preload("res://scripts/resources/missions/mission_manifest.gd")
 const WCSPathResolver = preload("res://addons/wcs_import/core/path_resolver.gd")
 
 func _parse_content() -> Variant:

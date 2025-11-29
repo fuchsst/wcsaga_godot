@@ -7,7 +7,7 @@ extends "res://addons/wcs_import/parsers/base_parser.gd"
 ## (one for each difficulty: Trainee, Rookie, Hotshot, Ace, Insane).
 ## Each AI class (e.g., "Coward", "Ace") becomes 5 separate resources.
 
-const AIClassResource = preload("res://scripts/resources/gameplay/ai_class_resource.gd")
+const AIClassResource = preload("res://scripts/resources/ai_classes/ai_class_resource.gd")
 
 const DIFFICULTY_LEVELS = ["1_very_easy", "2_easy", "3_medium", "4_hard", "5_insane"]
 

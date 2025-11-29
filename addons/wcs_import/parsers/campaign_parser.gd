@@ -3,13 +3,11 @@ extends "res://addons/wcs_import/parsers/base_parser.gd"
 
 ## Parser for Freespace 2 campaign files (.fc2).
 
-func _parse_content() -> Dictionary:
-	var campaign_data = {
-		"name": "",
-		"type": "",
-		"description": "",
-		"missions": []
-	}
+const CampaignManifest = preload("res://scripts/resources/campaigns/campaign_manifest.gd")
+const CampaignMission = preload("res://scripts/resources/campaigns/campaign_mission.gd")
+
+func _parse_content() -> Variant:
+	var manifest = CampaignManifest.new()
 	
 	_current_line_index = 0
 	
@@ -20,12 +18,15 @@ func _parse_content() -> Dictionary:
 			continue
 			
 		if line.begins_with("$Name:"):
-			campaign_data["name"] = _extract_string_value(line, "$Name:")
+			manifest.campaign_name = _extract_string_value(line, "$Name:")
 		elif line.begins_with("$Type:"):
-			campaign_data["type"] = _extract_string_value(line, "$Type:")
+			manifest.campaign_type = _extract_string_value(line, "$Type:")
 		elif line.begins_with("+Description:"):
-			campaign_data["description"] = _extract_string_value(line, "+Description:")
+			manifest.description = _extract_string_value(line, "+Description:")
 		elif line.begins_with("$Mission:"):
-			campaign_data["missions"].append(_extract_string_value(line, "$Mission:"))
+			var mission_name = _extract_string_value(line, "$Mission:")
+			var mission = CampaignMission.new()
+			mission.mission_name = mission_name
+			manifest.missions.append(mission)
 			
-	return {"campaign": campaign_data}
+	return manifest

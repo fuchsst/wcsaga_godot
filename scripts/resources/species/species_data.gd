@@ -7,131 +7,131 @@ extends "res://scripts/resources/core/wcs_base_resource.gd"
 
 # === IDENTITY AND CULTURE ===
 @export_group("Identity", "identity_")
-@export var species_name: String = ""                     # Display name (Terran, Kilrathi)
-@export var species_internal_id: int = 0                  # Internal species identifier
-@export var species_mnemonic: String = ""                 # Short code (TERRAN, KILRATHI)
-@export var is_playable: bool = false                     # Available for player selection
-@export var species_description: String = ""              # General description of species
-@export var cultural_background: String = ""              # Cultural/historical background
-@export var home_world_name: String = ""                  # Cross-reference to stellar object
-@export var government_type: String = ""                  # Political system structure
-@export var founding_year: int = 0                        # Calendar year of founding
+@export var species_name: String = "" # Display name (Terran, Kilrathi)
+@export var species_internal_id: int = 0 # Internal species identifier
+@export var species_mnemonic: String = "" # Short code (TERRAN, KILRATHI)
+@export var is_playable: bool = false # Available for player selection
+@export var species_description: String = "" # General description of species
+@export var cultural_background: String = "" # Cultural/historical background
+@export var home_world_name: String = "" # Cross-reference to stellar object
+@export var government_type: String = "" # Political system structure
+@export var founding_year: int = 0 # Calendar year of founding
 
 # === MILITARY DOCTRINE ===
 @export_group("Military Doctrine", "military_")
-@export var military_doctrine: String = ""                # Aggressive, Defensive, Balanced
-@export var ship_design_philosophy: String = ""           # Speed vs Armor vs Firepower focus
-@export var fleet_composition_preference: String = ""     # Preferred fleet mix
-@export var preferred_combat_range: float = 600.0         # Optimal engagement range (meters)
-@export var fighter_tactics: String = ""                  # Swarm, Hit-and-run, Dogfighting
-@export var capital_ship_tactics: String = ""             # Broadside, Artillery, Carrier-based
-@export var boarding_preference: String = ""               # Boarding combat style
-@export var retreat_threshold: float = 0.3                # When to retreat (0.0-1.0)
+@export var military_doctrine: String = "" # Aggressive, Defensive, Balanced
+@export var ship_design_philosophy: String = "" # Speed vs Armor vs Firepower focus
+@export var fleet_composition_preference: String = "" # Preferred fleet mix
+@export var preferred_combat_range: float = 600.0 # Optimal engagement range (meters)
+@export var fighter_tactics: String = "" # Swarm, Hit-and-run, Dogfighting
+@export var capital_ship_tactics: String = "" # Broadside, Artillery, Carrier-based
+@export var boarding_preference: String = "" # Boarding combat style
+@export var retreat_threshold: float = 0.3 # When to retreat (0.0-1.0)
 
 # === TECHNOLOGY LEVELS ===
 @export_group("Technology", "tech_")
-@export var energy_weapon_preference: float = 0.5         # 0.0=Kinetic, 1.0=Energy preference
-@export var shield_technology_level: int = 3              # 1-5 scale
-@export var armor_technology_level: int = 3               # 1-5 scale
-@export var engine_technology_level: int = 3              # 1-5 scale
-@export var ai_development_level: int = 3                 # 1-5 scale
-@export var sensor_technology_level: int = 3               # 1-5 scale
-@export var communication_technology_level: int = 3        # 1-5 scale
-@export var manufacturing_technology_level: int = 3        # 1-5 scale
-@export var research_efficiency_level: int = 3             # 1-5 scale
+@export var energy_weapon_preference: float = 0.5 # 0.0=Kinetic, 1.0=Energy preference
+@export var shield_technology_level: int = 3 # 1-5 scale
+@export var armor_technology_level: int = 3 # 1-5 scale
+@export var engine_technology_level: int = 3 # 1-5 scale
+@export var ai_development_level: int = 3 # 1-5 scale
+@export var sensor_technology_level: int = 3 # 1-5 scale
+@export var communication_technology_level: int = 3 # 1-5 scale
+@export var manufacturing_technology_level: int = 3 # 1-5 scale
+@export var research_efficiency_level: int = 3 # 1-5 scale
 
 # === SHIP CONSTRUCTION ===
 @export_group("Shipbuilding", "shipbuilding_")
-@export var preferred_ship_tonnage: String = ""           # Light/Medium/Heavy preference
+@export var preferred_ship_tonnage: String = "" # Light/Medium/Heavy preference
 @export var ship_material_preferences: Array[String] = [] # Preferred construction materials
-@export var reactor_type_preference: String = ""           # Preferred power systems
-@export var weapon_mount_style: String = ""               # Preferred weapon configurations
-@export var defensive_system_priority: String = ""        # Shields vs Armor priority
-@export var fighter_design_schools: Array[String] = []    # Fighter design philosophies
-@export var capital_design_schools: Array[String] = []    # Capital ship design philosophies
+@export var reactor_type_preference: String = "" # Preferred power systems
+@export var weapon_mount_style: String = "" # Preferred weapon configurations
+@export var defensive_system_priority: String = "" # Shields vs Armor priority
+@export var fighter_design_schools: Array[String] = [] # Fighter design philosophies
+@export var capital_design_schools: Array[String] = [] # Capital ship design philosophies
 
 # === VISUAL IDENTITY ===
 @export_group("Visual Identity", "visual_")
-@export var hull_color_primary: Color = Color(0, 100, 255)    # Primary hull color
+@export var hull_color_primary: Color = Color(0, 100, 255) # Primary hull color
 @export var hull_color_secondary: Color = Color(150, 200, 255) # Secondary hull color
-@export var hud_color_primary: Color = Color(0, 100, 255)     # Species UI color
+@export var hud_color_primary: Color = Color(0, 100, 255) # Species UI color
 @export var hud_color_secondary: Color = Color(150, 200, 255) # Secondary UI color
-@export var engine_exhaust_color: Color = Color(255, 200, 0)   # Engine exhaust color
-@export var shield_visual_effect: String = ""                 # Cross-reference to effect
-@export var ship_styling_keywords: Array[String] = []          # Visual design descriptors
-@export var cultural_aesthetics: String = ""                  # Cultural design principles
+@export var engine_exhaust_color: Color = Color(255, 200, 0) # Engine exhaust color
+@export var shield_visual_effect: String = "" # Cross-reference to effect
+@export var ship_styling_keywords: Array[String] = [] # Visual design descriptors
+@export var cultural_aesthetics: String = "" # Cultural design principles
 
 # === DIPLOMATIC RELATIONSHIPS ===
 @export_group("Diplomacy", "diplomacy_")
-@export var default_iff_status: Dictionary = {}              # Species -> relationship mapping
-@export var diplomatic_stance: String = ""                   # Current diplomatic posture
-@export var alliance_demands: Array[String] = []             # Requirements for alliance
-@export var betrayal_tolerance: float = 0.2                  # 0.0=Unforgiving, 1.0=Always forgive
-@export var war_preparation_time_months: int = 6             # Months to prepare for war
-@export var peace_negotiation_willingness: float = 0.5       # Willingness to negotiate peace
-@export var trade_preference_list: Array[String] = []        # Preferred trade goods
-@export var embargo_targets: Array[String] = []             # Who they embargo
+@export var default_iff_status: Dictionary = {} # Species -> relationship mapping
+@export var diplomatic_stance: String = "" # Current diplomatic posture
+@export var alliance_demands: Array[String] = [] # Requirements for alliance
+@export var betrayal_tolerance: float = 0.2 # 0.0=Unforgiving, 1.0=Always forgive
+@export var war_preparation_time_months: int = 6 # Months to prepare for war
+@export var peace_negotiation_willingness: float = 0.5 # Willingness to negotiate peace
+@export var trade_preference_list: Array[String] = [] # Preferred trade goods
+@export var embargo_targets: Array[String] = [] # Who they embargo
 
 # === AI PERSONALITY SYSTEM ===
 @export_group("AI Personality", "ai_")
-@export var base_ai_aggressiveness: float = 0.5             # Base aggression (0.0-1.0)
-@export var base_ai_skill_level: float = 0.7               # Base skill (0.0-1.0)
-@export var ai_reaction_time_factor: float = 1.0           # Reaction time multiplier
-@export var ai_targeting_accuracy_bonus: float = 0.0        # Accuracy modifier
-@export var ai_morale_factor: float = 1.0                   # Morale effect on performance
-@export var ai_tactical_adaptability: float = 0.5           # Adaptability to enemy tactics
-@export var ai_resource_conservation: float = 0.6           # Ammunition/fuel conservation
-@export var ai_specialization_focus: String = ""            # Tactical specialization
+@export var base_ai_aggressiveness: float = 0.5 # Base aggression (0.0-1.0)
+@export var base_ai_skill_level: float = 0.7 # Base skill (0.0-1.0)
+@export var ai_reaction_time_factor: float = 1.0 # Reaction time multiplier
+@export var ai_targeting_accuracy_bonus: float = 0.0 # Accuracy modifier
+@export var ai_morale_factor: float = 1.0 # Morale effect on performance
+@export var ai_tactical_adaptability: float = 0.5 # Adaptability to enemy tactics
+@export var ai_resource_conservation: float = 0.6 # Ammunition/fuel conservation
+@export var ai_specialization_focus: String = "" # Tactical specialization
 
 # === ECONOMIC FACTORS ===
 @export_group("Economics", "econ_")
-@export var resource_efficiency_multiplier: float = 1.0     # Ship cost multiplier
-@export var production_speed_multiplier: float = 1.0        # Build time multiplier
-@export var repair_efficiency_multiplier: float = 1.0       # Repair speed multiplier
-@export var research_cost_multiplier: float = 1.0           # Research cost modifier
-@export var trade_efficiency_multiplier: float = 1.0        # Trade profit modifier
-@export var population_growth_rate: float = 0.01            # Annual population growth
-@export var technological_advancement_rate: float = 0.02    # Tech advancement speed
+@export var resource_efficiency_multiplier: float = 1.0 # Ship cost multiplier
+@export var production_speed_multiplier: float = 1.0 # Build time multiplier
+@export var repair_efficiency_multiplier: float = 1.0 # Repair speed multiplier
+@export var research_cost_multiplier: float = 1.0 # Research cost modifier
+@export var trade_efficiency_multiplier: float = 1.0 # Trade profit modifier
+@export var population_growth_rate: float = 0.01 # Annual population growth
+@export var technological_advancement_rate: float = 0.02 # Tech advancement speed
 
 # === AUDIO CULTURE ===
 @export_group("Audio Culture", "audio_")
-@export var communication_sound_styles: Array[String] = []  # Cross-references to audio
-@export var music_preferences: Array[String] = []          # Preferred musical styles
-@export var victory_music_theme: String = ""               # Cross-reference to music
-@export var defeat_music_theme: String = ""                # Cross-reference to music
-@export var ambient_interior_sounds: Array[String] = []    # Ship interior ambience
-@export var bridge_command_sounds: Array[String] = []       # Command acknowledgment sounds
-@export var alert_sound_styles: Array[String] = []         # Alert notification styles
+@export var communication_sound_styles: Array[String] = [] # Cross-references to audio
+@export var music_preferences: Array[String] = [] # Preferred musical styles
+@export var victory_music_theme: String = "" # Cross-reference to music
+@export var defeat_music_theme: String = "" # Cross-reference to music
+@export var ambient_interior_sounds: Array[String] = [] # Ship interior ambience
+@export var bridge_command_sounds: Array[String] = [] # Command acknowledgment sounds
+@export var alert_sound_styles: Array[String] = [] # Alert notification styles
 
 # === SPECIAL CAPABILITIES ===
 @export_group("Special Abilities", "special_")
-@export var has_cloaking_technology: bool = false          # Access to cloaking tech
-@export var has_energy_shielding: bool = true              # Advanced shield systems
-@export var has_jump_drive_technology: bool = false        # Jump drive capability
-@export var has_artificial_gravity: bool = true            # Artificial gravity systems
-@export var has_advanced_sensors: bool = false             # Superior sensor technology
-@export var has_psionic_technology: bool = false           # Telepathic/psionic abilities
-@export var special_weapon_access: Array[String] = []      # Unique weapon technologies
-@export var unique_subsystems: Array[String] = []          # Species-specific subsystems
+@export var has_cloaking_technology: bool = false # Access to cloaking tech
+@export var has_energy_shielding: bool = true # Advanced shield systems
+@export var has_jump_drive_technology: bool = false # Jump drive capability
+@export var has_artificial_gravity: bool = true # Artificial gravity systems
+@export var has_advanced_sensors: bool = false # Superior sensor technology
+@export var has_psionic_technology: bool = false # Telepathic/psionic abilities
+@export var special_weapon_access: Array[String] = [] # Unique weapon technologies
+@export var unique_subsystems: Array[String] = [] # Species-specific subsystems
 
 # === STRATEGIC INTELLIGENCE ===
 @export_group("Strategic Intelligence", "strategic_")
-@export var fleet_size_preference: int = 12                # Preferred squadron size
-@export var formation_tactics: Array[String] = []          # Preferred formations
-@export var escort_behavior: String = ""                   # Escort mission preferences
-@export var patrol_patterns: Array[String] = []            # Patrol route preferences
-@export var ambush_preference: float = 0.3                 # Likelihood of ambush tactics
-@export var hit_and_run_preference: float = 0.4            # Preference for hit-and-run
-@export var resource_raiding_preference: float = 0.2       # Tendency to raid resources
+@export var fleet_size_preference: int = 12 # Preferred squadron size
+@export var formation_tactics: Array[String] = [] # Preferred formations
+@export var escort_behavior: String = "" # Escort mission preferences
+@export var patrol_patterns: Array[String] = [] # Patrol route preferences
+@export var ambush_preference: float = 0.3 # Likelihood of ambush tactics
+@export var hit_and_run_preference: float = 0.4 # Preference for hit-and-run
+@export var resource_raiding_preference: float = 0.2 # Tendency to raid resources
 
 # === HOMEWORLD CHARACTERISTICS ===
 @export_group("Homeworld", "homeworld_")
-@export var homeworld_climate: String = ""                 # Climate type
-@export var homeworld_gravity: float = 1.0                 # Standard gravity multiplier
-@export var homeworld_atmosphere: String = ""              # Atmosphere composition
+@export var homeworld_climate: String = "" # Climate type
+@export var homeworld_gravity: float = 1.0 # Standard gravity multiplier
+@export var homeworld_atmosphere: String = "" # Atmosphere composition
 @export var homeworld_temperature_range: Vector2 = Vector2(0, 30) # Temperature range
-@export var homeworld_dominant_terrain: String = ""        # Primary terrain type
-@export var homeworld_special_conditions: Array[String] = []      # Special environmental conditions
+@export var homeworld_dominant_terrain: String = "" # Primary terrain type
+@export var homeworld_special_conditions: Array[String] = [] # Special environmental conditions
 
 # Validation signals
 signal diplomacy_changed()
@@ -279,7 +279,7 @@ func _validate_ai_personality() -> void:
 	var ai_params = [
 		base_ai_aggressiveness,
 		base_ai_skill_level,
-		targeting_accuracy_bonus,
+		ai_targeting_accuracy_bonus,
 		ai_morale_factor,
 		ai_tactical_adaptability,
 		ai_resource_conservation
@@ -314,6 +314,17 @@ func _validate_economic_factors() -> void:
 	if technological_advancement_rate < 0 or technological_advancement_rate > 0.1:
 		_add_validation_warning("Technological advancement rate seems unusual")
 
+func _validate_special_capabilities() -> void:
+	"""Validate special capabilities"""
+	if not special_weapon_access.is_empty():
+		for weapon in special_weapon_access:
+			add_cross_reference_dependency(weapon)
+			
+	if not unique_subsystems.is_empty():
+		for subsystem in unique_subsystems:
+			# Assuming subsystems might be resources too, but for now just check they are strings
+			pass
+
 func _validate_audio_references() -> void:
 	"""Validate audio resource references"""
 	var audio_refs = []
@@ -347,7 +358,7 @@ func calculate_military_strength() -> float:
 	for tech in military_techs:
 		tech_sum += float(tech)
 
-	var tech_score = tech_sum / (military_techs.size() * 5.0)  # Max level is 5
+	var tech_score = tech_sum / (military_techs.size() * 5.0) # Max level is 5
 
 	# Factor in military doctrine
 	var doctrine_bonus = 0.0
@@ -418,12 +429,12 @@ func set_relationship_with(other_species: String, relationship: float) -> void:
 func is_hostile_to(other_species: String) -> bool:
 	"""Check if this species is hostile to another species"""
 	var relationship = get_relationship_with(other_species)
-	return relationship < -0.3  # Below -0.3 is considered hostile
+	return relationship < -0.3 # Below -0.3 is considered hostile
 
 func is_allied_with(other_species: String) -> bool:
 	"""Check if this species is allied with another species"""
 	var relationship = get_relationship_with(other_species)
-	return relationship > 0.7  # Above 0.7 is considered allied
+	return relationship > 0.7 # Above 0.7 is considered allied
 
 func get_combined_strength_score() -> float:
 	"""Calculate overall species strength considering military, economic, and technological factors"""

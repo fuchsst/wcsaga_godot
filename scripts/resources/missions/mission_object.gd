@@ -2,7 +2,7 @@ extends Resource
 class_name MissionObject
 
 ## Mission object/ship instance configuration
-
+const ObjectSubsystem = preload("res://scripts/resources/missions/object_subsystem.gd")
 # Basic Identity
 @export var object_name: String = ""
 @export var ship_class: String = ""

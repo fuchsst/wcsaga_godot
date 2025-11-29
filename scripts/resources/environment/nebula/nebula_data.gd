@@ -5,6 +5,8 @@
 class_name NebulaData
 extends "res://scripts/resources/core/wcs_base_resource.gd"
 
+const ShipStats = preload("res://scripts/resources/ships/ship_stats.gd")
+
 # === BASIC NEBULA PROPERTIES ===
 @export_group("Identity", "identity_")
 @export var nebula_name: String = "" # Nebula designation/name

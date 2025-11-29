@@ -6,7 +6,7 @@ extends "res://addons/wcs_import/parsers/base_parser.gd"
 ## The TBL format has multi-value fields where each flag has 5 values
 ## (one for each difficulty: Very Easy, Easy, Medium, Hard, Insane).
 
-const AIProfileResource = preload("res://scripts/resources/gameplay/ai_profile_resource.gd")
+const AIProfileResource = preload("res://scripts/resources/ai_profiles/ai_profile_resource.gd")
 
 const DIFFICULTY_LEVELS = ["1_very_easy", "2_easy", "3_medium", "4_hard", "5_insane"]
 

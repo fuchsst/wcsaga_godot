@@ -1,6 +1,8 @@
 class_name WCSShipParser
 extends "res://addons/wcs_import/parsers/base_parser.gd"
 
+const ShipStats = preload("res://scripts/resources/ships/ship_stats.gd")
+
 ## Parser for ships.tbl files.
 ## Converts ship data into ShipStats resources.
 

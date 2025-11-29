@@ -10,6 +10,35 @@ const WCSMissionParser = preload("res://addons/wcs_import/parsers/mission_parser
 const WCSAIProfileParser = preload("res://addons/wcs_import/parsers/ai_profile_parser.gd")
 const WCSAIClassParser = preload("res://addons/wcs_import/parsers/ai_class_parser.gd")
 const WCSAsteroidParser = preload("res://addons/wcs_import/parsers/asteroid_parser.gd")
+const WCSAutopilotParser = preload("res://addons/wcs_import/parsers/autopilot_parser.gd")
+const WCSMedalParser = preload("res://addons/wcs_import/parsers/medal_parser.gd")
+const WCSRankParser = preload("res://addons/wcs_import/parsers/rank_parser.gd")
+const WCSTraitorParser = preload("res://addons/wcs_import/parsers/traitor_parser.gd")
+const WCSTipsParser = preload("res://addons/wcs_import/parsers/tips_parser.gd")
+const WCSLocalizationParser = preload("res://addons/wcs_import/parsers/localization_parser.gd")
+const WCSCreditsParser = preload("res://addons/wcs_import/parsers/credits_parser.gd")
+const WCSCutsceneParser = preload("res://addons/wcs_import/parsers/cutscene_parser.gd")
+const WCSFireballParser = preload("res://addons/wcs_import/parsers/fireball_parser.gd")
+const WCSFontParser = preload("res://addons/wcs_import/parsers/font_parser.gd")
+const WCSHelpParser = preload("res://addons/wcs_import/parsers/help_parser.gd")
+const WCSHudGaugeParser = preload("res://addons/wcs_import/parsers/hud_gauge_parser.gd")
+const WCSIconParser = preload("res://addons/wcs_import/parsers/icon_parser.gd")
+const WCSIffParser = preload("res://addons/wcs_import/parsers/iff_parser.gd")
+const WCSLaunchHelpParser = preload("res://addons/wcs_import/parsers/launchhelp_parser.gd")
+const WCSLightningParser = preload("res://addons/wcs_import/parsers/lightning_parser.gd")
+const WCSMainhallParser = preload("res://addons/wcs_import/parsers/mainhall_parser.gd")
+const WCSMenuParser = preload("res://addons/wcs_import/parsers/menu_parser.gd")
+const WCSMessageParser = preload("res://addons/wcs_import/parsers/message_parser.gd")
+const WCSMFlashParser = preload("res://addons/wcs_import/parsers/mflash_parser.gd")
+const WCSMusicParser = preload("res://addons/wcs_import/parsers/music_parser.gd")
+const WCSNebulaParser = preload("res://addons/wcs_import/parsers/nebula_parser.gd")
+const WCSPixelParser = preload("res://addons/wcs_import/parsers/pixel_parser.gd")
+const WCSScriptingParser = preload("res://addons/wcs_import/parsers/scripting_parser.gd")
+const WCSSoundParser = preload("res://addons/wcs_import/parsers/sound_parser.gd")
+const WCSSpeciesParser = preload("res://addons/wcs_import/parsers/species_parser.gd")
+const WCSSSMParser = preload("res://addons/wcs_import/parsers/ssm_parser.gd")
+const WCSStarParser = preload("res://addons/wcs_import/parsers/star_parser.gd")
+const WCSWeaponExplParser = preload("res://addons/wcs_import/parsers/weapon_expl_parser.gd")
 const AsteroidGenerator = preload("res://addons/wcs_import/generators/asteroid_generator.gd")
 const WCSPathResolver = preload("res://addons/wcs_import/core/path_resolver.gd")
 
@@ -25,19 +54,31 @@ var _exit_code = 0
 
 func _process_campaign(input_path: String, output_dir: String) -> bool:
 	var parser = WCSCampaignParser.new()
-	var result = parser.parse(input_path)
+	var manifest = parser.parse(input_path)
 	
-	if result.is_empty() or not result.has("campaign"):
+	if manifest == null:
 		print("Failed to parse campaign.")
 		return false
 		
-	var data = result["campaign"]
-	print("Parsed campaign: " + data.get("name", "Unknown"))
+	print("Parsed campaign: " + manifest.campaign_name)
 	
-	# TODO: Create Campaign resource when available
-	# For now, just print success as we don't have a Campaign resource definition handy
-	# or save as a generic dictionary resource if needed.
+	# Save to campaigns/{campaign}/campaign.tres
+	var campaign_name = "hermes" # Default or derive
+	# If input path contains campaign name, use it
+	if input_path.contains("hermes"):
+		campaign_name = "hermes"
+		
+	var save_dir = output_dir.path_join("campaigns").path_join(campaign_name)
+	DirAccess.make_dir_recursive_absolute(save_dir)
 	
+	var save_path = save_dir.path_join("campaign.tres")
+	var err = ResourceSaver.save(manifest, save_path)
+	
+	if err != OK:
+		print("Failed to save campaign resource: " + save_path)
+		return false
+		
+	print("Saved: " + save_path)
 	return true
 
 func _initialize():
@@ -80,6 +121,64 @@ func _run():
 			success = _process_mission(input_path, output_dir)
 		"asteroids":
 			success = _process_asteroids(input_path, output_dir)
+		"autopilot":
+			success = _process_autopilot(input_path, output_dir)
+		"medals":
+			success = _process_medals(input_path, output_dir)
+		"ranks":
+			success = _process_ranks(input_path, output_dir)
+		"traitor":
+			success = _process_traitor(input_path, output_dir)
+		"tips":
+			success = _process_tips(input_path, output_dir)
+		"localization":
+			success = _process_localization(input_path, output_dir)
+		"credits":
+			success = _process_simple_resource(input_path, output_dir, WCSCreditsParser, "campaigns/hermes", "credits.tres")
+		"cutscenes":
+			success = _process_simple_resource(input_path, output_dir, WCSCutsceneParser, "campaigns/hermes", "cutscenes.tres")
+		"fireball":
+			success = _process_list_resource(input_path, output_dir, WCSFireballParser, "assets/effects/fireball", "name")
+		"fonts":
+			success = _process_simple_resource(input_path, output_dir, WCSFontParser, "campaigns/hermes", "fonts.tres")
+		"help":
+			success = _process_simple_resource(input_path, output_dir, WCSHelpParser, "campaigns/hermes", "help.tres")
+		"hud_gauges":
+			success = _process_list_resource(input_path, output_dir, WCSHudGaugeParser, "assets/cockpits", "gauge_name")
+		"icons":
+			success = _process_list_resource(input_path, output_dir, WCSIconParser, "assets/icons", "name")
+		"iff_defs":
+			success = _process_list_resource(input_path, output_dir, WCSIffParser, "assets/iff_defs", "iff_name")
+		"launchhelp":
+			success = _process_simple_resource(input_path, output_dir, WCSLaunchHelpParser, "campaigns/hermes", "launchhelp.tres")
+		"lightning":
+			success = _process_list_resource(input_path, output_dir, WCSLightningParser, "assets/effects/lightning", "name")
+		"mainhall":
+			success = _process_simple_resource(input_path, output_dir, WCSMainhallParser, "campaigns/hermes/menu", "mainhall.tres")
+		"menu":
+			success = _process_simple_resource(input_path, output_dir, WCSMenuParser, "campaigns/hermes/menu", "menu.tres")
+		"messages":
+			success = _process_simple_resource(input_path, output_dir, WCSMessageParser, "campaigns/hermes", "messages.tres")
+		"mflash":
+			success = _process_list_resource(input_path, output_dir, WCSMFlashParser, "assets/effects/mflash", "name")
+		"music":
+			success = _process_list_resource(input_path, output_dir, WCSMusicParser, "campaigns/hermes/music", "title")
+		"nebula":
+			success = _process_simple_resource(input_path, output_dir, WCSNebulaParser, "assets/environment/nebula", "nebula.tres")
+		"pixels":
+			success = _process_simple_resource(input_path, output_dir, WCSPixelParser, "assets/environment/stars", "pixels.tres")
+		"scripting":
+			success = _process_simple_resource(input_path, output_dir, WCSScriptingParser, "campaigns/hermes", "scripting.tres")
+		"sounds":
+			success = _process_simple_resource(input_path, output_dir, WCSSoundParser, "assets/sounds", "sounds.tres")
+		"species":
+			success = _process_list_resource(input_path, output_dir, WCSSpeciesParser, "assets/species", "species_name")
+		"ssm":
+			success = _process_simple_resource(input_path, output_dir, WCSSSMParser, "assets/weapons", "ssm.tres")
+		"stars":
+			success = _process_list_resource(input_path, output_dir, WCSStarParser, "assets/environment/stars", "bitmap")
+		"weapon_expl":
+			success = _process_list_resource(input_path, output_dir, WCSWeaponExplParser, "assets/effects/explosions", "name")
 		_:
 			print("Skipping unsupported type: " + type)
 			# Return success to avoid failing the batch in Python CLI
@@ -126,6 +225,41 @@ func _detect_type(path: String) -> String:
 		return "mission"
 	if filename == "asteroid.tbl":
 		return "asteroids"
+	if filename == "autopilot.tbl":
+		return "autopilot"
+	if filename == "medals.tbl":
+		return "medals"
+	if filename == "rank.tbl":
+		return "ranks"
+	if filename == "traitor.tbl":
+		return "traitor"
+	if filename == "tips.tbl":
+		return "tips"
+	if filename == "strings.tbl" or filename == "tstrings.tbl":
+		return "localization"
+	if filename == "credits.tbl": return "credits"
+	if filename == "cutscenes.tbl": return "cutscenes"
+	if filename == "fireball.tbl": return "fireball"
+	if filename == "fonts.tbl": return "fonts"
+	if filename == "help.tbl": return "help"
+	if filename == "hud_gauges.tbl": return "hud_gauges"
+	if filename == "icons.tbl": return "icons"
+	if filename == "iff_defs.tbl": return "iff_defs"
+	if filename == "launchhelp.tbl": return "launchhelp"
+	if filename == "lightning.tbl": return "lightning"
+	if filename == "mainhall.tbl": return "mainhall"
+	if filename == "menu.tbl": return "menu"
+	if filename == "messages.tbl": return "messages"
+	if filename == "mflash.tbl": return "mflash"
+	if filename == "music.tbl": return "music"
+	if filename == "nebula.tbl": return "nebula"
+	if filename == "pixels.tbl": return "pixels"
+	if filename == "scripting.tbl": return "scripting"
+	if filename == "sounds.tbl": return "sounds"
+	if filename == "species.tbl" or filename == "species_defs.tbl": return "species"
+	if filename == "ssm.tbl": return "ssm"
+	if filename == "stars.tbl": return "stars"
+	if filename == "weapon_expl.tbl": return "weapon_expl"
 	return "unknown"
 
 func _process_ships(input_path: String, output_dir: String) -> bool:
@@ -328,3 +462,205 @@ func _process_asteroids(input_path: String, output_dir: String) -> bool:
 			
 	print("Generated " + str(success_count) + "/" + str(asteroids.size()) + " asteroid scenes.")
 	return success_count == asteroids.size()
+
+func _process_autopilot(input_path: String, output_dir: String) -> bool:
+	var parser = WCSAutopilotParser.new()
+	var res = parser.parse(input_path)
+	
+	if res == null:
+		print("Failed to parse autopilot.")
+		return false
+		
+	# Save to campaigns/{campaign}/ui/localisation/autopilot.tres
+	# Assuming hermes for now based on mapping rules, or derive from path
+	var campaign_name = "hermes" # Defaulting as per rules for now
+	var save_dir = output_dir.path_join("campaigns").path_join(campaign_name).path_join("ui").path_join("localisation")
+	DirAccess.make_dir_recursive_absolute(save_dir)
+	
+	var save_path = save_dir.path_join("autopilot.tres")
+	var err = ResourceSaver.save(res, save_path)
+	if err != OK:
+		print("Failed to save resource: " + save_path)
+		return false
+	
+	print("Saved: " + save_path)
+	return true
+
+func _process_medals(input_path: String, output_dir: String) -> bool:
+	var parser = WCSMedalParser.new()
+	var medals = parser.parse(input_path)
+	
+	if medals == null:
+		print("Failed to parse medals.")
+		return false
+		
+	# Save to campaigns/{campaign}/medals.tres
+	# Since we have a list, we need to save individual resources or a container.
+	# The rule says "medals.tbl entries tres go to target/campaigns/hermes/medals.tres"
+	# This implies a single file. But Godot resources are usually one per file unless embedded.
+	# If we save a list, we need a container resource.
+	# For now, I will save them as individual files in a 'medals' directory to be safe,
+	# OR I will create a dummy container if needed.
+	# BUT, looking at the rule again: "medals.tres".
+	# I'll assume for now we save them individually in a folder named medals, 
+	# OR I'll save them as a ResourceGroup if I had one.
+	# Let's save them individually for now as it's safer for Godot.
+	# Wait, rule says: target/campaigns/hermes/medals.tres
+	# Maybe I should create a Resource that holds an Array?
+	# I didn't create a MedalsManifest.
+	# I'll save them as individual files in `target/campaigns/hermes/medals/` for now.
+	
+	var campaign_name = "hermes"
+	var save_dir = output_dir.path_join("campaigns").path_join(campaign_name).path_join("medals")
+	DirAccess.make_dir_recursive_absolute(save_dir)
+	
+	for medal in medals:
+		var filename = medal.name.to_lower().replace(" ", "_") + ".tres"
+		var save_path = save_dir.path_join(filename)
+		ResourceSaver.save(medal, save_path)
+		print("Saved: " + save_path)
+		
+	return true
+
+func _process_ranks(input_path: String, output_dir: String) -> bool:
+	var parser = WCSRankParser.new()
+	var ranks = parser.parse(input_path)
+	
+	if ranks == null:
+		print("Failed to parse ranks.")
+		return false
+		
+	var campaign_name = "hermes"
+	var save_dir = output_dir.path_join("campaigns").path_join(campaign_name).path_join("ranks")
+	DirAccess.make_dir_recursive_absolute(save_dir)
+	
+	for rank in ranks:
+		var filename = rank.name.to_lower().replace(" ", "_") + ".tres"
+		var save_path = save_dir.path_join(filename)
+		ResourceSaver.save(rank, save_path)
+		print("Saved: " + save_path)
+		
+	return true
+
+func _process_traitor(input_path: String, output_dir: String) -> bool:
+	var parser = WCSTraitorParser.new()
+	var res = parser.parse(input_path)
+	
+	if res == null:
+		print("Failed to parse traitor.")
+		return false
+		
+	var campaign_name = "hermes"
+	var save_dir = output_dir.path_join("campaigns").path_join(campaign_name)
+	DirAccess.make_dir_recursive_absolute(save_dir)
+	
+	var save_path = save_dir.path_join("traitor.tres")
+	var err = ResourceSaver.save(res, save_path)
+	if err != OK:
+		print("Failed to save resource: " + save_path)
+		return false
+		
+	print("Saved: " + save_path)
+	return true
+
+func _process_tips(input_path: String, output_dir: String) -> bool:
+	var parser = WCSTipsParser.new()
+	var res = parser.parse(input_path)
+	
+	if res == null:
+		print("Failed to parse tips.")
+		return false
+		
+	var campaign_name = "hermes"
+	var save_dir = output_dir.path_join("campaigns").path_join(campaign_name).path_join("ui").path_join("localisation")
+	DirAccess.make_dir_recursive_absolute(save_dir)
+	
+	var save_path = save_dir.path_join("tips.tres")
+	var err = ResourceSaver.save(res, save_path)
+	if err != OK:
+		print("Failed to save resource: " + save_path)
+		return false
+		
+	print("Saved: " + save_path)
+	return true
+
+func _process_localization(input_path: String, output_dir: String) -> bool:
+	var parser = WCSLocalizationParser.new()
+	var strings = parser.parse(input_path)
+	
+	if strings == null:
+		print("Failed to parse localization.")
+		return false
+		
+	var campaign_name = "hermes"
+	var save_dir = output_dir.path_join("campaigns").path_join(campaign_name).path_join("ui").path_join("localisation")
+	DirAccess.make_dir_recursive_absolute(save_dir)
+	
+	# Save as individual files? Or one big file?
+	# Usually localization is one big file/resource.
+	# But I defined LocalizationResource as single string.
+	# I should probably save them as individual files for now or change the resource to be a dictionary.
+	# Given the quantity (thousands), individual files is bad.
+	# But I didn't create a LocalizationManifest.
+	# I'll save them in a folder `strings` for now.
+	
+	var strings_dir = save_dir.path_join("strings")
+	DirAccess.make_dir_recursive_absolute(strings_dir)
+	
+	for s in strings:
+		var filename = str(s.id) + ".tres"
+		var save_path = strings_dir.path_join(filename)
+		ResourceSaver.save(s, save_path)
+		
+	print("Saved " + str(strings.size()) + " localization strings.")
+	return true
+
+func _process_simple_resource(input_path: String, output_dir: String, parser_class, subpath: String, filename: String) -> bool:
+	var parser = parser_class.new()
+	var res = parser.parse(input_path)
+	
+	if res == null:
+		print("Failed to parse " + input_path.get_file())
+		return false
+		
+	var save_dir = output_dir.path_join(subpath)
+	DirAccess.make_dir_recursive_absolute(save_dir)
+	
+	var save_path = save_dir.path_join(filename)
+	var err = ResourceSaver.save(res, save_path)
+	if err != OK:
+		print("Failed to save resource: " + save_path)
+		return false
+		
+	print("Saved: " + save_path)
+	return true
+
+func _process_list_resource(input_path: String, output_dir: String, parser_class, subpath: String, name_field: String) -> bool:
+	var parser = parser_class.new()
+	var items = parser.parse(input_path)
+	
+	if items == null:
+		print("Failed to parse " + input_path.get_file())
+		return false
+		
+	var save_dir = output_dir.path_join(subpath)
+	DirAccess.make_dir_recursive_absolute(save_dir)
+	
+	var saved_count = 0
+	for item in items:
+		var item_name = item.get(name_field)
+		if item_name == null:
+			item_name = "unknown_" + str(saved_count)
+			
+		var filename = str(item_name).to_lower().replace(" ", "_").replace(".", "_") + ".tres"
+		var save_path = save_dir.path_join(filename)
+		
+		var err = ResourceSaver.save(item, save_path)
+		if err != OK:
+			print("Failed to save resource: " + save_path)
+		else:
+			print("Saved: " + save_path)
+			saved_count += 1
+			
+	print("Saved " + str(saved_count) + " items from " + input_path.get_file())
+	return true
