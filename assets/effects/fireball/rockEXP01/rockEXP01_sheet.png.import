@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cc58gpsbqci8y"
-path="res://.godot/imported/WSCIcon.png-2768dcef2c1d3c38865b337a2ee698ab.ctex"
+uid="uid://kk4r384kfaxp"
+path="res://.godot/imported/rockEXP01_sheet.png-855667b1d8797fe8309c3f10a2c744e4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://WSCIcon.png"
-dest_files=["res://.godot/imported/WSCIcon.png-2768dcef2c1d3c38865b337a2ee698ab.ctex"]
+source_file="res://assets/effects/fireball/rockEXP01/rockEXP01_sheet.png"
+dest_files=["res://.godot/imported/rockEXP01_sheet.png-855667b1d8797fe8309c3f10a2c744e4.ctex"]
 
 [params]
 

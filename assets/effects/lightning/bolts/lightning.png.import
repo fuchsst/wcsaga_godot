@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cc58gpsbqci8y"
-path="res://.godot/imported/WSCIcon.png-2768dcef2c1d3c38865b337a2ee698ab.ctex"
+uid="uid://0tg0v8caq43v"
+path="res://.godot/imported/lightning.png-9308f006149c6a129cdef7595cb8bae0.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://WSCIcon.png"
-dest_files=["res://.godot/imported/WSCIcon.png-2768dcef2c1d3c38865b337a2ee698ab.ctex"]
+source_file="res://assets/effects/lightning/bolts/lightning.png"
+dest_files=["res://.godot/imported/lightning.png-9308f006149c6a129cdef7595cb8bae0.ctex"]
 
 [params]
 

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="LightningResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/effects/lightning/lightning_resource.gd" id="1_maa3f"]
+
+[resource]
+script = ExtResource("1_maa3f")
+name = "b_red"
+b_scale = 0.2
+b_shrink = 0.3
+b_poly_pct = 0.0075
+b_rand = 0.45
+b_add = 2.0
+b_strikes = 4
+b_lifetime = 0.2
+b_noise = 0.04
+b_texture = "lightning"
+b_glow = "beam-red"
+b_bright = 0.2

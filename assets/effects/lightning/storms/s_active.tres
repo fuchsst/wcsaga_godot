@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="LightningResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/effects/lightning/lightning_resource.gd" id="1_2hp5h"]
+
+[resource]
+script = ExtResource("1_2hp5h")
+name = "s_active"
+type = 1
+s_bolt_types = Array[String](["b_standard", "b_standard", "b_standard", "b_standard", "b_red"])
+s_flavor = Vector3(0, 500, 0)
+s_random_freq_min = 0.2
+s_random_freq_max = 0.4
+s_random_count_max = 4

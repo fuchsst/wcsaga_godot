@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cc58gpsbqci8y"
-path="res://.godot/imported/WSCIcon.png-2768dcef2c1d3c38865b337a2ee698ab.ctex"
+uid="uid://yn12xtw86jel"
+path="res://.godot/imported/exp07_sheet.png-0d9bf9ffa9d2a4c44b65d8731690e1b6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://WSCIcon.png"
-dest_files=["res://.godot/imported/WSCIcon.png-2768dcef2c1d3c38865b337a2ee698ab.ctex"]
+source_file="res://assets/effects/explosions/exp07/exp07_sheet.png"
+dest_files=["res://.godot/imported/exp07_sheet.png-0d9bf9ffa9d2a4c44b65d8731690e1b6.ctex"]
 
 [params]
 
