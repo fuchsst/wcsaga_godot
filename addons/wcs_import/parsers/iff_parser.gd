@@ -19,11 +19,11 @@ func _parse_content() -> Variant:
 			
 		if line.begins_with("$IFF Name:"):
 			current_iff = IffResource.new()
-			current_iff.iff_name = _extract_string_value(line, "$IFF Name:")
+			current_iff.name = _extract_string_value(line, "$IFF Name:")
 			iff_defs.append(current_iff)
 		elif current_iff:
 			if line.begins_with("$Color:"):
-				current_iff.color = _parse_color(line)
+				current_iff.display_color = _parse_color(line)
 			elif line.begins_with("+Flags:"):
 				# Parse flags if needed
 				pass

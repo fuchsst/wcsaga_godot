@@ -19,7 +19,7 @@ func _parse_content() -> Variant:
 			
 		if line.begins_with("$Bitmap:"):
 			current_star = StarBitmapData.new()
-			current_star.bitmap = _extract_string_value(line, "$Bitmap:")
+			current_star.filename = _extract_string_value(line, "$Bitmap:")
 			stars.append(current_star)
 				
 	return stars

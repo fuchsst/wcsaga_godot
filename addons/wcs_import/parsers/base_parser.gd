@@ -7,6 +7,7 @@ extends RefCounted
 var _content: String = ""
 var _lines: PackedStringArray = []
 var _current_line_index: int = 0
+var _file_path: String = ""
 
 func load_file(path: String) -> bool:
 	if not FileAccess.file_exists(path):
@@ -18,6 +19,7 @@ func load_file(path: String) -> bool:
 		push_error("Failed to open file: " + path)
 		return false
 		
+	_file_path = path
 	_content = file.get_as_text()
 	# Split by newline and filter empty lines if needed, 
 	# but keeping indices aligned might be better.

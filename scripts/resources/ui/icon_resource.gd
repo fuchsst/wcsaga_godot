@@ -7,7 +7,7 @@ extends "res://scripts/resources/core/wcs_base_resource.gd"
 ## Maps to icons.tbl
 
 @export_group("Icon")
-@export var icon_type: String = ""
+@export var name: String = ""
 @export var filename: String = ""
 
 func get_resource_type() -> String:

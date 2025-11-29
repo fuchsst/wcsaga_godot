@@ -39,7 +39,11 @@ const WCSSpeciesParser = preload("res://addons/wcs_import/parsers/species_parser
 const WCSSSMParser = preload("res://addons/wcs_import/parsers/ssm_parser.gd")
 const WCSStarParser = preload("res://addons/wcs_import/parsers/star_parser.gd")
 const WCSWeaponExplParser = preload("res://addons/wcs_import/parsers/weapon_expl_parser.gd")
+const WCSHudConfigParser = preload("res://addons/wcs_import/parsers/hud_config_parser.gd")
+const HudSceneGenerator = preload("res://addons/wcs_import/generators/hud_scene_generator.gd")
+const HudGaugeResource = preload("res://scripts/resources/ui/hud/hud_gauge_resource.gd")
 const AsteroidGenerator = preload("res://addons/wcs_import/generators/asteroid_generator.gd")
+const FireballGenerator = preload("res://addons/wcs_import/generators/fireball_generator.gd")
 const WCSPathResolver = preload("res://addons/wcs_import/core/path_resolver.gd")
 
 # Resource scripts
@@ -116,69 +120,77 @@ func _run():
 		"ai_profiles":
 			success = _process_ai_profiles(input_path, output_dir)
 		"ai_classes":
-			success = _process_ai_classes(input_path, output_dir)
-		"mission":
-			success = _process_mission(input_path, output_dir)
+			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes/ai_classes"), WCSAIClassParser, "", "class_name")
+		"ai_profiles":
+			success = _process_ai_profiles(input_path, _resolve_output_path(output_dir, "campaigns/hermes/ai_profiles"))
 		"asteroids":
-			success = _process_asteroids(input_path, output_dir)
+			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "assets/asteroids"), WCSAsteroidParser, "", "name")
 		"autopilot":
-			success = _process_autopilot(input_path, output_dir)
-		"medals":
-			success = _process_medals(input_path, output_dir)
-		"ranks":
-			success = _process_ranks(input_path, output_dir)
-		"traitor":
-			success = _process_traitor(input_path, output_dir)
-		"tips":
-			success = _process_tips(input_path, output_dir)
-		"localization":
-			success = _process_localization(input_path, output_dir)
+			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes"), WCSAutopilotParser, "", "autopilot.tres")
+		"campaign":
+			success = _process_campaign(input_path, _resolve_output_path(output_dir, "campaigns/hermes"))
 		"credits":
-			success = _process_simple_resource(input_path, output_dir, WCSCreditsParser, "campaigns/hermes", "credits.tres")
+			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes"), WCSCreditsParser, "", "credits.tres")
 		"cutscenes":
-			success = _process_simple_resource(input_path, output_dir, WCSCutsceneParser, "campaigns/hermes", "cutscenes.tres")
+			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes"), WCSCutsceneParser, "", "cutscenes.tres")
 		"fireball":
-			success = _process_list_resource(input_path, output_dir, WCSFireballParser, "assets/effects/fireball", "name")
+			success = _process_fireballs(input_path, _resolve_output_path(output_dir, "assets/effects/fireball"))
 		"fonts":
-			success = _process_simple_resource(input_path, output_dir, WCSFontParser, "campaigns/hermes", "fonts.tres")
+			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes"), WCSFontParser, "", "fonts.tres")
 		"help":
-			success = _process_simple_resource(input_path, output_dir, WCSHelpParser, "campaigns/hermes", "help.tres")
+			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes"), WCSHelpParser, "", "help.tres")
 		"hud_gauges":
-			success = _process_list_resource(input_path, output_dir, WCSHudGaugeParser, "assets/cockpits", "gauge_name")
+			success = _process_hud_gauges(input_path, output_dir)
+		"hud_config":
+			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes/config/hud"), WCSHudConfigParser, "", input_path.get_file().get_basename() + ".tres")
 		"icons":
-			success = _process_list_resource(input_path, output_dir, WCSIconParser, "assets/icons", "name")
+			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "assets/icons"), WCSIconParser, "", "name")
 		"iff_defs":
-			success = _process_list_resource(input_path, output_dir, WCSIffParser, "assets/iff_defs", "iff_name")
+			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes/config/iff_defs"), WCSIffParser, "", "name")
 		"launchhelp":
-			success = _process_simple_resource(input_path, output_dir, WCSLaunchHelpParser, "campaigns/hermes", "launchhelp.tres")
+			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes"), WCSLaunchHelpParser, "", "launchhelp.tres")
 		"lightning":
-			success = _process_list_resource(input_path, output_dir, WCSLightningParser, "assets/effects/lightning", "name")
+			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "assets/effects/lightning"), WCSLightningParser, "", "name")
 		"mainhall":
-			success = _process_simple_resource(input_path, output_dir, WCSMainhallParser, "campaigns/hermes/menu", "mainhall.tres")
+			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes/menu"), WCSMainhallParser, "", "mainhall.tres")
+		"medals":
+			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes"), WCSMedalParser, "", "name")
 		"menu":
-			success = _process_simple_resource(input_path, output_dir, WCSMenuParser, "campaigns/hermes/menu", "menu.tres")
+			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes/menu"), WCSMenuParser, "", "menu.tres")
 		"messages":
-			success = _process_simple_resource(input_path, output_dir, WCSMessageParser, "campaigns/hermes", "messages.tres")
+			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes"), WCSMessageParser, "", "messages.tres")
 		"mflash":
-			success = _process_list_resource(input_path, output_dir, WCSMFlashParser, "assets/effects/mflash", "name")
+			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "assets/effects/mflash"), WCSMFlashParser, "", "name")
+		"mission":
+			success = _process_mission(input_path, _resolve_output_path(output_dir, "campaigns/hermes/missions"))
 		"music":
-			success = _process_list_resource(input_path, output_dir, WCSMusicParser, "campaigns/hermes/music", "title")
+			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes/music"), WCSMusicParser, "", "title")
 		"nebula":
-			success = _process_simple_resource(input_path, output_dir, WCSNebulaParser, "assets/environment/nebula", "nebula.tres")
+			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "assets/environment/nebula"), WCSNebulaParser, "", "nebula.tres")
 		"pixels":
-			success = _process_simple_resource(input_path, output_dir, WCSPixelParser, "assets/environment/stars", "pixels.tres")
+			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "assets/environment/stars"), WCSPixelParser, "", "pixels.tres")
+		"rank":
+			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes"), WCSRankParser, "", "rank_name")
 		"scripting":
-			success = _process_simple_resource(input_path, output_dir, WCSScriptingParser, "campaigns/hermes", "scripting.tres")
+			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes"), WCSScriptingParser, "", "scripting.tres")
+		"ships":
+			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "assets/ships"), WCSShipParser, "", "ship_class_name")
 		"sounds":
-			success = _process_simple_resource(input_path, output_dir, WCSSoundParser, "assets/sounds", "sounds.tres")
+			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "assets/sounds"), WCSSoundParser, "", "sounds.tres")
 		"species":
-			success = _process_list_resource(input_path, output_dir, WCSSpeciesParser, "assets/species", "species_name")
+			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "assets/fiction/star_systems"), WCSSpeciesParser, "", "species_name")
 		"ssm":
-			success = _process_simple_resource(input_path, output_dir, WCSSSMParser, "assets/weapons", "ssm.tres")
+			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "assets/weapons"), WCSSSMParser, "", "name")
 		"stars":
-			success = _process_list_resource(input_path, output_dir, WCSStarParser, "assets/environment/stars", "bitmap")
+			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "assets/environment/stars"), WCSStarParser, "", "filename")
+		"tips":
+			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes"), WCSTipsParser, "", "tips.tres")
+		"traitor":
+			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes"), WCSTraitorParser, "", "traitor.tres")
 		"weapon_expl":
-			success = _process_list_resource(input_path, output_dir, WCSWeaponExplParser, "assets/effects/explosions", "name")
+			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "assets/effects/explosions"), WCSWeaponExplParser, "", "name")
+		"weapons":
+			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "assets/weapons"), WCSWeaponParser, "", "name")
 		_:
 			print("Skipping unsupported type: " + type)
 			# Return success to avoid failing the batch in Python CLI
@@ -260,6 +272,7 @@ func _detect_type(path: String) -> String:
 	if filename == "ssm.tbl": return "ssm"
 	if filename == "stars.tbl": return "stars"
 	if filename == "weapon_expl.tbl": return "weapon_expl"
+	if filename.ends_with(".hcf"): return "hud_config"
 	return "unknown"
 
 func _process_ships(input_path: String, output_dir: String) -> bool:
@@ -664,3 +677,99 @@ func _process_list_resource(input_path: String, output_dir: String, parser_class
 			
 	print("Saved " + str(saved_count) + " items from " + input_path.get_file())
 	return true
+
+func _resolve_output_path(base_output_dir: String, subpath: String) -> String:
+	# If subpath starts with "campaigns/", use project root (res://)
+	# This assumes the project root is the parent of "addons" or similar.
+	# But we need an absolute path for ResourceSaver if running headless?
+	# Actually, ResourceSaver works with res:// if inside project.
+	# But cli_runner might be running with absolute paths.
+	if subpath.begins_with("campaigns/"):
+		# We need to find the project root from base_output_dir
+		# base_output_dir is usually .../target/assets
+		# We want .../target/campaigns/...
+		# So we go up one level from assets
+		var project_root = base_output_dir.get_base_dir() # .../target
+		if base_output_dir.ends_with("assets"):
+			return project_root.path_join(subpath)
+		else:
+			# Fallback if output dir structure is unexpected
+			return base_output_dir.path_join(subpath)
+			
+	# If subpath starts with "assets/" and base_output_dir ends with "assets", strip it
+	if subpath.begins_with("assets/") and base_output_dir.ends_with("assets"):
+		return base_output_dir.path_join(subpath.substr(7))
+			
+	# Otherwise, use base output dir (target/assets)
+	return base_output_dir.path_join(subpath)
+
+func _process_hud_gauges(input_path: String, output_dir: String) -> bool:
+	var parser = WCSHudGaugeParser.new()
+	var gauges = parser.parse(input_path)
+	
+	if gauges == null:
+		print("Failed to parse hud_gauges.tbl")
+		return false
+		
+	var generator = HudSceneGenerator.new()
+	
+	# Group gauges by section
+	var sections = {
+		"Custom Gauges": [] as Array[HudGaugeResource],
+		"Main Gauges": [] as Array[HudGaugeResource],
+		"Gauges": [] as Array[HudGaugeResource],
+		"Ship Main Gauges": {},
+		"Ship Gauges": {}
+	}
+	
+	for gauge in gauges:
+		if gauge.section == "Custom Gauges":
+			sections["Custom Gauges"].append(gauge)
+		elif gauge.section == "Main Gauges":
+			sections["Main Gauges"].append(gauge)
+		elif gauge.section == "Gauges":
+			sections["Gauges"].append(gauge)
+		elif gauge.section == "Ship Main Gauges":
+			var ship = gauge.ship_name
+			if ship.is_empty():
+				ship = "generic"
+			if not sections["Ship Main Gauges"].has(ship):
+				sections["Ship Main Gauges"][ship] = [] as Array[HudGaugeResource]
+			sections["Ship Main Gauges"][ship].append(gauge)
+		elif gauge.section == "Ship Gauges":
+			var ship = gauge.ship_name
+			if ship.is_empty():
+				ship = "generic"
+			if not sections["Ship Gauges"].has(ship):
+				sections["Ship Gauges"][ship] = [] as Array[HudGaugeResource]
+			sections["Ship Gauges"][ship].append(gauge)
+			
+	generator.create_custom_gauges_scene(sections["Custom Gauges"], output_dir)
+	generator.create_main_gauges_scene(sections["Main Gauges"], output_dir)
+	generator.create_gauges_scene(sections["Gauges"], output_dir)
+	
+	generator.create_ship_scenes(sections["Ship Main Gauges"], output_dir, true)
+	generator.create_ship_scenes(sections["Ship Gauges"], output_dir, false)
+			
+	print("Generated HUD scenes.")
+	return true
+
+func _process_fireballs(input_path: String, output_dir: String) -> bool:
+	var parser = WCSFireballParser.new()
+	var fireballs = parser.parse(input_path)
+	
+	if fireballs == null or fireballs.is_empty():
+		print("Failed to parse fireballs.")
+		return false
+		
+	print("Parsed " + str(fireballs.size()) + " fireballs.")
+	
+	var generator = FireballGenerator.new()
+	var success_count = 0
+	
+	for res in fireballs:
+		if generator.generate(res, output_dir):
+			success_count += 1
+			
+	print("Generated " + str(success_count) + "/" + str(fireballs.size()) + " fireball scenes.")
+	return success_count == fireballs.size()
