@@ -44,6 +44,7 @@ const HudSceneGenerator = preload("res://addons/wcs_import/generators/hud_scene_
 const HudGaugeResource = preload("res://scripts/resources/ui/hud/hud_gauge_resource.gd")
 const AsteroidGenerator = preload("res://addons/wcs_import/generators/asteroid_generator.gd")
 const FireballGenerator = preload("res://addons/wcs_import/generators/fireball_generator.gd")
+const LightningGenerator = preload("res://addons/wcs_import/generators/lightning_generator.gd")
 const WCSPathResolver = preload("res://addons/wcs_import/core/path_resolver.gd")
 
 # Resource scripts
@@ -150,7 +151,7 @@ func _run():
 		"launchhelp":
 			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes"), WCSLaunchHelpParser, "", "launchhelp.tres")
 		"lightning":
-			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "assets/effects/lightning"), WCSLightningParser, "", "name")
+			success = _process_lightning(input_path, _resolve_output_path(output_dir, "assets/effects/lightning"))
 		"mainhall":
 			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes/menu"), WCSMainhallParser, "", "mainhall.tres")
 		"medals":
@@ -773,3 +774,23 @@ func _process_fireballs(input_path: String, output_dir: String) -> bool:
 			
 	print("Generated " + str(success_count) + "/" + str(fireballs.size()) + " fireball scenes.")
 	return success_count == fireballs.size()
+
+func _process_lightning(input_path: String, output_dir: String) -> bool:
+	var parser = WCSLightningParser.new()
+	var resources = parser.parse(input_path)
+	
+	if resources == null or resources.is_empty():
+		print("Failed to parse lightning.")
+		return false
+		
+	print("Parsed " + str(resources.size()) + " lightning entries.")
+	
+	var generator = LightningGenerator.new()
+	var success_count = 0
+	
+	for res in resources:
+		if generator.generate(res, output_dir):
+			success_count += 1
+			
+	print("Generated " + str(success_count) + "/" + str(resources.size()) + " lightning resources.")
+	return success_count == resources.size()
