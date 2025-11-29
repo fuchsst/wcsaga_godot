@@ -1,7 +1,7 @@
 class_name WCSFireballParser
 extends "res://addons/wcs_import/parsers/base_parser.gd"
 
-const FireballResource = preload("res://scripts/resources/effects/fireball/fireball_resource.gd")
+const FireballResource = preload("res://scripts/resources/effects/fireball_resource.gd")
 
 func _parse_content() -> Variant:
 	var fireballs: Array[FireballResource] = []

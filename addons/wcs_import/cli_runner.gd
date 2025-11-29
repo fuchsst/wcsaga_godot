@@ -26,6 +26,7 @@ const WCSIconParser = preload("res://addons/wcs_import/parsers/icon_parser.gd")
 const WCSIffParser = preload("res://addons/wcs_import/parsers/iff_parser.gd")
 const WCSLaunchHelpParser = preload("res://addons/wcs_import/parsers/launchhelp_parser.gd")
 const WCSLightningParser = preload("res://addons/wcs_import/parsers/lightning_parser.gd")
+const WCSMuzzleFlashParser = preload("res://addons/wcs_import/parsers/mflash_parser.gd")
 const WCSMainhallParser = preload("res://addons/wcs_import/parsers/mainhall_parser.gd")
 const WCSMenuParser = preload("res://addons/wcs_import/parsers/menu_parser.gd")
 const WCSMessageParser = preload("res://addons/wcs_import/parsers/message_parser.gd")
@@ -45,6 +46,8 @@ const HudGaugeResource = preload("res://scripts/resources/ui/hud/hud_gauge_resou
 const AsteroidGenerator = preload("res://addons/wcs_import/generators/asteroid_generator.gd")
 const FireballGenerator = preload("res://addons/wcs_import/generators/fireball_generator.gd")
 const LightningGenerator = preload("res://addons/wcs_import/generators/lightning_generator.gd")
+const MuzzleFlashGenerator = preload("res://addons/wcs_import/generators/mflash_generator.gd")
+const WeaponExplosionGenerator = preload("res://addons/wcs_import/generators/weapon_expl_generator.gd")
 const WCSPathResolver = preload("res://addons/wcs_import/core/path_resolver.gd")
 
 # Resource scripts
@@ -151,7 +154,9 @@ func _run():
 		"launchhelp":
 			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes"), WCSLaunchHelpParser, "", "launchhelp.tres")
 		"lightning":
-			success = _process_lightning(input_path, _resolve_output_path(output_dir, "assets/effects/lightning"))
+			success = _process_lightning(input_path, output_dir)
+		"mflash":
+			success = _process_mflash(input_path, _resolve_output_path(output_dir, "assets/effects"))
 		"mainhall":
 			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes/menu"), WCSMainhallParser, "", "mainhall.tres")
 		"medals":
@@ -189,7 +194,7 @@ func _run():
 		"traitor":
 			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes"), WCSTraitorParser, "", "traitor.tres")
 		"weapon_expl":
-			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "assets/effects/explosions"), WCSWeaponExplParser, "", "name")
+			success = _process_weapon_expl(input_path, _resolve_output_path(output_dir, "assets/effects"))
 		"weapons":
 			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "assets/weapons"), WCSWeaponParser, "", "name")
 		_:
@@ -793,4 +798,44 @@ func _process_lightning(input_path: String, output_dir: String) -> bool:
 			success_count += 1
 			
 	print("Generated " + str(success_count) + "/" + str(resources.size()) + " lightning resources.")
+	return success_count == resources.size()
+
+func _process_mflash(input_path: String, output_dir: String) -> bool:
+	var parser = WCSMuzzleFlashParser.new()
+	var resources = parser.parse(input_path)
+	
+	if resources == null or resources.is_empty():
+		print("Failed to parse mflash.")
+		return false
+		
+	print("Parsed " + str(resources.size()) + " mflash entries.")
+	
+	var generator = MuzzleFlashGenerator.new()
+	var success_count = 0
+	
+	for res in resources:
+		if generator.generate(res, output_dir):
+			success_count += 1
+			
+	print("Generated " + str(success_count) + "/" + str(resources.size()) + " mflash resources.")
+	return success_count == resources.size()
+
+func _process_weapon_expl(input_path: String, output_dir: String) -> bool:
+	var parser = WCSWeaponExplParser.new()
+	var resources = parser.parse(input_path)
+	
+	if resources == null or resources.is_empty():
+		print("Failed to parse weapon_expl.")
+		return false
+		
+	print("Parsed " + str(resources.size()) + " weapon_expl entries.")
+	
+	var generator = WeaponExplosionGenerator.new()
+	var success_count = 0
+	
+	for res in resources:
+		if generator.generate(res, output_dir):
+			success_count += 1
+			
+	print("Generated " + str(success_count) + "/" + str(resources.size()) + " weapon_expl resources.")
 	return success_count == resources.size()

@@ -4,7 +4,7 @@ extends RefCounted
 ## Generates Fireball Scenes from parsed TBL data
 ## Creates a scene with an AnimatedSprite3D using the converted spritesheet.
 
-const FireballResource = preload("res://scripts/resources/effects/fireball/fireball_resource.gd")
+const FireballResource = preload("res://scripts/resources/effects/fireball_resource.gd")
 const FireballScript = preload("res://scripts/entities/effects/fireball.gd")
 
 func generate(resource: FireballResource, output_dir: String) -> bool:

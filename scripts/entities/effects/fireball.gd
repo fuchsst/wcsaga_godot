@@ -8,7 +8,7 @@ signal finished
 signal warp_opened
 signal warp_closed
 
-const FireballResource = preload("res://scripts/resources/effects/fireball/fireball_resource.gd")
+const FireballResource = preload("res://scripts/resources/effects/fireball_resource.gd")
 
 @onready var sprite: AnimatedSprite3D = $AnimatedSprite3D
 

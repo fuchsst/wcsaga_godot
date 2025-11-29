@@ -1,11 +1,15 @@
-class_name WCSMFlashParser
 extends "res://addons/wcs_import/parsers/base_parser.gd"
 
-const MFlashResource = preload("res://scripts/resources/effects/mflash/mflash_resource.gd")
+const MuzzleFlashResource = preload("res://scripts/resources/effects/muzzleflash/muzzle_flash_resource.gd")
+
+func parse(path: String) -> Variant:
+	if not load_file(path):
+		return null
+	return _parse_content()
 
 func _parse_content() -> Variant:
-	var mflashes: Array[MFlashResource] = []
-	var current_mflash: MFlashResource = null
+	var resources: Array[MuzzleFlashResource] = []
+	var current_resource: MuzzleFlashResource = null
 	
 	_skip_empty_lines()
 	
@@ -17,14 +21,23 @@ func _parse_content() -> Variant:
 				break
 			continue
 			
-		if line.begins_with("$Name:"):
-			current_mflash = MFlashResource.new()
-			current_mflash.name = _extract_string_value(line, "$Name:")
-			mflashes.append(current_mflash)
-		elif current_mflash:
-			if line.begins_with("+Blob_name:"):
-				current_mflash.blob_name = _extract_string_value(line, "+Blob_name:")
-			elif line.begins_with("+Blob_id:"):
-				current_mflash.blob_id = _extract_int_value(line, "+Blob_id:")
-				
-	return mflashes
+		if line.begins_with("$Mflash:"):
+			current_resource = MuzzleFlashResource.new()
+			resources.append(current_resource)
+			
+		elif current_resource:
+			_parse_property(line, current_resource)
+			
+	return resources
+
+func _parse_property(line: String, res: MuzzleFlashResource) -> void:
+	if line.begins_with("+name:"):
+		res.name = _extract_string_value(line, "+name:")
+	elif line.begins_with("+blob_name:"):
+		var blob = MuzzleFlashResource.MuzzleFlashBlob.new()
+		blob.name = _extract_string_value(line, "+blob_name:")
+		res.blobs.append(blob)
+	elif line.begins_with("+blob_offset:") and not res.blobs.is_empty():
+		res.blobs.back().offset = _extract_float_value(line, "+blob_offset:")
+	elif line.begins_with("+blob_radius:") and not res.blobs.is_empty():
+		res.blobs.back().radius = _extract_float_value(line, "+blob_radius:")
