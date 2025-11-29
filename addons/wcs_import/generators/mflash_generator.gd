@@ -1,7 +1,7 @@
 class_name MuzzleFlashGenerator
 extends RefCounted
 
-const MuzzleFlashResource = preload("res://scripts/resources/effects/muzzleflash/muzzle_flash_resource.gd")
+const MuzzleFlashResource = preload("res://scripts/resources/effects/muzzle_flash_resource.gd")
 
 func generate(resource: MuzzleFlashResource, output_dir: String) -> bool:
 	var filename = resource.name

@@ -1,7 +1,7 @@
 class_name WCSLightningParser
 extends "res://addons/wcs_import/parsers/base_parser.gd"
 
-const LightningResource = preload("res://scripts/resources/effects/lightning/lightning_resource.gd")
+const LightningResource = preload("res://scripts/resources/effects/lightning_resource.gd")
 
 func _parse_content() -> Variant:
 	var resources: Array[LightningResource] = []

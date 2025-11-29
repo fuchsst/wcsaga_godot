@@ -1,6 +1,6 @@
 extends "res://addons/wcs_import/parsers/base_parser.gd"
 
-const MuzzleFlashResource = preload("res://scripts/resources/effects/muzzleflash/muzzle_flash_resource.gd")
+const MuzzleFlashResource = preload("res://scripts/resources/effects/muzzle_flash_resource.gd")
 
 func parse(path: String) -> Variant:
 	if not load_file(path):

@@ -160,7 +160,7 @@ func _run():
 		"mainhall":
 			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes/menu"), WCSMainhallParser, "", "mainhall.tres")
 		"medals":
-			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes"), WCSMedalParser, "", "name")
+			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes"), WCSMedalParser, "", "medals.tres")
 		"menu":
 			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes/menu"), WCSMenuParser, "", "menu.tres")
 		"messages":
@@ -176,7 +176,7 @@ func _run():
 		"pixels":
 			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "assets/environment/stars"), WCSPixelParser, "", "pixels.tres")
 		"rank":
-			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes"), WCSRankParser, "", "rank_name")
+			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes"), WCSRankParser, "", "ranks.tres")
 		"scripting":
 			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes"), WCSScriptingParser, "", "scripting.tres")
 		"ships":
@@ -248,7 +248,7 @@ func _detect_type(path: String) -> String:
 	if filename == "medals.tbl":
 		return "medals"
 	if filename == "rank.tbl":
-		return "ranks"
+		return "rank"
 	if filename == "traitor.tbl":
 		return "traitor"
 	if filename == "tips.tbl":

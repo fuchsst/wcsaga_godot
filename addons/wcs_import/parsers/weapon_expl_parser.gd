@@ -1,6 +1,6 @@
 extends "res://addons/wcs_import/parsers/base_parser.gd"
 
-const WeaponExplosionResource = preload("res://scripts/resources/effects/explosions/weapon_expl_resource.gd")
+const WeaponExplosionResource = preload("res://scripts/resources/effects/weapon_expl_resource.gd")
 
 func parse(path: String) -> Variant:
 	if not load_file(path):

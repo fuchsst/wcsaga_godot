@@ -4,7 +4,7 @@ extends RefCounted
 ## Generates Lightning Resources from parsed TBL data
 ## Handles saving resources to correct subfolders (bolts/storms).
 
-const LightningResource = preload("res://scripts/resources/effects/lightning/lightning_resource.gd")
+const LightningResource = preload("res://scripts/resources/effects/lightning_resource.gd")
 
 func generate(resource: LightningResource, output_dir: String) -> bool:
 	var subfolder = "bolts"
