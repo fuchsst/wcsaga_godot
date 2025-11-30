@@ -18,7 +18,7 @@ config/icon="uid://cc58gpsbqci8y"
 [autoload]
 
 Signal_Debugger="*res://addons/SignalVisualizer/Debugger/SignalDebugger.gd"
-SceneManager="res://addons/scene_manager/SceneManager.tscn"
+SceneManager="*res://addons/scene_manager/SceneManager.tscn"
 GlobalIFFManager="*res://autoload/iff_manager.gd"
 
 [display]
@@ -33,7 +33,7 @@ project/assembly_name="Wing Commander Saga"
 
 [editor_plugins]
 
-enabled=PackedStringArray()
+enabled=PackedStringArray("res://addons/SignalVisualizer/plugin.cfg", "res://addons/gdUnit4/plugin.cfg", "res://addons/scene_manager/plugin.cfg")
 
 [input]
 

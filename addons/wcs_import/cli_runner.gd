@@ -183,7 +183,7 @@ func _run():
 		"mission":
 			success = _process_mission(input_path, _resolve_output_path(output_dir, "campaigns/hermes/missions"))
 		"music":
-			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes/music"), WCSMusicParser, "", "title")
+			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes/soundtrack"), WCSMusicParser, "", "name")
 		"nebula":
 			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "assets/environment/nebula"), WCSNebulaParser, "", "nebula.tres")
 		"pixels":

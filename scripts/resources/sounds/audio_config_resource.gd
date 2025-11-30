@@ -3,14 +3,16 @@ extends "res://scripts/resources/core/wcs_base_resource.gd"
 
 ## Audio Configuration Resource
 ##
-## Defines sound effects and music tracks.
-## Maps to sounds.tbl, music.tbl
+## Defines sound effects.
+## Maps to sounds.tbl entries.
 
-@export_group("Audio Entry")
-@export var entry_name: String = ""
-@export var filename: String = ""
-@export var volume: float = 1.0
-@export var preload_data: bool = false
+@export var signature: int = -1
+@export var audio_stream: AudioStream
+@export var preload_sound: bool = false
+@export var default_volume: float = 1.0
+@export var is_3d: int = 0 # 0=None, 1=Stereo, 2=Aureal
+@export var min_distance: float = 0.0
+@export var max_distance: float = 0.0
 
 func get_resource_type() -> String:
 	return "audio_config"

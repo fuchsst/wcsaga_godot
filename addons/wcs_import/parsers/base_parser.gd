@@ -102,6 +102,10 @@ func _extract_float_value(line: String, prefix: String) -> float:
 		return s.to_float()
 	return 0.0
 
+func _extract_boolean_value(line: String, prefix: String) -> bool:
+	var s = _extract_string_value(line, prefix).to_upper()
+	return s == "YES" or s == "TRUE" or s == "1"
+
 func _extract_list_value(line: String) -> Array[String]:
 	# Expected format: $Key: ( "Item1" "Item2" )
 	var start_idx = line.find("(")
