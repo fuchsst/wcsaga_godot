@@ -3,25 +3,26 @@ extends "res://addons/wcs_import/parsers/base_parser.gd"
 
 const FireballResource = preload("res://scripts/resources/effects/fireball_resource.gd")
 
+
 func _parse_content() -> Variant:
 	var fireballs: Array[FireballResource] = []
 	var current_fireball: FireballResource = null
-	
+
 	_skip_empty_lines()
-	
+
 	while _has_more_lines():
 		var line = _get_next_line()
-		
+
 		if line.begins_with("#"):
 			if line == "#end":
 				break
 			continue
-			
+
 		if line.begins_with("$Name:"):
 			current_fireball = FireballResource.new()
 			var raw_name = _extract_string_value(line, "$Name:")
 			current_fireball.name = raw_name.split(";")[0].strip_edges()
-			
+
 			# Assign default type based on index
 			var index = fireballs.size()
 			if index == 0:
@@ -40,7 +41,7 @@ func _parse_content() -> Variant:
 				current_fireball.render_type = FireballResource.FireballType.EXPLOSION_LARGE2
 			else:
 				current_fireball.render_type = FireballResource.FireballType.CUSTOM
-				
+
 			fireballs.append(current_fireball)
 		elif current_fireball:
 			if line.begins_with("$LOD:"):
@@ -66,5 +67,5 @@ func _parse_content() -> Variant:
 				current_fireball.render_type = FireballResource.FireballType.EXPLOSION_LARGE2
 			elif line.begins_with("+Custom_Fireball"):
 				current_fireball.render_type = FireballResource.FireballType.CUSTOM
-				
+
 	return fireballs

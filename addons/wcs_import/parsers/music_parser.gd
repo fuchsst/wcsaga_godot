@@ -7,17 +7,18 @@ const MenuMusicResource = preload("res://scripts/resources/sounds/menu_music_res
 # Base path for music files - this should ideally be configurable or passed in
 const MUSIC_BASE_PATH = "res://campaigns/hermes/soundtrack/"
 
+
 func _parse_content() -> Variant:
 	var soundtracks: Array[SoundtrackResource] = []
 	var current_soundtrack: SoundtrackResource = null
 	var track_index: int = 0
 	var menu_music: MenuMusicResource = null
-	
+
 	_skip_empty_lines()
-	
+
 	while _has_more_lines():
 		var line = _get_next_line()
-		
+
 		if line.begins_with("#"):
 			if line.begins_with("#SoundTrack Start"):
 				current_soundtrack = SoundtrackResource.new()
@@ -39,7 +40,7 @@ func _parse_content() -> Variant:
 				# We need to change the return type or how we handle it.
 				pass
 			continue
-			
+
 		if menu_music != null:
 			if line.begins_with("$Name:"):
 				var label = _extract_string_value(line, "$Name:")
@@ -49,17 +50,17 @@ func _parse_content() -> Variant:
 					# Clean filename (remove comments)
 					if ";" in filename:
 						filename = filename.split(";")[0].strip_edges()
-					
+
 					if filename.ends_with(".wav"):
 						filename = filename.replace(".wav", ".ogg")
-						
+
 					var path = MUSIC_BASE_PATH + filename
 					var stream = null
 					if FileAccess.file_exists(path):
 						stream = load(path)
 					else:
 						push_warning("Menu music file not found: " + filename)
-						
+
 					match label:
 						"Command Brief":
 							menu_music.command_brief = stream
@@ -98,11 +99,13 @@ func _parse_content() -> Variant:
 
 		if current_soundtrack == null:
 			continue
-			
+
 		if line.begins_with("$Soundtrack Name:"):
 			current_soundtrack.name = _extract_string_value(line, "$Soundtrack Name:")
 		elif line.begins_with("+Allied Arrival Overlay:"):
-			current_soundtrack.allied_arrival_overlay = _extract_boolean_value(line, "+Allied Arrival Overlay:")
+			current_soundtrack.allied_arrival_overlay = _extract_boolean_value(
+				line, "+Allied Arrival Overlay:"
+			)
 		elif line.begins_with("+Lock in Ambient:"):
 			current_soundtrack.lock_in_ambient = _extract_boolean_value(line, "+Lock in Ambient:")
 		elif line.begins_with("$Name:"):
@@ -110,16 +113,16 @@ func _parse_content() -> Variant:
 			var parts = line.substr(6).strip_edges().split(" ", false)
 			var stream: AudioStream = null
 			var filename = ""
-			
+
 			if parts.size() >= 1:
 				filename = parts[0]
-				
+
 				# We always convert music to .ogg, so force the extension
 				if filename.ends_with(".wav"):
 					filename = filename.replace(".wav", ".ogg")
-					
+
 				var path = MUSIC_BASE_PATH + filename
-				
+
 				if FileAccess.file_exists(path):
 					stream = load(path)
 				else:
@@ -163,11 +166,8 @@ func _parse_content() -> Variant:
 				11:
 					current_soundtrack.player_dead = stream
 					current_soundtrack.player_dead_filename = filename
-				
+
 			track_index += 1
-				
+
 	# Return a dictionary containing both
-	return {
-		"soundtracks": soundtracks,
-		"menu_music": menu_music
-	}
+	return {"soundtracks": soundtracks, "menu_music": menu_music}

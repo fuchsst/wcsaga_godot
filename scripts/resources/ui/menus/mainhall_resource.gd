@@ -15,5 +15,6 @@ const MainHallDoor = preload("res://scripts/resources/ui/menus/main_hall_door.gd
 @export var music: String = ""
 @export var doors: Array[MainHallDoor] = []
 
+
 func get_resource_type() -> String:
 	return "mainhall"

@@ -4,6 +4,7 @@ extends RefCounted
 const SpeciesManifest = preload("res://scripts/resources/species/species_manifest.gd")
 const SpeciesData = preload("res://scripts/resources/species/species_data.gd")
 
+
 func generate(manifest: SpeciesManifest, output_dir: String, source_root: String) -> bool:
 	var save_dir = output_dir
 	if not DirAccess.dir_exists_absolute(save_dir):
@@ -21,16 +22,18 @@ func generate(manifest: SpeciesManifest, output_dir: String, source_root: String
 	print("Saved species manifest: " + save_path)
 	return true
 
+
 func _convert_species_assets(species: Resource, source_root: String, output_dir: String) -> void:
 	# Helper to convert and load
 	var convert_and_load = func(filename_prop: String, resource_prop: String, type: String):
 		if not species.has_meta(filename_prop):
 			return
-			
+
 		var filename = species.get_meta(filename_prop)
 		if not filename.is_empty():
 			var exts = [".pcx", ".dds", ".png", ".tga"]
-			if type == "animation": exts = [".ani", ".eff"]
+			if type == "animation":
+				exts = [".ani", ".eff"]
 
 			var source_file = _find_source_asset(source_root, filename, exts)
 			if not source_file.is_empty():
@@ -38,8 +41,10 @@ func _convert_species_assets(species: Resource, source_root: String, output_dir:
 
 				# Determine converted filename
 				var converted_filename = source_file.get_file().get_basename()
-				if type == "texture": converted_filename += ".png"
-				elif type == "animation": converted_filename += ".tres" # SpriteFrames
+				if type == "texture":
+					converted_filename += ".png"
+				elif type == "animation":
+					converted_filename += ".tres"  # SpriteFrames
 
 				var converted_path = output_dir.path_join(converted_filename)
 				var res_path = converted_path
@@ -55,15 +60,24 @@ func _convert_species_assets(species: Resource, source_root: String, output_dir:
 
 	convert_and_load.call("thruster_normal_filename", "thruster_normal", "animation")
 	convert_and_load.call("thruster_afterburn_filename", "thruster_afterburn", "animation")
-	convert_and_load.call("thruster_secondary_normal_filename", "thruster_secondary_normal", "animation")
-	convert_and_load.call("thruster_secondary_afterburn_filename", "thruster_secondary_afterburn", "animation")
-	convert_and_load.call("thruster_tertiary_normal_filename", "thruster_tertiary_normal", "animation")
-	convert_and_load.call("thruster_tertiary_afterburn_filename", "thruster_tertiary_afterburn", "animation")
+	convert_and_load.call(
+		"thruster_secondary_normal_filename", "thruster_secondary_normal", "animation"
+	)
+	convert_and_load.call(
+		"thruster_secondary_afterburn_filename", "thruster_secondary_afterburn", "animation"
+	)
+	convert_and_load.call(
+		"thruster_tertiary_normal_filename", "thruster_tertiary_normal", "animation"
+	)
+	convert_and_load.call(
+		"thruster_tertiary_afterburn_filename", "thruster_tertiary_afterburn", "animation"
+	)
 
 	convert_and_load.call("glow_normal_filename", "glow_normal", "texture")
 	convert_and_load.call("glow_afterburn_filename", "glow_afterburn", "texture")
 	convert_and_load.call("debris_texture_filename", "debris_texture", "texture")
 	convert_and_load.call("shield_hit_anim_filename", "shield_hit_anim", "animation")
+
 
 func _find_source_asset(root_path: String, filename: String, extensions: Array = []) -> String:
 	# 1. Try exact match in known directories (recursive search is expensive)
@@ -83,6 +97,7 @@ func _find_source_asset(root_path: String, filename: String, extensions: Array =
 				break
 
 	return found
+
 
 func _find_file_recursive(dir_path: String, filename: String) -> String:
 	if not DirAccess.dir_exists_absolute(dir_path):
@@ -105,12 +120,15 @@ func _find_file_recursive(dir_path: String, filename: String) -> String:
 			file_name = dir.get_next()
 	return ""
 
+
 func _convert_asset(source_path: String, target_dir: String, type: String) -> bool:
 	var global_source = ProjectSettings.globalize_path(source_path)
 	var global_target = ProjectSettings.globalize_path(target_dir)
 
 	# uv run python -m converter convert input output --type type
-	var args = ["run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type]
+	var args = [
+		"run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type
+	]
 
 	# print("Converting " + type + ": " + global_source + " -> " + global_target)
 	var output = []

@@ -3,23 +3,30 @@ extends RefCounted
 
 const HudGaugeResource = preload("res://scripts/resources/ui/hud/hud_gauge_resource.gd")
 
+
 func create_custom_gauges_scene(gauges: Array[HudGaugeResource], output_dir: String) -> void:
 	_create_scene(gauges, output_dir.path_join("cockpits/custom_gauges.tscn"), "CustomGauges")
+
 
 func create_main_gauges_scene(gauges: Array[HudGaugeResource], output_dir: String) -> void:
 	_create_scene(gauges, output_dir.path_join("cockpits/main_gauges.tscn"), "MainGauges")
 
+
 func create_gauges_scene(gauges: Array[HudGaugeResource], output_dir: String) -> void:
 	_create_scene(gauges, output_dir.path_join("cockpits/gauges.tscn"), "Gauges")
+
 
 func create_ship_scenes(ship_gauges: Dictionary, output_dir: String, is_main: bool) -> void:
 	for ship_name in ship_gauges:
 		var gauges = ship_gauges[ship_name]
 		var safe_ship_name = ship_name.to_lower().replace(" ", "_").replace(".", "_")
 		var subfolder = "main_gauges.tscn" if is_main else "gauges.tscn"
-		var path = output_dir.path_join("cockpits/ship_gauges").path_join(safe_ship_name).path_join(subfolder)
+		var path = output_dir.path_join("cockpits/ship_gauges").path_join(safe_ship_name).path_join(
+			subfolder
+		)
 		var root_name = "ShipMainGauges" if is_main else "ShipGauges"
 		_create_scene(gauges, path, root_name)
+
 
 func _create_scene(gauges: Array[HudGaugeResource], path: String, root_name: String) -> void:
 	var root = Node2D.new()
@@ -82,6 +89,7 @@ func _create_scene(gauges: Array[HudGaugeResource], path: String, root_name: Str
 
 	root.free()
 
+
 func generate(gauges: Array[HudGaugeResource], output_dir: String, source_root: String) -> bool:
 	var assets_dir = output_dir
 	if not DirAccess.dir_exists_absolute(assets_dir):
@@ -131,9 +139,12 @@ func generate(gauges: Array[HudGaugeResource], output_dir: String, source_root: 
 	print("Generated HUD scenes.")
 	return true
 
+
 func _convert_hud_gauge_assets(gauge: Resource, source_root: String, output_dir: String) -> void:
 	if not gauge.image.is_empty():
-		var source_file = _find_source_asset(source_root, gauge.image, [".pcx", ".dds", ".png", ".ani", ".eff"])
+		var source_file = _find_source_asset(
+			source_root, gauge.image, [".pcx", ".dds", ".png", ".ani", ".eff"]
+		)
 		if not source_file.is_empty():
 			var type = "texture"
 			if source_file.ends_with(".ani") or source_file.ends_with(".eff"):
@@ -149,6 +160,7 @@ func _convert_hud_gauge_assets(gauge: Resource, source_root: String, output_dir:
 	for sub in gauge.sub_gauges:
 		_convert_hud_gauge_assets(sub, source_root, output_dir)
 
+
 func _find_source_asset(root_path: String, filename: String, extensions: Array = []) -> String:
 	var found = _find_file_recursive(root_path, filename)
 	if found.is_empty() and not extensions.is_empty():
@@ -158,6 +170,7 @@ func _find_source_asset(root_path: String, filename: String, extensions: Array =
 			if not found.is_empty():
 				break
 	return found
+
 
 func _find_file_recursive(dir_path: String, filename: String) -> String:
 	if not DirAccess.dir_exists_absolute(dir_path):
@@ -180,11 +193,14 @@ func _find_file_recursive(dir_path: String, filename: String) -> String:
 			file_name = dir.get_next()
 	return ""
 
+
 func _convert_asset(source_path: String, target_dir: String, type: String) -> bool:
 	var global_source = ProjectSettings.globalize_path(source_path)
 	var global_target = ProjectSettings.globalize_path(target_dir)
 
-	var args = ["run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type]
+	var args = [
+		"run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type
+	]
 
 	var output = []
 	var exit_code = OS.execute("uv", args, output, true)
@@ -195,6 +211,7 @@ func _convert_asset(source_path: String, target_dir: String, type: String) -> bo
 		return false
 
 	return true
+
 
 func _set_owner_recursive(node: Node, root: Node) -> void:
 	if node != root:

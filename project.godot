@@ -33,7 +33,7 @@ project/assembly_name="Wing Commander Saga"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/SignalVisualizer/plugin.cfg", "res://addons/gdUnit4/plugin.cfg", "res://addons/scene_manager/plugin.cfg")
+enabled=PackedStringArray("res://addons/SignalVisualizer/plugin.cfg", "res://addons/scene_manager/plugin.cfg", "res://addons/gdUnit4/plugin.cfg")
 
 [input]
 

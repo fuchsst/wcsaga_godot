@@ -5,6 +5,10 @@
 class_name ShipStats
 extends "res://scripts/resources/core/wcs_base_resource.gd"
 
+signal weapon_mounts_changed
+signal subsystem_configuration_changed
+
+
 # === IDENTITY AND CLASSIFICATION ===
 @export_group("Identity", "identity_")
 @export var ship_class: String = "" # Military designation (F-86C Hellcat V)
@@ -34,13 +38,13 @@ extends "res://scripts/resources/core/wcs_base_resource.gd"
 @export_group("Physics", "physics_")
 @export var ship_length_meters: float = 0.0 # Ship length in meters
 @export var ship_mass_tons: float = 0.0 # Ship mass in tons
-@export var armor_thickness: Dictionary = { # Armor thickness in cm
+@export var armor_thickness: Dictionary = {
 	"fore": 0.0,
 	"aft": 0.0,
 	"left": 0.0,
 	"right": 0.0,
 	"top": 0.0,
-	"bottom": 0.0
+	"bottom": 0.0 # Armor thickness in cm
 }
 
 # === MOVEMENT AND PERFORMANCE ===
@@ -133,16 +137,16 @@ extends "res://scripts/resources/core/wcs_base_resource.gd"
 # === TURRET INFORMATION ===
 @export_group("Turrets", "turret_")
 @export var turret_mounts: Array[TurretMount] = []
- # Turret mounting specifications
+# Turret mounting specifications
 @export var turret_rotation_limits: Dictionary = {} # Turret rotation constraints
 
 # Internal validation signals
-signal weapon_mounts_changed()
-signal subsystem_configuration_changed()
+
 
 # === NESTED RESOURCE CLASSES ===
 
-class WeaponMount extends Resource:
+class WeaponMount:
+	extends Resource
 	"""Detailed weapon mount specification"""
 	@export var mount_name: String = "" # Mount identifier
 	@export var mount_type: int = 0 # 0=Primary, 1=Secondary, 2=Special
@@ -157,7 +161,9 @@ class WeaponMount extends Resource:
 	@export var is_gimballed: bool = false # Can track targets
 	@export var gimbal_range: float = 0.0 # Gimbal tracking range
 
-class EngineSubsystem extends Resource:
+
+class EngineSubsystem:
+	extends Resource
 	"""Engine subsystem configuration"""
 	@export var subsystem_name: String = "" # Subsystem name
 	@export var hitpoints: float = 15.0 # Subsystem hitpoints
@@ -166,7 +172,9 @@ class EngineSubsystem extends Resource:
 	@export var affects_performance: bool = true # Damaged engine affects performance
 	@export var thruster_effects: Array[String] = [] # Cross-references to effects
 
-class WeaponSubsystem extends Resource:
+
+class WeaponSubsystem:
+	extends Resource
 	"""Weapon subsystem configuration"""
 	@export var subsystem_name: String = "" # Subsystem name
 	@export var hitpoints: float = 10.0 # Subsystem hitpoints
@@ -174,14 +182,18 @@ class WeaponSubsystem extends Resource:
 	@export var affected_weapons: Array[int] = [] # Indices of affected weapon mounts
 	@export var damage_effect: float = 1.0 # Performance degradation multiplier
 
-class ShieldSubsystem extends Resource:
+
+class ShieldSubsystem:
+	extends Resource
 	"""Shield subsystem configuration"""
 	@export var subsystem_name: String = "" # Subsystem name
 	@export var shield_generator_type: String = "" # Generator type
 	@export var hitpoints: float = 20.0 # Subsystem hitpoints
 	@export var shield_regen_multiplier: float = 1.0 # Shield regeneration multiplier
 
-class TurretMount extends Resource:
+
+class TurretMount:
+	extends Resource
 	"""Turret mount specification"""
 	@export var turret_name: String = "" # Turret identifier
 	@export var base_position: Vector3 = Vector3.ZERO # Base mount position
@@ -191,10 +203,13 @@ class TurretMount extends Resource:
 	@export var azimuth_limits: Vector2 = Vector2(-180, 180) # Min/max azimuth angles
 	@export var weapon_class: String = "" # Allowed weapon type
 
+
 # ================== VALIDATION METHODS ==================
+
 
 func get_resource_type() -> String:
 	return "ship_stats"
+
 
 func validate() -> bool:
 	"""Comprehensive ship data validation"""
@@ -222,6 +237,7 @@ func validate() -> bool:
 
 	return is_valid
 
+
 func _validate_ship_identity() -> void:
 	"""Validate ship identity properties"""
 	if ship_class.is_empty():
@@ -238,6 +254,7 @@ func _validate_ship_identity() -> void:
 	if ship_role < 0 or ship_role > 3:
 		_add_validation_error("Ship role must be between 0 and 3")
 
+
 func _validate_visual_representation() -> void:
 	"""Validate visual representation properties"""
 	if model_file.is_empty():
@@ -250,6 +267,7 @@ func _validate_visual_representation() -> void:
 
 	_validate_detail_distances()
 
+
 func _validate_detail_distances() -> void:
 	"""Validate LOD detail distances"""
 	if detail_distances.size() < 2:
@@ -259,6 +277,7 @@ func _validate_detail_distances() -> void:
 	for i in range(detail_distances.size() - 1):
 		if detail_distances[i] >= detail_distances[i + 1]:
 			_add_validation_error("Detail distances must be in ascending order")
+
 
 func _validate_physics_properties() -> void:
 	"""Validate physics properties"""
@@ -283,6 +302,7 @@ func _validate_physics_properties() -> void:
 	if armor_total == 0 and hull_hitpoints > 0:
 		_add_validation_warning("No armor specified for a combat vessel")
 
+
 func _validate_movement_parameters() -> void:
 	"""Validate movement and performance parameters"""
 	# Validate velocities
@@ -306,6 +326,7 @@ func _validate_movement_parameters() -> void:
 	if rotational_dampening < 0:
 		_add_validation_error("Rotational dampening cannot be negative")
 
+
 func _validate_shield_systems() -> void:
 	"""Validate shield system properties"""
 	if shield_strength < 0:
@@ -319,6 +340,7 @@ func _validate_shield_systems() -> void:
 
 	if shield_regen_delay < 0:
 		_add_validation_error("Shield regeneration delay cannot be negative")
+
 
 func _validate_weapon_systems() -> void:
 	"""Validate weapon system configuration"""
@@ -342,6 +364,7 @@ func _validate_weapon_systems() -> void:
 	if weapon_energy_regen_rate < 0:
 		_add_validation_error("Weapon energy regeneration cannot be negative")
 
+
 func _validate_weapon_mount(mount: WeaponMount) -> void:
 	"""Validate individual weapon mount"""
 	if mount.mount_name.is_empty():
@@ -356,6 +379,7 @@ func _validate_weapon_mount(mount: WeaponMount) -> void:
 	if mount.fire_cooldown <= 0:
 		_add_validation_error("Weapon mount fire cooldown must be positive")
 
+
 func _validate_power_systems() -> void:
 	"""Validate power and energy systems"""
 	if max_afterburner_fuel < 0:
@@ -366,6 +390,7 @@ func _validate_power_systems() -> void:
 
 	if power_output <= 0:
 		_add_validation_warning("Power output should be positive for powered vessels")
+
 
 func _validate_ai_behavior() -> void:
 	"""Validate AI behavior parameters"""
@@ -381,6 +406,7 @@ func _validate_ai_behavior() -> void:
 	if ai_optimal_range <= 0:
 		_add_validation_error("AI optimal range must be positive")
 
+
 func _validate_subsystems() -> void:
 	"""Validate subsystem configurations"""
 	# Validate engine subsystems
@@ -393,7 +419,9 @@ func _validate_subsystems() -> void:
 		if weapon_sub.damage_effect <= 0:
 			_add_validation_error("Weapon subsystem damage effect must be positive")
 
+
 # ================== UTILITY METHODS ==================
+
 
 func get_weapon_mount_by_name(mount_name: String) -> WeaponMount:
 	"""Get weapon mount by name"""
@@ -401,6 +429,7 @@ func get_weapon_mount_by_name(mount_name: String) -> WeaponMount:
 		if mount.mount_name == mount_name:
 			return mount
 	return null
+
 
 func get_primary_weapon_mounts() -> Array[WeaponMount]:
 	"""Get all primary weapon mounts"""
@@ -410,6 +439,7 @@ func get_primary_weapon_mounts() -> Array[WeaponMount]:
 			primary_mounts.append(mount)
 	return primary_mounts
 
+
 func get_secondary_weapon_mounts() -> Array[WeaponMount]:
 	"""Get all secondary weapon mounts"""
 	var secondary_mounts = []
@@ -418,12 +448,14 @@ func get_secondary_weapon_mounts() -> Array[WeaponMount]:
 			secondary_mounts.append(mount)
 	return secondary_mounts
 
+
 func calculate_total_armor() -> float:
 	"""Calculate total armor value"""
 	var total_armor = 0.0
 	for armor_value in armor_thickness.values():
 		total_armor += armor_value
 	return total_armor
+
 
 func get_damage_profile() -> Dictionary:
 	"""Get ship damage profile based on armor distribution"""
@@ -440,7 +472,8 @@ func get_damage_profile() -> Dictionary:
 	return {
 		"fore_weakness": 1.0 - (armor_thickness["fore"] / total_armor),
 		"aft_weakness": 1.0 - (armor_thickness["aft"] / total_armor),
-		"side_weakness": 1.0 - ((armor_thickness["left"] + armor_thickness["right"]) / (2 * total_armor)),
+		"side_weakness":
+		1.0 - ((armor_thickness["left"] + armor_thickness["right"]) / (2 * total_armor)),
 		"top_weakness": 1.0 - (armor_thickness["top"] / total_armor),
 		"bottom_weakness": 1.0 - (armor_thickness["bottom"] / total_armor)
 	}

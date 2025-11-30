@@ -7,23 +7,12 @@ extends "res://scripts/resources/core/wcs_base_resource.gd"
 
 # === IDENTITY AND CLASSIFICATION ===
 @export_group("Identity", "identity_")
-@export var weapon_class: String = "" # Allowed weapon type
-@export var category: String = "" # Weapon category (Primary, Secondary, etc.)
+@export var weapon_class: String = ""  # Allowed weapon type
+@export var category: String = ""  # Weapon category (Primary, Secondary, etc.)
 
-enum WeaponType {
-	ENERGY = 0,
-	BALLISTIC = 1,
-	MISSILE = 2,
-	SPECIAL = 3
-}
+enum WeaponType { ENERGY = 0, BALLISTIC = 1, MISSILE = 2, SPECIAL = 3 }
 
-enum HomingType {
-	NONE = 0,
-	ASPECT = 1,
-	HEAT = 2,
-	IMAGE = 3,
-	FRIEND_FOE = 4
-}
+enum HomingType { NONE = 0, ASPECT = 1, HEAT = 2, IMAGE = 3, FRIEND_FOE = 4 }
 
 enum WeaponFlags {
 	BALLISTIC = 1 << 0,
@@ -44,95 +33,100 @@ enum WeaponFlags {
 	BOMBER_PLUS = 1 << 15,
 }
 
-class BeamConfiguration extends Resource:
+
+class BeamConfiguration:
+	extends Resource
 	"""Beam weapon specific configuration"""
-	@export var beam_type: int = 0 # 0=Standard, 1=Slash
-	@export var beam_life: float = 0.0 # Duration of beam
-	@export var beam_warmup: float = 0.0 # Warmup time
-	@export var beam_warmdown: float = 0.0 # Warmdown time
-	@export var beam_width: float = 1.0 # Width of the beam
-	@export var beam_glow_factor: float = 1.0 # Glow intensity
-	@export var beam_color: Color = Color.WHITE # Core color
-	@export var beam_outer_color: Color = Color.BLUE # Outer glow color
-	@export var beam_texture: String = "" # Texture path
-	@export var beam_sections: int = 1 # Number of sections
-	@export var range_multiplier: float = 1.0 # Range multiplier
+	@export var beam_type: int = 0  # 0=Standard, 1=Slash
+	@export var beam_life: float = 0.0  # Duration of beam
+	@export var beam_warmup: float = 0.0  # Warmup time
+	@export var beam_warmdown: float = 0.0  # Warmdown time
+	@export var beam_width: float = 1.0  # Width of the beam
+	@export var beam_glow_factor: float = 1.0  # Glow intensity
+	@export var beam_color: Color = Color.WHITE  # Core color
+	@export var beam_outer_color: Color = Color.BLUE  # Outer glow color
+	@export var beam_texture: String = ""  # Texture path
+	@export var beam_sections: int = 1  # Number of sections
+	@export var range_multiplier: float = 1.0  # Range multiplier
 
-class ParticleSpew extends Resource:
+
+class ParticleSpew:
+	extends Resource
 	"""Particle spew configuration"""
-	@export var count: int = 1 # Number of particles
-	@export var time: int = 1 # Duration/Frequency
-	@export var velocity: float = 0.0 # Particle velocity
-	@export var radius: float = 0.0 # Emitter radius
-	@export var lifetime: float = 0.0 # Particle lifetime
-	@export var scale: float = 1.0 # Particle scale
-	@export var bitmap: String = "" # Particle texture
+	@export var count: int = 1  # Number of particles
+	@export var time: int = 1  # Duration/Frequency
+	@export var velocity: float = 0.0  # Particle velocity
+	@export var radius: float = 0.0  # Emitter radius
+	@export var lifetime: float = 0.0  # Particle lifetime
+	@export var scale: float = 1.0  # Particle scale
+	@export var bitmap: String = ""  # Particle texture
 
-@export var display_name: String = "" # Display name (Ion Cannon)
-@export var weapon_family: String = "" # Weapon family classification
-@export var manufacturer_species: String = "" # Cross-reference to SpeciesData
-@export var tech_level: int = 0 # Technology era (0=WC1, 1=WC2, etc.)
-@export var weapon_type: WeaponType = WeaponType.ENERGY # 0=Energy, 1=Ballistic, 2=Missile, 3=Special
-@export var is_player_allowed: bool = true # Available to players
-@export var appears_in_tech_db: bool = false # Shows in tech database
-@export var is_stealth_weapon: bool = false # Undetectable when fired
-@export var is_beam: bool = false # Is a beam weapon
-@export var tech_description: String = "" # Technical description
+
+@export var display_name: String = ""  # Display name (Ion Cannon)
+@export var weapon_family: String = ""  # Weapon family classification
+@export var manufacturer_species: String = ""  # Cross-reference to SpeciesData
+@export var tech_level: int = 0  # Technology era (0=WC1, 1=WC2, etc.)
+@export var weapon_type: WeaponType = WeaponType.ENERGY  # 0=Energy, 1=Ballistic, 2=Missile, 3=Special
+@export var is_player_allowed: bool = true  # Available to players
+@export var appears_in_tech_db: bool = false  # Shows in tech database
+@export var is_stealth_weapon: bool = false  # Undetectable when fired
+@export var is_beam: bool = false  # Is a beam weapon
+@export var tech_description: String = ""  # Technical description
 
 # === PHYSICAL PROPERTIES ===
 @export_group("Physics", "physics_")
-@export var projectile_mass_kg: float = 0.2 # Projectile mass in kilograms
-@export var muzzle_velocity_mps: float = 810.0 # Muzzle velocity in meters/second
-@export var effective_range_meters: float = 907.2 # Maximum effective range
-@export var projectile_lifetime: float = 1.12 # Projectile lifetime in seconds
-@export var fire_rate_hz: float = 2.86 # Fire rate in shots per second
-@export var projectile_drag_coefficient: float = 0.0 # Air resistance (for atmospheric)
-@export var projectile_gravity_factor: float = 0.0 # Gravity influence
+@export var projectile_mass_kg: float = 0.2  # Projectile mass in kilograms
+@export var muzzle_velocity_mps: float = 810.0  # Muzzle velocity in meters/second
+@export var effective_range_meters: float = 907.2  # Maximum effective range
+@export var projectile_lifetime: float = 1.12  # Projectile lifetime in seconds
+@export var fire_rate_hz: float = 2.86  # Fire rate in shots per second
+@export var projectile_drag_coefficient: float = 0.0  # Air resistance (for atmospheric)
+@export var projectile_gravity_factor: float = 0.0  # Gravity influence
 
 # === DAMAGE MODELING ===
 @export_group("Damage", "damage_")
-@export var base_damage_energy: float = 30.0 # Base energy damage
-@export var damage_profile: String = "" # Cross-reference to damage profile
-@export var armor_penetration_factor: float = 1.0 # Armor penetration multiplier
-@export var shield_penetration_factor: float = 1.2 # Shield penetration multiplier
-@export var hull_penetration_factor: float = 1.0 # Hull penetration multiplier
-@export var subsystem_damage_factor: float = 0.7 # Subsystem damage multiplier
-@export var blast_radius: float = 0.0 # Blast radius for explosive weapons
-@export var explosion_damage: float = 0.0 # Explosion damage at center
-@export var shockwave_speed: float = 0.0 # Shockwave propagation speed
+@export var base_damage_energy: float = 30.0  # Base energy damage
+@export var damage_profile: String = ""  # Cross-reference to damage profile
+@export var armor_penetration_factor: float = 1.0  # Armor penetration multiplier
+@export var shield_penetration_factor: float = 1.2  # Shield penetration multiplier
+@export var hull_penetration_factor: float = 1.0  # Hull penetration multiplier
+@export var subsystem_damage_factor: float = 0.7  # Subsystem damage multiplier
+@export var blast_radius: float = 0.0  # Blast radius for explosive weapons
+@export var explosion_damage: float = 0.0  # Explosion damage at center
+@export var shockwave_speed: float = 0.0  # Shockwave propagation speed
 
 # === SURFACE DAMAGE MULTIPLIERS ===
 @export_group("Surface Multipliers", "surface_")
-@export var fore_damage_multiplier: float = 1.0 # Damage to fore armor
-@export var aft_damage_multiplier: float = 1.0 # Damage to aft armor
-@export var left_damage_multiplier: float = 1.0 # Damage to left armor
-@export var right_damage_multiplier: float = 1.0 # Damage to right armor
-@export var top_damage_multiplier: float = 1.0 # Damage to top armor
-@export var bottom_damage_multiplier: float = 1.0 # Damage to bottom armor
+@export var fore_damage_multiplier: float = 1.0  # Damage to fore armor
+@export var aft_damage_multiplier: float = 1.0  # Damage to aft armor
+@export var left_damage_multiplier: float = 1.0  # Damage to left armor
+@export var right_damage_multiplier: float = 1.0  # Damage to right armor
+@export var top_damage_multiplier: float = 1.0  # Damage to top armor
+@export var bottom_damage_multiplier: float = 1.0  # Damage to bottom armor
 
 # === ENERGY CONSUMPTION ===
 @export_group("Energy", "energy_")
-@export var energy_per_shot: float = 3.5 # Ship energy consumed per shot
-@export var heat_generated_per_shot: float = 5.0 # Heat units generated
-@export var overheat_threshold: float = 100.0 # Temperature to cause malfunction
-@export var cooling_rate: float = 10.0 # Heat dissipation per second
-@export var heat_capacity: float = 200.0 # Total heat capacity
-@export var thermal_efficiency: float = 0.95 # Energy to heat conversion
+@export var energy_per_shot: float = 3.5  # Ship energy consumed per shot
+@export var heat_generated_per_shot: float = 5.0  # Heat units generated
+@export var overheat_threshold: float = 100.0  # Temperature to cause malfunction
+@export var cooling_rate: float = 10.0  # Heat dissipation per second
+@export var heat_capacity: float = 200.0  # Total heat capacity
+@export var thermal_efficiency: float = 0.95  # Energy to heat conversion
 
 # === PROJECTILE VISUALS ===
 @export_group("Visual Effects", "visual_")
-@export var projectile_model: String = "" # Cross-reference to 3D model
-@export var laser_bitmap: String = "" # Cross-reference to 2D texture
-@export var laser_glow: String = "" # Cross-reference to glow effect
-@export var laser_length_meters: float = 10.0 # Visible laser length
-@export var laser_head_radius: float = 0.9 # Laser starting radius
-@export var laser_tail_radius: float = 0.9 # Laser ending radius
-@export var laser_primary_color: Color = Color(212, 16, 229) # Primary laser color
-@export var laser_secondary_color: Color = Color(0, 0, 0) # Secondary laser color
-@export var muzzle_flash_effect: String = "" # Cross-reference to effect
-@export var impact_effect: String = "" # Cross-reference to effect
-@export var explosion_effect: String = "" # Cross-reference to effect
-@export var projectile_trail_effect: String = "" # Cross-reference to trail effect
+@export var projectile_model: String = ""  # Cross-reference to 3D model
+@export var laser_bitmap: String = ""  # Cross-reference to 2D texture
+@export var laser_glow: String = ""  # Cross-reference to glow effect
+@export var laser_length_meters: float = 10.0  # Visible laser length
+@export var laser_head_radius: float = 0.9  # Laser starting radius
+@export var laser_tail_radius: float = 0.9  # Laser ending radius
+@export var laser_primary_color: Color = Color(212, 16, 229)  # Primary laser color
+@export var laser_secondary_color: Color = Color(0, 0, 0)  # Secondary laser color
+@export var muzzle_flash_effect: String = ""  # Cross-reference to effect
+@export var impact_effect: String = ""  # Cross-reference to effect
+@export var explosion_effect: String = ""  # Cross-reference to effect
+@export var projectile_trail_effect: String = ""  # Cross-reference to trail effect
 
 # === BEAM WEAPON CONFIGURATION ===
 @export_group("Beam Configuration", "beam_")
@@ -142,40 +136,49 @@ class ParticleSpew extends Resource:
 @export_group("Corkscrew Configuration", "corkscrew_")
 @export var corkscrew_config: CorkscrewConfiguration
 
-class CorkscrewConfiguration extends Resource:
+
+class CorkscrewConfiguration:
+	extends Resource
 	"""Corkscrew missile configuration"""
-	@export var num_missiles: int = 4 # Number of missiles fired
-	@export var radius: float = 1.25 # Radius of the corkscrew
-	@export var twist_rate: float = 5.0 # Twist rate in degrees/second
-	@export var shrink_rate: float = 0.0 # Rate at which radius shrinks
-	@export var fire_delay: float = 0.03 # Delay between missile firings (s)
-	@export var counter_rotate: bool = true # Counter-rotate every other missile
-	@export var helix: bool = true # Point missile in direction of spiral
-	@export var down_first: bool = true # Go down first
+	@export var num_missiles: int = 4  # Number of missiles fired
+	@export var radius: float = 1.25  # Radius of the corkscrew
+	@export var twist_rate: float = 5.0  # Twist rate in degrees/second
+	@export var shrink_rate: float = 0.0  # Rate at which radius shrinks
+	@export var fire_delay: float = 0.03  # Delay between missile firings (s)
+	@export var counter_rotate: bool = true  # Counter-rotate every other missile
+	@export var helix: bool = true  # Point missile in direction of spiral
+	@export var down_first: bool = true  # Go down first
+
 
 # === FLAK CONFIGURATION ===
 @export_group("Flak Configuration", "flak_")
 @export var flak_config: FlakConfiguration
 
-class FlakConfiguration extends Resource:
+
+class FlakConfiguration:
+	extends Resource
 	"""Flak weapon configuration"""
-	@export var target_range: float = 100.0 # Range to detonate
-	@export var range_variance: float = 0.0 # Variance in detonation range
-	@export var explosion_radius: float = 10.0 # Radius of flak explosion
-	@export var damage_falloff: bool = true # Damage falls off with distance
-	@export var jitter: float = 0.0 # Jitter in detonation position
-	@export var offset: float = 0.0 # Offset from target center
+	@export var target_range: float = 100.0  # Range to detonate
+	@export var range_variance: float = 0.0  # Variance in detonation range
+	@export var explosion_radius: float = 10.0  # Radius of flak explosion
+	@export var damage_falloff: bool = true  # Damage falls off with distance
+	@export var jitter: float = 0.0  # Jitter in detonation position
+	@export var offset: float = 0.0  # Offset from target center
+
 
 # === SWARM CONFIGURATION ===
 @export_group("Swarm Configuration", "swarm_")
 @export var swarm_config: SwarmConfiguration
 
-class SwarmConfiguration extends Resource:
+
+class SwarmConfiguration:
+	extends Resource
 	"""Swarm missile configuration"""
-	@export var count: int = 0 # Number of missiles in swarm
-	@export var wait_time: float = 0.1 # Time between shots
-	@export var spread_angle: float = 0.0 # Spread angle
-	@export var path_jitter: float = 0.0 # Random path variation
+	@export var count: int = 0  # Number of missiles in swarm
+	@export var wait_time: float = 0.1  # Time between shots
+	@export var spread_angle: float = 0.0  # Spread angle
+	@export var path_jitter: float = 0.0  # Random path variation
+
 
 # === PARTICLE SPEW CONFIGURATION ===
 @export_group("Particle Spew", "pspew_")
@@ -184,7 +187,9 @@ class SwarmConfiguration extends Resource:
 @export_group("Trail", "trail_")
 @export var trail_config: TrailConfiguration
 
-class TrailConfiguration extends Resource:
+
+class TrailConfiguration:
+	extends Resource
 	"""Weapon trail configuration"""
 	@export var bitmap: String = ""
 	@export var start_width: float = 1.0
@@ -193,87 +198,89 @@ class TrailConfiguration extends Resource:
 	@export var end_alpha: float = 0.0
 	@export var max_life: float = 1.0
 
+
 @export_group("Targeting", "targeting_")
-@export var homing_type: HomingType = HomingType.NONE # 0=None, 1=Aspect, 2=Heat, 3=Image, 4=Friend/Foe
-@export var guidance_package: String = "" # Cross-reference to guidance system
-@export var lock_time_seconds: float = 2.0 # Time to achieve lock (default 2.0)
-@export var min_lock_time: float = 0.0 # Minimum lock time (override?)
-@export var lock_range_meters: float = 1500.0 # Maximum lock range
-@export var lock_field_of_view_degrees: float = 5.0 # FOV for target acquisition
-@export var view_cone_degrees: float = 0.0 # FOV for heat seekers (View Cone)
-@export var max_turn_rate_dps: float = 0.0 # Maximum turn rate in degrees/second
-@export var max_seek_distance: float = 2000.0 # Maximum seek distance
-@export var seeking_duration_seconds: float = 10.0 # Seeking duration
-@export var decoy_resistance: float = 0.8 # Resistance to countermeasures
-@export var target_tracking_accuracy: float = 0.95 # Tracking accuracy (0.0-1.0)
-@export var free_flight_time: float = 0.25 # Time before homing begins
-@export var turn_time: float = 0.0 # Time to complete a turn (used to calc rate)
+@export var homing_type: HomingType = HomingType.NONE  # 0=None, 1=Aspect, 2=Heat, 3=Image, 4=Friend/Foe
+@export var guidance_package: String = ""  # Cross-reference to guidance system
+@export var lock_time_seconds: float = 2.0  # Time to achieve lock (default 2.0)
+@export var min_lock_time: float = 0.0  # Minimum lock time (override?)
+@export var lock_range_meters: float = 1500.0  # Maximum lock range
+@export var lock_field_of_view_degrees: float = 5.0  # FOV for target acquisition
+@export var view_cone_degrees: float = 0.0  # FOV for heat seekers (View Cone)
+@export var max_turn_rate_dps: float = 0.0  # Maximum turn rate in degrees/second
+@export var max_seek_distance: float = 2000.0  # Maximum seek distance
+@export var seeking_duration_seconds: float = 10.0  # Seeking duration
+@export var decoy_resistance: float = 0.8  # Resistance to countermeasures
+@export var target_tracking_accuracy: float = 0.95  # Tracking accuracy (0.0-1.0)
+@export var free_flight_time: float = 0.25  # Time before homing begins
+@export var turn_time: float = 0.0  # Time to complete a turn (used to calc rate)
 
 # === BURST AND MULTI-SHOT ===
 @export_group("Burst Fire", "burst_")
-@export var shots_per_burst: int = 1 # Number of shots in burst
-@export var burst_fire_delay: float = 0.0 # Delay between burst shots
-@export var burst_cooldown: float = 0.0 # Cooldown after burst
-@export var multi_shot_count: int = 1 # Projectiles per shot (swarm)
-@export var shot_spread_pattern: Vector2 = Vector2.ZERO # Shot spread angles (horizontal, vertical)
-@export var spawn_angle: float = 0.0 # Angle for spawned weapons
-@export var rearm_rate: float = 0.0 # Rate of rearming
+@export var shots_per_burst: int = 1  # Number of shots in burst
+@export var burst_fire_delay: float = 0.0  # Delay between burst shots
+@export var burst_cooldown: float = 0.0  # Cooldown after burst
+@export var multi_shot_count: int = 1  # Projectiles per shot (swarm)
+@export var shot_spread_pattern: Vector2 = Vector2.ZERO  # Shot spread angles (horizontal, vertical)
+@export var spawn_angle: float = 0.0  # Angle for spawned weapons
+@export var rearm_rate: float = 0.0  # Rate of rearming
 
 # === VISUAL EFFECTS ===
 
-
 # === COUNTERMEASURE INTERACTION ===
 @export_group("Countermeasures", "cm_")
-@export var countermeasure_vulnerability: float = 0.0 # Vulnerability to countermeasures
-@export var chaff_effectiveness_multiplier: float = 1.0 # Chaff effectiveness
-@export var flare_effectiveness_multiplier: float = 1.0 # Flare effectiveness
-@export var stealth_detection_range_modifier: float = 1.0 # Stealth detection modification
+@export var countermeasure_vulnerability: float = 0.0  # Vulnerability to countermeasures
+@export var chaff_effectiveness_multiplier: float = 1.0  # Chaff effectiveness
+@export var flare_effectiveness_multiplier: float = 1.0  # Flare effectiveness
+@export var stealth_detection_range_modifier: float = 1.0  # Stealth detection modification
 
 # === SPECIAL CHARACTERISTICS ===
 @export_group("Special", "special_")
-@export var cargo_size_units: float = 0.0 # Cargo space required (float in TBL)
-@export var is_bomb_type: bool = false # Requires bombing bay
-@export var is_huge_weapon: bool = false # Requires capital ship mount
-@export var no_shield_piercing: bool = false # Cannot penetrate shields
-@export var pierces_shields_only: bool = false # Only damages shields
-@export var drains_energy_on_hit: float = 0.0 # Energy drained from target
-@export var disables_subsystems_chance: float = 0.0 # Chance to disable subsystems
-@export var emp_intensity: float = 0.0 # EMP intensity
-@export var emp_time: float = 0.0 # EMP duration
-@export var swarm_count: int = 0 # Swarm missile count
-@export var swarm_wait: float = 0.0 # Wait between swarm shots
-@export var flags: int = 0 # Bitmask flags (WeaponFlags)
-@export var impact_explosion: String = "" # Impact explosion ANI
-@export var impact_explosion_radius: float = 0.0 # Impact explosion radius
+@export var cargo_size_units: float = 0.0  # Cargo space required (float in TBL)
+@export var is_bomb_type: bool = false  # Requires bombing bay
+@export var is_huge_weapon: bool = false  # Requires capital ship mount
+@export var no_shield_piercing: bool = false  # Cannot penetrate shields
+@export var pierces_shields_only: bool = false  # Only damages shields
+@export var drains_energy_on_hit: float = 0.0  # Energy drained from target
+@export var disables_subsystems_chance: float = 0.0  # Chance to disable subsystems
+@export var emp_intensity: float = 0.0  # EMP intensity
+@export var emp_time: float = 0.0  # EMP duration
+@export var swarm_count: int = 0  # Swarm missile count
+@export var swarm_wait: float = 0.0  # Wait between swarm shots
+@export var flags: int = 0  # Bitmask flags (WeaponFlags)
+@export var impact_explosion: String = ""  # Impact explosion ANI
+@export var impact_explosion_radius: float = 0.0  # Impact explosion radius
 
 # === AUDIO SYSTEMS ===
 @export_group("Audio", "audio_")
-@export var launch_sound_resource: String = "" # Cross-reference to audio
-@export var impact_sound_resource: String = "" # Cross-reference to audio
-@export var flyby_sound_resource: String = "" # Cross-reference to audio
-@export var lock_acquisition_sound: String = "" # Cross-reference to audio
-@export var lock_lost_sound: String = "" # Cross-reference to audio
-@export var missile_tracking_sound: String = "" # Cross-reference to audio
-@export var launch_sound_id: int = -1 # Raw sound ID from TBL
-@export var impact_sound_id: int = -1 # Raw sound ID from TBL
-@export var flyby_sound_id: int = -1 # Raw sound ID from TBL
+@export var launch_sound_resource: String = ""  # Cross-reference to audio
+@export var impact_sound_resource: String = ""  # Cross-reference to audio
+@export var flyby_sound_resource: String = ""  # Cross-reference to audio
+@export var lock_acquisition_sound: String = ""  # Cross-reference to audio
+@export var lock_lost_sound: String = ""  # Cross-reference to audio
+@export var missile_tracking_sound: String = ""  # Cross-reference to audio
+@export var launch_sound_id: int = -1  # Raw sound ID from TBL
+@export var impact_sound_id: int = -1  # Raw sound ID from TBL
+@export var flyby_sound_id: int = -1  # Raw sound ID from TBL
 
 # === VISUALIZATION HELPERS ===
 @export_group("Visualization", "viz_")
-@export var display_icon: String = "" # Cross-reference to UI icon
-@export var tech_animation: String = "" # Cross-reference to tech animation
-@export var loadout_visual: String = "" # Cross-reference to loadout art
-@export var inventory_model: String = "" # Cross-reference to inventory model
+@export var display_icon: String = ""  # Cross-reference to UI icon
+@export var tech_animation: String = ""  # Cross-reference to tech animation
+@export var loadout_visual: String = ""  # Cross-reference to loadout art
+@export var inventory_model: String = ""  # Cross-reference to inventory model
 
 # Validation signals
-signal damage_calculation_changed()
-signal targeting_parameters_changed()
-signal visual_effects_changed()
+signal damage_calculation_changed
+signal targeting_parameters_changed
+signal visual_effects_changed
 
 # ================== VALIDATION METHODS ==================
 
+
 func get_resource_type() -> String:
 	return "weapon_data"
+
 
 func validate() -> bool:
 	"""Comprehensive weapon data validation with physics modeling"""
@@ -302,6 +309,7 @@ func validate() -> bool:
 
 	return is_valid
 
+
 func _validate_weapon_identity() -> void:
 	"""Validate weapon identity properties"""
 	if weapon_class.is_empty():
@@ -320,6 +328,7 @@ func _validate_weapon_identity() -> void:
 		_add_validation_warning("Manufacturer species not specified")
 	else:
 		add_cross_reference_dependency("res://scripts/resources/species_data.gd")
+
 
 func _validate_physics_modeling() -> void:
 	"""Validate physics-based properties"""
@@ -342,6 +351,7 @@ func _validate_physics_modeling() -> void:
 
 	if fire_rate_hz > 50.0:
 		_add_validation_warning("Very high fire rate may affect performance")
+
 
 func _validate_damage_profile() -> void:
 	"""Validate damage modeling parameters"""
@@ -366,6 +376,7 @@ func _validate_damage_profile() -> void:
 			_add_validation_error("Explosive weapons must have positive explosion damage")
 		if shockwave_speed <= 0:
 			_add_validation_error("Explosive weapons must have positive shockwave speed")
+
 
 func _validate_surface_multipliers() -> void:
 	"""Validate surface damage multipliers"""
@@ -393,6 +404,7 @@ func _validate_surface_multipliers() -> void:
 			_add_validation_warning("Surface damage multipliers have high variance")
 			break
 
+
 func _validate_energy_system() -> void:
 	"""Validate weapon energy consumption"""
 	if energy_per_shot < 0:
@@ -409,6 +421,7 @@ func _validate_energy_system() -> void:
 
 	if heat_capacity <= 0 and heat_generated_per_shot > 0:
 		_add_validation_error("Heat capacity must be positive when heat is generated")
+
 
 func _validate_visual_effects() -> void:
 	"""Validate visual effect references"""
@@ -427,19 +440,20 @@ func _validate_visual_effects() -> void:
 			add_cross_reference_dependency(effect_ref)
 
 	# Validate laser visual properties
-	if weapon_type == 0: # Energy weapon
+	if weapon_type == 0:  # Energy weapon
 		if laser_length_meters <= 0:
 			_add_validation_warning("Laser weapon has zero length")
 
 		if laser_head_radius <= 0 or laser_tail_radius <= 0:
 			_add_validation_error("Laser radius must be positive")
 
+
 func _validate_targeting_system() -> void:
 	"""Validate homing and targeting systems"""
 	if homing_type < 0 or homing_type > 4:
 		_add_validation_error("Homing type must be between 0 and 4")
 
-	if homing_type > 0: # Any homing weapon
+	if homing_type > 0:  # Any homing weapon
 		if lock_time_seconds < 0:
 			_add_validation_error("Lock time cannot be negative")
 
@@ -458,6 +472,7 @@ func _validate_targeting_system() -> void:
 	if lock_range_meters > 0 and homing_type == 0:
 		_add_validation_warning("Non-homing weapon has lock range defined")
 
+
 func _validate_countermeasures() -> void:
 	"""Validate countermeasure interaction properties"""
 	if countermeasure_vulnerability < 0 or countermeasure_vulnerability > 1:
@@ -468,6 +483,7 @@ func _validate_countermeasures() -> void:
 
 	if flare_effectiveness_multiplier < 0:
 		_add_validation_error("Flare effectiveness multiplier cannot be negative")
+
 
 func _validate_special_properties() -> void:
 	"""Validate special weapon properties"""
@@ -483,11 +499,14 @@ func _validate_special_properties() -> void:
 
 	# Validate weapon category flags
 	var special_flags = 0
-	if is_bomb_type: special_flags += 1
-	if is_huge_weapon: special_flags += 1
+	if is_bomb_type:
+		special_flags += 1
+	if is_huge_weapon:
+		special_flags += 1
 
 	if special_flags > 1:
 		_add_validation_warning("Weapon has multiple special type flags")
+
 
 func _validate_audio_resources() -> void:
 	"""Validate audio resource references"""
@@ -504,7 +523,9 @@ func _validate_audio_resources() -> void:
 		if not audio_ref.is_empty():
 			add_cross_reference_dependency(audio_ref)
 
+
 # ================== DAMAGE CALCULATION METHODS ==================
+
 
 func calculate_damage_against_target(
 	target_species: String,
@@ -585,7 +606,9 @@ func calculate_damage_against_target(
 	result["subsystem_damage"] = result["hull_damage"] * subsystem_damage_factor
 
 	# Calculate total damage
-	result["total_damage"] = result["shield_damage"] + result["armor_damage"] + result["hull_damage"]
+	result["total_damage"] = (
+		result["shield_damage"] + result["armor_damage"] + result["hull_damage"]
+	)
 
 	# Apply explosion damage if applicable
 	if blast_radius > 0 and result["total_damage"] > 0:
@@ -602,36 +625,43 @@ func calculate_damage_against_target(
 
 	return result
 
+
 func get_surface_damage_multiplier(impact_point_local: Vector3) -> float:
 	"""Get surface damage multiplier based on impact location"""
 	var normalized_point = impact_point_local.normalized()
 
 	# Determine surface based on normal direction
-	if normalized_point.z > 0.5: # Fore
+	if normalized_point.z > 0.5:  # Fore
 		return fore_damage_multiplier
-	elif normalized_point.z < -0.5: # Aft
+	elif normalized_point.z < -0.5:  # Aft
 		return aft_damage_multiplier
-	elif normalized_point.x > 0.5: # Right
+	elif normalized_point.x > 0.5:  # Right
 		return right_damage_multiplier
-	elif normalized_point.x < -0.5: # Left
+	elif normalized_point.x < -0.5:  # Left
 		return left_damage_multiplier
-	elif normalized_point.y > 0.5: # Top
+	elif normalized_point.y > 0.5:  # Top
 		return top_damage_multiplier
-	elif normalized_point.y < -0.5: # Bottom
+	elif normalized_point.y < -0.5:  # Bottom
 		return bottom_damage_multiplier
 	else:
 		# Inconclusive - return average
-		return (fore_damage_multiplier + aft_damage_multiplier +
-				left_damage_multiplier + right_damage_multiplier +
-				top_damage_multiplier + bottom_damage_multiplier) / 6.0
+		return (
+			(
+				fore_damage_multiplier
+				+ aft_damage_multiplier
+				+ left_damage_multiplier
+				+ right_damage_multiplier
+				+ top_damage_multiplier
+				+ bottom_damage_multiplier
+			)
+			/ 6.0
+		)
+
 
 func calculate_explosion_damage(target_position: Vector3, explosion_radius: float) -> Dictionary:
 	"""Calculate explosion damage at target position"""
 	var result = {
-		"explosion_damage": 0.0,
-		"armor_damage": 0.0,
-		"hull_damage": 0.0,
-		"shield_damage": 0.0
+		"explosion_damage": 0.0, "armor_damage": 0.0, "hull_damage": 0.0, "shield_damage": 0.0
 	}
 
 	if blast_radius <= 0 or explosion_damage <= 0:
@@ -642,7 +672,7 @@ func calculate_explosion_damage(target_position: Vector3, explosion_radius: floa
 	var damage_falloff = 1.0 - clamp(distance_from_center / blast_radius, 0.0, 1.0)
 
 	if damage_falloff <= 0:
-		return result # Too far from explosion
+		return result  # Too far from explosion
 
 	# Calculate explosion damage
 	var explosion_damage_amount = explosion_damage * damage_falloff
@@ -655,11 +685,14 @@ func calculate_explosion_damage(target_position: Vector3, explosion_radius: floa
 
 	return result
 
+
 # ================== UTILITY METHODS ==================
+
 
 func get_damage_per_second() -> float:
 	"""Calculate theoretical damage per second"""
 	return base_damage_energy * fire_rate_hz
+
 
 func get_energy_efficiency() -> float:
 	"""Calculate energy efficiency (damage per energy unit)"""
@@ -667,23 +700,28 @@ func get_energy_efficiency() -> float:
 		return 0.0
 	return base_damage_energy / energy_per_shot
 
+
 func get_thermal_efficiency() -> float:
 	"""Calculate thermal efficiency (damage per heat unit)"""
 	if heat_generated_per_shot <= 0:
 		return 0.0
 	return base_damage_energy / heat_generated_per_shot
 
+
 func is_explosive() -> bool:
 	"""Check if weapon is explosive"""
 	return blast_radius > 0 and explosion_damage > 0
+
 
 func is_homing() -> bool:
 	"""Check if weapon has homing capability"""
 	return homing_type > 0 and max_turn_rate_dps > 0
 
+
 func is_burst_weapon() -> bool:
 	"""Check if weapon fires in bursts"""
 	return shots_per_burst > 1
+
 
 func get_homing_type_name() -> String:
 	"""Get human-readable homing type name"""
@@ -691,6 +729,7 @@ func get_homing_type_name() -> String:
 	if homing_type >= 0 and homing_type < homing_types.size():
 		return homing_types[homing_type]
 	return "Unknown"
+
 
 func get_weapon_type_name() -> String:
 	"""Get human-readable weapon type name"""

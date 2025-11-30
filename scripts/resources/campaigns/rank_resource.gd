@@ -1,6 +1,5 @@
 extends Resource
 
-
 @export var name: String
 @export var bitmap: Texture2D
 @export var promotion_text: String

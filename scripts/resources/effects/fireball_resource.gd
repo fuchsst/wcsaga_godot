@@ -22,8 +22,9 @@ enum FireballType {
 @export var texture_name: String = ""
 @export var radius: float = 1.0
 @export var render_type: FireballType = FireballType.EXPLOSION_MEDIUM
-@export var warp_lifetime: float = 2.35 # Default grow time
+@export var warp_lifetime: float = 2.35  # Default grow time
 @export var is_warp: bool = false
+
 
 func get_resource_type() -> String:
 	return "fireball"

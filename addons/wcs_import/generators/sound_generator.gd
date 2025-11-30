@@ -4,6 +4,7 @@ extends RefCounted
 const SoundManifest = preload("res://scripts/resources/sounds/sound_manifest.gd")
 const AudioConfigResource = preload("res://scripts/resources/sounds/audio_config_resource.gd")
 
+
 func generate(manifest: SoundManifest, output_dir: String, source_root: String) -> bool:
 	var save_dir = output_dir
 	if not DirAccess.dir_exists_absolute(save_dir):
@@ -24,6 +25,7 @@ func generate(manifest: SoundManifest, output_dir: String, source_root: String) 
 
 	print("Saved sounds manifest to: " + save_path)
 	return true
+
 
 func _convert_audio_config(config: Resource, source_root: String, output_dir: String) -> void:
 	var filename = config.filename
@@ -48,6 +50,7 @@ func _convert_audio_config(config: Resource, source_root: String, output_dir: St
 		else:
 			print("Warning: Could not find source for sound: " + filename)
 
+
 func _find_source_asset(root_path: String, filename: String, extensions: Array = []) -> String:
 	var found = _find_file_recursive(root_path, filename)
 	if found.is_empty() and not extensions.is_empty():
@@ -58,6 +61,7 @@ func _find_source_asset(root_path: String, filename: String, extensions: Array =
 			if not found.is_empty():
 				break
 	return found
+
 
 func _find_file_recursive(dir_path: String, filename: String) -> String:
 	if not DirAccess.dir_exists_absolute(dir_path):
@@ -80,12 +84,15 @@ func _find_file_recursive(dir_path: String, filename: String) -> String:
 			file_name = dir.get_next()
 	return ""
 
+
 func _convert_asset(source_path: String, target_dir: String, type: String) -> bool:
 	var global_source = ProjectSettings.globalize_path(source_path)
 	var global_target = ProjectSettings.globalize_path(target_dir)
 
 	# uv run python -m converter convert input output --type type
-	var args = ["run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type]
+	var args = [
+		"run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type
+	]
 
 	# print("Converting " + type + ": " + global_source + " -> " + global_target)
 	var output = []

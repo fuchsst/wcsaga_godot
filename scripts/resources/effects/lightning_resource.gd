@@ -5,10 +5,7 @@ extends "res://scripts/resources/core/wcs_base_resource.gd"
 ## Defines lightning bolts and storms.
 ## Maps to lightning.tbl
 
-enum LightningType {
-	BOLT = 0,
-	STORM = 1
-}
+enum LightningType { BOLT = 0, STORM = 1 }
 
 @export var name: String = ""
 @export var type: LightningType = LightningType.BOLT
@@ -21,7 +18,7 @@ enum LightningType {
 @export var b_rand: float = 0.0
 @export var b_add: float = 0.0
 @export var b_strikes: int = 1
-@export var b_lifetime: float = 0.0 # in seconds (converted from ms)
+@export var b_lifetime: float = 0.0  # in seconds (converted from ms)
 @export var b_noise: float = 0.0
 @export var b_emp_intensity: float = 0.0
 @export var b_emp_time: float = 0.0
@@ -33,10 +30,11 @@ enum LightningType {
 @export_group("Storm")
 @export var s_bolt_types: Array[String] = []
 @export var s_flavor: Vector3 = Vector3.ZERO
-@export var s_random_freq_min: float = 0.0 # in seconds
-@export var s_random_freq_max: float = 0.0 # in seconds
+@export var s_random_freq_min: float = 0.0  # in seconds
+@export var s_random_freq_max: float = 0.0  # in seconds
 @export var s_random_count_min: int = 1
 @export var s_random_count_max: int = 1
+
 
 func get_resource_type() -> String:
 	return "lightning"

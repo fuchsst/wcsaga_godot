@@ -8,5 +8,6 @@ class_name WCSSunFlare
 @export var position: float = 0.0
 @export var scale: float = 1.0
 
+
 func get_resource_type() -> String:
 	return "sun_flare"

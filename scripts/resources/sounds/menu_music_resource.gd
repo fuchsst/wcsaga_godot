@@ -39,5 +39,6 @@ extends "res://scripts/resources/core/wcs_base_resource.gd"
 @export var credits: AudioStream
 @export var credits_filename: String = ""
 
+
 func get_resource_type() -> String:
 	return "menu_music"

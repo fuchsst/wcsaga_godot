@@ -3,6 +3,7 @@
 
 extends GdUnitTestSuite
 
+
 # Test the complete resource pipeline
 func test_complete_resource_pipeline():
 	# This test would run in a Godot environment with access to filesystem
@@ -25,6 +26,7 @@ func test_complete_resource_pipeline():
 	if manager.has_method("resolve_all_cross_references"):
 		manager.resolve_all_cross_references()
 
+
 func _create_test_manager():
 	# Create a test resource manager instance
 	var manager_script = load("res://target/scripts/resource_loaders/wcs_resource_manager.gd")
@@ -33,6 +35,7 @@ func _create_test_manager():
 		manager.resources_base_path = "res://target/scripts/resources/"
 		return manager
 	return null
+
 
 func test_resource_creation_workflow():
 	# Test creating resources programmatically
@@ -46,6 +49,7 @@ func test_resource_creation_workflow():
 	var valid = ship_stats.validate()
 	assert_bool(valid).is_true()
 
+
 func test_resource_validation_workflow():
 	# Test with invalid data
 	var weapon = WeaponData.new()
@@ -55,6 +59,7 @@ func test_resource_validation_workflow():
 	var valid = weapon.validate()
 	assert_bool(valid).is_false()
 	assert_int(weapon.validation_errors.size()).is_greater_than(0)
+
 
 func test_cross_reference_dependency():
 	# Create a species and ship that reference it

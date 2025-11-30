@@ -3,6 +3,7 @@ extends RefCounted
 
 const WCSPathResolver = preload("res://addons/wcs_import/core/path_resolver.gd")
 
+
 func generate(ships: Array, output_dir: String, source_root: String) -> bool:
 	print("Processing " + str(ships.size()) + " ships...")
 
@@ -10,7 +11,7 @@ func generate(ships: Array, output_dir: String, source_root: String) -> bool:
 		# Determine output path using PathResolver
 		var pof_file = res.model_file
 		if pof_file.is_empty():
-			pof_file = res.ship_class + ".pof" # Fallback
+			pof_file = res.ship_class + ".pof"  # Fallback
 			res.model_file = pof_file
 
 		var path_info = WCSPathResolver.determine_output_path(pof_file)
@@ -18,11 +19,11 @@ func generate(ships: Array, output_dir: String, source_root: String) -> bool:
 		var subcategory = path_info[1]
 
 		var filename = _normalize_filename(res.ship_class)
-		
+
 		# Create per-ship subfolder
 		var ship_dir = output_dir.path_join(category).path_join(subcategory).path_join(filename)
 		DirAccess.make_dir_recursive_absolute(ship_dir)
-		
+
 		# Convert POF Model
 		var pof_source = _find_source_asset(source_root, pof_file)
 		if not pof_source.is_empty():
@@ -43,12 +44,14 @@ func generate(ships: Array, output_dir: String, source_root: String) -> bool:
 
 	return true
 
+
 func _normalize_filename(name: String) -> String:
 	var n = name.to_lower()
 	n = n.replace(" ", "_")
 	n = n.replace("-", "_")
 	n = n.replace("#", "_")
 	return n
+
 
 func _find_source_asset(root_path: String, filename: String, extensions: Array = []) -> String:
 	var found = _find_file_recursive(root_path, filename)
@@ -59,6 +62,7 @@ func _find_source_asset(root_path: String, filename: String, extensions: Array =
 			if not found.is_empty():
 				break
 	return found
+
 
 func _find_file_recursive(dir_path: String, filename: String) -> String:
 	if not DirAccess.dir_exists_absolute(dir_path):
@@ -81,11 +85,16 @@ func _find_file_recursive(dir_path: String, filename: String) -> String:
 			file_name = dir.get_next()
 	return ""
 
-func _convert_asset(source_path: String, target_dir: String, type: String, extra_args: Array = []) -> bool:
+
+func _convert_asset(
+	source_path: String, target_dir: String, type: String, extra_args: Array = []
+) -> bool:
 	var global_source = ProjectSettings.globalize_path(source_path)
 	var global_target = ProjectSettings.globalize_path(target_dir)
 
-	var args = ["run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type]
+	var args = [
+		"run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type
+	]
 	args.append_array(extra_args)
 
 	var output = []

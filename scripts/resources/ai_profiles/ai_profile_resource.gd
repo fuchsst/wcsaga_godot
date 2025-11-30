@@ -8,8 +8,8 @@ extends Resource
 ## Each profile defines AI behavior flags that control how AI ships behave in combat.
 
 @export_group("AI Profile")
-@export var difficulty_level: String = "" ## Difficulty level: Very Easy, Easy, Medium, Hard, Insane
-@export var profile_name: String = "" ## Name of the profile (usually matches difficulty_level)
+@export var difficulty_level: String = ""  ## Difficulty level: Very Easy, Easy, Medium, Hard, Insane
+@export var profile_name: String = ""  ## Name of the profile (usually matches difficulty_level)
 
 ## Legacy float attributes (may not be in all TBL versions)
 @export var accuracy: float = 1.0
@@ -118,6 +118,7 @@ extends Resource
 ## Miscellaneous
 @export var repair_penalty: int = 35
 @export var delay_before_allowing_bombs_to_be_shot_down: float = 1.5
+
 
 func get_resource_type() -> String:
 	return "ai_profile"

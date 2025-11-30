@@ -6,4 +6,4 @@ extends Resource
 ## Holds a collection of cutscenes for a campaign.
 
 # Dictionary of cutscenes, keyed by filename (without extension)
-@export var cutscenes: Dictionary = {} # { String: CutsceneResource }
+@export var cutscenes: Dictionary = {}  # { String: CutsceneResource }

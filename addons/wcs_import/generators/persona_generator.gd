@@ -7,7 +7,8 @@ const PersonaResource = preload("res://scripts/resources/persona/persona_resourc
 # We use globalized paths for source to ensure we can find them outside the project if needed,
 # but here they are in the project source_assets folder.
 const SOURCE_SOUNDS_DIR = "res://../source_assets/wcs_hermes_campaign/hermes_sounds"
-const SOURCE_MOVIES_DIR = "res://../source_assets/wcs_hermes_campaign/hermes_movies" # Assumption
+const SOURCE_MOVIES_DIR = "res://../source_assets/wcs_hermes_campaign/hermes_movies"  # Assumption
+
 
 func generate_persona(persona: PersonaResource, output_root: String, source_root: String) -> void:
 	# Target: target/campaigns/hermes/persona/<PersonaName>/
@@ -25,7 +26,9 @@ func generate_persona(persona: PersonaResource, output_root: String, source_root
 		if not msg.wave_filename.is_empty():
 			# Search in source_root/hermes_sounds (or similar)
 			# We can use _find_asset with source_root
-			var wave_source = _find_asset(msg.wave_filename, [source_root.path_join("hermes_sounds"), source_root])
+			var wave_source = _find_asset(
+				msg.wave_filename, [source_root.path_join("hermes_sounds"), source_root]
+			)
 			if wave_source:
 				# Convert to OGG
 				var target_ogg_filename = msg.wave_filename.get_basename() + ".ogg"
@@ -55,7 +58,14 @@ func generate_persona(persona: PersonaResource, output_root: String, source_root
 
 		# Handle Video (AVI)
 		if not msg.avi_filename.is_empty():
-			var avi_source = _find_asset(msg.avi_filename, [source_root.path_join("hermes_movies"), source_root.path_join("../data/movies"), source_root])
+			var avi_source = _find_asset(
+				msg.avi_filename,
+				[
+					source_root.path_join("hermes_movies"),
+					source_root.path_join("../data/movies"),
+					source_root
+				]
+			)
 			if avi_source:
 				# Convert to OGV
 				var target_ogv_filename = msg.avi_filename.get_basename() + ".ogv"
@@ -85,6 +95,7 @@ func generate_persona(persona: PersonaResource, output_root: String, source_root
 	ResourceSaver.save(persona, resource_path)
 	print("Saved persona: " + resource_path)
 
+
 func _find_asset(filename: String, search_dirs: Array) -> String:
 	for dir in search_dirs:
 		var path = dir.path_join(filename)
@@ -94,6 +105,7 @@ func _find_asset(filename: String, search_dirs: Array) -> String:
 		if not found.is_empty():
 			return dir.path_join(found)
 	return ""
+
 
 func _find_file_case_insensitive(dir_path: String, filename: String) -> String:
 	var dir = DirAccess.open(dir_path)
@@ -107,12 +119,15 @@ func _find_file_case_insensitive(dir_path: String, filename: String) -> String:
 			file_name = dir.get_next()
 	return ""
 
+
 func _convert_asset(source_path: String, target_path: String, type: String) -> bool:
 	var global_source = ProjectSettings.globalize_path(source_path)
 	var global_target = ProjectSettings.globalize_path(target_path)
 
 	# uv run python -m converter convert input output --type type
-	var args = ["run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type]
+	var args = [
+		"run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type
+	]
 
 	print("Converting " + type + ": " + global_source + " -> " + global_target)
 	var output = []

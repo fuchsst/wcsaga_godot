@@ -1,6 +1,7 @@
 class_name MainhallGenerator
 extends RefCounted
 
+
 func generate(mainhall: Resource, output_dir: String, source_root: String) -> bool:
 	DirAccess.make_dir_recursive_absolute(output_dir)
 
@@ -27,7 +28,9 @@ func generate(mainhall: Resource, output_dir: String, source_root: String) -> bo
 	# 3. Door Icons
 	for door in mainhall.doors:
 		if not door.icon.is_empty():
-			var source = _find_source_asset(source_root, door.icon, [".pcx", ".dds", ".png", ".ani"])
+			var source = _find_source_asset(
+				source_root, door.icon, [".pcx", ".dds", ".png", ".ani"]
+			)
 			if not source.is_empty():
 				var type = "texture"
 				if source.ends_with(".ani"):
@@ -46,6 +49,7 @@ func generate(mainhall: Resource, output_dir: String, source_root: String) -> bo
 	print("Saved mainhall: " + save_path)
 	return true
 
+
 func _find_source_asset(root_path: String, filename: String, extensions: Array = []) -> String:
 	var found = _find_file_recursive(root_path, filename)
 	if found.is_empty() and not extensions.is_empty():
@@ -55,6 +59,7 @@ func _find_source_asset(root_path: String, filename: String, extensions: Array =
 			if not found.is_empty():
 				break
 	return found
+
 
 func _find_file_recursive(dir_path: String, filename: String) -> String:
 	if not DirAccess.dir_exists_absolute(dir_path):
@@ -77,11 +82,14 @@ func _find_file_recursive(dir_path: String, filename: String) -> String:
 			file_name = dir.get_next()
 	return ""
 
+
 func _convert_asset(source_path: String, target_dir: String, type: String) -> bool:
 	var global_source = ProjectSettings.globalize_path(source_path)
 	var global_target = ProjectSettings.globalize_path(target_dir)
 
-	var args = ["run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type]
+	var args = [
+		"run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type
+	]
 
 	var output = []
 	var exit_code = OS.execute("uv", args, output, true)

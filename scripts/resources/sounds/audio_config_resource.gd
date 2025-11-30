@@ -11,9 +11,10 @@ extends "res://scripts/resources/core/wcs_base_resource.gd"
 @export var audio_stream: AudioStream
 @export var preload_sound: bool = false
 @export var default_volume: float = 1.0
-@export var is_3d: int = 0 # 0=None, 1=Stereo, 2=Aureal
+@export var is_3d: int = 0  # 0=None, 1=Stereo, 2=Aureal
 @export var min_distance: float = 0.0
 @export var max_distance: float = 0.0
+
 
 func get_resource_type() -> String:
 	return "audio_config"

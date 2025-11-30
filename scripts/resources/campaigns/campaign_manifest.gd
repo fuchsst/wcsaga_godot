@@ -9,26 +9,27 @@ const CampaignMission = preload("res://scripts/resources/campaigns/campaign_miss
 # === METADATA ===
 @export_group("Metadata", "meta_")
 @export var campaign_name: String = ""
-@export var campaign_type: String = "single" # single, multi
+@export var campaign_type: String = "single"  # single, multi
 @export var description: String = ""
 @export var author: String = ""
 
 # === MEDIA ===
 @export_group("Media", "media_")
-@export var intro_cutscene: String = "" # Path to cutscene
-@export var end_cutscene: String = "" # Path to cutscene
-@export var description_anim: String = "" # Path to animation
+@export var intro_cutscene: String = ""  # Path to cutscene
+@export var end_cutscene: String = ""  # Path to cutscene
+@export var description_anim: String = ""  # Path to animation
 
 # === CONFIGURATION ===
 @export_group("Configuration", "config_")
-@export var starting_ships: Array[String] = [] # List of allowed ships
-@export var starting_weapons: Array[String] = [] # List of allowed weapons
+@export var starting_ships: Array[String] = []  # List of allowed ships
+@export var starting_weapons: Array[String] = []  # List of allowed weapons
 @export var loop_mission: bool = false
-@export var flags: Array[String] = [] # Campaign flags
+@export var flags: Array[String] = []  # Campaign flags
 
 # === MISSIONS ===
 @export_group("Missions", "mission_")
 @export var missions: Array[CampaignMission] = []
+
 
 func get_resource_type() -> String:
 	return "campaign_manifest"

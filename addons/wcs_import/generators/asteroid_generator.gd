@@ -7,6 +7,7 @@ extends RefCounted
 const AsteroidData = preload("res://scripts/resources/asteroids/asteroid_data.gd")
 const Asteroid = preload("res://scripts/entities/asteroid/asteroid.gd")
 
+
 func generate(data: Dictionary, output_dir: String, source_root: String) -> bool:
 	var asteroid_id = data.get("resource_identifier", "unknown")
 	var asteroid_name = data.get("asteroid_name", "Unknown Asteroid")
@@ -74,7 +75,7 @@ func generate(data: Dictionary, output_dir: String, source_root: String) -> bool
 	# Add Collision Shape (Placeholder - Sphere)
 	var collision = CollisionShape3D.new()
 	var shape = SphereShape3D.new()
-	shape.radius = 10.0 # Default
+	shape.radius = 10.0  # Default
 	collision.shape = shape
 	collision.name = "CollisionShape3D"
 	root.add_child(collision)
@@ -113,7 +114,7 @@ func generate(data: Dictionary, output_dir: String, source_root: String) -> bool
 
 			# Update collision radius from first variation
 			if i == 0:
-				shape.radius = 20.0 # Placeholder - ideally calculated from AABB
+				shape.radius = 20.0  # Placeholder - ideally calculated from AABB
 
 			# Hide by default (except first one)
 			instance.visible = (i == 0)
@@ -143,6 +144,7 @@ func generate(data: Dictionary, output_dir: String, source_root: String) -> bool
 	root.free()
 	return true
 
+
 func _find_source_asset(root_path: String, filename: String, extensions: Array = []) -> String:
 	var found = _find_file_recursive(root_path, filename)
 	if found.is_empty() and not extensions.is_empty():
@@ -152,6 +154,7 @@ func _find_source_asset(root_path: String, filename: String, extensions: Array =
 			if not found.is_empty():
 				break
 	return found
+
 
 func _find_file_recursive(dir_path: String, filename: String) -> String:
 	if not DirAccess.dir_exists_absolute(dir_path):
@@ -174,11 +177,14 @@ func _find_file_recursive(dir_path: String, filename: String) -> String:
 			file_name = dir.get_next()
 	return ""
 
+
 func _convert_asset(source_path: String, target_dir: String, type: String) -> bool:
 	var global_source = ProjectSettings.globalize_path(source_path)
 	var global_target = ProjectSettings.globalize_path(target_dir)
 
-	var args = ["run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type]
+	var args = [
+		"run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type
+	]
 
 	var output = []
 	var exit_code = OS.execute("uv", args, output, true)

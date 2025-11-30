@@ -1,8 +1,9 @@
 class_name MusicGenerator
 extends RefCounted
 
-const SoundtrackResource = preload("res://scripts/resources/soundtrack/soundtrack_resource.gd")
-const MenuMusicResource = preload("res://scripts/resources/soundtrack/menu_music_resource.gd")
+const SoundtrackResource = preload("res://scripts/resources/sounds/soundtrack_resource.gd")
+const MenuMusicResource = preload("res://scripts/resources/sounds/menu_music_resource.gd")
+
 
 func generate(parsed_data: Dictionary, output_dir: String, source_root: String) -> bool:
 	var soundtracks = parsed_data.get("soundtracks", [])
@@ -43,6 +44,7 @@ func generate(parsed_data: Dictionary, output_dir: String, source_root: String) 
 	print("Saved " + str(saved_count) + " soundtracks and menu music.")
 	return true
 
+
 func _convert_soundtrack_assets(res: Resource, source_root: String, output_dir: String) -> void:
 	# Iterate over properties ending in _filename
 	var props = res.get_property_list()
@@ -70,6 +72,7 @@ func _convert_soundtrack_assets(res: Resource, source_root: String, output_dir: 
 				else:
 					print("Warning: Could not find source for music: " + filename)
 
+
 func _convert_menu_music_assets(res: Resource, source_root: String, output_dir: String) -> void:
 	var props = res.get_property_list()
 	for prop in props:
@@ -95,6 +98,7 @@ func _convert_menu_music_assets(res: Resource, source_root: String, output_dir: 
 				else:
 					print("Warning: Could not find source for menu music: " + filename)
 
+
 func _find_source_asset(root_path: String, filename: String, extensions: Array = []) -> String:
 	var found = _find_file_recursive(root_path, filename)
 	if found.is_empty() and not extensions.is_empty():
@@ -104,6 +108,7 @@ func _find_source_asset(root_path: String, filename: String, extensions: Array =
 			if not found.is_empty():
 				break
 	return found
+
 
 func _find_file_recursive(dir_path: String, filename: String) -> String:
 	if not DirAccess.dir_exists_absolute(dir_path):
@@ -126,11 +131,14 @@ func _find_file_recursive(dir_path: String, filename: String) -> String:
 			file_name = dir.get_next()
 	return ""
 
+
 func _convert_asset(source_path: String, target_dir: String, type: String) -> bool:
 	var global_source = ProjectSettings.globalize_path(source_path)
 	var global_target = ProjectSettings.globalize_path(target_dir)
 
-	var args = ["run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type]
+	var args = [
+		"run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type
+	]
 
 	var output = []
 	var exit_code = OS.execute("uv", args, output, true)

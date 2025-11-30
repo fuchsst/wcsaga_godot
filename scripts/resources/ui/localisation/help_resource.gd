@@ -11,5 +11,6 @@ extends "res://scripts/resources/core/wcs_base_resource.gd"
 @export var text: String = ""
 @export var category: String = "general"
 
+
 func get_resource_type() -> String:
 	return "help"

@@ -10,5 +10,6 @@ extends "res://scripts/resources/core/wcs_base_resource.gd"
 @export var type: String = ""
 @export var config_data: Dictionary = {}
 
+
 func get_resource_type() -> String:
 	return "environment"

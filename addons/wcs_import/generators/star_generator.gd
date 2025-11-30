@@ -4,6 +4,7 @@ extends RefCounted
 const WCSSunData = preload("res://scripts/resources/environment/stars/sun_data.gd")
 const WCSSunFlare = preload("res://scripts/resources/environment/stars/sun_flare.gd")
 
+
 func generate(result: Dictionary, output_dir: String, source_root: String) -> bool:
 	var success = true
 
@@ -12,10 +13,10 @@ func generate(result: Dictionary, output_dir: String, source_root: String) -> bo
 	# suns -> target/assets/environment/suns/
 	# debris -> target/assets/environment/debris/
 
-	var stars_dir = output_dir # target/assets/environment/stars
-	var suns_dir = output_dir.get_base_dir().path_join("suns") # target/assets/environment/suns
-	var debris_dir = output_dir.get_base_dir().path_join("debris") # target/assets/environment/debris
-	var debris_neb_dir = output_dir.get_base_dir().path_join("debris_neb") # target/assets/environment/debris_neb
+	var stars_dir = output_dir  # target/assets/environment/stars
+	var suns_dir = output_dir.get_base_dir().path_join("suns")  # target/assets/environment/suns
+	var debris_dir = output_dir.get_base_dir().path_join("debris")  # target/assets/environment/debris
+	var debris_neb_dir = output_dir.get_base_dir().path_join("debris_neb")  # target/assets/environment/debris_neb
 
 	DirAccess.make_dir_recursive_absolute(stars_dir)
 	DirAccess.make_dir_recursive_absolute(suns_dir)
@@ -27,7 +28,9 @@ func generate(result: Dictionary, output_dir: String, source_root: String) -> bo
 		# star is WCSStarBitmapData, has filename
 		var tex_filename = star.filename
 		if not tex_filename.is_empty():
-			var source_file = _find_source_asset(source_root, tex_filename, [".pcx", ".dds", ".png", ".tga"])
+			var source_file = _find_source_asset(
+				source_root, tex_filename, [".pcx", ".dds", ".png", ".tga"]
+			)
 			if not source_file.is_empty():
 				_convert_asset(source_file, stars_dir, "texture")
 
@@ -55,9 +58,11 @@ func generate(result: Dictionary, output_dir: String, source_root: String) -> bo
 		# Handle sunglow texture
 		var sunglow_name = sun_dict.get("sunglow_filename", "")
 		if not sunglow_name.is_empty():
-			var source_file = _find_source_asset(source_root, sunglow_name, [".pcx", ".dds", ".png", ".tga"])
+			var source_file = _find_source_asset(
+				source_root, sunglow_name, [".pcx", ".dds", ".png", ".tga"]
+			)
 			if not source_file.is_empty():
-				_convert_asset(source_file, stars_dir, "texture") # Save texture to stars dir? Or suns dir? User said images go to stars/
+				_convert_asset(source_file, stars_dir, "texture")  # Save texture to stars dir? Or suns dir? User said images go to stars/
 				# Load the converted texture using PlaceholderTexture2D to ensure path is saved
 				var png_filename = source_file.get_file().get_basename() + ".png"
 				var png_path = stars_dir.path_join(png_filename)
@@ -81,9 +86,11 @@ func generate(result: Dictionary, output_dir: String, source_root: String) -> bo
 
 			var flare_tex_name = flare_dict.get("texture_filename", "")
 			if not flare_tex_name.is_empty():
-				var source_file = _find_source_asset(source_root, flare_tex_name, [".pcx", ".dds", ".png", ".tga"])
+				var source_file = _find_source_asset(
+					source_root, flare_tex_name, [".pcx", ".dds", ".png", ".tga"]
+				)
 				if not source_file.is_empty():
-					_convert_asset(source_file, stars_dir, "texture") # Save texture to stars dir
+					_convert_asset(source_file, stars_dir, "texture")  # Save texture to stars dir
 					var png_filename = source_file.get_file().get_basename() + ".png"
 					var png_path = stars_dir.path_join(png_filename)
 
@@ -117,7 +124,9 @@ func generate(result: Dictionary, output_dir: String, source_root: String) -> bo
 			target_dir = debris_neb_dir
 
 		if not tex_filename.is_empty():
-			var source_file = _find_source_asset(source_root, tex_filename, [".pcx", ".dds", ".png", ".tga", ".ani", ".eff"])
+			var source_file = _find_source_asset(
+				source_root, tex_filename, [".pcx", ".dds", ".png", ".tga", ".ani", ".eff"]
+			)
 			if not source_file.is_empty():
 				var ext = source_file.get_extension().to_lower()
 				if ext == "ani" or ext == "eff":
@@ -132,6 +141,7 @@ func generate(result: Dictionary, output_dir: String, source_root: String) -> bo
 
 	return success
 
+
 func _find_source_asset(root_path: String, filename: String, extensions: Array = []) -> String:
 	var found = _find_file_recursive(root_path, filename)
 	if found.is_empty() and not extensions.is_empty():
@@ -141,6 +151,7 @@ func _find_source_asset(root_path: String, filename: String, extensions: Array =
 			if not found.is_empty():
 				break
 	return found
+
 
 func _find_file_recursive(dir_path: String, filename: String) -> String:
 	if not DirAccess.dir_exists_absolute(dir_path):
@@ -163,11 +174,14 @@ func _find_file_recursive(dir_path: String, filename: String) -> String:
 			file_name = dir.get_next()
 	return ""
 
+
 func _convert_asset(source_path: String, target_dir: String, type: String) -> bool:
 	var global_source = ProjectSettings.globalize_path(source_path)
 	var global_target = ProjectSettings.globalize_path(target_dir)
 
-	var args = ["run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type]
+	var args = [
+		"run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type
+	]
 
 	var output = []
 	var exit_code = OS.execute("uv", args, output, true)

@@ -2,6 +2,7 @@ extends RefCounted
 
 const WeaponExplosionResource = preload("res://scripts/resources/effects/weapon_expl_resource.gd")
 
+
 func generate(resource: WeaponExplosionResource, output_dir: String, source_root: String) -> bool:
 	var filename = resource.name
 	if filename.is_empty():
@@ -40,14 +41,26 @@ func generate(resource: WeaponExplosionResource, output_dir: String, source_root
 
 	# LOD 0
 	# Frames are now in a subdirectory with the same name as the resource
-	var base_lod_path = "res://assets/effects/explosions/" + resource.name.to_lower() + "/" + resource.name.to_lower() + ".tres"
+	var base_lod_path = (
+		"res://assets/effects/explosions/"
+		+ resource.name.to_lower()
+		+ "/"
+		+ resource.name.to_lower()
+		+ ".tres"
+	)
 	resource.lod_paths.append(base_lod_path)
 
 	# LOD 1+
 	for i in range(1, resource.lod_count):
 		var lod_name = resource.name + "_" + str(i)
 		# Assuming LODs are also sequences in their own subdirectories
-		var lod_path = "res://assets/effects/explosions/" + lod_name.to_lower() + "/" + lod_name.to_lower() + ".tres"
+		var lod_path = (
+			"res://assets/effects/explosions/"
+			+ lod_name.to_lower()
+			+ "/"
+			+ lod_name.to_lower()
+			+ ".tres"
+		)
 		resource.lod_paths.append(lod_path)
 
 	# 1. Save Resource (.tres)
@@ -71,7 +84,8 @@ func generate(resource: WeaponExplosionResource, output_dir: String, source_root
 	if not uid.is_empty():
 		uid_str = ' uid="' + uid + '"'
 
-	var tscn_content = """[gd_scene load_steps=3 format=3]
+	var tscn_content = (
+		"""[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/entities/effects/weapon_explosion.gd" id="1_script"]
 [ext_resource type="Resource"%s path="%s" id="2_resource"]
@@ -79,7 +93,9 @@ func generate(resource: WeaponExplosionResource, output_dir: String, source_root
 [node name="%s" type="Node3D"]
 script = ExtResource("1_script")
 resource = ExtResource("2_resource")
-""" % [uid_str, res_path, filename]
+"""
+		% [uid_str, res_path, filename]
+	)
 
 	var tscn_path = target_dir.path_join(filename + ".tscn")
 	var file = FileAccess.open(tscn_path, FileAccess.WRITE)
@@ -92,11 +108,13 @@ resource = ExtResource("2_resource")
 
 	return true
 
+
 func _get_uid(path: String) -> String:
 	var uid = ResourceLoader.get_resource_uid(path)
 	if uid != -1:
 		return ResourceUID.id_to_text(uid)
 	return ""
+
 
 func _find_source_asset(root_path: String, filename: String, extensions: Array = []) -> String:
 	var found = _find_file_recursive(root_path, filename)
@@ -107,6 +125,7 @@ func _find_source_asset(root_path: String, filename: String, extensions: Array =
 			if not found.is_empty():
 				break
 	return found
+
 
 func _find_file_recursive(dir_path: String, filename: String) -> String:
 	if not DirAccess.dir_exists_absolute(dir_path):
@@ -129,11 +148,14 @@ func _find_file_recursive(dir_path: String, filename: String) -> String:
 			file_name = dir.get_next()
 	return ""
 
+
 func _convert_asset(source_path: String, target_dir: String, type: String) -> bool:
 	var global_source = ProjectSettings.globalize_path(source_path)
 	var global_target = ProjectSettings.globalize_path(target_dir)
 
-	var args = ["run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type]
+	var args = [
+		"run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type
+	]
 
 	var output = []
 	var exit_code = OS.execute("uv", args, output, true)

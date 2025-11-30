@@ -4,6 +4,7 @@ extends RefCounted
 const WeaponSceneGenerator = preload("res://addons/wcs_import/generators/weapon_scene_generator.gd")
 const WCSPathResolver = preload("res://addons/wcs_import/core/path_resolver.gd")
 
+
 func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 	print("Processing " + str(weapons.size()) + " weapons...")
 
@@ -22,7 +23,9 @@ func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 		var faction_dir = res.manufacturer_species.to_lower().replace(" ", "_")
 		var weapon_slug = res.weapon_class.to_lower().replace(" ", "_")
 
-		var weapon_dir = weapons_root.path_join(category_dir).path_join(faction_dir).path_join(weapon_slug)
+		var weapon_dir = weapons_root.path_join(category_dir).path_join(faction_dir).path_join(
+			weapon_slug
+		)
 		DirAccess.make_dir_recursive_absolute(weapon_dir)
 
 		# 2. Convert POF Model
@@ -37,19 +40,25 @@ func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 
 		# 3. Convert/Copy Textures and Icons
 		if not res.display_icon.is_empty():
-			var icon_source = _find_source_asset(source_root, res.display_icon, [".pcx", ".dds", ".png"])
+			var icon_source = _find_source_asset(
+				source_root, res.display_icon, [".pcx", ".dds", ".png"]
+			)
 			if not icon_source.is_empty():
 				_convert_asset(icon_source, weapon_dir, "texture")
-				res.display_icon = icon_source.get_file().get_basename() + ".png" # Assuming conversion to PNG
+				res.display_icon = icon_source.get_file().get_basename() + ".png"  # Assuming conversion to PNG
 
 		if not res.laser_bitmap.is_empty():
-			var laser_source = _find_source_asset(source_root, res.laser_bitmap, [".pcx", ".dds", ".png"])
+			var laser_source = _find_source_asset(
+				source_root, res.laser_bitmap, [".pcx", ".dds", ".png"]
+			)
 			if not laser_source.is_empty():
 				_convert_asset(laser_source, weapon_dir, "texture")
 				res.laser_bitmap = laser_source.get_file().get_basename() + ".png"
 
 		if not res.laser_glow.is_empty():
-			var glow_source = _find_source_asset(source_root, res.laser_glow, [".pcx", ".dds", ".png"])
+			var glow_source = _find_source_asset(
+				source_root, res.laser_glow, [".pcx", ".dds", ".png"]
+			)
 			if not glow_source.is_empty():
 				_convert_asset(glow_source, weapon_dir, "texture")
 				res.laser_glow = glow_source.get_file().get_basename() + ".png"
@@ -57,7 +66,7 @@ func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 		if not res.tech_animation.is_empty():
 			var anim_source = _find_source_asset(source_root, res.tech_animation, [".ani", ".eff"])
 			if not anim_source.is_empty():
-				_convert_asset(anim_source, weapon_dir, "ui") # Or animation type
+				_convert_asset(anim_source, weapon_dir, "ui")  # Or animation type
 				# res.tech_animation updated by generator or here?
 				# For now assume generator handles the resource path if it's standard
 
@@ -67,7 +76,7 @@ func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 			# Assuming explosion generator puts them in assets/effects/weapon_expl or similar
 			# The user mentioned "target/assets/effects/explosion/"
 			var expl_name = res.impact_explosion.get_basename()
-			var expl_path = "res://assets/effects/explosions/" + expl_name + ".tscn" # Adjust path based on actual generator output
+			var expl_path = "res://assets/effects/explosions/" + expl_name + ".tscn"  # Adjust path based on actual generator output
 			res.impact_explosion = expl_path
 
 		# 5. Generate Scene and Resource
@@ -75,11 +84,13 @@ func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 
 	return true
 
+
 func _resolve_output_path(base_output_dir: String, subpath: String) -> String:
 	# If subpath starts with "assets/" and base_output_dir ends with "assets", strip it
 	if subpath.begins_with("assets/") and base_output_dir.ends_with("assets"):
 		return base_output_dir.path_join(subpath.substr(7))
 	return base_output_dir.path_join(subpath)
+
 
 func _find_source_asset(root_path: String, filename: String, extensions: Array = []) -> String:
 	var found = _find_file_recursive(root_path, filename)
@@ -90,6 +101,7 @@ func _find_source_asset(root_path: String, filename: String, extensions: Array =
 			if not found.is_empty():
 				break
 	return found
+
 
 func _find_file_recursive(dir_path: String, filename: String) -> String:
 	if not DirAccess.dir_exists_absolute(dir_path):
@@ -112,11 +124,14 @@ func _find_file_recursive(dir_path: String, filename: String) -> String:
 			file_name = dir.get_next()
 	return ""
 
+
 func _convert_asset(source_path: String, target_dir: String, type: String) -> bool:
 	var global_source = ProjectSettings.globalize_path(source_path)
 	var global_target = ProjectSettings.globalize_path(target_dir)
 
-	var args = ["run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type]
+	var args = [
+		"run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type
+	]
 
 	var output = []
 	var exit_code = OS.execute("uv", args, output, true)

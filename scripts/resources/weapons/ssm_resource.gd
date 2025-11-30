@@ -11,5 +11,6 @@ extends "res://scripts/resources/core/wcs_base_resource.gd"
 @export var damage: float = 0.0
 @export var radius: float = 0.0
 
+
 func get_resource_type() -> String:
 	return "ssm"

@@ -8,7 +8,8 @@ extends "res://scripts/resources/core/wcs_base_resource.gd"
 
 @export_group("Menu Layout")
 @export var bitmap_filename: String = ""
-@export var region_definitions: Array[Dictionary] = [] # { "name": "...", "coords": [...] }
+@export var region_definitions: Array[Dictionary] = []  # { "name": "...", "coords": [...] }
+
 
 func get_resource_type() -> String:
 	return "menu"

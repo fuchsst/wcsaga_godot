@@ -9,5 +9,6 @@ extends "res://scripts/resources/core/wcs_base_resource.gd"
 @export_group("Message")
 @export var messages: Dictionary = {}
 
+
 func get_resource_type() -> String:
 	return "message"

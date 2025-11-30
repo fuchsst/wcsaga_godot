@@ -31,19 +31,20 @@ const AsteroidField = preload("res://scripts/resources/missions/asteroid_field.g
 @export var command_briefing: Array[CommandBriefingStage] = []
 
 # Asset Dependencies
-@export var cutscenes: Array[VideoStream] = [] # List of video streams
-@export var audio: Array[Dictionary] = [] # { "path": "...", "usage": "..." }
-@export var animations: Array[Dictionary] = [] # { "path": "...", "usage": "..." }
-@export var models: Array[Dictionary] = [] # { "path": "...", "usage": "..." }
+@export var cutscenes: Array[VideoStream] = []  # List of video streams
+@export var audio: Array[Dictionary] = []  # { "path": "...", "usage": "..." }
+@export var animations: Array[Dictionary] = []  # { "path": "...", "usage": "..." }
+@export var models: Array[Dictionary] = []  # { "path": "...", "usage": "..." }
 
 ## List of fiction/text files
-@export var fiction: Array[Dictionary] = [] # { "path": "...", "usage": "..." }
+@export var fiction: Array[Dictionary] = []  # { "path": "...", "usage": "..." }
 
 # === LOGIC & ENVIRONMENT ===
 @export var sexp_variables: Array[SexpVariable] = []
 @export var players: PlayerData = PlayerData.new()
 @export var backgrounds: BackgroundData = BackgroundData.new()
 @export var asteroid_fields: Array[AsteroidField] = []
+
 
 func get_resource_type() -> String:
 	return "mission_manifest"

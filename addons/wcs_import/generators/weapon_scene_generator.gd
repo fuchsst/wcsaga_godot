@@ -7,6 +7,7 @@ const Missile = preload("res://scripts/entities/missile.gd")
 const BeamWeapon = preload("res://scripts/entities/beam_weapon.gd")
 const FlakWeapon = preload("res://scripts/entities/flak_weapon.gd")
 
+
 func generate_scene(weapon_data: WCSWeaponData, output_root: String) -> void:
 	# Determine folder structure: target/assets/weapons/<category>/<faction>/<weapon>/
 	# The parser now populates category and manufacturer_species based on path mapping rules
@@ -18,7 +19,9 @@ func generate_scene(weapon_data: WCSWeaponData, output_root: String) -> void:
 
 	var weapon_slug = weapon_data.weapon_class.to_lower().replace(" ", "_")
 
-	var target_dir = output_root.path_join(category_slug).path_join(faction_slug).path_join(weapon_slug)
+	var target_dir = output_root.path_join(category_slug).path_join(faction_slug).path_join(
+		weapon_slug
+	)
 
 	# Ensure directory exists
 	if not DirAccess.dir_exists_absolute(target_dir):
@@ -49,7 +52,10 @@ func generate_scene(weapon_data: WCSWeaponData, output_root: String) -> void:
 	root_node.weapon_data = weapon_data
 
 	# 5. Instantiate Visuals
-	if not weapon_data.projectile_model.is_empty() and weapon_data.projectile_model.ends_with(".glb"):
+	if (
+		not weapon_data.projectile_model.is_empty()
+		and weapon_data.projectile_model.ends_with(".glb")
+	):
 		var model_path = target_dir.path_join(weapon_data.projectile_model)
 		if FileAccess.file_exists(model_path):
 			var model_scene = load(model_path)
@@ -60,7 +66,6 @@ func generate_scene(weapon_data: WCSWeaponData, output_root: String) -> void:
 				model_instance.name = "Visuals"
 		else:
 			print("Warning: Model file not found at " + model_path)
-
 
 	# Pack and Save Scene
 	var packed_scene = PackedScene.new()

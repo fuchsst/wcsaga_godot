@@ -9,5 +9,6 @@ extends "res://scripts/resources/sounds/audio_config_resource.gd"
 @export var faction: String = ""
 @export var index: int = 0
 
+
 func get_resource_type() -> String:
 	return "flyby_sound"

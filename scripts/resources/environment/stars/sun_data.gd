@@ -12,5 +12,6 @@ class_name WCSSunData
 ## Array of WCSSunFlare resources (stored as Resource to avoid cyclic dependency issues)
 @export var flares: Array[Resource] = []
 
+
 func get_resource_type() -> String:
 	return "sun_data"

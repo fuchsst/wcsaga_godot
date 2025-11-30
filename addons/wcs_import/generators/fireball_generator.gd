@@ -7,6 +7,7 @@ extends RefCounted
 const FireballResource = preload("res://scripts/resources/effects/fireball_resource.gd")
 const FireballScript = preload("res://scripts/entities/effects/fireball.gd")
 
+
 func generate(resource: FireballResource, output_dir: String, source_root: String) -> bool:
 	var fireball_name = resource.name
 	if fireball_name.is_empty():
@@ -54,7 +55,8 @@ func generate(resource: FireballResource, output_dir: String, source_root: Strin
 	if not uid.is_empty():
 		uid_str = ' uid="uid://' + uid + '"'
 
-	var tscn_content = """[gd_scene load_steps=3 format=3]
+	var tscn_content = (
+		"""[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/entities/effects/fireball.gd" id="1_script"]
 [ext_resource type="SpriteFrames"%s path="%s" id="2_frames"]
@@ -66,7 +68,9 @@ script = ExtResource("1_script")
 sprite_frames = ExtResource("2_frames")
 pixel_size = 0.1
 billboard = 1
-""" % [uid_str, res_path, fireball_name]
+"""
+		% [uid_str, res_path, fireball_name]
+	)
 
 	var tscn_path = asset_dir.path_join(fireball_name + ".tscn")
 	var file = FileAccess.open(tscn_path, FileAccess.WRITE)
@@ -80,6 +84,7 @@ billboard = 1
 
 	return true
 
+
 func _get_uid(path: String) -> String:
 	var file = FileAccess.open(path, FileAccess.READ)
 	if file:
@@ -92,6 +97,7 @@ func _get_uid(path: String) -> String:
 			return result.get_string(1)
 	return ""
 
+
 func _find_source_asset(root_path: String, filename: String, extensions: Array = []) -> String:
 	var found = _find_file_recursive(root_path, filename)
 	if found.is_empty() and not extensions.is_empty():
@@ -101,6 +107,7 @@ func _find_source_asset(root_path: String, filename: String, extensions: Array =
 			if not found.is_empty():
 				break
 	return found
+
 
 func _find_file_recursive(dir_path: String, filename: String) -> String:
 	if not DirAccess.dir_exists_absolute(dir_path):
@@ -123,11 +130,14 @@ func _find_file_recursive(dir_path: String, filename: String) -> String:
 			file_name = dir.get_next()
 	return ""
 
+
 func _convert_asset(source_path: String, target_dir: String, type: String) -> bool:
 	var global_source = ProjectSettings.globalize_path(source_path)
 	var global_target = ProjectSettings.globalize_path(target_dir)
 
-	var args = ["run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type]
+	var args = [
+		"run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type
+	]
 
 	var output = []
 	var exit_code = OS.execute("uv", args, output, true)

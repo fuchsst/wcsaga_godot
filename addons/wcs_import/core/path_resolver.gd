@@ -85,13 +85,18 @@ const MISC_MAPPINGS = {
 	"launcher": ["utility", "launcher"],
 }
 
+
 static func determine_output_path(filename: String) -> Array:
 	var file_base = filename.get_file().get_basename()
-	
+
 	if file_base in SPECIAL_CASES:
 		return SPECIAL_CASES[file_base]
-		
-	if file_base.begins_with("ast") or file_base.begins_with("asta") or file_base.begins_with("astb"):
+
+	if (
+		file_base.begins_with("ast")
+		or file_base.begins_with("asta")
+		or file_base.begins_with("astb")
+	):
 		var asteroid_id = ""
 		if file_base.begins_with("asta"):
 			asteroid_id = file_base.substr(4)
@@ -99,7 +104,7 @@ static func determine_output_path(filename: String) -> Array:
 			asteroid_id = file_base.substr(4)
 		elif file_base.begins_with("ast"):
 			asteroid_id = file_base.substr(3)
-			
+
 		if asteroid_id.is_empty():
 			asteroid_id = "01"
 		return ["asteroid", "asteroid_" + asteroid_id]
@@ -124,10 +129,11 @@ static func determine_output_path(filename: String) -> Array:
 
 	return ["misc", "unknown"]
 
+
 static func determine_asset_output_path(filename: String) -> Array:
 	var ext = filename.get_extension().to_lower()
 	var name = filename.to_lower()
-	
+
 	# Extension based checks
 	if ext in ["wav", "ogg", "mp3"]:
 		return ["audio", "misc"]
@@ -151,18 +157,18 @@ static func determine_asset_output_path(filename: String) -> Array:
 		return ["data", "force_feedback"]
 	elif ext == "vf":
 		return ["interface", "fonts"]
-		
+
 	# Pattern based checks
 	for pattern in ASSET_MAPPINGS:
 		if pattern in name:
 			var mapping = ASSET_MAPPINGS[pattern]
 			var category = mapping[0]
-			
+
 			if category == "audio" and not ext in ["wav", "ogg", "mp3"]:
 				continue
 			if category == "video" and not ext in ["avi", "mve", "ogv"]:
 				continue
-				
+
 			return mapping
 
 	return ["misc", "unknown"]

@@ -10,7 +10,6 @@ extends "res://scripts/resources/core/wcs_base_resource.gd"
 @export var allied_arrival_overlay: bool = false
 @export var lock_in_ambient: bool = false
 
-
 # Explicit tracks based on fixed order in music.tbl
 # Explicit tracks based on fixed order in music.tbl
 @export var ambience: AudioStream
@@ -48,6 +47,7 @@ extends "res://scripts/resources/core/wcs_base_resource.gd"
 
 @export var player_dead: AudioStream
 @export var player_dead_filename: String = ""
+
 
 func get_resource_type() -> String:
 	return "soundtrack"

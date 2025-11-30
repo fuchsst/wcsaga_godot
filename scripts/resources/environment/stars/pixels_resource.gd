@@ -10,5 +10,6 @@ extends "res://scripts/resources/core/wcs_base_resource.gd"
 @export var effect_name: String = ""
 @export var shader_path: String = ""
 
+
 func get_resource_type() -> String:
 	return "pixels"

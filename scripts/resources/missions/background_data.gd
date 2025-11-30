@@ -7,4 +7,4 @@ const BackgroundSet = preload("res://scripts/resources/missions/background_set.g
 @export var num_stars: int = 0
 @export var ambient_light_level: int = 0
 @export var nebula: MissionNebulaData = null
-@export var backgrounds: Array[BackgroundSet] = [] # Multiple background sets possible
+@export var backgrounds: Array[BackgroundSet] = []  # Multiple background sets possible

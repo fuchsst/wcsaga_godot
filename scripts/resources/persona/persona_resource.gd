@@ -18,8 +18,10 @@ extends "res://scripts/resources/core/wcs_base_resource.gd"
 ## Value: PersonaMessage
 @export var messages: Dictionary = {}
 
+
 func get_resource_type() -> String:
 	return "persona"
+
 
 func add_message(msg_name: String, text: String, avi: String, wave: String) -> void:
 	var msg = PersonaMessage.new()
@@ -28,16 +30,16 @@ func add_message(msg_name: String, text: String, avi: String, wave: String) -> v
 	msg.wave_filename = wave
 	messages[msg_name] = msg
 
+
 ## Inner class for typed message data
 class PersonaMessage:
 	extends Resource
-	
+
 	@export var text: String = ""
-	var avi_filename: String = ""
-	var wave_filename: String = ""
-	
 	## The actual audio stream resource (loaded from wave_filename)
 	@export var wave_stream: AudioStream
-	
 	## The actual video stream resource (loaded from avi_filename)
 	@export var avi_stream: VideoStream
+
+	var avi_filename: String = ""
+	var wave_filename: String = ""

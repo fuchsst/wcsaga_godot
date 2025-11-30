@@ -3,21 +3,22 @@ extends "res://addons/wcs_import/parsers/base_parser.gd"
 
 const LightningResource = preload("res://scripts/resources/effects/lightning_resource.gd")
 
+
 func _parse_content() -> Variant:
 	var resources: Array[LightningResource] = []
 	var current_resource: LightningResource = null
-	
+
 	_skip_empty_lines()
-	
+
 	while _has_more_lines():
 		var line = _get_next_line()
-		
+
 		if line.begins_with("#"):
 			if line == "#Bolts end" or line == "#Storms end":
 				current_resource = null
 				continue
 			continue
-			
+
 		# Bolt Definition
 		if line.begins_with("$Bolt:"):
 			current_resource = LightningResource.new()
@@ -25,7 +26,7 @@ func _parse_content() -> Variant:
 			var raw_name = _extract_string_value(line, "$Bolt:")
 			current_resource.name = raw_name.split(";")[0].strip_edges()
 			resources.append(current_resource)
-			
+
 		# Storm Definition
 		elif line.begins_with("$Storm:"):
 			current_resource = LightningResource.new()
@@ -33,14 +34,15 @@ func _parse_content() -> Variant:
 			var raw_name = _extract_string_value(line, "$Storm:")
 			current_resource.name = raw_name.split(";")[0].strip_edges()
 			resources.append(current_resource)
-			
+
 		elif current_resource:
 			if current_resource.type == LightningResource.LightningType.BOLT:
 				_parse_bolt_property(line, current_resource)
 			else:
 				_parse_storm_property(line, current_resource)
-				
+
 	return resources
+
 
 func _parse_bolt_property(line: String, res: LightningResource) -> void:
 	if line.begins_with("+b_scale:"):
@@ -56,7 +58,7 @@ func _parse_bolt_property(line: String, res: LightningResource) -> void:
 	elif line.begins_with("+b_strikes:"):
 		res.b_strikes = _extract_int_value(line, "+b_strikes:")
 	elif line.begins_with("+b_lifetime:"):
-		res.b_lifetime = _extract_float_value(line, "+b_lifetime:") / 1000.0 # Convert ms to s
+		res.b_lifetime = _extract_float_value(line, "+b_lifetime:") / 1000.0  # Convert ms to s
 	elif line.begins_with("+b_noise:"):
 		res.b_noise = _extract_float_value(line, "+b_noise:")
 	elif line.begins_with("+b_emp:"):
@@ -70,6 +72,7 @@ func _parse_bolt_property(line: String, res: LightningResource) -> void:
 		res.b_glow = _extract_string_value(line, "+b_glow:")
 	elif line.begins_with("+b_bright:"):
 		res.b_bright = _extract_float_value(line, "+b_bright:")
+
 
 func _parse_storm_property(line: String, res: LightningResource) -> void:
 	if line.begins_with("+bolt:"):
