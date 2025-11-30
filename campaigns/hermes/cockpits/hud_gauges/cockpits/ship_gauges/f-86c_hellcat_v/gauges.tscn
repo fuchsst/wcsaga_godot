@@ -1,0 +1,145 @@
+[gd_scene load_steps=16 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/ui/hud/hud_gauge_resource.gd" id="1_lofxn"]
+
+[sub_resource type="Resource" id="Resource_delbu"]
+script = ExtResource("1_lofxn")
+name = "HP_Silhouette"
+section = "Ship Gauges"
+ship_name = "F-86C Hellcat V"
+image = "hp_sil_hellcat.png"
+
+[sub_resource type="Resource" id="Resource_drwt6"]
+script = ExtResource("1_lofxn")
+name = "HP_PBank1_L"
+section = "Ship Gauges"
+ship_name = "F-86C Hellcat V"
+position = Vector2i(53, 25)
+
+[sub_resource type="Resource" id="Resource_6d6kp"]
+script = ExtResource("1_lofxn")
+name = "HP_PBank1_R"
+section = "Ship Gauges"
+ship_name = "F-86C Hellcat V"
+position = Vector2i(65, 25)
+
+[sub_resource type="Resource" id="Resource_wnnxa"]
+script = ExtResource("1_lofxn")
+name = "HP_PBank2_L"
+section = "Ship Gauges"
+ship_name = "F-86C Hellcat V"
+position = Vector2i(42, 25)
+
+[sub_resource type="Resource" id="Resource_kyadr"]
+script = ExtResource("1_lofxn")
+name = "HP_PBank2_R"
+section = "Ship Gauges"
+ship_name = "F-86C Hellcat V"
+position = Vector2i(76, 25)
+
+[sub_resource type="Resource" id="Resource_auh13"]
+script = ExtResource("1_lofxn")
+name = "HP_PBank3_L"
+section = "Ship Gauges"
+ship_name = "F-86C Hellcat V"
+
+[sub_resource type="Resource" id="Resource_1j6eh"]
+script = ExtResource("1_lofxn")
+name = "HP_PBank3_R"
+section = "Ship Gauges"
+ship_name = "F-86C Hellcat V"
+
+[sub_resource type="Resource" id="Resource_tfgid"]
+script = ExtResource("1_lofxn")
+name = "HP_SBank1"
+section = "Ship Gauges"
+ship_name = "F-86C Hellcat V"
+position = Vector2i(25, 50)
+
+[sub_resource type="Resource" id="Resource_fo37o"]
+script = ExtResource("1_lofxn")
+name = "HP_SBank2"
+section = "Ship Gauges"
+ship_name = "F-86C Hellcat V"
+position = Vector2i(96, 50)
+
+[sub_resource type="Resource" id="Resource_6dmhp"]
+script = ExtResource("1_lofxn")
+name = "HP_SBank3"
+section = "Ship Gauges"
+ship_name = "F-86C Hellcat V"
+
+[sub_resource type="Resource" id="Resource_5edx6"]
+script = ExtResource("1_lofxn")
+name = "HP_SBank4"
+section = "Ship Gauges"
+ship_name = "F-86C Hellcat V"
+
+[sub_resource type="Resource" id="Resource_ty25y"]
+script = ExtResource("1_lofxn")
+name = "HP_SBank5"
+section = "Ship Gauges"
+ship_name = "F-86C Hellcat V"
+
+[sub_resource type="Resource" id="Resource_lff70"]
+script = ExtResource("1_lofxn")
+name = "HP_SBank6"
+section = "Ship Gauges"
+ship_name = "F-86C Hellcat V"
+
+[sub_resource type="Resource" id="Resource_sy4hk"]
+script = ExtResource("1_lofxn")
+name = "Hardpoints"
+section = "Ship Gauges"
+ship_name = "F-86C Hellcat V"
+sub_gauges = Array[ExtResource("1_lofxn")]([SubResource("Resource_delbu"), SubResource("Resource_drwt6"), SubResource("Resource_6d6kp"), SubResource("Resource_wnnxa"), SubResource("Resource_kyadr"), SubResource("Resource_auh13"), SubResource("Resource_1j6eh"), SubResource("Resource_tfgid"), SubResource("Resource_fo37o"), SubResource("Resource_6dmhp"), SubResource("Resource_5edx6"), SubResource("Resource_ty25y"), SubResource("Resource_lff70")])
+
+[node name="ShipGauges" type="Node2D"]
+
+[node name="Hardpoints" type="Node2D" parent="."]
+metadata/gauge_resource = SubResource("Resource_sy4hk")
+
+[node name="HP_Silhouette" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_delbu")
+
+[node name="HP_PBank1_L" type="Node2D" parent="Hardpoints"]
+position = Vector2(53, 25)
+metadata/gauge_resource = SubResource("Resource_drwt6")
+
+[node name="HP_PBank1_R" type="Node2D" parent="Hardpoints"]
+position = Vector2(65, 25)
+metadata/gauge_resource = SubResource("Resource_6d6kp")
+
+[node name="HP_PBank2_L" type="Node2D" parent="Hardpoints"]
+position = Vector2(42, 25)
+metadata/gauge_resource = SubResource("Resource_wnnxa")
+
+[node name="HP_PBank2_R" type="Node2D" parent="Hardpoints"]
+position = Vector2(76, 25)
+metadata/gauge_resource = SubResource("Resource_kyadr")
+
+[node name="HP_PBank3_L" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_auh13")
+
+[node name="HP_PBank3_R" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_1j6eh")
+
+[node name="HP_SBank1" type="Node2D" parent="Hardpoints"]
+position = Vector2(25, 50)
+metadata/gauge_resource = SubResource("Resource_tfgid")
+
+[node name="HP_SBank2" type="Node2D" parent="Hardpoints"]
+position = Vector2(96, 50)
+metadata/gauge_resource = SubResource("Resource_fo37o")
+
+[node name="HP_SBank3" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_6dmhp")
+
+[node name="HP_SBank4" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_5edx6")
+
+[node name="HP_SBank5" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_ty25y")
+
+[node name="HP_SBank6" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_lff70")

@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="SoundtrackResource" load_steps=14 format=3]
+
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/ambient_b_03.ogg" id="1_by7s1"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/aarrival_battle_b_01.ogg" id="2_tmqoj"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/aarrival_normal_b_01.ogg" id="3_kqpx8"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/earrival_battle_b_01.ogg" id="4_b4rf6"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/earrival_normal_b_01.ogg" id="5_xg1nn"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/battle1_b_03.ogg" id="6_liexg"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/battle2_b_03.ogg" id="7_44kf3"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/battle3_b_03.ogg" id="8_pa8j0"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/goal_failed_b_01.ogg" id="9_5ww23"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/player_dead_b_01.ogg" id="10_4f6hb"]
+[ext_resource type="Script" path="res://scripts/resources/sounds/soundtrack_resource.gd" id="11_vp4y3"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/goal_achieved_b_01.ogg" id="12_bk8vk"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/victory_b_01.ogg" id="13_f3smt"]
+
+[resource]
+script = ExtResource("11_vp4y3")
+name = "Proxima"
+ambience = ExtResource("1_by7s1")
+ambience_filename = "ambient_b_03.ogg"
+arrival_allied_normal = ExtResource("3_kqpx8")
+arrival_allied_normal_filename = "aarrival_normal_b_01.ogg"
+arrival_enemy_normal = ExtResource("5_xg1nn")
+arrival_enemy_normal_filename = "earrival_normal_b_01.ogg"
+battle_1 = ExtResource("6_liexg")
+battle_1_filename = "battle1_b_03.ogg"
+battle_2 = ExtResource("7_44kf3")
+battle_2_filename = "battle2_b_03.ogg"
+battle_3 = ExtResource("8_pa8j0")
+battle_3_filename = "battle3_b_03.ogg"
+arrival_allied_battle = ExtResource("2_tmqoj")
+arrival_allied_battle_filename = "aarrival_battle_b_01.ogg"
+arrival_enemy_battle = ExtResource("4_b4rf6")
+arrival_enemy_battle_filename = "earrival_battle_b_01.ogg"
+victory_1 = ExtResource("12_bk8vk")
+victory_1_filename = "goal_achieved_b_01.ogg"
+victory_2 = ExtResource("13_f3smt")
+victory_2_filename = "victory_b_01.ogg"
+goal_failed = ExtResource("9_5ww23")
+goal_failed_filename = "goal_failed_b_01.ogg"
+player_dead = ExtResource("10_4f6hb")
+player_dead_filename = "player_dead_b_01.ogg"

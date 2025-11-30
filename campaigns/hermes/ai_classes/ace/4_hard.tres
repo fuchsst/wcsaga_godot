@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="AIClassResource" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/gameplay/ai_class_resource.gd" id="1_3a278"]
+[ext_resource type="Script" path="res://scripts/resources/ai_classes/ai_class_resource.gd" id="1_7oblf"]
 
 [resource]
-script = ExtResource("1_3a278")
+script = ExtResource("1_7oblf")
 ai_class_name = "Ace"
 difficulty_level = "4_hard"
 accuracy = 0.95

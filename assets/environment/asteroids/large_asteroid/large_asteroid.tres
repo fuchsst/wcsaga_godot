@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="AsteroidData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/asteroids/asteroid_data.gd" id="1_rrumo"]
+
+[resource]
+script = ExtResource("1_rrumo")
+asteroid_name = "Large Asteroid"
+resource_identifier = "large_asteroid"
+lod_distances = Array[float]([0.0, 12000.0, 24000.0])
+hitpoints = 147.0
+explosion_inner_radius = 100.0
+explosion_outer_radius = 200.0
+explosion_damage = 50.0
+explosion_blast = 3000.0

@@ -1,0 +1,159 @@
+{
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 58,
+      "type": "VEC3",
+      "max": [
+        20.0,
+        20.0,
+        20.0
+      ],
+      "min": [
+        -20.0,
+        -20.0,
+        -20.0
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 58,
+      "type": "VEC3",
+      "max": [
+        0.9999999999754376,
+        -4.992262347391421e-06,
+        4.9195505197232154e-06
+      ],
+      "min": [
+        0.9999999999754376,
+        -4.992262802138772e-06,
+        4.919548700733812e-06
+      ]
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 58,
+      "type": "VEC2",
+      "max": [
+        0.0,
+        -1.0
+      ],
+      "min": [
+        0.0,
+        -1.0
+      ]
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "normalized": false,
+      "count": 336,
+      "type": "SCALAR",
+      "max": [
+        57.0
+      ],
+      "min": [
+        0.0
+      ]
+    }
+  ],
+  "asset": {
+    "generator": "WCSaga POF Converter",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 696,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 696,
+      "byteLength": 696,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1392,
+      "byteLength": 464,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1856,
+      "byteLength": 672,
+      "target": 34963
+    }
+  ],
+  "buffers": [
+    {
+      "uri": "misc_ghost.bin",
+      "byteLength": 2528
+    }
+  ],
+  "materials": [
+    {
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.5
+      },
+      "emissiveFactor": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "name": "misc_ghost_material"
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "mode": 4,
+          "material": 0
+        }
+      ],
+      "name": "ExportedMesh"
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "name": "hull01"
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ]
+}

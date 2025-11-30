@@ -1,0 +1,1827 @@
+[gd_resource type="Resource" script_class="SoundManifest" load_steps=267 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/sounds/audio_config_resource.gd" id="1_3rs84"]
+[ext_resource type="Script" path="res://scripts/resources/sounds/flyby_sound_resource.gd" id="2_i5d3h"]
+[ext_resource type="Script" path="res://scripts/resources/sounds/sound_manifest.gd" id="3_arcoc"]
+
+[sub_resource type="Resource" id="Resource_6s4v3"]
+script = ExtResource("1_3rs84")
+signature = 0
+filename = "snd_missile_tracking.wav"
+default_volume = 0.4
+
+[sub_resource type="Resource" id="Resource_juiqt"]
+script = ExtResource("1_3rs84")
+signature = 1
+filename = "snd_missile_lock.wav"
+default_volume = 0.4
+
+[sub_resource type="Resource" id="Resource_2ut7a"]
+script = ExtResource("1_3rs84")
+signature = 2
+filename = "snd_primary_cycle.wav"
+default_volume = 0.6
+
+[sub_resource type="Resource" id="Resource_sniql"]
+script = ExtResource("1_3rs84")
+signature = 3
+filename = "snd_secondary_cycle.wav"
+default_volume = 0.6
+
+[sub_resource type="Resource" id="Resource_xx6lv"]
+script = ExtResource("1_3rs84")
+signature = 4
+filename = "snd_engine.wav"
+default_volume = 0.55
+
+[sub_resource type="Resource" id="Resource_8byr8"]
+script = ExtResource("1_3rs84")
+signature = 5
+filename = "snd_cargo_reveal.wav"
+default_volume = 0.4
+
+[sub_resource type="Resource" id="Resource_wbmqe"]
+script = ExtResource("1_3rs84")
+signature = 6
+filename = "snd_death_roll.wav"
+is_3d = 2
+min_distance = 100.0
+max_distance = 800.0
+
+[sub_resource type="Resource" id="Resource_366kr"]
+script = ExtResource("1_3rs84")
+signature = 7
+filename = "snd_ship_explode_1.wav"
+default_volume = 0.9
+is_3d = 2
+min_distance = 750.0
+max_distance = 1500.0
+
+[sub_resource type="Resource" id="Resource_jpl42"]
+script = ExtResource("1_3rs84")
+signature = 8
+filename = "snd_target_acquire.wav"
+default_volume = 0.6
+
+[sub_resource type="Resource" id="Resource_go5t6"]
+script = ExtResource("1_3rs84")
+signature = 9
+filename = "snd_energy_adjust.wav"
+default_volume = 0.5
+
+[sub_resource type="Resource" id="Resource_bs8km"]
+script = ExtResource("1_3rs84")
+signature = 10
+filename = "snd_energy_adjust_fail.wav"
+default_volume = 0.5
+
+[sub_resource type="Resource" id="Resource_loa3b"]
+script = ExtResource("1_3rs84")
+signature = 11
+filename = "snd_energy_trans.wav"
+default_volume = 0.5
+
+[sub_resource type="Resource" id="Resource_w0j8x"]
+script = ExtResource("1_3rs84")
+signature = 12
+filename = "snd_energy_trans_fail.wav"
+default_volume = 0.5
+
+[sub_resource type="Resource" id="Resource_5veai"]
+script = ExtResource("1_3rs84")
+signature = 13
+filename = "snd_full_throttle.wav"
+default_volume = 0.4
+
+[sub_resource type="Resource" id="Resource_grm4i"]
+script = ExtResource("1_3rs84")
+signature = 14
+filename = "snd_zero_throttle.wav"
+default_volume = 0.4
+
+[sub_resource type="Resource" id="Resource_agtia"]
+script = ExtResource("1_3rs84")
+signature = 15
+filename = "snd_throttle_up.wav"
+default_volume = 0.4
+
+[sub_resource type="Resource" id="Resource_7bhnk"]
+script = ExtResource("1_3rs84")
+signature = 16
+filename = "snd_throttle_down.wav"
+default_volume = 0.4
+
+[sub_resource type="Resource" id="Resource_iidg1"]
+script = ExtResource("1_3rs84")
+signature = 17
+filename = "snd_dock_approach.wav"
+default_volume = 0.6
+is_3d = 2
+min_distance = 10.0
+max_distance = 800.0
+
+[sub_resource type="Resource" id="Resource_cepjl"]
+script = ExtResource("1_3rs84")
+signature = 18
+filename = "snd_dock_attach.wav"
+default_volume = 0.6
+is_3d = 2
+min_distance = 10.0
+max_distance = 800.0
+
+[sub_resource type="Resource" id="Resource_4iehl"]
+script = ExtResource("1_3rs84")
+signature = 19
+filename = "snd_dock_detach.wav"
+default_volume = 0.6
+is_3d = 2
+min_distance = 10.0
+max_distance = 800.0
+
+[sub_resource type="Resource" id="Resource_fhbey"]
+script = ExtResource("1_3rs84")
+signature = 20
+filename = "snd_dock_depart.wav"
+default_volume = 0.6
+is_3d = 2
+min_distance = 10.0
+max_distance = 800.0
+
+[sub_resource type="Resource" id="Resource_6x3s8"]
+script = ExtResource("1_3rs84")
+signature = 21
+filename = "snd_aburn_engage.wav"
+default_volume = 0.6
+min_distance = 100.0
+max_distance = 500.0
+
+[sub_resource type="Resource" id="Resource_kin7y"]
+script = ExtResource("1_3rs84")
+signature = 22
+filename = "snd_aburn_loop.wav"
+default_volume = 0.75
+min_distance = 100.0
+max_distance = 500.0
+
+[sub_resource type="Resource" id="Resource_14yiu"]
+script = ExtResource("1_3rs84")
+signature = 23
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_aus2a"]
+script = ExtResource("1_3rs84")
+signature = 24
+filename = "snd_aburn_fail.wav"
+default_volume = 0.5
+
+[sub_resource type="Resource" id="Resource_q53h5"]
+script = ExtResource("1_3rs84")
+signature = 25
+filename = "snd_heatlock_warn.wav"
+
+[sub_resource type="Resource" id="Resource_e36yt"]
+script = ExtResource("1_3rs84")
+signature = 26
+filename = "snd_out_of_missles.wav"
+default_volume = 0.6
+
+[sub_resource type="Resource" id="Resource_iqehn"]
+script = ExtResource("1_3rs84")
+signature = 27
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_hkjj8"]
+script = ExtResource("1_3rs84")
+signature = 28
+filename = "snd_target_fail.wav"
+default_volume = 0.5
+
+[sub_resource type="Resource" id="Resource_o5m7o"]
+script = ExtResource("1_3rs84")
+signature = 29
+filename = "snd_squadmsging_on.wav"
+default_volume = 0.5
+
+[sub_resource type="Resource" id="Resource_yqvxc"]
+script = ExtResource("1_3rs84")
+signature = 30
+filename = "snd_squadmsging_off.wav"
+default_volume = 0.5
+
+[sub_resource type="Resource" id="Resource_a42vb"]
+script = ExtResource("1_3rs84")
+signature = 31
+filename = "snd_debris.wav"
+default_volume = 0.4
+is_3d = 2
+min_distance = 100.0
+max_distance = 300.0
+
+[sub_resource type="Resource" id="Resource_osutd"]
+script = ExtResource("1_3rs84")
+signature = 32
+filename = "snd_subsys_die_1.wav"
+default_volume = 0.6
+
+[sub_resource type="Resource" id="Resource_lrt04"]
+script = ExtResource("1_3rs84")
+signature = 33
+filename = "snd_missile_start_load.wav"
+default_volume = 0.5
+
+[sub_resource type="Resource" id="Resource_bqx3x"]
+script = ExtResource("1_3rs84")
+signature = 34
+filename = "snd_missile_load.wav"
+default_volume = 0.5
+
+[sub_resource type="Resource" id="Resource_aj06b"]
+script = ExtResource("1_3rs84")
+signature = 35
+filename = "snd_ship_repair.wav"
+default_volume = 0.5
+
+[sub_resource type="Resource" id="Resource_l6uys"]
+script = ExtResource("1_3rs84")
+signature = 36
+filename = "snd_player_hit_laser.wav"
+default_volume = 0.9
+is_3d = 2
+min_distance = 30.0
+max_distance = 100.0
+
+[sub_resource type="Resource" id="Resource_gs4ft"]
+script = ExtResource("1_3rs84")
+signature = 37
+filename = "snd_player_hit_missile.wav"
+default_volume = 0.9
+is_3d = 2
+min_distance = 30.0
+max_distance = 100.0
+
+[sub_resource type="Resource" id="Resource_dkjlw"]
+script = ExtResource("1_3rs84")
+signature = 38
+filename = "snd_cmeasure_cycle.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_26vhe"]
+script = ExtResource("1_3rs84")
+signature = 39
+filename = "snd_shield_hit.wav"
+default_volume = 0.7
+is_3d = 2
+min_distance = 250.0
+max_distance = 1500.0
+
+[sub_resource type="Resource" id="Resource_flapj"]
+script = ExtResource("1_3rs84")
+signature = 40
+filename = "snd_shield_hit_you.wav"
+default_volume = 0.8
+is_3d = 2
+min_distance = 10.0
+max_distance = 100.0
+
+[sub_resource type="Resource" id="Resource_jsdnj"]
+script = ExtResource("1_3rs84")
+signature = 41
+filename = "snd_game_mouse_click.wav"
+default_volume = 0.6
+
+[sub_resource type="Resource" id="Resource_p183j"]
+script = ExtResource("1_3rs84")
+signature = 42
+filename = "snd_aspectlock_warn.wav"
+
+[sub_resource type="Resource" id="Resource_edeq5"]
+script = ExtResource("1_3rs84")
+signature = 43
+filename = "snd_shield_xfer_ok.wav"
+default_volume = 0.6
+
+[sub_resource type="Resource" id="Resource_ypwtu"]
+script = ExtResource("1_3rs84")
+signature = 44
+filename = "snd_engine_wash.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_7gibs"]
+script = ExtResource("1_3rs84")
+signature = 45
+filename = "snd_warp_in.wav"
+default_volume = 0.6
+is_3d = 2
+min_distance = 750.0
+max_distance = 1500.0
+
+[sub_resource type="Resource" id="Resource_vctfn"]
+script = ExtResource("1_3rs84")
+signature = 46
+filename = "snd_warp_out.wav"
+default_volume = 0.6
+is_3d = 2
+min_distance = 750.0
+max_distance = 1500.0
+
+[sub_resource type="Resource" id="Resource_33mtr"]
+script = ExtResource("1_3rs84")
+signature = 47
+filename = "snd_player_warp_fail.wav"
+default_volume = 0.5
+
+[sub_resource type="Resource" id="Resource_5f2ky"]
+script = ExtResource("1_3rs84")
+signature = 48
+filename = "none.wav"
+default_volume = 0.6
+
+[sub_resource type="Resource" id="Resource_0nosb"]
+script = ExtResource("1_3rs84")
+signature = 49
+filename = "snd_ship_explode_2.wav"
+default_volume = 0.9
+is_3d = 2
+min_distance = 750.0
+max_distance = 1500.0
+
+[sub_resource type="Resource" id="Resource_fo837"]
+script = ExtResource("1_3rs84")
+signature = 50
+filename = "snd_player_warp_out.wav"
+default_volume = 0.7
+
+[sub_resource type="Resource" id="Resource_3t1y8"]
+script = ExtResource("1_3rs84")
+signature = 51
+filename = "snd_ship_ship_heavy.wav"
+default_volume = 0.7
+is_3d = 2
+min_distance = 100.0
+max_distance = 200.0
+
+[sub_resource type="Resource" id="Resource_8si0s"]
+script = ExtResource("1_3rs84")
+signature = 52
+filename = "snd_ship_ship_light.wav"
+default_volume = 0.7
+is_3d = 2
+min_distance = 100.0
+max_distance = 200.0
+
+[sub_resource type="Resource" id="Resource_78llm"]
+script = ExtResource("1_3rs84")
+signature = 53
+filename = "snd_ship_ship_shield.wav"
+default_volume = 0.7
+is_3d = 2
+min_distance = 100.0
+max_distance = 200.0
+
+[sub_resource type="Resource" id="Resource_c21al"]
+script = ExtResource("1_3rs84")
+signature = 54
+filename = "snd_threat_flash.wav"
+default_volume = 0.5
+
+[sub_resource type="Resource" id="Resource_42d5h"]
+script = ExtResource("1_3rs84")
+signature = 55
+filename = "snd_proximity_warning.wav"
+default_volume = 0.9
+
+[sub_resource type="Resource" id="Resource_dlcjj"]
+script = ExtResource("1_3rs84")
+signature = 56
+filename = "snd_proximity_asp_warning.wav"
+default_volume = 0.9
+
+[sub_resource type="Resource" id="Resource_2rwun"]
+script = ExtResource("1_3rs84")
+signature = 57
+filename = "snd_directive_complete.wav"
+default_volume = 0.7
+
+[sub_resource type="Resource" id="Resource_dmtun"]
+script = ExtResource("1_3rs84")
+signature = 58
+filename = "snd_subsys_explode.wav"
+default_volume = 0.9
+is_3d = 2
+min_distance = 250.0
+max_distance = 800.0
+
+[sub_resource type="Resource" id="Resource_mhnmp"]
+script = ExtResource("1_3rs84")
+signature = 59
+filename = "snd_capship_explode.wav"
+default_volume = 0.9
+is_3d = 2
+min_distance = 2000.0
+max_distance = 4000.0
+
+[sub_resource type="Resource" id="Resource_ywxys"]
+script = ExtResource("1_3rs84")
+signature = 60
+filename = "snd_capship_subsys_explode.wav"
+default_volume = 0.9
+is_3d = 2
+min_distance = 250.0
+max_distance = 1500.0
+
+[sub_resource type="Resource" id="Resource_mksv2"]
+script = ExtResource("1_3rs84")
+signature = 61
+filename = "snd_largeship_warpout.wav"
+is_3d = 2
+min_distance = 1500.0
+max_distance = 2000.0
+
+[sub_resource type="Resource" id="Resource_tlafb"]
+script = ExtResource("1_3rs84")
+signature = 62
+filename = "snd_asteroid_explode_large.wav"
+default_volume = 0.8
+is_3d = 2
+min_distance = 750.0
+max_distance = 1500.0
+
+[sub_resource type="Resource" id="Resource_t1yqc"]
+script = ExtResource("1_3rs84")
+signature = 63
+filename = "snd_asteroid_explode_small.wav"
+default_volume = 0.8
+is_3d = 2
+min_distance = 500.0
+max_distance = 1000.0
+
+[sub_resource type="Resource" id="Resource_ju7pp"]
+script = ExtResource("1_3rs84")
+signature = 64
+filename = "none.wav"
+default_volume = 0.9
+
+[sub_resource type="Resource" id="Resource_oe35k"]
+script = ExtResource("1_3rs84")
+signature = 65
+filename = "none.wav"
+default_volume = 0.9
+
+[sub_resource type="Resource" id="Resource_kl03e"]
+script = ExtResource("1_3rs84")
+signature = 66
+filename = "snd_cargo_scan.wav"
+default_volume = 0.5
+
+[sub_resource type="Resource" id="Resource_31hni"]
+script = ExtResource("1_3rs84")
+signature = 67
+filename = "snd_weapon_flyby.wav"
+default_volume = 0.6
+is_3d = 2
+min_distance = 50.0
+max_distance = 250.0
+
+[sub_resource type="Resource" id="Resource_3nn4e"]
+script = ExtResource("1_3rs84")
+signature = 68
+filename = "snd_asteroid.wav"
+default_volume = 0.5
+is_3d = 2
+min_distance = 200.0
+max_distance = 700.0
+
+[sub_resource type="Resource" id="Resource_p2nom"]
+script = ExtResource("1_3rs84")
+signature = 69
+filename = "snd_capital_warp_in.wav"
+is_3d = 2
+min_distance = 2000.0
+max_distance = 4000.0
+
+[sub_resource type="Resource" id="Resource_vrnaa"]
+script = ExtResource("1_3rs84")
+signature = 70
+filename = "snd_capital_warp_out.wav"
+is_3d = 2
+min_distance = 2000.0
+max_distance = 4000.0
+
+[sub_resource type="Resource" id="Resource_lv3f1"]
+script = ExtResource("1_3rs84")
+signature = 71
+filename = "snd_engine_loop_large.wav"
+default_volume = 0.7
+is_3d = 2
+min_distance = 600.0
+max_distance = 1000.0
+
+[sub_resource type="Resource" id="Resource_3pdyh"]
+script = ExtResource("1_3rs84")
+signature = 72
+filename = "none.wav"
+default_volume = 0.3
+
+[sub_resource type="Resource" id="Resource_cdhgm"]
+script = ExtResource("1_3rs84")
+signature = 73
+filename = "none.wav"
+default_volume = 0.3
+
+[sub_resource type="Resource" id="Resource_oxw88"]
+script = ExtResource("1_3rs84")
+signature = 74
+filename = "snd_missile_evaded_popup.wav"
+default_volume = 0.7
+
+[sub_resource type="Resource" id="Resource_l2dha"]
+script = ExtResource("1_3rs84")
+signature = 75
+filename = "snd_engine_loop_huge.wav"
+default_volume = 0.7
+is_3d = 2
+min_distance = 600.0
+max_distance = 1000.0
+
+[sub_resource type="Resource" id="Resource_x634x"]
+script = ExtResource("1_3rs84")
+signature = 76
+filename = "snd_laser_cannon_fire.wav"
+default_volume = 0.5
+is_3d = 2
+min_distance = 200.0
+max_distance = 1200.0
+
+[sub_resource type="Resource" id="Resource_fuiki"]
+script = ExtResource("1_3rs84")
+signature = 77
+filename = "snd_plasma_gun_fire.wav"
+default_volume = 0.5
+is_3d = 2
+min_distance = 200.0
+max_distance = 1200.0
+
+[sub_resource type="Resource" id="Resource_go08v"]
+script = ExtResource("1_3rs84")
+signature = 78
+filename = "snd_reaper_gun_fire.wav"
+default_volume = 0.5
+is_3d = 2
+min_distance = 200.0
+max_distance = 1200.0
+
+[sub_resource type="Resource" id="Resource_qbgkt"]
+script = ExtResource("1_3rs84")
+signature = 79
+filename = "snd_mass_driver_fire.wav"
+default_volume = 0.5
+is_3d = 2
+min_distance = 200.0
+max_distance = 1200.0
+
+[sub_resource type="Resource" id="Resource_ix78i"]
+script = ExtResource("1_3rs84")
+signature = 80
+filename = "snd_ion_cannon_fire.wav"
+default_volume = 0.5
+is_3d = 2
+min_distance = 200.0
+max_distance = 1200.0
+
+[sub_resource type="Resource" id="Resource_8684c"]
+script = ExtResource("1_3rs84")
+signature = 81
+filename = "snd_meson_blaster_fire.wav"
+default_volume = 0.5
+is_3d = 2
+min_distance = 200.0
+max_distance = 1200.0
+
+[sub_resource type="Resource" id="Resource_vw1yg"]
+script = ExtResource("1_3rs84")
+signature = 82
+filename = "snd_tachyon_gun_fire.wav"
+default_volume = 0.5
+is_3d = 2
+min_distance = 200.0
+max_distance = 1200.0
+
+[sub_resource type="Resource" id="Resource_iu661"]
+script = ExtResource("1_3rs84")
+signature = 83
+filename = "snd_particle_gun_fire.wav"
+default_volume = 0.5
+is_3d = 2
+min_distance = 200.0
+max_distance = 1200.0
+
+[sub_resource type="Resource" id="Resource_rwfc1"]
+script = ExtResource("1_3rs84")
+signature = 84
+filename = "snd_neutron_gun_fire.wav"
+default_volume = 0.5
+is_3d = 2
+min_distance = 200.0
+max_distance = 1200.0
+
+[sub_resource type="Resource" id="Resource_6urvr"]
+script = ExtResource("1_3rs84")
+signature = 85
+filename = "snd_laser_impact.wav"
+default_volume = 0.9
+is_3d = 2
+min_distance = 200.0
+max_distance = 800.0
+
+[sub_resource type="Resource" id="Resource_el1e5"]
+script = ExtResource("1_3rs84")
+signature = 86
+filename = "snd_photon_gun_fire.wav"
+default_volume = 0.5
+is_3d = 2
+min_distance = 200.0
+max_distance = 1200.0
+
+[sub_resource type="Resource" id="Resource_2as57"]
+script = ExtResource("1_3rs84")
+signature = 87
+filename = "snd_dumbfire_launch.wav"
+default_volume = 0.8
+is_3d = 2
+min_distance = 200.0
+max_distance = 1800.0
+
+[sub_resource type="Resource" id="Resource_p74dd"]
+script = ExtResource("1_3rs84")
+signature = 88
+filename = "snd_missile_impact.wav"
+default_volume = 0.8
+is_3d = 2
+min_distance = 500.0
+max_distance = 1200.0
+
+[sub_resource type="Resource" id="Resource_104y2"]
+script = ExtResource("1_3rs84")
+signature = 89
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_lcx5x"]
+script = ExtResource("1_3rs84")
+signature = 90
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_mpdre"]
+script = ExtResource("1_3rs84")
+signature = 91
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_he8gw"]
+script = ExtResource("1_3rs84")
+signature = 92
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_wr3ie"]
+script = ExtResource("1_3rs84")
+signature = 93
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_7c4ts"]
+script = ExtResource("1_3rs84")
+signature = 94
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_apm1v"]
+script = ExtResource("1_3rs84")
+signature = 95
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_uhegy"]
+script = ExtResource("1_3rs84")
+signature = 96
+filename = "snd_light_tachyon_fire.wav"
+default_volume = 0.5
+is_3d = 2
+min_distance = 200.0
+max_distance = 1200.0
+
+[sub_resource type="Resource" id="Resource_t4uxl"]
+script = ExtResource("1_3rs84")
+signature = 97
+filename = "snd_torpedo_launch.wav"
+is_3d = 2
+min_distance = 500.0
+max_distance = 3000.0
+
+[sub_resource type="Resource" id="Resource_4ikgg"]
+script = ExtResource("1_3rs84")
+signature = 98
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_2qf3t"]
+script = ExtResource("1_3rs84")
+signature = 99
+filename = "snd_cmeasure1_launch.wav"
+default_volume = 0.9
+is_3d = 2
+min_distance = 100.0
+max_distance = 1000.0
+
+[sub_resource type="Resource" id="Resource_6lxvi"]
+script = ExtResource("1_3rs84")
+signature = 100
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_jtnba"]
+script = ExtResource("1_3rs84")
+signature = 101
+filename = "snd_shockwave_explode.wav"
+default_volume = 0.8
+is_3d = 2
+min_distance = 1200.0
+max_distance = 2000.0
+
+[sub_resource type="Resource" id="Resource_hsi38"]
+script = ExtResource("1_3rs84")
+signature = 102
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_7605h"]
+script = ExtResource("1_3rs84")
+signature = 103
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_d2nol"]
+script = ExtResource("1_3rs84")
+signature = 104
+filename = "snd_engine_loop_capital_1.wav"
+default_volume = 0.7
+is_3d = 2
+min_distance = 100.0
+max_distance = 2000.0
+
+[sub_resource type="Resource" id="Resource_o62mu"]
+script = ExtResource("1_3rs84")
+signature = 105
+filename = "snd_engine_loop_capital_2.wav"
+default_volume = 0.7
+is_3d = 2
+min_distance = 100.0
+max_distance = 2000.0
+
+[sub_resource type="Resource" id="Resource_m78vr"]
+script = ExtResource("1_3rs84")
+signature = 106
+filename = "snd_engine_loop_capital_3.wav"
+default_volume = 0.7
+is_3d = 2
+min_distance = 100.0
+max_distance = 2000.0
+
+[sub_resource type="Resource" id="Resource_4rw87"]
+script = ExtResource("1_3rs84")
+signature = 107
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_8ch2s"]
+script = ExtResource("1_3rs84")
+signature = 108
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_kes06"]
+script = ExtResource("1_3rs84")
+signature = 109
+filename = "snd_shockwave_impact.wav"
+default_volume = 0.7
+is_3d = 2
+min_distance = 50.0
+max_distance = 800.0
+
+[sub_resource type="Resource" id="Resource_ps5gl"]
+script = ExtResource("1_3rs84")
+signature = 110
+filename = "snd_laser_turret_fire.wav"
+default_volume = 0.6
+is_3d = 2
+min_distance = 200.0
+max_distance = 2000.0
+
+[sub_resource type="Resource" id="Resource_qv4hd"]
+script = ExtResource("1_3rs84")
+signature = 111
+filename = "snd_amg_turret_fire.wav"
+default_volume = 0.6
+is_3d = 2
+min_distance = 500.0
+max_distance = 3500.0
+
+[sub_resource type="Resource" id="Resource_qryne"]
+script = ExtResource("1_3rs84")
+signature = 112
+filename = "snd_tachyon_turret_fire.wav"
+default_volume = 0.6
+is_3d = 2
+min_distance = 200.0
+max_distance = 2000.0
+
+[sub_resource type="Resource" id="Resource_c85le"]
+script = ExtResource("1_3rs84")
+signature = 113
+filename = "snd_neutron_turret_fire.wav"
+default_volume = 0.6
+is_3d = 2
+min_distance = 200.0
+max_distance = 2000.0
+
+[sub_resource type="Resource" id="Resource_1v7lj"]
+script = ExtResource("1_3rs84")
+signature = 114
+filename = "snd_plasma_turret_fire.wav"
+default_volume = 0.6
+is_3d = 2
+min_distance = 200.0
+max_distance = 2000.0
+
+[sub_resource type="Resource" id="Resource_ui31q"]
+script = ExtResource("1_3rs84")
+signature = 115
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_hk11o"]
+script = ExtResource("1_3rs84")
+signature = 116
+filename = "snd_flak_fire.wav"
+default_volume = 0.6
+is_3d = 2
+min_distance = 250.0
+max_distance = 1000.0
+
+[sub_resource type="Resource" id="Resource_s7sl4"]
+script = ExtResource("1_3rs84")
+signature = 117
+filename = "snd_shield_breaker.wav"
+default_volume = 0.8
+is_3d = 2
+min_distance = 400.0
+max_distance = 800.0
+
+[sub_resource type="Resource" id="Resource_v0yna"]
+script = ExtResource("1_3rs84")
+signature = 118
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_hvrhi"]
+script = ExtResource("1_3rs84")
+signature = 119
+filename = "snd_autocannon_loop.wav"
+default_volume = 0.6
+is_3d = 2
+min_distance = 200.0
+max_distance = 600.0
+
+[sub_resource type="Resource" id="Resource_k7nsc"]
+script = ExtResource("1_3rs84")
+signature = 120
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_kfndd"]
+script = ExtResource("1_3rs84")
+signature = 121
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_gwfyd"]
+script = ExtResource("1_3rs84")
+signature = 122
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_s6fb7"]
+script = ExtResource("1_3rs84")
+signature = 123
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_hdkjw"]
+script = ExtResource("1_3rs84")
+signature = 124
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_xnn5y"]
+script = ExtResource("1_3rs84")
+signature = 125
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_m2mfm"]
+script = ExtResource("1_3rs84")
+signature = 126
+filename = "snd_confed_fighter_eng.wav"
+default_volume = 0.6
+is_3d = 2
+min_distance = 50.0
+max_distance = 1000.0
+
+[sub_resource type="Resource" id="Resource_1a82u"]
+script = ExtResource("1_3rs84")
+signature = 127
+filename = "snd_confed_bomber_eng.wav"
+default_volume = 0.6
+is_3d = 2
+min_distance = 50.0
+max_distance = 1000.0
+
+[sub_resource type="Resource" id="Resource_vyhou"]
+script = ExtResource("1_3rs84")
+signature = 128
+filename = "snd_confed_utility_eng.wav"
+default_volume = 0.6
+is_3d = 2
+min_distance = 50.0
+max_distance = 1000.0
+
+[sub_resource type="Resource" id="Resource_1ft3n"]
+script = ExtResource("1_3rs84")
+signature = 129
+filename = "snd_confed_capship_eng.wav"
+default_volume = 0.7
+is_3d = 2
+min_distance = 50.0
+max_distance = 1000.0
+
+[sub_resource type="Resource" id="Resource_cu21p"]
+script = ExtResource("1_3rs84")
+signature = 130
+filename = "snd_confed_base_eng.wav"
+default_volume = 0.7
+is_3d = 2
+min_distance = 50.0
+max_distance = 1000.0
+
+[sub_resource type="Resource" id="Resource_s7rsn"]
+script = ExtResource("1_3rs84")
+signature = 131
+filename = "snd_kilrathi_fighter_eng.wav"
+default_volume = 0.7
+is_3d = 2
+min_distance = 50.0
+max_distance = 1000.0
+
+[sub_resource type="Resource" id="Resource_7q347"]
+script = ExtResource("1_3rs84")
+signature = 132
+filename = "snd_kilrathi_bomber_eng.wav"
+default_volume = 0.6
+is_3d = 2
+min_distance = 50.0
+max_distance = 1000.0
+
+[sub_resource type="Resource" id="Resource_gd1ws"]
+script = ExtResource("1_3rs84")
+signature = 133
+filename = "snd_kilrathi_utility_eng.wav"
+default_volume = 0.6
+is_3d = 2
+min_distance = 50.0
+max_distance = 1000.0
+
+[sub_resource type="Resource" id="Resource_xui74"]
+script = ExtResource("1_3rs84")
+signature = 134
+filename = "snd_kilrathi_capship_eng.wav"
+default_volume = 0.7
+is_3d = 2
+min_distance = 50.0
+max_distance = 1000.0
+
+[sub_resource type="Resource" id="Resource_pnaxs"]
+script = ExtResource("1_3rs84")
+signature = 135
+filename = "snd_kilrathi_base_eng.wav"
+default_volume = 0.6
+is_3d = 2
+min_distance = 50.0
+max_distance = 1000.0
+
+[sub_resource type="Resource" id="Resource_f4mif"]
+script = ExtResource("1_3rs84")
+signature = 136
+filename = "snd_behemoth_eng.wav"
+default_volume = 0.7
+is_3d = 2
+min_distance = 100.0
+max_distance = 2000.0
+
+[sub_resource type="Resource" id="Resource_mrk4j"]
+script = ExtResource("1_3rs84")
+signature = 137
+filename = "snd_dreadnaught_eng.wav"
+default_volume = 0.8
+is_3d = 2
+min_distance = 100.0
+max_distance = 2000.0
+
+[sub_resource type="Resource" id="Resource_g7oj2"]
+script = ExtResource("1_3rs84")
+signature = 138
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_873r6"]
+script = ExtResource("1_3rs84")
+signature = 139
+filename = "snd_debris_arc_01.wav"
+default_volume = 0.3
+is_3d = 2
+min_distance = 200.0
+max_distance = 400.0
+
+[sub_resource type="Resource" id="Resource_81e6c"]
+script = ExtResource("1_3rs84")
+signature = 140
+filename = "snd_debris_arc_02.wav"
+default_volume = 0.3
+is_3d = 2
+min_distance = 200.0
+max_distance = 400.0
+
+[sub_resource type="Resource" id="Resource_4b0ax"]
+script = ExtResource("1_3rs84")
+signature = 141
+filename = "snd_debris_arc_03.wav"
+default_volume = 0.3
+is_3d = 2
+min_distance = 200.0
+max_distance = 400.0
+
+[sub_resource type="Resource" id="Resource_j384d"]
+script = ExtResource("1_3rs84")
+signature = 142
+filename = "snd_debris_arc_04.wav"
+default_volume = 0.3
+is_3d = 2
+min_distance = 200.0
+max_distance = 400.0
+
+[sub_resource type="Resource" id="Resource_ci2yc"]
+script = ExtResource("1_3rs84")
+signature = 143
+filename = "snd_debris_arc_05.wav"
+default_volume = 0.3
+is_3d = 2
+min_distance = 200.0
+max_distance = 400.0
+
+[sub_resource type="Resource" id="Resource_j0osk"]
+script = ExtResource("1_3rs84")
+signature = 144
+filename = "snd_cloak_on.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_xildj"]
+script = ExtResource("1_3rs84")
+signature = 145
+filename = "snd_cloak_off.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_li8me"]
+script = ExtResource("1_3rs84")
+signature = 146
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_lrqkr"]
+script = ExtResource("1_3rs84")
+signature = 147
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_w763y"]
+script = ExtResource("1_3rs84")
+signature = 148
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_q38wo"]
+script = ExtResource("1_3rs84")
+signature = 149
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_nqgfm"]
+script = ExtResource("1_3rs84")
+signature = 150
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_44lgp"]
+script = ExtResource("1_3rs84")
+signature = 151
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_5pmkg"]
+script = ExtResource("1_3rs84")
+signature = 152
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_lw67i"]
+script = ExtResource("1_3rs84")
+signature = 153
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_1wfit"]
+script = ExtResource("1_3rs84")
+signature = 154
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_41uvc"]
+script = ExtResource("1_3rs84")
+signature = 155
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_ljets"]
+script = ExtResource("1_3rs84")
+signature = 156
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_peiro"]
+script = ExtResource("1_3rs84")
+signature = 157
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_mpjho"]
+script = ExtResource("1_3rs84")
+signature = 158
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_w7ew4"]
+script = ExtResource("1_3rs84")
+signature = 159
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_7esjm"]
+script = ExtResource("1_3rs84")
+signature = 160
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_jgm42"]
+script = ExtResource("1_3rs84")
+signature = 161
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_tku4c"]
+script = ExtResource("1_3rs84")
+signature = 162
+filename = "snd_startup.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_odbdv"]
+script = ExtResource("1_3rs84")
+signature = 163
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_lgg73"]
+script = ExtResource("1_3rs84")
+signature = 164
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_wr7gu"]
+script = ExtResource("1_3rs84")
+signature = 165
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_omro8"]
+script = ExtResource("1_3rs84")
+signature = 166
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_gf5ln"]
+script = ExtResource("1_3rs84")
+signature = 167
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_cnhfj"]
+script = ExtResource("1_3rs84")
+signature = 168
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_ror4q"]
+script = ExtResource("1_3rs84")
+signature = 169
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_crir7"]
+script = ExtResource("1_3rs84")
+signature = 170
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_txopx"]
+script = ExtResource("1_3rs84")
+signature = 171
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_d7367"]
+script = ExtResource("1_3rs84")
+signature = 172
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_18a02"]
+script = ExtResource("1_3rs84")
+signature = 173
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_5donp"]
+script = ExtResource("1_3rs84")
+signature = 174
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_dqkn7"]
+script = ExtResource("1_3rs84")
+signature = 175
+filename = "snd_engine_loop_large_1.wav"
+default_volume = 0.8
+is_3d = 2
+min_distance = 50.0
+max_distance = 1000.0
+
+[sub_resource type="Resource" id="Resource_b7lky"]
+script = ExtResource("1_3rs84")
+signature = 176
+filename = "snd_engine_loop_large_2.wav"
+default_volume = 0.8
+is_3d = 2
+min_distance = 50.0
+max_distance = 1000.0
+
+[sub_resource type="Resource" id="Resource_3ru1l"]
+script = ExtResource("1_3rs84")
+signature = 177
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_kfrpp"]
+script = ExtResource("1_3rs84")
+signature = 178
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_0b0c6"]
+script = ExtResource("1_3rs84")
+signature = 179
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_7bqrk"]
+script = ExtResource("1_3rs84")
+signature = 180
+filename = "snd_lightning_1.wav"
+default_volume = 0.6
+
+[sub_resource type="Resource" id="Resource_s86ts"]
+script = ExtResource("1_3rs84")
+signature = 181
+filename = "snd_lightning_2.wav"
+default_volume = 0.6
+
+[sub_resource type="Resource" id="Resource_ics5k"]
+script = ExtResource("1_3rs84")
+signature = 182
+filename = "snd_lightning_3.wav"
+default_volume = 0.6
+
+[sub_resource type="Resource" id="Resource_bvr5g"]
+script = ExtResource("1_3rs84")
+signature = 183
+filename = "snd_lightning_4.wav"
+default_volume = 0.6
+
+[sub_resource type="Resource" id="Resource_lx6jf"]
+script = ExtResource("1_3rs84")
+signature = 184
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_cdiiy"]
+script = ExtResource("1_3rs84")
+signature = 185
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_umks8"]
+script = ExtResource("1_3rs84")
+signature = 186
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_3dmf1"]
+script = ExtResource("1_3rs84")
+signature = 187
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_hoa4w"]
+script = ExtResource("1_3rs84")
+signature = 188
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_p4ltb"]
+script = ExtResource("1_3rs84")
+signature = 189
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_2eq5d"]
+script = ExtResource("1_3rs84")
+signature = 190
+filename = "snd_installation_1.wav"
+default_volume = 0.8
+is_3d = 2
+min_distance = 1500.0
+max_distance = 3000.0
+
+[sub_resource type="Resource" id="Resource_47207"]
+script = ExtResource("1_3rs84")
+signature = 191
+filename = "snd_installation_2.wav"
+default_volume = 0.8
+is_3d = 2
+min_distance = 1500.0
+max_distance = 3000.0
+
+[sub_resource type="Resource" id="Resource_s15sr"]
+script = ExtResource("1_3rs84")
+signature = 0
+filename = "snd_iface_mouse_click.wav"
+default_volume = 0.7
+
+[sub_resource type="Resource" id="Resource_amdhu"]
+script = ExtResource("1_3rs84")
+signature = 1
+filename = "none.wav"
+default_volume = 0.7
+
+[sub_resource type="Resource" id="Resource_0im73"]
+script = ExtResource("1_3rs84")
+signature = 2
+filename = "snd_icon_drop_on_wing.wav"
+default_volume = 0.6
+
+[sub_resource type="Resource" id="Resource_wuu2w"]
+script = ExtResource("1_3rs84")
+signature = 3
+filename = "snd_icon_drop.wav"
+default_volume = 0.6
+
+[sub_resource type="Resource" id="Resource_r0m83"]
+script = ExtResource("1_3rs84")
+signature = 4
+filename = "snd_screen_mode_pressed.wav"
+default_volume = 0.7
+
+[sub_resource type="Resource" id="Resource_78wml"]
+script = ExtResource("1_3rs84")
+signature = 5
+filename = "snd_switch_screens.wav"
+default_volume = 0.7
+
+[sub_resource type="Resource" id="Resource_qy7fv"]
+script = ExtResource("1_3rs84")
+signature = 6
+filename = "snd_help_pressed.wav"
+default_volume = 0.7
+
+[sub_resource type="Resource" id="Resource_li7w8"]
+script = ExtResource("1_3rs84")
+signature = 7
+filename = "snd_commit_pressed.wav"
+default_volume = 0.6
+
+[sub_resource type="Resource" id="Resource_ptjhe"]
+script = ExtResource("1_3rs84")
+signature = 8
+filename = "snd_prev_next_pressed.wav"
+default_volume = 0.7
+
+[sub_resource type="Resource" id="Resource_nsapd"]
+script = ExtResource("1_3rs84")
+signature = 9
+filename = "snd_scroll.wav"
+default_volume = 0.7
+
+[sub_resource type="Resource" id="Resource_w27xb"]
+script = ExtResource("1_3rs84")
+signature = 10
+filename = "snd_general_fail.wav"
+default_volume = 0.7
+
+[sub_resource type="Resource" id="Resource_qndfo"]
+script = ExtResource("1_3rs84")
+signature = 11
+filename = "snd_ship_icon_change.wav"
+default_volume = 0.5
+
+[sub_resource type="Resource" id="Resource_t2es3"]
+script = ExtResource("1_3rs84")
+signature = 12
+filename = "none.wav"
+default_volume = 0.6
+
+[sub_resource type="Resource" id="Resource_dn04k"]
+script = ExtResource("1_3rs84")
+signature = 13
+filename = "none.wav"
+default_volume = 0.6
+
+[sub_resource type="Resource" id="Resource_oggpl"]
+script = ExtResource("1_3rs84")
+signature = 14
+filename = "snd_brief_stage_chg.wav"
+default_volume = 0.7
+
+[sub_resource type="Resource" id="Resource_l3517"]
+script = ExtResource("1_3rs84")
+signature = 15
+filename = "snd_brief_stage_chg_fail.wav"
+default_volume = 0.7
+
+[sub_resource type="Resource" id="Resource_iuwf0"]
+script = ExtResource("1_3rs84")
+signature = 16
+filename = "snd_brief_icon_select.wav"
+default_volume = 0.7
+
+[sub_resource type="Resource" id="Resource_ptxy6"]
+script = ExtResource("1_3rs84")
+signature = 17
+filename = "snd_user_over.wav"
+default_volume = 0.5
+
+[sub_resource type="Resource" id="Resource_xbgcb"]
+script = ExtResource("1_3rs84")
+signature = 18
+filename = "snd_user_select.wav"
+default_volume = 0.7
+
+[sub_resource type="Resource" id="Resource_b27y8"]
+script = ExtResource("1_3rs84")
+signature = 19
+filename = "snd_reset_pressed.wav"
+default_volume = 0.7
+
+[sub_resource type="Resource" id="Resource_1gnbr"]
+script = ExtResource("1_3rs84")
+signature = 20
+filename = "snd_brief_text_wipe.wav"
+default_volume = 0.6
+
+[sub_resource type="Resource" id="Resource_ipyy4"]
+script = ExtResource("1_3rs84")
+signature = 21
+filename = "none.wav"
+default_volume = 0.5
+
+[sub_resource type="Resource" id="Resource_apd2y"]
+script = ExtResource("1_3rs84")
+signature = 22
+filename = "snd_weapon_anim_start.wav"
+default_volume = 0.6
+
+[sub_resource type="Resource" id="Resource_0swi0"]
+script = ExtResource("1_3rs84")
+signature = 23
+filename = "snd_main_hall_door_open.wav"
+default_volume = 0.5
+
+[sub_resource type="Resource" id="Resource_5ifkg"]
+script = ExtResource("1_3rs84")
+signature = 24
+filename = "snd_main_hall_door_close.wav"
+default_volume = 0.5
+
+[sub_resource type="Resource" id="Resource_pyd10"]
+script = ExtResource("1_3rs84")
+signature = 25
+filename = "none.wav"
+default_volume = 0.5
+
+[sub_resource type="Resource" id="Resource_yoxv4"]
+script = ExtResource("1_3rs84")
+signature = 26
+filename = "none.wav"
+default_volume = 0.5
+
+[sub_resource type="Resource" id="Resource_1usay"]
+script = ExtResource("1_3rs84")
+signature = 27
+filename = "none.wav"
+default_volume = 0.6
+
+[sub_resource type="Resource" id="Resource_pgra1"]
+script = ExtResource("1_3rs84")
+signature = 28
+filename = "snd_popup_appear.wav"
+default_volume = 0.7
+
+[sub_resource type="Resource" id="Resource_utbgu"]
+script = ExtResource("1_3rs84")
+signature = 29
+filename = "snd_popup_disappear.wav"
+default_volume = 0.7
+
+[sub_resource type="Resource" id="Resource_dqcgm"]
+script = ExtResource("1_3rs84")
+signature = 30
+filename = "snd_voice_slider_clip.wav"
+
+[sub_resource type="Resource" id="Resource_5r71a"]
+script = ExtResource("1_3rs84")
+signature = 31
+filename = "none.wav"
+default_volume = 0.5
+
+[sub_resource type="Resource" id="Resource_hj3k3"]
+script = ExtResource("1_3rs84")
+signature = 32
+filename = "none.wav"
+default_volume = 0.7
+
+[sub_resource type="Resource" id="Resource_knhrx"]
+script = ExtResource("1_3rs84")
+signature = 33
+filename = "none.wav"
+default_volume = 0.7
+
+[sub_resource type="Resource" id="Resource_132d5"]
+script = ExtResource("1_3rs84")
+signature = 34
+filename = "none.wav"
+default_volume = 0.7
+
+[sub_resource type="Resource" id="Resource_m73y7"]
+script = ExtResource("1_3rs84")
+signature = 35
+filename = "none.wav"
+default_volume = 0.7
+
+[sub_resource type="Resource" id="Resource_lflfo"]
+script = ExtResource("1_3rs84")
+signature = 36
+filename = "snd_main_hall_weld3.wav"
+
+[sub_resource type="Resource" id="Resource_gwj57"]
+script = ExtResource("1_3rs84")
+signature = 37
+filename = "snd_main_hall_weld4.wav"
+
+[sub_resource type="Resource" id="Resource_8l1pc"]
+script = ExtResource("1_3rs84")
+signature = 38
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_xxlip"]
+script = ExtResource("1_3rs84")
+signature = 39
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_nbaj7"]
+script = ExtResource("1_3rs84")
+signature = 40
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_ywyju"]
+script = ExtResource("1_3rs84")
+signature = 41
+filename = "snd_icon_highlight.wav"
+default_volume = 0.4
+
+[sub_resource type="Resource" id="Resource_10qj5"]
+script = ExtResource("1_3rs84")
+signature = 42
+filename = "snd_briefing_static.wav"
+default_volume = 0.4
+
+[sub_resource type="Resource" id="Resource_aeybw"]
+script = ExtResource("1_3rs84")
+signature = 43
+filename = "snd_main_hall2_crane1_1.wav"
+
+[sub_resource type="Resource" id="Resource_iaron"]
+script = ExtResource("1_3rs84")
+signature = 44
+filename = "snd_main_hall_pa_1.wav"
+
+[sub_resource type="Resource" id="Resource_co0d1"]
+script = ExtResource("1_3rs84")
+signature = 45
+filename = "snd_main_hall_pa_2.wav"
+
+[sub_resource type="Resource" id="Resource_e8th6"]
+script = ExtResource("1_3rs84")
+signature = 46
+filename = "snd_main_hall_pa_3.wav"
+
+[sub_resource type="Resource" id="Resource_1jv7j"]
+script = ExtResource("1_3rs84")
+signature = 47
+filename = "snd_main_hall_pa_4.wav"
+
+[sub_resource type="Resource" id="Resource_rf18r"]
+script = ExtResource("1_3rs84")
+signature = 48
+filename = "snd_main_hall_pa_5.wav"
+
+[sub_resource type="Resource" id="Resource_w2wx6"]
+script = ExtResource("1_3rs84")
+signature = 49
+filename = "snd_main_hall_pa_6.wav"
+
+[sub_resource type="Resource" id="Resource_5r400"]
+script = ExtResource("1_3rs84")
+signature = 50
+filename = "snd_main_hall_pa_7.wav"
+
+[sub_resource type="Resource" id="Resource_8rup3"]
+script = ExtResource("1_3rs84")
+signature = 51
+filename = "snd_main_hall_pa_8.wav"
+
+[sub_resource type="Resource" id="Resource_dn56g"]
+script = ExtResource("1_3rs84")
+signature = 52
+filename = "snd_main_hall_pa_9.wav"
+
+[sub_resource type="Resource" id="Resource_j4nva"]
+script = ExtResource("1_3rs84")
+signature = 53
+filename = "snd_main_hall_pa_10.wav"
+
+[sub_resource type="Resource" id="Resource_h41vy"]
+script = ExtResource("1_3rs84")
+signature = 54
+filename = "snd_main_hall_pa_11.wav"
+
+[sub_resource type="Resource" id="Resource_pgvjs"]
+script = ExtResource("1_3rs84")
+signature = 55
+filename = "snd_main_hall_pa_12.wav"
+
+[sub_resource type="Resource" id="Resource_sv0xa"]
+script = ExtResource("1_3rs84")
+signature = 56
+filename = "snd_main_hall_pa_13.wav"
+
+[sub_resource type="Resource" id="Resource_gfknd"]
+script = ExtResource("1_3rs84")
+signature = 57
+filename = "snd_main_hall_pa_14.wav"
+
+[sub_resource type="Resource" id="Resource_24747"]
+script = ExtResource("1_3rs84")
+signature = 58
+filename = "snd_main_hall_pa_15.wav"
+
+[sub_resource type="Resource" id="Resource_4htu2"]
+script = ExtResource("1_3rs84")
+signature = 59
+filename = "snd_main_hall_pa_16.wav"
+
+[sub_resource type="Resource" id="Resource_uhfli"]
+script = ExtResource("1_3rs84")
+signature = 60
+filename = "snd_main_hall_pa_17.wav"
+
+[sub_resource type="Resource" id="Resource_6efwt"]
+script = ExtResource("1_3rs84")
+signature = 61
+filename = "snd_main_hall_pa_18.wav"
+
+[sub_resource type="Resource" id="Resource_uf055"]
+script = ExtResource("1_3rs84")
+signature = 62
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_j3qmn"]
+script = ExtResource("1_3rs84")
+signature = 63
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_sdcak"]
+script = ExtResource("1_3rs84")
+signature = 64
+filename = "none.wav"
+default_volume = 0.8
+
+[sub_resource type="Resource" id="Resource_cdnen"]
+script = ExtResource("2_i5d3h")
+faction = "Terran"
+signature = 0
+filename = "snd_confed_flyby_fighter.wav"
+default_volume = 0.75
+is_3d = 2
+min_distance = 200.0
+max_distance = 400.0
+
+[sub_resource type="Resource" id="Resource_kq6vc"]
+script = ExtResource("2_i5d3h")
+faction = "Terran"
+index = 1
+signature = 1
+filename = "snd_confed_flyby_bomber.wav"
+default_volume = 0.75
+is_3d = 2
+min_distance = 200.0
+max_distance = 400.0
+
+[sub_resource type="Resource" id="Resource_yp2gt"]
+script = ExtResource("2_i5d3h")
+faction = "Pirate"
+signature = 0
+filename = "snd_pirate_flyby_fighter.wav"
+default_volume = 0.75
+is_3d = 2
+min_distance = 200.0
+max_distance = 400.0
+
+[sub_resource type="Resource" id="Resource_fcafq"]
+script = ExtResource("2_i5d3h")
+faction = "Pirate"
+index = 1
+signature = 1
+filename = "snd_pirate_flyby_bomber.wav"
+default_volume = 0.75
+is_3d = 2
+min_distance = 200.0
+max_distance = 400.0
+
+[sub_resource type="Resource" id="Resource_jlxsx"]
+script = ExtResource("2_i5d3h")
+faction = "Kilrathi"
+signature = 0
+filename = "snd_kilrathi_flyby_fighter.wav"
+default_volume = 0.75
+is_3d = 2
+min_distance = 200.0
+max_distance = 400.0
+
+[sub_resource type="Resource" id="Resource_pwace"]
+script = ExtResource("2_i5d3h")
+faction = "Kilrathi"
+index = 1
+signature = 1
+filename = "snd_kilrathi_flyby_bomber.wav"
+default_volume = 0.75
+is_3d = 2
+min_distance = 200.0
+max_distance = 400.0
+
+[resource]
+script = ExtResource("3_arcoc")
+audio_configs = Array[Resource]([SubResource("Resource_6s4v3"), SubResource("Resource_juiqt"), SubResource("Resource_2ut7a"), SubResource("Resource_sniql"), SubResource("Resource_xx6lv"), SubResource("Resource_8byr8"), SubResource("Resource_wbmqe"), SubResource("Resource_366kr"), SubResource("Resource_jpl42"), SubResource("Resource_go5t6"), SubResource("Resource_bs8km"), SubResource("Resource_loa3b"), SubResource("Resource_w0j8x"), SubResource("Resource_5veai"), SubResource("Resource_grm4i"), SubResource("Resource_agtia"), SubResource("Resource_7bhnk"), SubResource("Resource_iidg1"), SubResource("Resource_cepjl"), SubResource("Resource_4iehl"), SubResource("Resource_fhbey"), SubResource("Resource_6x3s8"), SubResource("Resource_kin7y"), SubResource("Resource_14yiu"), SubResource("Resource_aus2a"), SubResource("Resource_q53h5"), SubResource("Resource_e36yt"), SubResource("Resource_iqehn"), SubResource("Resource_hkjj8"), SubResource("Resource_o5m7o"), SubResource("Resource_yqvxc"), SubResource("Resource_a42vb"), SubResource("Resource_osutd"), SubResource("Resource_lrt04"), SubResource("Resource_bqx3x"), SubResource("Resource_aj06b"), SubResource("Resource_l6uys"), SubResource("Resource_gs4ft"), SubResource("Resource_dkjlw"), SubResource("Resource_26vhe"), SubResource("Resource_flapj"), SubResource("Resource_jsdnj"), SubResource("Resource_p183j"), SubResource("Resource_edeq5"), SubResource("Resource_ypwtu"), SubResource("Resource_7gibs"), SubResource("Resource_vctfn"), SubResource("Resource_33mtr"), SubResource("Resource_5f2ky"), SubResource("Resource_0nosb"), SubResource("Resource_fo837"), SubResource("Resource_3t1y8"), SubResource("Resource_8si0s"), SubResource("Resource_78llm"), SubResource("Resource_c21al"), SubResource("Resource_42d5h"), SubResource("Resource_dlcjj"), SubResource("Resource_2rwun"), SubResource("Resource_dmtun"), SubResource("Resource_mhnmp"), SubResource("Resource_ywxys"), SubResource("Resource_mksv2"), SubResource("Resource_tlafb"), SubResource("Resource_t1yqc"), SubResource("Resource_ju7pp"), SubResource("Resource_oe35k"), SubResource("Resource_kl03e"), SubResource("Resource_31hni"), SubResource("Resource_3nn4e"), SubResource("Resource_p2nom"), SubResource("Resource_vrnaa"), SubResource("Resource_lv3f1"), SubResource("Resource_3pdyh"), SubResource("Resource_cdhgm"), SubResource("Resource_oxw88"), SubResource("Resource_l2dha"), SubResource("Resource_x634x"), SubResource("Resource_fuiki"), SubResource("Resource_go08v"), SubResource("Resource_qbgkt"), SubResource("Resource_ix78i"), SubResource("Resource_8684c"), SubResource("Resource_vw1yg"), SubResource("Resource_iu661"), SubResource("Resource_rwfc1"), SubResource("Resource_6urvr"), SubResource("Resource_el1e5"), SubResource("Resource_2as57"), SubResource("Resource_p74dd"), SubResource("Resource_104y2"), SubResource("Resource_lcx5x"), SubResource("Resource_mpdre"), SubResource("Resource_he8gw"), SubResource("Resource_wr3ie"), SubResource("Resource_7c4ts"), SubResource("Resource_apm1v"), SubResource("Resource_uhegy"), SubResource("Resource_t4uxl"), SubResource("Resource_4ikgg"), SubResource("Resource_2qf3t"), SubResource("Resource_6lxvi"), SubResource("Resource_jtnba"), SubResource("Resource_hsi38"), SubResource("Resource_7605h"), SubResource("Resource_d2nol"), SubResource("Resource_o62mu"), SubResource("Resource_m78vr"), SubResource("Resource_4rw87"), SubResource("Resource_8ch2s"), SubResource("Resource_kes06"), SubResource("Resource_ps5gl"), SubResource("Resource_qv4hd"), SubResource("Resource_qryne"), SubResource("Resource_c85le"), SubResource("Resource_1v7lj"), SubResource("Resource_ui31q"), SubResource("Resource_hk11o"), SubResource("Resource_s7sl4"), SubResource("Resource_v0yna"), SubResource("Resource_hvrhi"), SubResource("Resource_k7nsc"), SubResource("Resource_kfndd"), SubResource("Resource_gwfyd"), SubResource("Resource_s6fb7"), SubResource("Resource_hdkjw"), SubResource("Resource_xnn5y"), SubResource("Resource_m2mfm"), SubResource("Resource_1a82u"), SubResource("Resource_vyhou"), SubResource("Resource_1ft3n"), SubResource("Resource_cu21p"), SubResource("Resource_s7rsn"), SubResource("Resource_7q347"), SubResource("Resource_gd1ws"), SubResource("Resource_xui74"), SubResource("Resource_pnaxs"), SubResource("Resource_f4mif"), SubResource("Resource_mrk4j"), SubResource("Resource_g7oj2"), SubResource("Resource_873r6"), SubResource("Resource_81e6c"), SubResource("Resource_4b0ax"), SubResource("Resource_j384d"), SubResource("Resource_ci2yc"), SubResource("Resource_j0osk"), SubResource("Resource_xildj"), SubResource("Resource_li8me"), SubResource("Resource_lrqkr"), SubResource("Resource_w763y"), SubResource("Resource_q38wo"), SubResource("Resource_nqgfm"), SubResource("Resource_44lgp"), SubResource("Resource_5pmkg"), SubResource("Resource_lw67i"), SubResource("Resource_1wfit"), SubResource("Resource_41uvc"), SubResource("Resource_ljets"), SubResource("Resource_peiro"), SubResource("Resource_mpjho"), SubResource("Resource_w7ew4"), SubResource("Resource_7esjm"), SubResource("Resource_jgm42"), SubResource("Resource_tku4c"), SubResource("Resource_odbdv"), SubResource("Resource_lgg73"), SubResource("Resource_wr7gu"), SubResource("Resource_omro8"), SubResource("Resource_gf5ln"), SubResource("Resource_cnhfj"), SubResource("Resource_ror4q"), SubResource("Resource_crir7"), SubResource("Resource_txopx"), SubResource("Resource_d7367"), SubResource("Resource_18a02"), SubResource("Resource_5donp"), SubResource("Resource_dqkn7"), SubResource("Resource_b7lky"), SubResource("Resource_3ru1l"), SubResource("Resource_kfrpp"), SubResource("Resource_0b0c6"), SubResource("Resource_7bqrk"), SubResource("Resource_s86ts"), SubResource("Resource_ics5k"), SubResource("Resource_bvr5g"), SubResource("Resource_lx6jf"), SubResource("Resource_cdiiy"), SubResource("Resource_umks8"), SubResource("Resource_3dmf1"), SubResource("Resource_hoa4w"), SubResource("Resource_p4ltb"), SubResource("Resource_2eq5d"), SubResource("Resource_47207"), SubResource("Resource_s15sr"), SubResource("Resource_amdhu"), SubResource("Resource_0im73"), SubResource("Resource_wuu2w"), SubResource("Resource_r0m83"), SubResource("Resource_78wml"), SubResource("Resource_qy7fv"), SubResource("Resource_li7w8"), SubResource("Resource_ptjhe"), SubResource("Resource_nsapd"), SubResource("Resource_w27xb"), SubResource("Resource_qndfo"), SubResource("Resource_t2es3"), SubResource("Resource_dn04k"), SubResource("Resource_oggpl"), SubResource("Resource_l3517"), SubResource("Resource_iuwf0"), SubResource("Resource_ptxy6"), SubResource("Resource_xbgcb"), SubResource("Resource_b27y8"), SubResource("Resource_1gnbr"), SubResource("Resource_ipyy4"), SubResource("Resource_apd2y"), SubResource("Resource_0swi0"), SubResource("Resource_5ifkg"), SubResource("Resource_pyd10"), SubResource("Resource_yoxv4"), SubResource("Resource_1usay"), SubResource("Resource_pgra1"), SubResource("Resource_utbgu"), SubResource("Resource_dqcgm"), SubResource("Resource_5r71a"), SubResource("Resource_hj3k3"), SubResource("Resource_knhrx"), SubResource("Resource_132d5"), SubResource("Resource_m73y7"), SubResource("Resource_lflfo"), SubResource("Resource_gwj57"), SubResource("Resource_8l1pc"), SubResource("Resource_xxlip"), SubResource("Resource_nbaj7"), SubResource("Resource_ywyju"), SubResource("Resource_10qj5"), SubResource("Resource_aeybw"), SubResource("Resource_iaron"), SubResource("Resource_co0d1"), SubResource("Resource_e8th6"), SubResource("Resource_1jv7j"), SubResource("Resource_rf18r"), SubResource("Resource_w2wx6"), SubResource("Resource_5r400"), SubResource("Resource_8rup3"), SubResource("Resource_dn56g"), SubResource("Resource_j4nva"), SubResource("Resource_h41vy"), SubResource("Resource_pgvjs"), SubResource("Resource_sv0xa"), SubResource("Resource_gfknd"), SubResource("Resource_24747"), SubResource("Resource_4htu2"), SubResource("Resource_uhfli"), SubResource("Resource_6efwt"), SubResource("Resource_uf055"), SubResource("Resource_j3qmn"), SubResource("Resource_sdcak")])
+flyby_sounds = Array[Resource]([SubResource("Resource_cdnen"), SubResource("Resource_kq6vc"), SubResource("Resource_yp2gt"), SubResource("Resource_fcafq"), SubResource("Resource_jlxsx"), SubResource("Resource_pwace")])

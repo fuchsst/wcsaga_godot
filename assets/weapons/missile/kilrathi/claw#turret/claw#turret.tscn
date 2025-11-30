@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/missile.gd" id="1_pycmo"]
+[ext_resource type="Resource" path="./assets/weapons/missile/kilrathi/claw#turret/claw#turret.tres" id="2_d8sk6"]
+
+[node name="Missile" type="Area3D"]
+script = ExtResource("1_pycmo")
+weapon_data = ExtResource("2_d8sk6")

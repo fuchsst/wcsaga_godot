@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="AsteroidData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/asteroids/asteroid_data.gd" id="1_dx6vy"]
+
+[resource]
+script = ExtResource("1_dx6vy")
+asteroid_name = "Kilrathi Debris 1"
+resource_identifier = "kilrathi_debris_1"
+lod_distances = Array[float]([0.0, 300.0, 600.0, 800.0])
+hitpoints = 147.0
+explosion_inner_radius = 100.0
+explosion_outer_radius = 200.0
+explosion_damage = 50.0
+explosion_blast = 3000.0

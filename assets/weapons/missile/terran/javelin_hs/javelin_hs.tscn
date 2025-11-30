@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/missile.gd" id="1_c205b"]
+[ext_resource type="Resource" path="./assets/weapons/missile/terran/javelin_hs/javelin_hs.tres" id="2_gk75a"]
+
+[node name="Missile" type="Area3D"]
+script = ExtResource("1_c205b")
+weapon_data = ExtResource("2_gk75a")

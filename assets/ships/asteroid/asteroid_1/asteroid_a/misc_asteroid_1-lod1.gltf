@@ -1,0 +1,296 @@
+{
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 2112,
+      "type": "VEC3",
+      "max": [
+        2172.56005859375,
+        2213.77001953125,
+        2255.449951171875
+      ],
+      "min": [
+        -2134.550048828125,
+        -2192.2099609375,
+        -2224.75
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 2112,
+      "type": "VEC3",
+      "max": [
+        0.9980379184867281,
+        0.9990295737933346,
+        0.9977884727409133
+      ],
+      "min": [
+        -0.9993477898168629,
+        -0.9982209251168702,
+        -0.9985592721005896
+      ]
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 2112,
+      "type": "VEC2",
+      "max": [
+        0.9997483489860315,
+        -0.0008310675621032715
+      ],
+      "min": [
+        0.0006263260147534311,
+        -0.9997327327728271
+      ]
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "normalized": false,
+      "count": 12366,
+      "type": "SCALAR",
+      "max": [
+        2111.0
+      ],
+      "min": [
+        0.0
+      ]
+    },
+    {
+      "bufferView": 4,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 545,
+      "type": "VEC3",
+      "max": [
+        2171.800048828125,
+        2214.409912109375,
+        2249.610107421875
+      ],
+      "min": [
+        -2126.179931640625,
+        -2183.389892578125,
+        -2223.64990234375
+      ]
+    },
+    {
+      "bufferView": 5,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 545,
+      "type": "VEC3",
+      "max": [
+        0.9980379184867281,
+        0.9990295737933346,
+        0.9963173874887047
+      ],
+      "min": [
+        -0.9977621112762514,
+        -0.9893970745841195,
+        -0.996763115175857
+      ]
+    },
+    {
+      "bufferView": 6,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 545,
+      "type": "VEC2",
+      "max": [
+        0.9994392400258221,
+        -0.0022100210189819336
+      ],
+      "min": [
+        0.0008604680188000202,
+        -0.9997315406799316
+      ]
+    },
+    {
+      "bufferView": 7,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "normalized": false,
+      "count": 3090,
+      "type": "SCALAR",
+      "max": [
+        544.0
+      ],
+      "min": [
+        0.0
+      ]
+    }
+  ],
+  "asset": {
+    "generator": "WCSaga Godot Converter",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 25344,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 25344,
+      "byteLength": 25344,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 50688,
+      "byteLength": 16896,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 67584,
+      "byteLength": 24732,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 92316,
+      "byteLength": 6540,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 98856,
+      "byteLength": 6540,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 105396,
+      "byteLength": 4360,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 109756,
+      "byteLength": 6180,
+      "target": 34963
+    }
+  ],
+  "buffers": [
+    {
+      "uri": "misc_asteroid_1-lod1.bin",
+      "byteLength": 115936
+    }
+  ],
+  "images": [
+    {
+      "uri": "asteroid_huge_01_albedo.png",
+      "mimeType": "image/png",
+      "name": "asteroid_huge_01_albedo_image"
+    },
+    {
+      "uri": "asteroid_huge_01_normal.png",
+      "mimeType": "image/png",
+      "name": "asteroid_huge_01_normal_image"
+    },
+    {
+      "uri": "asteroid_huge_01_orm.png",
+      "mimeType": "image/png",
+      "name": "asteroid_huge_01_orm_image"
+    }
+  ],
+  "materials": [
+    {
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.15,
+        "roughnessFactor": 0.75,
+        "baseColorTexture": {
+          "index": 0,
+          "texCoord": 0
+        },
+        "metallicRoughnessTexture": {
+          "index": 2,
+          "texCoord": 0
+        }
+      },
+      "normalTexture": {
+        "index": 1,
+        "texCoord": 0
+      },
+      "occlusionTexture": {
+        "index": 2,
+        "texCoord": 0
+      },
+      "emissiveFactor": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "name": "standard"
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 4,
+            "NORMAL": 5,
+            "TEXCOORD_0": 6
+          },
+          "indices": 7,
+          "mode": 4,
+          "material": 0
+        }
+      ],
+      "name": "ExportedMesh"
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "name": "Model"
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "source": 0,
+      "name": "asteroid_huge_01_albedo_texture"
+    },
+    {
+      "source": 1,
+      "name": "asteroid_huge_01_normal_texture"
+    },
+    {
+      "source": 2,
+      "name": "asteroid_huge_01_orm_texture"
+    }
+  ]
+}

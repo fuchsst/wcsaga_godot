@@ -1,0 +1,153 @@
+[gd_scene load_steps=16 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/ui/hud/hud_gauge_resource.gd" id="1_vm8ut"]
+
+[sub_resource type="Resource" id="Resource_we8su"]
+script = ExtResource("1_vm8ut")
+name = "HP_Silhouette"
+section = "Ship Gauges"
+ship_name = "F-57B Sabre"
+image = "hp_sil_sabre.png"
+
+[sub_resource type="Resource" id="Resource_r653k"]
+script = ExtResource("1_vm8ut")
+name = "HP_PBank1_L"
+section = "Ship Gauges"
+ship_name = "F-57B Sabre"
+position = Vector2i(40, 32)
+
+[sub_resource type="Resource" id="Resource_lmmy2"]
+script = ExtResource("1_vm8ut")
+name = "HP_PBank1_R"
+section = "Ship Gauges"
+ship_name = "F-57B Sabre"
+position = Vector2i(78, 32)
+
+[sub_resource type="Resource" id="Resource_0u1d1"]
+script = ExtResource("1_vm8ut")
+name = "HP_PBank2_L"
+section = "Ship Gauges"
+ship_name = "F-57B Sabre"
+position = Vector2i(30, 36)
+
+[sub_resource type="Resource" id="Resource_edv1h"]
+script = ExtResource("1_vm8ut")
+name = "HP_PBank2_R"
+section = "Ship Gauges"
+ship_name = "F-57B Sabre"
+position = Vector2i(88, 36)
+
+[sub_resource type="Resource" id="Resource_8qqbh"]
+script = ExtResource("1_vm8ut")
+name = "HP_PBank3_L"
+section = "Ship Gauges"
+ship_name = "F-57B Sabre"
+
+[sub_resource type="Resource" id="Resource_dmbow"]
+script = ExtResource("1_vm8ut")
+name = "HP_PBank3_R"
+section = "Ship Gauges"
+ship_name = "F-57B Sabre"
+
+[sub_resource type="Resource" id="Resource_tb4fo"]
+script = ExtResource("1_vm8ut")
+name = "HP_SBank1"
+section = "Ship Gauges"
+ship_name = "F-57B Sabre"
+position = Vector2i(10, 65)
+
+[sub_resource type="Resource" id="Resource_x84td"]
+script = ExtResource("1_vm8ut")
+name = "HP_SBank2"
+section = "Ship Gauges"
+ship_name = "F-57B Sabre"
+position = Vector2i(17, 61)
+
+[sub_resource type="Resource" id="Resource_wauof"]
+script = ExtResource("1_vm8ut")
+name = "HP_SBank3"
+section = "Ship Gauges"
+ship_name = "F-57B Sabre"
+position = Vector2i(56, 45)
+
+[sub_resource type="Resource" id="Resource_vwbqa"]
+script = ExtResource("1_vm8ut")
+name = "HP_SBank4"
+section = "Ship Gauges"
+ship_name = "F-57B Sabre"
+position = Vector2i(65, 45)
+
+[sub_resource type="Resource" id="Resource_4q06p"]
+script = ExtResource("1_vm8ut")
+name = "HP_SBank5"
+section = "Ship Gauges"
+ship_name = "F-57B Sabre"
+position = Vector2i(104, 61)
+
+[sub_resource type="Resource" id="Resource_iqb3i"]
+script = ExtResource("1_vm8ut")
+name = "HP_SBank6"
+section = "Ship Gauges"
+ship_name = "F-57B Sabre"
+position = Vector2i(111, 65)
+
+[sub_resource type="Resource" id="Resource_xd0rc"]
+script = ExtResource("1_vm8ut")
+name = "Hardpoints"
+section = "Ship Gauges"
+ship_name = "F-57B Sabre"
+sub_gauges = Array[ExtResource("1_vm8ut")]([SubResource("Resource_we8su"), SubResource("Resource_r653k"), SubResource("Resource_lmmy2"), SubResource("Resource_0u1d1"), SubResource("Resource_edv1h"), SubResource("Resource_8qqbh"), SubResource("Resource_dmbow"), SubResource("Resource_tb4fo"), SubResource("Resource_x84td"), SubResource("Resource_wauof"), SubResource("Resource_vwbqa"), SubResource("Resource_4q06p"), SubResource("Resource_iqb3i")])
+
+[node name="ShipGauges" type="Node2D"]
+
+[node name="Hardpoints" type="Node2D" parent="."]
+metadata/gauge_resource = SubResource("Resource_xd0rc")
+
+[node name="HP_Silhouette" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_we8su")
+
+[node name="HP_PBank1_L" type="Node2D" parent="Hardpoints"]
+position = Vector2(40, 32)
+metadata/gauge_resource = SubResource("Resource_r653k")
+
+[node name="HP_PBank1_R" type="Node2D" parent="Hardpoints"]
+position = Vector2(78, 32)
+metadata/gauge_resource = SubResource("Resource_lmmy2")
+
+[node name="HP_PBank2_L" type="Node2D" parent="Hardpoints"]
+position = Vector2(30, 36)
+metadata/gauge_resource = SubResource("Resource_0u1d1")
+
+[node name="HP_PBank2_R" type="Node2D" parent="Hardpoints"]
+position = Vector2(88, 36)
+metadata/gauge_resource = SubResource("Resource_edv1h")
+
+[node name="HP_PBank3_L" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_8qqbh")
+
+[node name="HP_PBank3_R" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_dmbow")
+
+[node name="HP_SBank1" type="Node2D" parent="Hardpoints"]
+position = Vector2(10, 65)
+metadata/gauge_resource = SubResource("Resource_tb4fo")
+
+[node name="HP_SBank2" type="Node2D" parent="Hardpoints"]
+position = Vector2(17, 61)
+metadata/gauge_resource = SubResource("Resource_x84td")
+
+[node name="HP_SBank3" type="Node2D" parent="Hardpoints"]
+position = Vector2(56, 45)
+metadata/gauge_resource = SubResource("Resource_wauof")
+
+[node name="HP_SBank4" type="Node2D" parent="Hardpoints"]
+position = Vector2(65, 45)
+metadata/gauge_resource = SubResource("Resource_vwbqa")
+
+[node name="HP_SBank5" type="Node2D" parent="Hardpoints"]
+position = Vector2(104, 61)
+metadata/gauge_resource = SubResource("Resource_4q06p")
+
+[node name="HP_SBank6" type="Node2D" parent="Hardpoints"]
+position = Vector2(111, 65)
+metadata/gauge_resource = SubResource("Resource_iqb3i")

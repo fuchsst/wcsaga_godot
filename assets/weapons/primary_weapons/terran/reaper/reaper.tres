@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="WCSWeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/weapons/weapon_data.gd" id="1_nkyoc"]
+
+[resource]
+script = ExtResource("1_nkyoc")
+weapon_class = "Reaper"
+category = "Primary Weapons"
+display_name = "Reaper"
+manufacturer_species = "Terran"
+tech_description = "XSTR(\"The reaper cannon evolved from the standard ion cannon, and its refire rate is slightly faster. This cannon delivers high-speed pulses of charged atomic particles that give off energy and radiation damage. Fighters find this cannon especially useful against ships with shields that regenerate quickly, and any ship with slow shield generation is sure to take damage.\", -1)"
+projectile_mass_kg = 0.3
+muzzle_velocity_mps = 880.0
+effective_range_meters = 900.0
+fire_rate_hz = 10.0
+base_damage_energy = 35.0
+armor_penetration_factor = 1.3
+shield_penetration_factor = 0.7
+subsystem_damage_factor = 1.0
+energy_per_shot = 0.0
+projectile_model = "none"
+laser_bitmap = "Reaper_Bitmap.png"
+laser_glow = "Reaper_Glow.png"
+laser_length_meters = 13.0
+laser_head_radius = 0.7
+laser_tail_radius = 0.7
+laser_primary_color = Color(0.8745098, 0.11764706, 0.8980392, 1)
+impact_explosion = "res://assets/effects/explosions/Shivan_Impact02.tscn"
+impact_explosion_radius = 1.5
+launch_sound_id = 78
+impact_sound_id = 85
+display_icon = "IconReaper"
+tech_animation = "LoadoutReaper"

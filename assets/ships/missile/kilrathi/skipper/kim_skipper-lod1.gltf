@@ -1,0 +1,283 @@
+{
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 965,
+      "type": "VEC3",
+      "max": [
+        4.366159915924072,
+        9.508429527282715,
+        3.211750030517578
+      ],
+      "min": [
+        -4.366159915924072,
+        -10.445500373840332,
+        -3.211750030517578
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 965,
+      "type": "VEC3",
+      "max": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "min": [
+        -1.0,
+        -1.0,
+        -1.0
+      ]
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 965,
+      "type": "VEC2",
+      "max": [
+        0.9980720281600952,
+        -0.010285019874572754
+      ],
+      "min": [
+        0.003945999778807163,
+        -0.9870550036430359
+      ]
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "normalized": false,
+      "count": 1974,
+      "type": "SCALAR",
+      "max": [
+        964.0
+      ],
+      "min": [
+        0.0
+      ]
+    },
+    {
+      "bufferView": 4,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 1004,
+      "type": "VEC3",
+      "max": [
+        4.366159915924072,
+        9.508429527282715,
+        3.211750030517578
+      ],
+      "min": [
+        -4.366159915924072,
+        -10.440799713134766,
+        -3.211750030517578
+      ]
+    },
+    {
+      "bufferView": 5,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 1004,
+      "type": "VEC3",
+      "max": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "min": [
+        -1.0,
+        -1.0,
+        -1.0
+      ]
+    },
+    {
+      "bufferView": 6,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 1004,
+      "type": "VEC2",
+      "max": [
+        0.9980720281600952,
+        -0.010285019874572754
+      ],
+      "min": [
+        0.003945999778807163,
+        -0.9870550036430359
+      ]
+    },
+    {
+      "bufferView": 7,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "normalized": false,
+      "count": 1980,
+      "type": "SCALAR",
+      "max": [
+        1003.0
+      ],
+      "min": [
+        0.0
+      ]
+    }
+  ],
+  "asset": {
+    "generator": "WCSaga Godot Converter",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 11580,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 11580,
+      "byteLength": 11580,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 23160,
+      "byteLength": 7720,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 30880,
+      "byteLength": 3948,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 34828,
+      "byteLength": 12048,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 46876,
+      "byteLength": 12048,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 58924,
+      "byteLength": 8032,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 66956,
+      "byteLength": 3960,
+      "target": 34963
+    }
+  ],
+  "buffers": [
+    {
+      "uri": "kim_skipper-lod1.bin",
+      "byteLength": 70916
+    }
+  ],
+  "images": [
+    {
+      "uri": "kim_skipper_1_albedo.png",
+      "mimeType": "image/png",
+      "name": "kim_skipper_1_albedo_image"
+    },
+    {
+      "uri": "kim_skipper_1_orm.png",
+      "mimeType": "image/png",
+      "name": "kim_skipper_1_orm_image"
+    }
+  ],
+  "materials": [
+    {
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.15,
+        "roughnessFactor": 0.75,
+        "baseColorTexture": {
+          "index": 0,
+          "texCoord": 0
+        },
+        "metallicRoughnessTexture": {
+          "index": 1,
+          "texCoord": 0
+        }
+      },
+      "occlusionTexture": {
+        "index": 1,
+        "texCoord": 0
+      },
+      "emissiveFactor": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "name": "standard"
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 4,
+            "NORMAL": 5,
+            "TEXCOORD_0": 6
+          },
+          "indices": 7,
+          "mode": 4,
+          "material": 0
+        }
+      ],
+      "name": "ExportedMesh"
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "name": "Model"
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "source": 0,
+      "name": "kim_skipper_1_albedo_texture"
+    },
+    {
+      "source": 1,
+      "name": "kim_skipper_1_orm_texture"
+    }
+  ]
+}

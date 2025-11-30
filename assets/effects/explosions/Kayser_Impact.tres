@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="WeaponExplosionResource" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/effects/explosions/weapon_expl_resource.gd" id="1_iaxbx"]
+[ext_resource type="Script" path="res://scripts/resources/effects/weapon_expl_resource.gd" id="1_ntjlm"]
 
 [resource]
-script = ExtResource("1_iaxbx")
+script = ExtResource("1_ntjlm")
 name = "Kayser_Impact"
 lod_paths = Array[String](["res://assets/effects/explosions/kayser_impact/kayser_impact.tres"])

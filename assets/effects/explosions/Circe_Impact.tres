@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="WeaponExplosionResource" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/effects/explosions/weapon_expl_resource.gd" id="1_j1uou"]
+[ext_resource type="Script" path="res://scripts/resources/effects/weapon_expl_resource.gd" id="1_uu0u0"]
 
 [resource]
-script = ExtResource("1_j1uou")
+script = ExtResource("1_uu0u0")
 name = "Circe_Impact"
 lod_paths = Array[String](["res://assets/effects/explosions/circe_impact/circe_impact.tres"])

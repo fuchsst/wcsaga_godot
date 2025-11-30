@@ -1,0 +1,141 @@
+[gd_resource type="Resource" script_class="CutsceneManifest" load_steps=27 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/cutscenes/cutscene_resource.gd" id="1_svfe4"]
+[ext_resource type="Script" path="res://scripts/resources/cutscenes/cutscene_manifest.gd" id="2_i2ten"]
+
+[sub_resource type="VideoStreamTheora" id="VideoStreamTheora_vtvoa"]
+file = "res://campaigns/hermes/cutscenes/intro.ogv"
+
+[sub_resource type="Resource" id="Resource_o38rj"]
+script = ExtResource("1_svfe4")
+name = "Introduction"
+description = "Wing Commander Saga Introduction"
+filename = "intro.ogg"
+video_stream = SubResource("VideoStreamTheora_vtvoa")
+
+[sub_resource type="VideoStreamTheora" id="VideoStreamTheora_mcr3s"]
+file = "res://campaigns/hermes/cutscenes/prologue_intro.ogv"
+
+[sub_resource type="Resource" id="Resource_ldb1e"]
+script = ExtResource("1_svfe4")
+name = "Reporting Aboard"
+description = "New flight cadets arrive on the TCS Wellington to start the final phase of their training."
+filename = "prologue_intro.ogg"
+video_stream = SubResource("VideoStreamTheora_mcr3s")
+
+[sub_resource type="VideoStreamTheora" id="VideoStreamTheora_ylicb"]
+file = "res://campaigns/hermes/cutscenes/prologue_outro.ogv"
+
+[sub_resource type="Resource" id="Resource_haoyn"]
+script = ExtResource("1_svfe4")
+name = "The Beginning in the End"
+description = "A cruel fate destroys the Wellington and turns the cadets into fully fledged pilots."
+filename = "prologue_outro.ogg"
+video_stream = SubResource("VideoStreamTheora_ylicb")
+
+[sub_resource type="VideoStreamTheora" id="VideoStreamTheora_i2ugs"]
+file = "res://campaigns/hermes/cutscenes/hermes_intro.ogv"
+
+[sub_resource type="Resource" id="Resource_76ham"]
+script = ExtResource("1_svfe4")
+name = "Hit the Ground Running"
+description = "The Wellington survivors arrive on the TCS Hermes to start a new journey."
+filename = "hermes_intro.ogg"
+video_stream = SubResource("VideoStreamTheora_i2ugs")
+
+[sub_resource type="VideoStreamTheora" id="VideoStreamTheora_y88wp"]
+file = "res://campaigns/hermes/cutscenes/episode_01_outro.ogv"
+
+[sub_resource type="Resource" id="Resource_7sstg"]
+script = ExtResource("1_svfe4")
+name = "The Bombardment of Vega Prime"
+description = "The Battle of Vega ends in an overwhelming defeat, and the Kilrathi commences anti-matter bombardment of Vega Prime."
+filename = "episode_01_outro.ogg"
+video_stream = SubResource("VideoStreamTheora_y88wp")
+
+[sub_resource type="VideoStreamTheora" id="VideoStreamTheora_p2co7"]
+file = "res://campaigns/hermes/cutscenes/episode_02_outro.ogv"
+
+[sub_resource type="Resource" id="Resource_ggqnh"]
+script = ExtResource("1_svfe4")
+name = "Kinney Memorial Service"
+description = "The crew of the Hermes mourns the loss of the TCS Kinney, yet another casualty in the decades-long war."
+filename = "episode_02_outro.ogg"
+video_stream = SubResource("VideoStreamTheora_p2co7")
+
+[sub_resource type="VideoStreamTheora" id="VideoStreamTheora_20wrt"]
+file = "res://campaigns/hermes/cutscenes/episode_03_outro.ogv"
+
+[sub_resource type="Resource" id="Resource_6dia5"]
+script = ExtResource("1_svfe4")
+name = "Hiding a Behemoth"
+description = "A Confed Special Ops team stands watch over the Behemoth while she undergoes pre-deployment trials."
+filename = "episode_03_outro.ogg"
+video_stream = SubResource("VideoStreamTheora_20wrt")
+
+[sub_resource type="VideoStreamTheora" id="VideoStreamTheora_da4jy"]
+file = "res://campaigns/hermes/cutscenes/episode_04_outro.ogv"
+
+[sub_resource type="Resource" id="Resource_8pgme"]
+script = ExtResource("1_svfe4")
+name = "The Behemoth Disaster"
+description = "The Behemoth has been destroyed and Confed's chances of winning the war now seem impossible."
+filename = "episode_04_outro.ogg"
+video_stream = SubResource("VideoStreamTheora_da4jy")
+
+[sub_resource type="VideoStreamTheora" id="VideoStreamTheora_qiiqw"]
+file = "res://campaigns/hermes/cutscenes/episode_05_outro.ogv"
+
+[sub_resource type="Resource" id="Resource_wiqfv"]
+script = ExtResource("1_svfe4")
+name = "Force Multiplier"
+description = "The Hermes receives a reinforced squadron of new Excalibur fighters. Meanwhile, Confed forces prepare to bring the fight to the Kilrathi's doorstep."
+filename = "episode_05_outro.ogg"
+video_stream = SubResource("VideoStreamTheora_qiiqw")
+
+[sub_resource type="VideoStreamTheora" id="VideoStreamTheora_j0tak"]
+file = "res://campaigns/hermes/cutscenes/episode_06_outro.ogv"
+
+[sub_resource type="Resource" id="Resource_vvst5"]
+script = ExtResource("1_svfe4")
+name = "The Fleet"
+description = "The end of the Kilrathi War is near. Confed rallies its entire forces to destroy the Kilrathi homeworld once and for all."
+filename = "episode_06_outro.ogg"
+video_stream = SubResource("VideoStreamTheora_j0tak")
+
+[sub_resource type="VideoStreamTheora" id="VideoStreamTheora_kaa7l"]
+file = "res://campaigns/hermes/cutscenes/hermes_outro.ogv"
+
+[sub_resource type="Resource" id="Resource_jfbiu"]
+script = ExtResource("1_svfe4")
+name = "The Treaty of Torgo"
+description = "The War is finally over, and Sandman flies as part of the Honor Guard during the treaty signing. How will our hero and his comrades cope with peace?"
+filename = "hermes_outro.ogg"
+video_stream = SubResource("VideoStreamTheora_kaa7l")
+
+[sub_resource type="VideoStreamTheora" id="VideoStreamTheora_k7206"]
+file = "res://campaigns/hermes/cutscenes/hermes_credits.ogv"
+
+[sub_resource type="Resource" id="Resource_8vqct"]
+script = ExtResource("1_svfe4")
+name = "Credits"
+description = "Meet the team that has poured countless hours of blood, sweat, and tears into creating Wing Commander Saga: The Darkest Dawn."
+filename = "hermes_credits.ogg"
+video_stream = SubResource("VideoStreamTheora_k7206")
+
+[resource]
+script = ExtResource("2_i2ten")
+cutscenes = {
+"episode_01_outro": SubResource("Resource_7sstg"),
+"episode_02_outro": SubResource("Resource_ggqnh"),
+"episode_03_outro": SubResource("Resource_6dia5"),
+"episode_04_outro": SubResource("Resource_8pgme"),
+"episode_05_outro": SubResource("Resource_wiqfv"),
+"episode_06_outro": SubResource("Resource_vvst5"),
+"hermes_credits": SubResource("Resource_8vqct"),
+"hermes_intro": SubResource("Resource_76ham"),
+"hermes_outro": SubResource("Resource_jfbiu"),
+"intro": SubResource("Resource_o38rj"),
+"prologue_intro": SubResource("Resource_ldb1e"),
+"prologue_outro": SubResource("Resource_haoyn")
+}

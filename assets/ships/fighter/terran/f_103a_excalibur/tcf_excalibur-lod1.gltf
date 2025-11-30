@@ -1,0 +1,309 @@
+{
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 11292,
+      "type": "VEC3",
+      "max": [
+        5.2535600662231445,
+        10.703499794006348,
+        2.6680901050567627
+      ],
+      "min": [
+        -5.2535600662231445,
+        -10.572199821472168,
+        -2.669490098953247
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 11292,
+      "type": "VEC3",
+      "max": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "min": [
+        -1.0,
+        -1.0,
+        -1.0
+      ]
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 11292,
+      "type": "VEC2",
+      "max": [
+        0.9960950016975403,
+        -0.04105299711227417
+      ],
+      "min": [
+        0.004217999987304211,
+        -0.9728099703788757
+      ]
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "normalized": false,
+      "count": 26142,
+      "type": "SCALAR",
+      "max": [
+        11291.0
+      ],
+      "min": [
+        0.0
+      ]
+    },
+    {
+      "bufferView": 4,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 2085,
+      "type": "VEC3",
+      "max": [
+        5.256840229034424,
+        10.647500038146973,
+        2.6317899227142334
+      ],
+      "min": [
+        -5.2535600662231445,
+        -10.571200370788574,
+        -2.6391398906707764
+      ]
+    },
+    {
+      "bufferView": 5,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 2085,
+      "type": "VEC3",
+      "max": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "min": [
+        -1.0,
+        -1.0,
+        -1.0
+      ]
+    },
+    {
+      "bufferView": 6,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 2085,
+      "type": "VEC2",
+      "max": [
+        0.9955840110778809,
+        -0.04139602184295654
+      ],
+      "min": [
+        0.00559999980032444,
+        -0.9739770293235779
+      ]
+    },
+    {
+      "bufferView": 7,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "normalized": false,
+      "count": 3681,
+      "type": "SCALAR",
+      "max": [
+        2084.0
+      ],
+      "min": [
+        0.0
+      ]
+    }
+  ],
+  "asset": {
+    "generator": "WCSaga Godot Converter",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 135504,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 135504,
+      "byteLength": 135504,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 271008,
+      "byteLength": 90336,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 361344,
+      "byteLength": 52284,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 413628,
+      "byteLength": 25020,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 438648,
+      "byteLength": 25020,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 463668,
+      "byteLength": 16680,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 480348,
+      "byteLength": 7362,
+      "target": 34963
+    }
+  ],
+  "buffers": [
+    {
+      "uri": "tcf_excalibur-lod1.bin",
+      "byteLength": 487712
+    }
+  ],
+  "images": [
+    {
+      "uri": "tcf_excalibur_albedo.png",
+      "mimeType": "image/png",
+      "name": "tcf_excalibur_albedo_image"
+    },
+    {
+      "uri": "tcf_excalibur_normal.png",
+      "mimeType": "image/png",
+      "name": "tcf_excalibur_normal_image"
+    },
+    {
+      "uri": "tcf_excalibur_glow.png",
+      "mimeType": "image/png",
+      "name": "tcf_excalibur_glow_image"
+    },
+    {
+      "uri": "tcf_excalibur_orm.png",
+      "mimeType": "image/png",
+      "name": "tcf_excalibur_orm_image"
+    }
+  ],
+  "materials": [
+    {
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.15,
+        "roughnessFactor": 0.75,
+        "baseColorTexture": {
+          "index": 0,
+          "texCoord": 0
+        },
+        "metallicRoughnessTexture": {
+          "index": 3,
+          "texCoord": 0
+        }
+      },
+      "normalTexture": {
+        "index": 1,
+        "texCoord": 0
+      },
+      "occlusionTexture": {
+        "index": 3,
+        "texCoord": 0
+      },
+      "emissiveFactor": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveTexture": {
+        "index": 2,
+        "texCoord": 0
+      },
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "name": "standard"
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 4,
+            "NORMAL": 5,
+            "TEXCOORD_0": 6
+          },
+          "indices": 7,
+          "mode": 4,
+          "material": 0
+        }
+      ],
+      "name": "ExportedMesh"
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "name": "Model"
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "source": 0,
+      "name": "tcf_excalibur_albedo_texture"
+    },
+    {
+      "source": 1,
+      "name": "tcf_excalibur_normal_texture"
+    },
+    {
+      "source": 2,
+      "name": "tcf_excalibur_glow_texture"
+    },
+    {
+      "source": 3,
+      "name": "tcf_excalibur_orm_texture"
+    }
+  ]
+}

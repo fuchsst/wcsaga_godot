@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/weapon.gd" id="1_s3g5m"]
+[ext_resource type="Resource" path="./assets/weapons/primary_weapons/terran/plasma/plasma.tres" id="2_oheap"]
+
+[node name="Weapon" type="Area3D"]
+script = ExtResource("1_s3g5m")
+weapon_data = ExtResource("2_oheap")

@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="FireballResource" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/effects/fireball/fireball_resource.gd" id="1_6f6jk"]
+[ext_resource type="Script" path="res://scripts/resources/effects/fireball_resource.gd" id="1_ahasd"]
 
 [resource]
-script = ExtResource("1_6f6jk")
+script = ExtResource("1_ahasd")
 name = "WarpMap01"
 render_type = 2
 is_warp = true

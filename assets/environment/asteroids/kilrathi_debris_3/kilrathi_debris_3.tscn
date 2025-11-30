@@ -1,0 +1,29 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/asteroid/asteroid.gd" id="1_tmb6k"]
+[ext_resource type="Script" path="res://scripts/resources/asteroids/asteroid_data.gd" id="2_jaw2o"]
+
+[sub_resource type="Resource" id="Resource_c8geg"]
+script = ExtResource("2_jaw2o")
+asteroid_name = "Kilrathi Debris 3"
+resource_identifier = "kilrathi_debris_3"
+lod_distances = Array[float]([0.0, 300.0, 600.0, 800.0])
+hitpoints = 147.0
+explosion_inner_radius = 100.0
+explosion_outer_radius = 200.0
+explosion_damage = 50.0
+explosion_blast = 3000.0
+impact_explosion_effect = "ExpMissilehit1"
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_d4g3j"]
+radius = 20.0
+
+[node name="Kilrathi Debris 3" type="RigidBody3D" node_paths=PackedStringArray("variations")]
+script = ExtResource("1_tmb6k")
+asteroid_data = SubResource("Resource_c8geg")
+variations = [NodePath("Variation_0")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_d4g3j")
+
+[node name="Variation_0" type="Node3D" parent="."]

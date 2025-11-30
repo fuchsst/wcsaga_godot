@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="LightningResource" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/effects/lightning/lightning_resource.gd" id="1_maa3f"]
+[ext_resource type="Script" path="res://scripts/resources/effects/lightning_resource.gd" id="1_m8y5t"]
 
 [resource]
-script = ExtResource("1_maa3f")
+script = ExtResource("1_m8y5t")
 name = "b_red"
 b_scale = 0.2
 b_shrink = 0.3

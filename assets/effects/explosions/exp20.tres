@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="WeaponExplosionResource" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/effects/explosions/weapon_expl_resource.gd" id="1_i03fa"]
+[ext_resource type="Script" path="res://scripts/resources/effects/weapon_expl_resource.gd" id="1_s6ywn"]
 
 [resource]
-script = ExtResource("1_i03fa")
+script = ExtResource("1_s6ywn")
 name = "exp20"
 lod_paths = Array[String](["res://assets/effects/explosions/exp20/exp20.tres"])

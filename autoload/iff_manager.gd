@@ -57,7 +57,7 @@ func get_iff_perception(viewer_iff: String, target_iff: String) -> Color:
 	var target_resource = get_iff(target_iff)
 	if target_resource:
 		return target_resource.display_color
-	return Color(1, 1, 1, 1) # Default to white
+	return Color(1, 1, 1, 1)  # Default to white
 
 
 # Get the display color for an IFF
@@ -65,4 +65,4 @@ func get_iff_color(iff_name: String) -> Color:
 	var iff_resource = get_iff(iff_name)
 	if iff_resource:
 		return iff_resource.display_color
-	return Color(1, 1, 1, 1) # Default to white
+	return Color(1, 1, 1, 1)  # Default to white

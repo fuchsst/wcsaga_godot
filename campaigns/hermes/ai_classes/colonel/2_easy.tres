@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="AIClassResource" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/gameplay/ai_class_resource.gd" id="1_rt116"]
+[ext_resource type="Script" path="res://scripts/resources/ai_classes/ai_class_resource.gd" id="1_qyoyk"]
 
 [resource]
-script = ExtResource("1_rt116")
+script = ExtResource("1_qyoyk")
 ai_class_name = "Colonel"
 difficulty_level = "2_easy"
 accuracy = 0.75

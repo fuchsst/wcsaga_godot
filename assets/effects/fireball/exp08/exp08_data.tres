@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="FireballResource" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/effects/fireball/fireball_resource.gd" id="1_8bfnc"]
+[ext_resource type="Script" path="res://scripts/resources/effects/fireball_resource.gd" id="1_r5wdq"]
 
 [resource]
-script = ExtResource("1_8bfnc")
+script = ExtResource("1_r5wdq")
 name = "exp08"
 render_type = 4

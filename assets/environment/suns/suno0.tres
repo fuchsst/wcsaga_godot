@@ -1,52 +1,52 @@
 [gd_resource type="Resource" script_class="WCSSunData" load_steps=16 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/environment/stars/sun_flare.gd" id="1_gi3vp"]
-[ext_resource type="Texture2D" path="res://../target/assets/environment/stars/coronaSunO0_001.png" id="2_hrr1x"]
-[ext_resource type="Texture2D" path="res://../target/assets/environment/stars/coronaSunO0_002.png" id="3_w0fks"]
-[ext_resource type="Texture2D" path="res://../target/assets/environment/stars/corona003.png" id="4_2w0no"]
-[ext_resource type="Texture2D" path="res://../target/assets/environment/stars/corona004.png" id="5_iirxa"]
-[ext_resource type="Texture2D" path="res://../target/assets/environment/stars/corona005.png" id="6_uyom4"]
-[ext_resource type="Texture2D" path="res://../target/assets/environment/stars/corona006.png" id="7_6lwe1"]
-[ext_resource type="Script" path="res://scripts/resources/environment/stars/sun_data.gd" id="8_yfks8"]
-[ext_resource type="Texture2D" path="res://../target/assets/environment/stars/SunGlow01.png" id="9_5x1td"]
+[ext_resource type="Script" path="res://scripts/resources/environment/stars/sun_flare.gd" id="1_18x83"]
+[ext_resource type="Texture2D" path="res://assets/environment/stars/coronaSunO0_001.png" id="2_i6yt3"]
+[ext_resource type="Texture2D" path="res://assets/environment/stars/coronaSunO0_002.png" id="3_a2hso"]
+[ext_resource type="Texture2D" path="res://assets/environment/stars/corona003.png" id="4_dbrb6"]
+[ext_resource type="Texture2D" path="res://assets/environment/stars/corona004.png" id="5_n2hy2"]
+[ext_resource type="Texture2D" path="res://assets/environment/stars/corona005.png" id="6_7usb2"]
+[ext_resource type="Texture2D" path="res://assets/environment/stars/corona006.png" id="7_106gc"]
+[ext_resource type="Script" path="res://scripts/resources/environment/stars/sun_data.gd" id="8_1bcj7"]
+[ext_resource type="Texture2D" path="res://assets/environment/stars/SunGlow.png" id="9_vlt1u"]
 
-[sub_resource type="Resource" id="Resource_it7uw"]
-script = ExtResource("1_gi3vp")
-texture = ExtResource("2_hrr1x")
+[sub_resource type="Resource" id="Resource_wlmr7"]
+script = ExtResource("1_18x83")
+texture = ExtResource("2_i6yt3")
 scale = 5.0
 
-[sub_resource type="Resource" id="Resource_lp8tc"]
-script = ExtResource("1_gi3vp")
-texture = ExtResource("3_w0fks")
+[sub_resource type="Resource" id="Resource_kvy80"]
+script = ExtResource("1_18x83")
+texture = ExtResource("3_a2hso")
 position = 0.1
 scale = 16.0
 
-[sub_resource type="Resource" id="Resource_4vsvb"]
-script = ExtResource("1_gi3vp")
-texture = ExtResource("4_2w0no")
+[sub_resource type="Resource" id="Resource_aefy1"]
+script = ExtResource("1_18x83")
+texture = ExtResource("4_dbrb6")
 position = 0.3
 scale = 2.0
 
-[sub_resource type="Resource" id="Resource_ns718"]
-script = ExtResource("1_gi3vp")
-texture = ExtResource("5_iirxa")
+[sub_resource type="Resource" id="Resource_ti0k6"]
+script = ExtResource("1_18x83")
+texture = ExtResource("5_n2hy2")
 position = 0.6
 
-[sub_resource type="Resource" id="Resource_uycty"]
-script = ExtResource("1_gi3vp")
-texture = ExtResource("6_uyom4")
+[sub_resource type="Resource" id="Resource_wicbs"]
+script = ExtResource("1_18x83")
+texture = ExtResource("6_7usb2")
 position = 1.2
 scale = 6.0
 
-[sub_resource type="Resource" id="Resource_mmmui"]
-script = ExtResource("1_gi3vp")
-texture = ExtResource("7_6lwe1")
+[sub_resource type="Resource" id="Resource_cjgn0"]
+script = ExtResource("1_18x83")
+texture = ExtResource("7_106gc")
 position = 1.8
 scale = 4.0
 
 [resource]
-script = ExtResource("8_yfks8")
+script = ExtResource("8_1bcj7")
 sun_name = "SunO0"
-sunglow = ExtResource("9_5x1td")
+sunglow = ExtResource("9_vlt1u")
 color = Color(0.61, 0.69, 1, 1)
-flares = Array[Resource]([SubResource("Resource_it7uw"), SubResource("Resource_lp8tc"), SubResource("Resource_4vsvb"), SubResource("Resource_ns718"), SubResource("Resource_uycty"), SubResource("Resource_mmmui")])
+flares = Array[Resource]([SubResource("Resource_wlmr7"), SubResource("Resource_kvy80"), SubResource("Resource_aefy1"), SubResource("Resource_ti0k6"), SubResource("Resource_wicbs"), SubResource("Resource_cjgn0")])

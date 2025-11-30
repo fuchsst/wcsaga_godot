@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="MainHallResource" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/ui/menus/main_hall_door.gd" id="1_skyhm"]
+[ext_resource type="Script" path="res://scripts/resources/ui/menus/mainhall_resource.gd" id="2_d88ku"]
+
+[resource]
+script = ExtResource("2_d88ku")
+bitmap = "2_MainHall1"
+music = "Wellington"

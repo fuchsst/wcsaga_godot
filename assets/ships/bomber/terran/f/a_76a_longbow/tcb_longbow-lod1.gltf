@@ -1,0 +1,309 @@
+{
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 8024,
+      "type": "VEC3",
+      "max": [
+        4.725279808044434,
+        9.348930358886719,
+        4.504499912261963
+      ],
+      "min": [
+        -4.725279808044434,
+        -14.65410041809082,
+        -4.3090901374816895
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 8024,
+      "type": "VEC3",
+      "max": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "min": [
+        -1.0,
+        -1.0,
+        -1.0
+      ]
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 8024,
+      "type": "VEC2",
+      "max": [
+        0.9914159774780273,
+        -0.015070021152496338
+      ],
+      "min": [
+        0.012261999770998955,
+        -0.9943209886550903
+      ]
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "normalized": false,
+      "count": 19902,
+      "type": "SCALAR",
+      "max": [
+        8023.0
+      ],
+      "min": [
+        0.0
+      ]
+    },
+    {
+      "bufferView": 4,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 2062,
+      "type": "VEC3",
+      "max": [
+        4.721889972686768,
+        11.004599571228027,
+        4.497650146484375
+      ],
+      "min": [
+        -4.721889972686768,
+        -14.628899574279785,
+        -4.298299789428711
+      ]
+    },
+    {
+      "bufferView": 5,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 2062,
+      "type": "VEC3",
+      "max": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "min": [
+        -1.0,
+        -1.0,
+        -1.0
+      ]
+    },
+    {
+      "bufferView": 6,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 2062,
+      "type": "VEC2",
+      "max": [
+        0.9913849830627441,
+        -0.0054000020027160645
+      ],
+      "min": [
+        0.0,
+        -1.0
+      ]
+    },
+    {
+      "bufferView": 7,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "normalized": false,
+      "count": 4056,
+      "type": "SCALAR",
+      "max": [
+        2061.0
+      ],
+      "min": [
+        0.0
+      ]
+    }
+  ],
+  "asset": {
+    "generator": "WCSaga Godot Converter",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 96288,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 96288,
+      "byteLength": 96288,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 192576,
+      "byteLength": 64192,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 256768,
+      "byteLength": 39804,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 296572,
+      "byteLength": 24744,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 321316,
+      "byteLength": 24744,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 346060,
+      "byteLength": 16496,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 362556,
+      "byteLength": 8112,
+      "target": 34963
+    }
+  ],
+  "buffers": [
+    {
+      "uri": "tcb_longbow-lod1.bin",
+      "byteLength": 370668
+    }
+  ],
+  "images": [
+    {
+      "uri": "tcb_longbow_albedo.png",
+      "mimeType": "image/png",
+      "name": "tcb_longbow_albedo_image"
+    },
+    {
+      "uri": "tcb_longbow_normal.png",
+      "mimeType": "image/png",
+      "name": "tcb_longbow_normal_image"
+    },
+    {
+      "uri": "tcb_longbow_glow.png",
+      "mimeType": "image/png",
+      "name": "tcb_longbow_glow_image"
+    },
+    {
+      "uri": "tcb_longbow_orm.png",
+      "mimeType": "image/png",
+      "name": "tcb_longbow_orm_image"
+    }
+  ],
+  "materials": [
+    {
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.15,
+        "roughnessFactor": 0.75,
+        "baseColorTexture": {
+          "index": 0,
+          "texCoord": 0
+        },
+        "metallicRoughnessTexture": {
+          "index": 3,
+          "texCoord": 0
+        }
+      },
+      "normalTexture": {
+        "index": 1,
+        "texCoord": 0
+      },
+      "occlusionTexture": {
+        "index": 3,
+        "texCoord": 0
+      },
+      "emissiveFactor": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveTexture": {
+        "index": 2,
+        "texCoord": 0
+      },
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "name": "standard"
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 4,
+            "NORMAL": 5,
+            "TEXCOORD_0": 6
+          },
+          "indices": 7,
+          "mode": 4,
+          "material": 0
+        }
+      ],
+      "name": "ExportedMesh"
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "name": "Model"
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "source": 0,
+      "name": "tcb_longbow_albedo_texture"
+    },
+    {
+      "source": 1,
+      "name": "tcb_longbow_normal_texture"
+    },
+    {
+      "source": 2,
+      "name": "tcb_longbow_glow_texture"
+    },
+    {
+      "source": 3,
+      "name": "tcb_longbow_orm_texture"
+    }
+  ]
+}

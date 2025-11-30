@@ -1,0 +1,27 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/asteroid/asteroid.gd" id="1_u4mkf"]
+[ext_resource type="Script" path="res://scripts/resources/asteroids/asteroid_data.gd" id="2_a5omy"]
+
+[sub_resource type="Resource" id="Resource_xg0fj"]
+script = ExtResource("2_a5omy")
+asteroid_name = "Pirate Debris 3"
+resource_identifier = "pirate_debris_3"
+lod_distances = Array[float]([0.0, 300.0, 600.0, 800.0])
+hitpoints = 147.0
+explosion_inner_radius = 100.0
+explosion_outer_radius = 200.0
+explosion_damage = 50.0
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_xums5"]
+radius = 20.0
+
+[node name="Pirate Debris 3" type="RigidBody3D" node_paths=PackedStringArray("variations")]
+script = ExtResource("1_u4mkf")
+asteroid_data = SubResource("Resource_xg0fj")
+variations = [NodePath("Variation_0")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_xums5")
+
+[node name="Variation_0" type="Node3D" parent="."]

@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="WCSWeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/weapons/weapon_data.gd" id="1_4bu5u"]
+
+[resource]
+script = ExtResource("1_4bu5u")
+weapon_class = "Laser"
+category = "Primary Weapons"
+display_name = "Laser"
+manufacturer_species = "Terran"
+tech_description = "XSTR(\"The laser is the backbone of today's energy guns. Consistently improved upon and perfected over the last half-century, the laser provides the standard against which most other blasters are judged. Low maintenance and a low energy cost make it standard armament for almost every ship in existence. The laser is ideally suited to deep-space combat (in atmospheric conditions, rays refract and lose their effectiveness). However, it has no effect against shields on larger ships.\", -1)"
+projectile_mass_kg = 0.3
+muzzle_velocity_mps = 900.0
+effective_range_meters = 1000.0
+fire_rate_hz = 10.0
+base_damage_energy = 18.0
+shield_penetration_factor = 1.0
+subsystem_damage_factor = 0.3
+energy_per_shot = 0.0
+projectile_model = "none"
+laser_bitmap = "Laser_Bitmap.png"
+laser_glow = "Laser_Glow.png"
+laser_length_meters = 12.0
+laser_head_radius = 0.7
+laser_tail_radius = 0.7
+laser_primary_color = Color(0.8980392, 0.12156863, 0.10980392, 1)
+launch_sound_id = 76
+impact_sound_id = 85
+display_icon = "IconLaser"
+tech_animation = "LoadoutLaser"

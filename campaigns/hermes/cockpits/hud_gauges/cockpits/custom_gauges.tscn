@@ -1,0 +1,163 @@
+[gd_scene load_steps=19 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/ui/hud/hud_gauge_resource.gd" id="1_u2byk"]
+
+[sub_resource type="Resource" id="Resource_rnwd3"]
+script = ExtResource("1_u2byk")
+name = "Autopilot"
+section = "Custom Gauges"
+position = Vector2i(483, 233)
+
+[sub_resource type="Resource" id="Resource_u1xar"]
+script = ExtResource("1_u2byk")
+name = "Central Reticle"
+section = "Custom Gauges"
+position = Vector2i(347, 219)
+
+[sub_resource type="Resource" id="Resource_qsf6v"]
+script = ExtResource("1_u2byk")
+name = "Hardpoints"
+section = "Custom Gauges"
+position = Vector2i(892, 385)
+
+[sub_resource type="Resource" id="Resource_ftyn3"]
+script = ExtResource("1_u2byk")
+name = "HP_Text"
+section = "Custom Gauges"
+position = Vector2i(9, 2)
+parent = "Hardpoints"
+
+[sub_resource type="Resource" id="Resource_1g0um"]
+script = ExtResource("1_u2byk")
+name = "HP_Silhouette"
+section = "Custom Gauges"
+parent = "Hardpoints"
+
+[sub_resource type="Resource" id="Resource_3qnp5"]
+script = ExtResource("1_u2byk")
+name = "HP_PBank1_L"
+section = "Custom Gauges"
+parent = "Hardpoints"
+
+[sub_resource type="Resource" id="Resource_spdov"]
+script = ExtResource("1_u2byk")
+name = "HP_PBank1_R"
+section = "Custom Gauges"
+parent = "Hardpoints"
+
+[sub_resource type="Resource" id="Resource_ea23p"]
+script = ExtResource("1_u2byk")
+name = "HP_PBank2_L"
+section = "Custom Gauges"
+parent = "Hardpoints"
+
+[sub_resource type="Resource" id="Resource_qhvi5"]
+script = ExtResource("1_u2byk")
+name = "HP_PBank2_R"
+section = "Custom Gauges"
+parent = "Hardpoints"
+
+[sub_resource type="Resource" id="Resource_o5npg"]
+script = ExtResource("1_u2byk")
+name = "HP_PBank3_L"
+section = "Custom Gauges"
+parent = "Hardpoints"
+
+[sub_resource type="Resource" id="Resource_h72ge"]
+script = ExtResource("1_u2byk")
+name = "HP_PBank3_R"
+section = "Custom Gauges"
+parent = "Hardpoints"
+
+[sub_resource type="Resource" id="Resource_tnraj"]
+script = ExtResource("1_u2byk")
+name = "HP_SBank1"
+section = "Custom Gauges"
+parent = "Hardpoints"
+
+[sub_resource type="Resource" id="Resource_vw2ox"]
+script = ExtResource("1_u2byk")
+name = "HP_SBank2"
+section = "Custom Gauges"
+parent = "Hardpoints"
+
+[sub_resource type="Resource" id="Resource_w8wya"]
+script = ExtResource("1_u2byk")
+name = "HP_SBank3"
+section = "Custom Gauges"
+parent = "Hardpoints"
+
+[sub_resource type="Resource" id="Resource_mdqj7"]
+script = ExtResource("1_u2byk")
+name = "HP_SBank4"
+section = "Custom Gauges"
+parent = "Hardpoints"
+
+[sub_resource type="Resource" id="Resource_76hv0"]
+script = ExtResource("1_u2byk")
+name = "HP_SBank5"
+section = "Custom Gauges"
+parent = "Hardpoints"
+
+[sub_resource type="Resource" id="Resource_6kviv"]
+script = ExtResource("1_u2byk")
+name = "HP_SBank6"
+section = "Custom Gauges"
+parent = "Hardpoints"
+
+[node name="CustomGauges" type="Node2D"]
+
+[node name="Autopilot" type="Node2D" parent="."]
+position = Vector2(483, 233)
+metadata/gauge_resource = SubResource("Resource_rnwd3")
+
+[node name="Central Reticle" type="Node2D" parent="."]
+position = Vector2(347, 219)
+metadata/gauge_resource = SubResource("Resource_u1xar")
+
+[node name="Hardpoints" type="Node2D" parent="."]
+position = Vector2(892, 385)
+metadata/gauge_resource = SubResource("Resource_qsf6v")
+
+[node name="HP_Text" type="Node2D" parent="Hardpoints"]
+position = Vector2(9, 2)
+metadata/gauge_resource = SubResource("Resource_ftyn3")
+
+[node name="HP_Silhouette" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_1g0um")
+
+[node name="HP_PBank1_L" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_3qnp5")
+
+[node name="HP_PBank1_R" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_spdov")
+
+[node name="HP_PBank2_L" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_ea23p")
+
+[node name="HP_PBank2_R" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_qhvi5")
+
+[node name="HP_PBank3_L" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_o5npg")
+
+[node name="HP_PBank3_R" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_h72ge")
+
+[node name="HP_SBank1" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_tnraj")
+
+[node name="HP_SBank2" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_vw2ox")
+
+[node name="HP_SBank3" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_w8wya")
+
+[node name="HP_SBank4" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_mdqj7")
+
+[node name="HP_SBank5" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_76hv0")
+
+[node name="HP_SBank6" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_6kviv")

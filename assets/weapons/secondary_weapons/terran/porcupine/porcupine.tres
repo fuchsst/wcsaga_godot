@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="WCSWeaponData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/weapons/weapon_data.gd" id="1_h1gx7"]
+
+[sub_resource type="GDScript" id="GDScript_1c6gj"]
+
+[sub_resource type="Resource" id="Resource_efqyo"]
+script = SubResource("GDScript_1c6gj")
+bitmap = "empty"
+start_width = 0.0
+end_width = 0.0
+start_alpha = 0.0
+end_alpha = 0.0
+max_life = 0.0
+
+[resource]
+script = ExtResource("1_h1gx7")
+weapon_class = "Porcupine"
+category = "Secondary Weapons"
+display_name = "Porcupine"
+manufacturer_species = "Terran"
+tech_description = "XSTR(\"Mines are useful for booby-trapping areas that the enemy may pass through such as jump points, gaps in asteroid fields and pulsar shadows. The Confederation and Kilrathi's latest mines have simplified guidance systems that can seek out disabled ships. Since mines move so slowly and have a low radar cross signature, ship detection systems are hard pressed to track them with sensors or radar. This deadly device has limited homing capabilities and built-in proximity sensors, detonation does not require contact.\", -1)"
+projectile_mass_kg = 3.0
+muzzle_velocity_mps = 200.0
+fire_rate_hz = 0.5
+base_damage_energy = 0.0
+armor_penetration_factor = 0.0
+shield_penetration_factor = 0.0
+subsystem_damage_factor = 0.0
+energy_per_shot = 0.0
+projectile_model = "misc_ghostmissile.gltf"
+trail_config = SubResource("Resource_efqyo")
+rearm_rate = 1.0
+cargo_size_units = 10.0
+launch_sound_id = 87
+impact_sound_id = 107
+display_icon = "IconPorcupine"
+tech_animation = "LoadoutPorcupine"

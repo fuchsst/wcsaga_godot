@@ -18,7 +18,7 @@
 
 [resource]
 script = ExtResource("15_7pb3e")
-backgrounds = {
+backgrounds = Dictionary[String, Texture2D]({
 "nbackblack": ExtResource("8_e8vsc"),
 "nbackblue1": ExtResource("1_wkh3o"),
 "nbackblue2": ExtResource("2_e1vq7"),
@@ -27,12 +27,12 @@ backgrounds = {
 "nbackpurp1": ExtResource("5_37hok"),
 "nbackpurp2": ExtResource("6_4ed08"),
 "nbackred": ExtResource("7_2cnva")
-}
-poofs = {
+})
+poofs = Dictionary[String, Texture2D]({
 "PoofGreen01": ExtResource("9_t8nt4"),
 "PoofGreen02": ExtResource("10_j400b"),
 "PoofPurp01": ExtResource("13_sol64"),
 "PoofPurp02": ExtResource("14_201pb"),
 "PoofRed01": ExtResource("11_1ckom"),
 "PoofRed02": ExtResource("12_umxsl")
-}
+})

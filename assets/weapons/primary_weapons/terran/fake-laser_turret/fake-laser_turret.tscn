@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/weapon.gd" id="1_xe3hr"]
+[ext_resource type="Resource" path="./assets/weapons/primary_weapons/terran/fake-laser_turret/fake-laser_turret.tres" id="2_ufehv"]
+
+[node name="Weapon" type="Area3D"]
+script = ExtResource("1_xe3hr")
+weapon_data = ExtResource("2_ufehv")

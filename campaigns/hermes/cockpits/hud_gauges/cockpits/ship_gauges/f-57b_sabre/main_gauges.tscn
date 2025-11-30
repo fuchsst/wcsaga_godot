@@ -1,0 +1,38 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/ui/hud/hud_gauge_resource.gd" id="1_xbpik"]
+
+[sub_resource type="Resource" id="Resource_1w6l0"]
+script = ExtResource("1_xbpik")
+name = "Afterburner Energy"
+section = "Ship Main Gauges"
+ship_name = "F-57B Sabre"
+position = Vector2i(344, 643)
+
+[sub_resource type="Resource" id="Resource_18l8k"]
+script = ExtResource("1_xbpik")
+name = "Weapons Energy"
+section = "Ship Main Gauges"
+ship_name = "F-57B Sabre"
+position = Vector2i(596, 643)
+
+[sub_resource type="Resource" id="Resource_e4vjc"]
+script = ExtResource("1_xbpik")
+name = "Central Reticle"
+section = "Ship Main Gauges"
+ship_name = "F-57B Sabre"
+position = Vector2i(347, 223)
+
+[node name="ShipMainGauges" type="Node2D"]
+
+[node name="Afterburner Energy" type="Node2D" parent="."]
+position = Vector2(344, 643)
+metadata/gauge_resource = SubResource("Resource_1w6l0")
+
+[node name="Weapons Energy" type="Node2D" parent="."]
+position = Vector2(596, 643)
+metadata/gauge_resource = SubResource("Resource_18l8k")
+
+[node name="Central Reticle" type="Node2D" parent="."]
+position = Vector2(347, 223)
+metadata/gauge_resource = SubResource("Resource_e4vjc")

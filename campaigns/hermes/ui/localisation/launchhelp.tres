@@ -1,0 +1,125 @@
+[gd_resource type="Resource" script_class="HelpResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/ui/localisation/help_resource.gd" id="1_e73r6"]
+
+[resource]
+script = ExtResource("1_e73r6")
+topic = "Launch Help"
+text = "XSTR(\"
+----------------------------------------------
+The FreeSpace 2 Launcher
+----------------------------------------------
+
+The Launcher's buttons enable you to set up and play FreeSpace 2,
+customize your hardware settings, get updated versions of the game,
+and access the FreeSpace 2 web pages at Volition, Inc.
+Here's what each button does:
+
+
+PLAY
+Click this button to launch FreeSpace 2.
+
+
+SETUP
+Under Setup, you'll see tabs for Video, Audio, Joystick, Speed,
+Network, DirectX, and Misc.
+\", -1)
+$end_multi_text
+
+XSTR(\"
+* Video - You must have a 3D Accelerator card to play FreeSpace 2.
+You can choose to have FreeSpace 2 detect Glide only, D3D only, or both
+by selecting the proper checkboxes, then clicking on the 'Detect
+Available Cards' button.
+- 'Interlaced Cutscenes' - When displaying ingame movies, draws
+every other line (interlaced mode) so that slower video cards have an
+easier time.
+- 'Fast Clear for Cutscenes' - Speeds up movie playback by not
+clearing the background buffer when a new frame is being rendered.
+- 'Fast D3D Textures' - Improves your video and gameplay
+performance, but at a cost to the visual quality of FreeSpace 2. Enable
+fast D3D textures *only* if you are experiencing severe slowdown during
+gameplay.
+- WFOG is a Direct3D-only option. 'Force WFOG' makes the D3D card
+use WFOG (table-based rather than vertex-based fog) if available. Some
+cards don't do WFOG properly (the S4, for example), so vertex fog is
+used by default. Use this setting only for experimentation purposes.
+- 'Disable Direct3D Zbuffer Bias' - If you are a Direct3D user and are
+experiencing strange rendering problems with squadron logos (specifically,
+the logos rendering on top of everything else), checking this box should
+resolve the problem.
+
+* Audio - FreeSpace 2 supports DirectSound, A3D, and EAX. You can
+choose one of these by clicking on 'Detect Available Sound Cards' and
+when selecting from the dropdown box. You can enable Launcher sounds
+from here as well.
+\", -1)
+$end_multi_text
+
+XSTR(\"
+* Joystick - Enables you to set up or change the joystick used by
+FreeSpace 2. Also lets you toggle Force Feedback support on or off (any
+joystick supporting DirectX 6.0 force feedback may be used).
+
+* Speed - This setting determines the default Detail Level used in
+FreeSpace 2 when new pilots are created. You may manually change this
+default if you wish, but it may adversely affect your gameplay speed.
+
+* Network - Here you choose your connection type and speed for
+multiplayer games. If playing on Volition's free PXO service, you can
+enter your login name and password. The 'Force Local Port' option
+enables the user to run a local copy of the game on a different network
+port than the default (which is 7808). The 'PXO Banners' checkbox
+enables banner displays while you're in PXO.
+
+* DirectX - On this tab you can check your DirectX version and choose
+to install or update DirectX on your machine.
+
+* Misc. - On this tab, you choose the language (written and spoken)
+in which all game text and messages appear. The 'Optional Command Line'
+box enables the user to specify a set of command-line switches that are
+passed to the game at startup. See the readme.txt file for available
+commands.
+\", -1)
+$end_multi_text
+
+
+XSTR(\"
+VIEW README
+Opens the readme.txt file for FreeSpace 2.
+
+
+UPDATE
+This button enables you to see if a new version of FreeSpace 2 is
+available for downloading. If one is available, you can choose to
+update your version by clicking on OK. The process is automated.
+
+
+HELP
+This opens a Help document containing information about the Launcher
+buttons.
+
+
+UNINSTALL
+Uninstalls FreeSpace 2 from your computer.
+
+
+QUIT
+Closes the Launcher without running FreeSpace 2.
+
+
+VOLITION LOGO
+This takes you to Volition's Internet home page.
+
+
+PXO LOGO
+This takes you to the Internet home page for Parallax Online, a free
+multiplayer service for Volition and Outrage games.
+
+\", -1)
+
+$end_multi_text
+
+$end
+"
+category = "launch"

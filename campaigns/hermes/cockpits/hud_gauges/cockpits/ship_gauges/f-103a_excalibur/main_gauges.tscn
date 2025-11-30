@@ -1,0 +1,38 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/ui/hud/hud_gauge_resource.gd" id="1_cwhfl"]
+
+[sub_resource type="Resource" id="Resource_rw2d4"]
+script = ExtResource("1_cwhfl")
+name = "Afterburner Energy"
+section = "Ship Main Gauges"
+ship_name = "F-103A Excalibur"
+position = Vector2i(344, 643)
+
+[sub_resource type="Resource" id="Resource_68cjo"]
+script = ExtResource("1_cwhfl")
+name = "Weapons Energy"
+section = "Ship Main Gauges"
+ship_name = "F-103A Excalibur"
+position = Vector2i(596, 643)
+
+[sub_resource type="Resource" id="Resource_2ale5"]
+script = ExtResource("1_cwhfl")
+name = "Central Reticle"
+section = "Ship Main Gauges"
+ship_name = "F-103A Excalibur"
+position = Vector2i(347, 207)
+
+[node name="ShipMainGauges" type="Node2D"]
+
+[node name="Afterburner Energy" type="Node2D" parent="."]
+position = Vector2(344, 643)
+metadata/gauge_resource = SubResource("Resource_rw2d4")
+
+[node name="Weapons Energy" type="Node2D" parent="."]
+position = Vector2(596, 643)
+metadata/gauge_resource = SubResource("Resource_68cjo")
+
+[node name="Central Reticle" type="Node2D" parent="."]
+position = Vector2(347, 207)
+metadata/gauge_resource = SubResource("Resource_2ale5")

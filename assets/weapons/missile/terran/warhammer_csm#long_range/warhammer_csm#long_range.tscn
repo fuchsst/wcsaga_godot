@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/missile.gd" id="1_u53f2"]
+[ext_resource type="Resource" path="./assets/weapons/missile/terran/warhammer_csm#long_range/warhammer_csm#long_range.tres" id="2_5sj85"]
+
+[node name="Missile" type="Area3D"]
+script = ExtResource("1_u53f2")
+weapon_data = ExtResource("2_5sj85")

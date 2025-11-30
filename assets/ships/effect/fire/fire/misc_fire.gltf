@@ -1,0 +1,286 @@
+{
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 11799,
+      "type": "VEC3",
+      "max": [
+        24.82390022277832,
+        39.70600128173828,
+        2.0306599140167236
+      ],
+      "min": [
+        -24.841899871826172,
+        -39.09260177612305,
+        -2.3214199542999268
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 11799,
+      "type": "VEC3",
+      "max": [
+        0.9995366839500185,
+        0.9994754885047785,
+        0.9997594996284705
+      ],
+      "min": [
+        -0.999795897833036,
+        -0.9994330154081881,
+        -0.9999606365461534
+      ]
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "normalized": false,
+      "count": 11799,
+      "type": "VEC2",
+      "max": [
+        0.9875389933586121,
+        -0.001992464065551758
+      ],
+      "min": [
+        0.0,
+        -1.0
+      ]
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "normalized": false,
+      "count": 25983,
+      "type": "SCALAR",
+      "max": [
+        11798.0
+      ],
+      "min": [
+        0.0
+      ]
+    }
+  ],
+  "asset": {
+    "generator": "WCSaga Godot Converter",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 141588,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 141588,
+      "byteLength": 141588,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 283176,
+      "byteLength": 94392,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 377568,
+      "byteLength": 51966,
+      "target": 34963
+    }
+  ],
+  "buffers": [
+    {
+      "uri": "misc_fire.bin",
+      "byteLength": 429536
+    }
+  ],
+  "images": [
+    {
+      "uri": "debris01c_albedo.png",
+      "mimeType": "image/png",
+      "name": "debris01c_albedo_image"
+    },
+    {
+      "uri": "debris01c_glow.png",
+      "mimeType": "image/png",
+      "name": "debris01c_glow_image"
+    },
+    {
+      "uri": "debris01c_orm.png",
+      "mimeType": "image/png",
+      "name": "debris01c_orm_image"
+    }
+  ],
+  "materials": [
+    {
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.15,
+        "roughnessFactor": 0.75,
+        "baseColorTexture": {
+          "index": 0,
+          "texCoord": 0
+        },
+        "metallicRoughnessTexture": {
+          "index": 2,
+          "texCoord": 0
+        }
+      },
+      "occlusionTexture": {
+        "index": 2,
+        "texCoord": 0
+      },
+      "emissiveFactor": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveTexture": {
+        "index": 1,
+        "texCoord": 0
+      },
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "name": "standard"
+    },
+    {
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.15,
+        "roughnessFactor": 0.75
+      },
+      "emissiveFactor": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "name": "standard"
+    },
+    {
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.15,
+        "roughnessFactor": 0.75
+      },
+      "emissiveFactor": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "name": "standard"
+    },
+    {
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.15,
+        "roughnessFactor": 0.75
+      },
+      "emissiveFactor": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "name": "standard"
+    },
+    {
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "metallicFactor": 0.15,
+        "roughnessFactor": 0.75
+      },
+      "emissiveFactor": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "name": "standard"
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "mode": 4,
+          "material": 0
+        }
+      ],
+      "name": "ExportedMesh"
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "name": "Model"
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "source": 0,
+      "name": "debris01c_albedo_texture"
+    },
+    {
+      "source": 1,
+      "name": "debris01c_glow_texture"
+    },
+    {
+      "source": 2,
+      "name": "debris01c_orm_texture"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/ui/hud/hud_gauge_resource.gd" id="1_dj0xw"]
+
+[sub_resource type="Resource" id="Resource_eo3ab"]
+script = ExtResource("1_dj0xw")
+name = "Afterburner Energy"
+section = "Ship Main Gauges"
+ship_name = "F/A-76A Longbow"
+position = Vector2i(344, 643)
+
+[sub_resource type="Resource" id="Resource_xfsu3"]
+script = ExtResource("1_dj0xw")
+name = "Weapons Energy"
+section = "Ship Main Gauges"
+ship_name = "F/A-76A Longbow"
+position = Vector2i(596, 643)
+
+[sub_resource type="Resource" id="Resource_6285g"]
+script = ExtResource("1_dj0xw")
+name = "Central Reticle"
+section = "Ship Main Gauges"
+ship_name = "F/A-76A Longbow"
+position = Vector2i(346, 219)
+
+[node name="ShipMainGauges" type="Node2D"]
+
+[node name="Afterburner Energy" type="Node2D" parent="."]
+position = Vector2(344, 643)
+metadata/gauge_resource = SubResource("Resource_eo3ab")
+
+[node name="Weapons Energy" type="Node2D" parent="."]
+position = Vector2(596, 643)
+metadata/gauge_resource = SubResource("Resource_xfsu3")
+
+[node name="Central Reticle" type="Node2D" parent="."]
+position = Vector2(346, 219)
+metadata/gauge_resource = SubResource("Resource_6285g")

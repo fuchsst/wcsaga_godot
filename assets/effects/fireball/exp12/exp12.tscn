@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/entities/effects/fireball.gd" id="1_script"]
-[ext_resource type="SpriteFrames" uid="uid://700295a63827" path="res://assets/effects/fireball/exp12/exp12.tres" id="2_frames"]
+[ext_resource type="SpriteFrames" uid="uid://700295a63827" path="./assets/effects/fireball/exp12/exp12.tres" id="2_frames"]
 
 [node name="exp12" type="Node3D"]
 script = ExtResource("1_script")

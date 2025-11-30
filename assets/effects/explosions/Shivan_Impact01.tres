@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="WeaponExplosionResource" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/effects/explosions/weapon_expl_resource.gd" id="1_kvo31"]
+[ext_resource type="Script" path="res://scripts/resources/effects/weapon_expl_resource.gd" id="1_fmsv8"]
 
 [resource]
-script = ExtResource("1_kvo31")
+script = ExtResource("1_fmsv8")
 name = "Shivan_Impact01"
 lod_paths = Array[String](["res://assets/effects/explosions/shivan_impact01/shivan_impact01.tres"])

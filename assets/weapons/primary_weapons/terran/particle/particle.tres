@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="WCSWeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/weapons/weapon_data.gd" id="1_k3xet"]
+
+[resource]
+script = ExtResource("1_k3xet")
+weapon_class = "Particle"
+category = "Primary Weapons"
+display_name = "Particle"
+manufacturer_species = "Terran"
+tech_description = "XSTR(\"The particle cannon is perhaps the most significant energy technology we possess. Prototypes were first developed three years into the war, when a similar cannon was extracted from a captured Kilrathi fighter. Engineers built a comparable version capable of hurling minute nuclear particles at high speeds. Any impact results in a small nuclear explosion that gives off blast, heat and radiation damage. This cannon is useless, however, in atmospheric conditions.\", -1)"
+projectile_mass_kg = 0.4
+muzzle_velocity_mps = 945.0
+effective_range_meters = 840.0
+fire_rate_hz = 10.0
+base_damage_energy = 43.0
+shield_penetration_factor = 1.0
+subsystem_damage_factor = 0.35
+energy_per_shot = 2.2
+projectile_model = "none"
+laser_bitmap = "Particle_Bitmap.png"
+laser_glow = "Particle_Glow.png"
+laser_length_meters = 5.0
+laser_head_radius = 2.0
+laser_tail_radius = 2.0
+laser_primary_color = Color(0.8980392, 0.65882355, 0, 1)
+impact_explosion = "res://assets/effects/explosions/Shivan_Impact01.tscn"
+impact_explosion_radius = 2.4
+launch_sound_id = 83
+impact_sound_id = 85
+display_icon = "IconParticle"
+tech_animation = "LoadoutParticle"

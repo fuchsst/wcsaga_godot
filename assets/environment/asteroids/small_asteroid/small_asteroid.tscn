@@ -1,0 +1,30 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/asteroid/asteroid.gd" id="1_cin5p"]
+[ext_resource type="Script" path="res://scripts/resources/asteroids/asteroid_data.gd" id="2_j00l6"]
+
+[sub_resource type="Resource" id="Resource_fuhku"]
+script = ExtResource("2_j00l6")
+asteroid_name = "Small Asteroid"
+resource_identifier = "small_asteroid"
+lod_distances = Array[float]([0.0, 12000.0, 24000.0])
+hitpoints = 23.0
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_8amhk"]
+radius = 20.0
+
+[node name="Small Asteroid" type="RigidBody3D" node_paths=PackedStringArray("variations")]
+script = ExtResource("1_cin5p")
+asteroid_data = SubResource("Resource_fuhku")
+variations = [NodePath("Variation_0"), NodePath("Variation_1"), NodePath("Variation_2")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_8amhk")
+
+[node name="Variation_0" type="Node3D" parent="."]
+
+[node name="Variation_1" type="Node3D" parent="."]
+visible = false
+
+[node name="Variation_2" type="Node3D" parent="."]
+visible = false

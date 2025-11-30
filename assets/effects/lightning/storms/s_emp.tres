@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="LightningResource" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/effects/lightning/lightning_resource.gd" id="1_wsuo4"]
+[ext_resource type="Script" path="res://scripts/resources/effects/lightning_resource.gd" id="1_nf1rf"]
 
 [resource]
-script = ExtResource("1_wsuo4")
+script = ExtResource("1_nf1rf")
 name = "s_emp"
 type = 1
 s_bolt_types = Array[String](["b_standard", "b_standard", "b_standard", "b_red", "b_red", "b_emp", "b_red", "b_red"])

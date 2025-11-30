@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ShipStats" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/ships/ship_stats.gd" id="1_83746"]
+
+[sub_resource type="GDScript" id="GDScript_t8xbw"]
+
+[sub_resource type="GDScript" id="GDScript_chs1k"]
+
+[sub_resource type="GDScript" id="GDScript_jecvk"]
+
+[sub_resource type="GDScript" id="GDScript_0hh3c"]
+
+[sub_resource type="GDScript" id="GDScript_6xcd0"]
+
+[resource]
+script = ExtResource("1_83746")
+ship_class = "Default700"
+display_name = "Default700"
+model_file = "Default700.pof"

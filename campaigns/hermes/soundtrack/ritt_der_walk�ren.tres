@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="SoundtrackResource" load_steps=4 format=3]
+
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/ritt_der_walkueren_comm.ogg" id="1_ig1ja"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/player_dead_b_01.ogg" id="2_o18we"]
+[ext_resource type="Script" path="res://scripts/resources/sounds/soundtrack_resource.gd" id="3_pdcxv"]
+
+[resource]
+script = ExtResource("3_pdcxv")
+name = "Ritt der Walk�ren"
+lock_in_ambient = true
+ambience = ExtResource("1_ig1ja")
+ambience_filename = "ritt_der_walkueren_comm.ogg"
+arrival_allied_normal = ExtResource("1_ig1ja")
+arrival_allied_normal_filename = "ritt_der_walkueren_comm.ogg"
+arrival_enemy_normal = ExtResource("1_ig1ja")
+arrival_enemy_normal_filename = "ritt_der_walkueren_comm.ogg"
+battle_1 = ExtResource("1_ig1ja")
+battle_1_filename = "ritt_der_walkueren_comm.ogg"
+battle_2 = ExtResource("1_ig1ja")
+battle_2_filename = "ritt_der_walkueren_comm.ogg"
+battle_3 = ExtResource("1_ig1ja")
+battle_3_filename = "ritt_der_walkueren_comm.ogg"
+arrival_allied_battle = ExtResource("1_ig1ja")
+arrival_allied_battle_filename = "ritt_der_walkueren_comm.ogg"
+arrival_enemy_battle = ExtResource("1_ig1ja")
+arrival_enemy_battle_filename = "ritt_der_walkueren_comm.ogg"
+victory_1 = ExtResource("1_ig1ja")
+victory_1_filename = "ritt_der_walkueren_comm.ogg"
+victory_2 = ExtResource("1_ig1ja")
+victory_2_filename = "ritt_der_walkueren_comm.ogg"
+goal_failed = ExtResource("1_ig1ja")
+goal_failed_filename = "ritt_der_walkueren_comm.ogg"
+player_dead = ExtResource("2_o18we")
+player_dead_filename = "player_dead_b_01.ogg"

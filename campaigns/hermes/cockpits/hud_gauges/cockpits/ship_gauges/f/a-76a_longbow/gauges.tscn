@@ -1,0 +1,153 @@
+[gd_scene load_steps=16 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/ui/hud/hud_gauge_resource.gd" id="1_a6nj5"]
+
+[sub_resource type="Resource" id="Resource_yjjcs"]
+script = ExtResource("1_a6nj5")
+name = "HP_Silhouette"
+section = "Ship Gauges"
+ship_name = "F/A-76A Longbow"
+image = "hp_sil_longbow.png"
+
+[sub_resource type="Resource" id="Resource_qxeps"]
+script = ExtResource("1_a6nj5")
+name = "HP_PBank1_L"
+section = "Ship Gauges"
+ship_name = "F/A-76A Longbow"
+position = Vector2i(53, 16)
+
+[sub_resource type="Resource" id="Resource_qmlbf"]
+script = ExtResource("1_a6nj5")
+name = "HP_PBank1_R"
+section = "Ship Gauges"
+ship_name = "F/A-76A Longbow"
+position = Vector2i(65, 16)
+
+[sub_resource type="Resource" id="Resource_nnbtf"]
+script = ExtResource("1_a6nj5")
+name = "HP_PBank2_L"
+section = "Ship Gauges"
+ship_name = "F/A-76A Longbow"
+position = Vector2i(54, 45)
+
+[sub_resource type="Resource" id="Resource_8i4u3"]
+script = ExtResource("1_a6nj5")
+name = "HP_PBank2_R"
+section = "Ship Gauges"
+ship_name = "F/A-76A Longbow"
+position = Vector2i(64, 45)
+
+[sub_resource type="Resource" id="Resource_db05c"]
+script = ExtResource("1_a6nj5")
+name = "HP_PBank3_L"
+section = "Ship Gauges"
+ship_name = "F/A-76A Longbow"
+
+[sub_resource type="Resource" id="Resource_enl74"]
+script = ExtResource("1_a6nj5")
+name = "HP_PBank3_R"
+section = "Ship Gauges"
+ship_name = "F/A-76A Longbow"
+
+[sub_resource type="Resource" id="Resource_xmrfd"]
+script = ExtResource("1_a6nj5")
+name = "HP_SBank1"
+section = "Ship Gauges"
+ship_name = "F/A-76A Longbow"
+position = Vector2i(15, 58)
+
+[sub_resource type="Resource" id="Resource_trvl3"]
+script = ExtResource("1_a6nj5")
+name = "HP_SBank2"
+section = "Ship Gauges"
+ship_name = "F/A-76A Longbow"
+position = Vector2i(23, 51)
+
+[sub_resource type="Resource" id="Resource_04kw5"]
+script = ExtResource("1_a6nj5")
+name = "HP_SBank3"
+section = "Ship Gauges"
+ship_name = "F/A-76A Longbow"
+position = Vector2i(45, 44)
+
+[sub_resource type="Resource" id="Resource_yhe3c"]
+script = ExtResource("1_a6nj5")
+name = "HP_SBank4"
+section = "Ship Gauges"
+ship_name = "F/A-76A Longbow"
+position = Vector2i(76, 44)
+
+[sub_resource type="Resource" id="Resource_a0spu"]
+script = ExtResource("1_a6nj5")
+name = "HP_SBank5"
+section = "Ship Gauges"
+ship_name = "F/A-76A Longbow"
+position = Vector2i(98, 51)
+
+[sub_resource type="Resource" id="Resource_ucu6g"]
+script = ExtResource("1_a6nj5")
+name = "HP_SBank6"
+section = "Ship Gauges"
+ship_name = "F/A-76A Longbow"
+position = Vector2i(106, 58)
+
+[sub_resource type="Resource" id="Resource_cg1ml"]
+script = ExtResource("1_a6nj5")
+name = "Hardpoints"
+section = "Ship Gauges"
+ship_name = "F/A-76A Longbow"
+sub_gauges = Array[ExtResource("1_a6nj5")]([SubResource("Resource_yjjcs"), SubResource("Resource_qxeps"), SubResource("Resource_qmlbf"), SubResource("Resource_nnbtf"), SubResource("Resource_8i4u3"), SubResource("Resource_db05c"), SubResource("Resource_enl74"), SubResource("Resource_xmrfd"), SubResource("Resource_trvl3"), SubResource("Resource_04kw5"), SubResource("Resource_yhe3c"), SubResource("Resource_a0spu"), SubResource("Resource_ucu6g")])
+
+[node name="ShipGauges" type="Node2D"]
+
+[node name="Hardpoints" type="Node2D" parent="."]
+metadata/gauge_resource = SubResource("Resource_cg1ml")
+
+[node name="HP_Silhouette" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_yjjcs")
+
+[node name="HP_PBank1_L" type="Node2D" parent="Hardpoints"]
+position = Vector2(53, 16)
+metadata/gauge_resource = SubResource("Resource_qxeps")
+
+[node name="HP_PBank1_R" type="Node2D" parent="Hardpoints"]
+position = Vector2(65, 16)
+metadata/gauge_resource = SubResource("Resource_qmlbf")
+
+[node name="HP_PBank2_L" type="Node2D" parent="Hardpoints"]
+position = Vector2(54, 45)
+metadata/gauge_resource = SubResource("Resource_nnbtf")
+
+[node name="HP_PBank2_R" type="Node2D" parent="Hardpoints"]
+position = Vector2(64, 45)
+metadata/gauge_resource = SubResource("Resource_8i4u3")
+
+[node name="HP_PBank3_L" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_db05c")
+
+[node name="HP_PBank3_R" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_enl74")
+
+[node name="HP_SBank1" type="Node2D" parent="Hardpoints"]
+position = Vector2(15, 58)
+metadata/gauge_resource = SubResource("Resource_xmrfd")
+
+[node name="HP_SBank2" type="Node2D" parent="Hardpoints"]
+position = Vector2(23, 51)
+metadata/gauge_resource = SubResource("Resource_trvl3")
+
+[node name="HP_SBank3" type="Node2D" parent="Hardpoints"]
+position = Vector2(45, 44)
+metadata/gauge_resource = SubResource("Resource_04kw5")
+
+[node name="HP_SBank4" type="Node2D" parent="Hardpoints"]
+position = Vector2(76, 44)
+metadata/gauge_resource = SubResource("Resource_yhe3c")
+
+[node name="HP_SBank5" type="Node2D" parent="Hardpoints"]
+position = Vector2(98, 51)
+metadata/gauge_resource = SubResource("Resource_a0spu")
+
+[node name="HP_SBank6" type="Node2D" parent="Hardpoints"]
+position = Vector2(106, 58)
+metadata/gauge_resource = SubResource("Resource_ucu6g")

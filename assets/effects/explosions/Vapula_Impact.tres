@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="WeaponExplosionResource" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/effects/explosions/weapon_expl_resource.gd" id="1_2dov1"]
+[ext_resource type="Script" path="res://scripts/resources/effects/weapon_expl_resource.gd" id="1_2d8dc"]
 
 [resource]
-script = ExtResource("1_2dov1")
+script = ExtResource("1_2d8dc")
 name = "Vapula_Impact"
 lod_paths = Array[String](["res://assets/effects/explosions/vapula_impact/vapula_impact.tres"])

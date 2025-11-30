@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="WCSWeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/weapons/weapon_data.gd" id="1_k5nuo"]
+
+[resource]
+script = ExtResource("1_k5nuo")
+weapon_class = "Ion"
+category = "Primary Weapons"
+display_name = "Ion"
+manufacturer_species = "Terran"
+tech_description = "XSTR(\"Found mainly on fighters and also used as an anti-fighter cannon the ion cannon imparts energy and radiation damage to targets. Charged atomic particles are magnetically accelerated to high speeds, then discharged in pulses. This cannon delivers more damage than a laser and can cause severe pilot injuries. However, the ion cannon has higher energy consumption and a slower refire rate than the laser.\", -1)"
+effective_range_meters = 900.0
+fire_rate_hz = 2.857142857142857
+projectile_model = "none"
+laser_bitmap = "Ion_Bitmap.png"
+laser_glow = "Ion_Glow.png"
+laser_primary_color = Color(0.83137256, 0.0627451, 0.8980392, 1)
+impact_explosion = "res://assets/effects/explosions/Mekhu_Impact.tscn"
+impact_explosion_radius = 1.8
+launch_sound_id = 80
+impact_sound_id = 85
+display_icon = "IconIon"
+tech_animation = "LoadoutIon"

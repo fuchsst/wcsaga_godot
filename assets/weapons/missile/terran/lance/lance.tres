@@ -1,0 +1,45 @@
+[gd_resource type="Resource" script_class="WCSWeaponData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/weapons/weapon_data.gd" id="1_2y2qa"]
+
+[sub_resource type="GDScript" id="GDScript_1c6gj"]
+
+[sub_resource type="Resource" id="Resource_6g2ja"]
+script = SubResource("GDScript_1c6gj")
+bitmap = "newmiss1"
+start_width = 0.4
+end_width = 1.0
+start_alpha = 0.5
+end_alpha = 0.0
+max_life = 2.0
+
+[resource]
+script = ExtResource("1_2y2qa")
+weapon_class = "Lance"
+category = "missile"
+display_name = "Lance"
+manufacturer_species = "terran"
+tech_description = "XSTR(\"A mainstay in both Terran and Kilrathi fleets, the torpedo is a large, maneuverable warhead used against capital ships and bases. It has a built-in image-recognition system that locks onto the target, and even laser turrets can't shoot it down. Although the lock time is longer than that of any other missile, the torpedo is the only fighter weapon that can easily destroy carriers.\", -1)"
+projectile_mass_kg = 6.0
+muzzle_velocity_mps = 156.0
+fire_rate_hz = 1.0
+base_damage_energy = 22000.0
+shield_penetration_factor = 0.0
+subsystem_damage_factor = 0.6
+blast_radius = 75.0
+energy_per_shot = 0.0
+projectile_model = "tcm_lance.gltf"
+trail_config = SubResource("Resource_6g2ja")
+homing_type = 1
+min_lock_time = 20.0
+rearm_rate = 1.0
+cargo_size_units = 40.0
+is_bomb_type = true
+is_huge_weapon = true
+flags = 12
+impact_explosion = "res://assets/effects/explosions/exp07.tscn"
+impact_explosion_radius = 45.0
+launch_sound_id = 97
+impact_sound_id = 88
+display_icon = "IconLance"
+tech_animation = "LoadoutLance"

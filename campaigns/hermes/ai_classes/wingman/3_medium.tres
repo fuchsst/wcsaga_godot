@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="AIClassResource" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/gameplay/ai_class_resource.gd" id="1_de0b1"]
+[ext_resource type="Script" path="res://scripts/resources/ai_classes/ai_class_resource.gd" id="1_qx74l"]
 
 [resource]
-script = ExtResource("1_de0b1")
+script = ExtResource("1_qx74l")
 ai_class_name = "Wingman"
 difficulty_level = "3_medium"
 accuracy = 1.0

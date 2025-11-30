@@ -1,0 +1,28 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/asteroid/asteroid.gd" id="1_c4ffp"]
+[ext_resource type="Script" path="res://scripts/resources/asteroids/asteroid_data.gd" id="2_lghl7"]
+
+[sub_resource type="Resource" id="Resource_ebvme"]
+script = ExtResource("2_lghl7")
+asteroid_name = "Terran Debris 2"
+resource_identifier = "terran_debris_2"
+lod_distances = Array[float]([0.0, 300.0, 600.0, 800.0])
+hitpoints = 147.0
+explosion_inner_radius = 100.0
+explosion_outer_radius = 200.0
+explosion_damage = 50.0
+explosion_blast = 3000.0
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_v7p8e"]
+radius = 20.0
+
+[node name="Terran Debris 2" type="RigidBody3D" node_paths=PackedStringArray("variations")]
+script = ExtResource("1_c4ffp")
+asteroid_data = SubResource("Resource_ebvme")
+variations = [NodePath("Variation_0")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_v7p8e")
+
+[node name="Variation_0" type="Node3D" parent="."]

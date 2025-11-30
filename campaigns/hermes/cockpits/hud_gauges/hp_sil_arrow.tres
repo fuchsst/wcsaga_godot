@@ -1,0 +1,20 @@
+[gd_resource type="SpriteFrames" load_steps=3 format=3 uid="uid://8a2126a4da61"]
+
+[ext_resource type="Texture2D" uid="uid://c0c880fe3ffe" path="res://campaigns/hermes/cockpits/hud_gauges/hp_sil_arrow.png" id="1_tex"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0"]
+atlas = ExtResource("1_tex")
+region = Rect2(0, 0, 126, 100)
+
+[resource]
+animations = [{
+"frames": [
+{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0")
+}
+],
+"loop": true,
+"name": &"default",
+"speed": 15.0
+}]

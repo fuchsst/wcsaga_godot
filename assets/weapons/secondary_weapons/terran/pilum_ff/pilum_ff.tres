@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="WCSWeaponData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/weapons/weapon_data.gd" id="1_5w85g"]
+
+[sub_resource type="GDScript" id="GDScript_1c6gj"]
+
+[sub_resource type="Resource" id="Resource_8pnup"]
+script = SubResource("GDScript_1c6gj")
+bitmap = "empty"
+start_width = 0.0
+end_width = 0.0
+start_alpha = 0.0
+end_alpha = 0.0
+max_life = 0.0
+
+[resource]
+script = ExtResource("1_5w85g")
+weapon_class = "Pilum FF"
+category = "Secondary Weapons"
+display_name = "Pilum FF"
+manufacturer_species = "Terran"
+tech_description = "XSTR(\"The Pilum friend-or-foe (FF) missile was developed once ship systems were able to distinguish between friendly and enemy ships. Capable of identifying the distinctive Confederation ship signal, it makes a beeline for the nearest ship that isn't broadcasting that signal. This has resulted in the destruction of several Terran ships whose communications systems were damaged. In spite of this inherent danger, both sides continue to use the FF as standard armament for medium and heavy fighters. This missile doesn't require a lock, and it will acquire a new target if the current one is destroyed before detonation..\", -1)"
+projectile_mass_kg = 3.0
+muzzle_velocity_mps = 200.0
+fire_rate_hz = 2.0
+base_damage_energy = 0.0
+armor_penetration_factor = 0.0
+shield_penetration_factor = 0.0
+subsystem_damage_factor = 0.0
+energy_per_shot = 0.0
+projectile_model = "misc_ghostmissile.gltf"
+trail_config = SubResource("Resource_8pnup")
+spawn_angle = 0.1
+rearm_rate = 1.0
+cargo_size_units = 10.0
+launch_sound_id = 87
+impact_sound_id = 107
+display_icon = "IconPilum"
+tech_animation = "LoadoutPilum"

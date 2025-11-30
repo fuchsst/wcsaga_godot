@@ -1,0 +1,55 @@
+[gd_resource type="Resource" script_class="WCSWeaponData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/weapons/weapon_data.gd" id="1_r6qwt"]
+
+[sub_resource type="GDScript" id="GDScript_np4b7"]
+
+[sub_resource type="Resource" id="Resource_bqs0b"]
+script = SubResource("GDScript_np4b7")
+count = 1
+time = 17
+velocity = 0.4
+radius = 0.4
+lifetime = 0.2
+scale = 0.65
+bitmap = "Vapula_Particle"
+
+[sub_resource type="GDScript" id="GDScript_1c6gj"]
+
+[sub_resource type="Resource" id="Resource_lylqg"]
+script = SubResource("GDScript_1c6gj")
+bitmap = "neutrontrail2"
+start_width = 1.0
+end_width = 0.7
+start_alpha = 1.2
+end_alpha = 0.0
+max_life = 0.1
+
+[resource]
+script = ExtResource("1_r6qwt")
+weapon_class = "Neutron"
+category = "Primary Weapons"
+display_name = "Neutron"
+manufacturer_species = "Terran"
+tech_description = "XSTR(\"Neutron guns do heavy damage, but only at close range. No other projectile weapon provides an equivalent level of destructive capability. The down side is that neutron guns heat up rapidly and eat up power at an alarming rate. Also, the neutron gun's lack of range had led many foolhardy and underskilled pilots into close-quarter combat for which they were ill-prepared. Some of these pilots never made it home.\", -1)"
+muzzle_velocity_mps = 675.0
+effective_range_meters = 800.0
+fire_rate_hz = 10.0
+armor_penetration_factor = 1.1
+shield_penetration_factor = 1.0
+subsystem_damage_factor = 0.3
+energy_per_shot = 0.0
+projectile_model = "none"
+laser_bitmap = "Neutron_Bitmap.png"
+laser_glow = "Neutron_Glow.png"
+laser_length_meters = 5.0
+laser_head_radius = 0.95
+laser_primary_color = Color(0.8980392, 0.41960785, 0.09803922, 1)
+particle_spew = SubResource("Resource_bqs0b")
+trail_config = SubResource("Resource_lylqg")
+impact_explosion = "res://assets/effects/explosions/Circe_Impact.tscn"
+impact_explosion_radius = 2.2
+launch_sound_id = 84
+impact_sound_id = 85
+display_icon = "IconNeutron"
+tech_animation = "LoadoutNeutron"

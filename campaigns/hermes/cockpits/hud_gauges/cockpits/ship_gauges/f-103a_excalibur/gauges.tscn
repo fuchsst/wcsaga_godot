@@ -1,0 +1,151 @@
+[gd_scene load_steps=16 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/ui/hud/hud_gauge_resource.gd" id="1_6j6oq"]
+
+[sub_resource type="Resource" id="Resource_bkvfm"]
+script = ExtResource("1_6j6oq")
+name = "HP_Silhouette"
+section = "Ship Gauges"
+ship_name = "F-103A Excalibur"
+image = "hp_sil_excalibur.png"
+
+[sub_resource type="Resource" id="Resource_a5w5b"]
+script = ExtResource("1_6j6oq")
+name = "HP_PBank1_L"
+section = "Ship Gauges"
+ship_name = "F-103A Excalibur"
+position = Vector2i(26, 54)
+image = "primary_dbl_left.png"
+
+[sub_resource type="Resource" id="Resource_wl362"]
+script = ExtResource("1_6j6oq")
+name = "HP_PBank1_R"
+section = "Ship Gauges"
+ship_name = "F-103A Excalibur"
+position = Vector2i(81, 54)
+image = "primary_dbl_right.png"
+
+[sub_resource type="Resource" id="Resource_x7xao"]
+script = ExtResource("1_6j6oq")
+name = "HP_PBank2_L"
+section = "Ship Gauges"
+ship_name = "F-103A Excalibur"
+position = Vector2i(53, 24)
+
+[sub_resource type="Resource" id="Resource_s7yt4"]
+script = ExtResource("1_6j6oq")
+name = "HP_PBank2_R"
+section = "Ship Gauges"
+ship_name = "F-103A Excalibur"
+position = Vector2i(65, 24)
+
+[sub_resource type="Resource" id="Resource_r1pf8"]
+script = ExtResource("1_6j6oq")
+name = "HP_PBank3_L"
+section = "Ship Gauges"
+ship_name = "F-103A Excalibur"
+
+[sub_resource type="Resource" id="Resource_o74ct"]
+script = ExtResource("1_6j6oq")
+name = "HP_PBank3_R"
+section = "Ship Gauges"
+ship_name = "F-103A Excalibur"
+
+[sub_resource type="Resource" id="Resource_x3r5g"]
+script = ExtResource("1_6j6oq")
+name = "HP_SBank1"
+section = "Ship Gauges"
+ship_name = "F-103A Excalibur"
+position = Vector2i(47, 52)
+
+[sub_resource type="Resource" id="Resource_erv6k"]
+script = ExtResource("1_6j6oq")
+name = "HP_SBank2"
+section = "Ship Gauges"
+ship_name = "F-103A Excalibur"
+position = Vector2i(57, 52)
+
+[sub_resource type="Resource" id="Resource_dag6r"]
+script = ExtResource("1_6j6oq")
+name = "HP_SBank3"
+section = "Ship Gauges"
+ship_name = "F-103A Excalibur"
+position = Vector2i(64, 52)
+
+[sub_resource type="Resource" id="Resource_ygmkt"]
+script = ExtResource("1_6j6oq")
+name = "HP_SBank4"
+section = "Ship Gauges"
+ship_name = "F-103A Excalibur"
+position = Vector2i(74, 52)
+
+[sub_resource type="Resource" id="Resource_r0imt"]
+script = ExtResource("1_6j6oq")
+name = "HP_SBank5"
+section = "Ship Gauges"
+ship_name = "F-103A Excalibur"
+
+[sub_resource type="Resource" id="Resource_utd6m"]
+script = ExtResource("1_6j6oq")
+name = "HP_SBank6"
+section = "Ship Gauges"
+ship_name = "F-103A Excalibur"
+
+[sub_resource type="Resource" id="Resource_4fgub"]
+script = ExtResource("1_6j6oq")
+name = "Hardpoints"
+section = "Ship Gauges"
+ship_name = "F-103A Excalibur"
+sub_gauges = Array[ExtResource("1_6j6oq")]([SubResource("Resource_bkvfm"), SubResource("Resource_a5w5b"), SubResource("Resource_wl362"), SubResource("Resource_x7xao"), SubResource("Resource_s7yt4"), SubResource("Resource_r1pf8"), SubResource("Resource_o74ct"), SubResource("Resource_x3r5g"), SubResource("Resource_erv6k"), SubResource("Resource_dag6r"), SubResource("Resource_ygmkt"), SubResource("Resource_r0imt"), SubResource("Resource_utd6m")])
+
+[node name="ShipGauges" type="Node2D"]
+
+[node name="Hardpoints" type="Node2D" parent="."]
+metadata/gauge_resource = SubResource("Resource_4fgub")
+
+[node name="HP_Silhouette" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_bkvfm")
+
+[node name="HP_PBank1_L" type="Node2D" parent="Hardpoints"]
+position = Vector2(26, 54)
+metadata/gauge_resource = SubResource("Resource_a5w5b")
+
+[node name="HP_PBank1_R" type="Node2D" parent="Hardpoints"]
+position = Vector2(81, 54)
+metadata/gauge_resource = SubResource("Resource_wl362")
+
+[node name="HP_PBank2_L" type="Node2D" parent="Hardpoints"]
+position = Vector2(53, 24)
+metadata/gauge_resource = SubResource("Resource_x7xao")
+
+[node name="HP_PBank2_R" type="Node2D" parent="Hardpoints"]
+position = Vector2(65, 24)
+metadata/gauge_resource = SubResource("Resource_s7yt4")
+
+[node name="HP_PBank3_L" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_r1pf8")
+
+[node name="HP_PBank3_R" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_o74ct")
+
+[node name="HP_SBank1" type="Node2D" parent="Hardpoints"]
+position = Vector2(47, 52)
+metadata/gauge_resource = SubResource("Resource_x3r5g")
+
+[node name="HP_SBank2" type="Node2D" parent="Hardpoints"]
+position = Vector2(57, 52)
+metadata/gauge_resource = SubResource("Resource_erv6k")
+
+[node name="HP_SBank3" type="Node2D" parent="Hardpoints"]
+position = Vector2(64, 52)
+metadata/gauge_resource = SubResource("Resource_dag6r")
+
+[node name="HP_SBank4" type="Node2D" parent="Hardpoints"]
+position = Vector2(74, 52)
+metadata/gauge_resource = SubResource("Resource_ygmkt")
+
+[node name="HP_SBank5" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_r0imt")
+
+[node name="HP_SBank6" type="Node2D" parent="Hardpoints"]
+metadata/gauge_resource = SubResource("Resource_utd6m")
