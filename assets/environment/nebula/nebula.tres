@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="NebulaAssets" load_steps=16 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/environment/nebula/nbackblue1.png" id="1_wkh3o"]
+[ext_resource type="Texture2D" path="res://assets/environment/nebula/nbackblue2.png" id="2_e1vq7"]
+[ext_resource type="Texture2D" path="res://assets/environment/nebula/nbackcyan.png" id="3_u2yxi"]
+[ext_resource type="Texture2D" path="res://assets/environment/nebula/nbackgreen.png" id="4_cgbrw"]
+[ext_resource type="Texture2D" path="res://assets/environment/nebula/nbackpurp1.png" id="5_37hok"]
+[ext_resource type="Texture2D" path="res://assets/environment/nebula/nbackpurp2.png" id="6_4ed08"]
+[ext_resource type="Texture2D" path="res://assets/environment/nebula/nbackred.png" id="7_2cnva"]
+[ext_resource type="Texture2D" path="res://assets/environment/nebula/nbackblack.png" id="8_e8vsc"]
+[ext_resource type="Texture2D" path="res://assets/environment/nebula/PoofGreen01.png" id="9_t8nt4"]
+[ext_resource type="Texture2D" path="res://assets/environment/nebula/PoofGreen02.png" id="10_j400b"]
+[ext_resource type="Texture2D" path="res://assets/environment/nebula/PoofRed01.png" id="11_1ckom"]
+[ext_resource type="Texture2D" path="res://assets/environment/nebula/PoofRed02.png" id="12_umxsl"]
+[ext_resource type="Texture2D" path="res://assets/environment/nebula/PoofPurp01.png" id="13_sol64"]
+[ext_resource type="Texture2D" path="res://assets/environment/nebula/PoofPurp02.png" id="14_201pb"]
+[ext_resource type="Script" path="res://scripts/resources/environment/nebula/nebula_assets.gd" id="15_7pb3e"]
+
+[resource]
+script = ExtResource("15_7pb3e")
+backgrounds = {
+"nbackblack": ExtResource("8_e8vsc"),
+"nbackblue1": ExtResource("1_wkh3o"),
+"nbackblue2": ExtResource("2_e1vq7"),
+"nbackcyan": ExtResource("3_u2yxi"),
+"nbackgreen": ExtResource("4_cgbrw"),
+"nbackpurp1": ExtResource("5_37hok"),
+"nbackpurp2": ExtResource("6_4ed08"),
+"nbackred": ExtResource("7_2cnva")
+}
+poofs = {
+"PoofGreen01": ExtResource("9_t8nt4"),
+"PoofGreen02": ExtResource("10_j400b"),
+"PoofPurp01": ExtResource("13_sol64"),
+"PoofPurp02": ExtResource("14_201pb"),
+"PoofRed01": ExtResource("11_1ckom"),
+"PoofRed02": ExtResource("12_umxsl")
+}

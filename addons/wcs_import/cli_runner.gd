@@ -187,7 +187,7 @@ func _run():
 		"music":
 			success = _process_music(input_path, output_dir)
 		"nebula":
-			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "assets/environment/nebula"), WCSNebulaParser, "", "nebula.tres")
+			success = _process_nebula(input_path, _resolve_output_path(output_dir, "assets/environment/nebula"))
 		"pixels":
 			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "assets/environment/stars"), WCSPixelParser, "", "pixels.tres")
 		"rank":
@@ -795,6 +795,68 @@ func _resolve_output_path(base_output_dir: String, subpath: String) -> String:
 			
 	# Otherwise, use base output dir (target/assets)
 	return base_output_dir.path_join(subpath)
+
+func _process_nebula(input_path: String, output_dir: String) -> bool:
+	var parser = WCSNebulaParser.new()
+	var assets = parser.parse(input_path)
+	
+	if assets == null:
+		print("Failed to parse nebula.")
+		return false
+		
+	DirAccess.make_dir_recursive_absolute(output_dir)
+	
+	# Process background bitmaps
+	for bitmap_name in assets.backgrounds.keys():
+		var source = _find_source_asset(input_path.get_base_dir().get_base_dir(), bitmap_name, [".pcx", ".dds", ".png", ".tga"])
+		if not source.is_empty():
+			_convert_asset(source, output_dir, "texture")
+			var texture_path = output_dir.path_join(source.get_file().get_basename() + ".png")
+			# Use PlaceholderTexture2D to create a reference to the file
+			# This ensures ResourceSaver writes ExtResource("path") even if the file isn't imported yet
+			var texture = PlaceholderTexture2D.new()
+			# Ensure path is res://
+			var res_path = texture_path
+			if not res_path.begins_with("res://"):
+				# Assuming running from project root, relative paths are res://
+				# Strip ./ if present
+				res_path = res_path.replace("./", "")
+				# If it doesn't start with res://, prepend it
+				if not res_path.begins_with("res://"):
+					res_path = "res://" + res_path.lstrip("/")
+			
+			texture.resource_path = res_path
+			assets.backgrounds[bitmap_name] = texture
+		else:
+			print("Source not found for: " + bitmap_name)
+
+	# Process poof bitmaps
+	for poof_name in assets.poofs.keys():
+		var source = _find_source_asset(input_path.get_base_dir().get_base_dir(), poof_name, [".pcx", ".dds", ".png", ".tga"])
+		if not source.is_empty():
+			_convert_asset(source, output_dir, "texture")
+			var texture_path = output_dir.path_join(source.get_file().get_basename() + ".png")
+			
+			var texture = PlaceholderTexture2D.new()
+			var res_path = texture_path
+			if not res_path.begins_with("res://"):
+				res_path = res_path.replace("./", "")
+				if not res_path.begins_with("res://"):
+					res_path = "res://" + res_path.lstrip("/")
+					
+			texture.resource_path = res_path
+			assets.poofs[poof_name] = texture
+		else:
+			print("Source not found for: " + poof_name)
+			
+	var save_path = output_dir.path_join("nebula.tres")
+	var err = ResourceSaver.save(assets, save_path)
+	if err != OK:
+		print("Failed to save resource: " + save_path)
+		return false
+		
+	print("Saved: " + save_path)
+	return true
 
 func _process_hud_gauges(input_path: String, output_dir: String) -> bool:
 	var parser = WCSHudGaugeParser.new()
