@@ -1,0 +1,72 @@
+[gd_resource type="Resource" script_class="IFFManifest" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/iff_defs/iff_resource.gd" id="1_lgln4"]
+[ext_resource type="Script" path="res://scripts/resources/iff_defs/iff_manifest.gd" id="2_avy36"]
+
+[sub_resource type="Resource" id="Resource_0470a"]
+script = ExtResource("1_lgln4")
+iff_name = "Friendly"
+color = Color(0, 0.09411765, 0.28235295, 0.9098039)
+attacks = Array[String](["Hostile", "Neutral", "Traitor"])
+flags = Array[int]([2])
+default_ship_flags = Array[String](["cargo-known"])
+default_ship_flags2 = Array[String](["no-subspace-drive"])
+
+[sub_resource type="Resource" id="Resource_lv7jk"]
+script = ExtResource("1_lgln4")
+iff_name = "Hostile"
+color = Color(0, 0.9254902, 0.21960784, 0.09411765)
+attacks = Array[String](["Friendly", "Neutral", "Traitor"])
+perceptions = {
+"Friendly": Color(0.9254902, 0.21960784, 0.09411765, 1),
+"Hostile": Color(0.09411765, 0.28235295, 0.9098039, 1)
+}
+flags = Array[int]([2, 4])
+default_ship_flags2 = Array[String](["no-subspace-drive"])
+
+[sub_resource type="Resource" id="Resource_korav"]
+script = ExtResource("1_lgln4")
+iff_name = "Neutral"
+color = Color(0, 0.9254902, 0.21960784, 0.09411765)
+attacks = Array[String](["Friendly", "Traitor"])
+perceptions = {
+"Friendly": Color(0.9254902, 0.21960784, 0.09411765, 1),
+"Hostile": Color(0.09411765, 0.28235295, 0.9098039, 1),
+"Neutral": Color(0.09411765, 0.28235295, 0.9098039, 1)
+}
+flags = Array[int]([2, 4])
+default_ship_flags2 = Array[String](["no-subspace-drive"])
+
+[sub_resource type="Resource" id="Resource_swwsl"]
+script = ExtResource("1_lgln4")
+iff_name = "Unknown"
+color = Color(0, 0.7647059, 0.28627452, 0.7137255)
+attacks = Array[String](["Hostile"])
+perceptions = {
+"Neutral": Color(0.78431374, 0.6431373, 0, 1),
+"Traitor": Color(0.78431374, 0.6431373, 0, 1)
+}
+flags = Array[int]([1, 2, 4])
+default_ship_flags2 = Array[String](["no-subspace-drive"])
+
+[sub_resource type="Resource" id="Resource_rywb3"]
+script = ExtResource("1_lgln4")
+iff_name = "Traitor"
+color = Color(0, 0.9254902, 0.21960784, 0.09411765)
+attacks = Array[String](["Friendly", "Hostile", "Neutral", "Traitor"])
+perceptions = {
+"Friendly": Color(0.9254902, 0.21960784, 0.09411765, 1)
+}
+flags = Array[int]([2, 4])
+default_ship_flags2 = Array[String](["no-subspace-drive"])
+
+[sub_resource type="Resource" id="Resource_vry0m"]
+script = ExtResource("1_lgln4")
+iff_name = "Non Combatant"
+color = Color(0, 0, 0, 1)
+flags = Array[int]([1, 2, 4])
+default_ship_flags2 = Array[String](["no-subspace-drive"])
+
+[resource]
+script = ExtResource("2_avy36")
+iffs = Array[Resource]([SubResource("Resource_0470a"), SubResource("Resource_lv7jk"), SubResource("Resource_korav"), SubResource("Resource_swwsl"), SubResource("Resource_rywb3"), SubResource("Resource_vry0m")])

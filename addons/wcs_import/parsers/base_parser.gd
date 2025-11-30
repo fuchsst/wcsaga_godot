@@ -101,3 +101,30 @@ func _extract_float_value(line: String, prefix: String) -> float:
 	if s.is_valid_float():
 		return s.to_float()
 	return 0.0
+
+func _extract_list_value(line: String) -> Array[String]:
+	# Expected format: $Key: ( "Item1" "Item2" )
+	var start_idx = line.find("(")
+	var end_idx = line.rfind(")")
+	
+	if start_idx == -1 or end_idx == -1 or end_idx <= start_idx:
+		return []
+		
+	var content = line.substr(start_idx + 1, end_idx - start_idx - 1).strip_edges()
+	var items: Array[String] = []
+	var current_item = ""
+	var in_quote = false
+	
+	for i in range(content.length()):
+		var char = content[i]
+		if char == '"':
+			if in_quote:
+				items.append(current_item)
+				current_item = ""
+				in_quote = false
+			else:
+				in_quote = true
+		elif in_quote:
+			current_item += char
+			
+	return items

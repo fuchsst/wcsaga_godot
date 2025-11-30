@@ -4,24 +4,31 @@
 class_name IFFResource
 extends Resource
 
-# Team name
-@export var name: String = ""
+enum IFFFlags {
+	SUPPORT_ALLOWED,
+	EXEMPT_FROM_ALL_TEAMS_AT_WAR,
+	ORDERS_HIDDEN,
+	ORDERS_SHOWN,
+	WING_NAME_HIDDEN
+}
 
-# Color used for HUD/radar display
-@export var display_color: Color = Color(1, 1, 1, 1)
+# Team Identity
+@export var iff_name: String = ""
+@export var color: Color = Color.WHITE
+@export var color_index: int = 0
 
-# List of team names this IFF attacks
+# Attack Relationships
 @export var attacks: Array[String] = []
 
-# Dictionary mapping other IFF names to how this IFF perceives them
-# Key: IFF name, Value: Color as perceived
+# Perception Colors (Subjective View)
+# Dictionary mapping other IFF names to the color this IFF sees them as
+# Key: IFF Name (String), Value: Color
 @export var perceptions: Dictionary = {}
 
-# Special behavior flags
-@export var flags: Array[String] = []
+# Flags
+@export var flags: Array[IFFFlags] = []
 
-# Default ship flags
+# Default Ship Flags
+@export_group("Default Ship Flags")
 @export var default_ship_flags: Array[String] = []
-
-# Additional ship flags
 @export var default_ship_flags2: Array[String] = []

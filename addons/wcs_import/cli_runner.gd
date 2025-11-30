@@ -105,6 +105,19 @@ func _run():
 		return
 		
 	var input_path = args["input"]
+	if not input_path.begins_with("/"):
+		# Resolve relative path against project root (parent of target/)
+		var res_path = ProjectSettings.globalize_path("res://")
+		print("res:// path: " + res_path)
+		
+		# If res_path ends with /, remove it to get base dir correctly
+		if res_path.ends_with("/"):
+			res_path = res_path.left(-1)
+			
+		var project_root = res_path.get_base_dir()
+		print("Project root: " + project_root)
+		input_path = project_root.path_join(input_path)
+		
 	var output_dir = args["output"]
 	var type = args.get("type", "auto")
 	
@@ -150,7 +163,7 @@ func _run():
 		"icons":
 			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "assets/icons"), WCSIconParser, "", "name")
 		"iff_defs":
-			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes/config/iff_defs"), WCSIffParser, "", "name")
+			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes/iff_defs"), WCSIffParser, "", "iff_defs.tres")
 		"launchhelp":
 			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes"), WCSLaunchHelpParser, "", "launchhelp.tres")
 		"lightning":
@@ -184,7 +197,7 @@ func _run():
 		"sounds":
 			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "assets/sounds"), WCSSoundParser, "", "sounds.tres")
 		"species":
-			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "assets/fiction/star_systems"), WCSSpeciesParser, "", "species_name")
+			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "assets/species"), WCSSpeciesParser, "", "species_defs.tres")
 		"ssm":
 			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "assets/weapons"), WCSSSMParser, "", "name")
 		"stars":
@@ -255,6 +268,8 @@ func _detect_type(path: String) -> String:
 		return "tips"
 	if filename == "strings.tbl" or filename == "tstrings.tbl":
 		return "localization"
+	if filename == "species.tbl" or filename == "species_defs.tbl":
+		return "species"
 	if filename == "credits.tbl": return "credits"
 	if filename == "cutscenes.tbl": return "cutscenes"
 	if filename == "fireball.tbl": return "fireball"
