@@ -163,7 +163,7 @@ func _run():
 		"hud_config":
 			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes/config/hud"), WCSHudConfigParser, "", input_path.get_file().get_basename() + ".tres")
 		"icons":
-			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "assets/icons"), WCSIconParser, "", "name")
+			success = _process_icons(input_path, output_dir)
 		"iff_defs":
 			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes/iff_defs"), WCSIffParser, "", "iff_defs.tres")
 		"launchhelp":
@@ -600,6 +600,42 @@ func _process_asteroids(input_path: String, output_dir: String) -> bool:
 			
 	print("Generated " + str(success_count) + "/" + str(asteroids.size()) + " asteroid scenes.")
 	return success_count == asteroids.size()
+
+func _process_icons(input_path: String, output_dir: String) -> bool:
+	var parser = WCSIconParser.new()
+	var icons = parser.parse(input_path)
+	
+	if icons == null or icons.is_empty():
+		print("Failed to parse icons.")
+		return false
+		
+	print("Parsed " + str(icons.size()) + " icons.")
+	
+	var save_dir = _resolve_output_path(output_dir, "assets/icons")
+	DirAccess.make_dir_recursive_absolute(save_dir)
+	
+	var saved_count = 0
+	for icon in icons:
+		# Use name as filename if filename is empty (common in icons.tbl)
+		var search_filename = icon.filename
+		if search_filename.is_empty():
+			search_filename = icon.name
+			
+		# Convert image if present
+		if not search_filename.is_empty():
+			var source_file = _find_source_asset(input_path.get_base_dir().get_base_dir(), search_filename, [".pcx", ".dds", ".png", ".ani"])
+			if not source_file.is_empty():
+				var type = "texture"
+				if source_file.ends_with(".ani"):
+					type = "animation"
+					
+				_convert_asset(source_file, save_dir, type)
+				saved_count += 1
+			else:
+				print("Warning: Could not find source image for icon: " + search_filename)
+			
+	print("Converted assets for " + str(saved_count) + "/" + str(icons.size()) + " icons.")
+	return true
 
 func _process_autopilot(input_path: String, output_dir: String) -> bool:
 	var parser = WCSAutopilotParser.new()

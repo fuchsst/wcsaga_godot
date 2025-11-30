@@ -1,0 +1,28 @@
+[gd_resource type="SpriteFrames" load_steps=4 format=3 uid="uid://92bf90a33877"]
+
+[ext_resource type="Texture2D" uid="uid://542791cf1103" path="res://assets/icons/bicon-hellcatV.png" id="1_tex"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0"]
+atlas = ExtResource("1_tex")
+region = Rect2(0, 0, 60, 52)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1"]
+atlas = ExtResource("1_tex")
+region = Rect2(60, 0, 60, 52)
+
+[resource]
+animations = [{
+"frames": [
+{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0")
+}, 
+{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1")
+}
+],
+"loop": true,
+"name": &"default",
+"speed": 15.0
+}]
