@@ -8,6 +8,7 @@ extends "res://scripts/resources/core/wcs_base_resource.gd"
 # === IDENTITY AND CLASSIFICATION ===
 @export_group("Identity", "identity_")
 @export var weapon_class: String = "" # Allowed weapon type
+@export var category: String = "" # Weapon category (Primary, Secondary, etc.)
 
 class BeamConfiguration extends Resource:
 	"""Beam weapon specific configuration"""
@@ -107,18 +108,30 @@ class ParticleSpew extends Resource:
 @export_group("Particle Spew", "pspew_")
 @export var particle_spew: ParticleSpew
 
-# === AUTO-TARGETING SYSTEMS ===
+class TrailConfiguration extends Resource:
+	"""Weapon trail configuration"""
+	@export var bitmap: String = ""
+	@export var start_width: float = 1.0
+	@export var end_width: float = 0.0
+	@export var start_alpha: float = 1.0
+	@export var end_alpha: float = 0.0
+	@export var max_life: float = 1.0
+
 @export_group("Targeting", "targeting_")
 @export var homing_type: int = 0 # 0=None, 1=Aspect, 2=Heat, 3=Image, 4=Friend/Foe
 @export var guidance_package: String = "" # Cross-reference to guidance system
-@export var lock_time_seconds: float = 0.0 # Time to achieve lock
+@export var lock_time_seconds: float = 2.0 # Time to achieve lock (default 2.0)
+@export var min_lock_time: float = 0.0 # Minimum lock time (override?)
 @export var lock_range_meters: float = 1500.0 # Maximum lock range
 @export var lock_field_of_view_degrees: float = 5.0 # FOV for target acquisition
+@export var view_cone_degrees: float = 0.0 # FOV for heat seekers (View Cone)
 @export var max_turn_rate_dps: float = 0.0 # Maximum turn rate in degrees/second
 @export var max_seek_distance: float = 2000.0 # Maximum seek distance
 @export var seeking_duration_seconds: float = 10.0 # Seeking duration
 @export var decoy_resistance: float = 0.8 # Resistance to countermeasures
 @export var target_tracking_accuracy: float = 0.95 # Tracking accuracy (0.0-1.0)
+@export var free_flight_time: float = 0.25 # Time before homing begins
+@export var turn_time: float = 0.0 # Time to complete a turn (used to calc rate)
 
 # === BURST AND MULTI-SHOT ===
 @export_group("Burst Fire", "burst_")
@@ -127,6 +140,24 @@ class ParticleSpew extends Resource:
 @export var burst_cooldown: float = 0.0 # Cooldown after burst
 @export var multi_shot_count: int = 1 # Projectiles per shot (swarm)
 @export var shot_spread_pattern: Vector2 = Vector2.ZERO # Shot spread angles (horizontal, vertical)
+@export var spawn_angle: float = 0.0 # Angle for spawned weapons
+@export var rearm_rate: float = 0.0 # Rate of rearming
+
+# === VISUAL EFFECTS ===
+@export_group("Visual Effects", "visual_")
+@export var projectile_model: String = "" # Cross-reference to 3D model
+@export var laser_bitmap: String = "" # Cross-reference to 2D texture
+@export var laser_glow: String = "" # Cross-reference to glow effect
+@export var laser_length_meters: float = 10.0 # Visible laser length
+@export var laser_head_radius: float = 0.9 # Laser starting radius
+@export var laser_tail_radius: float = 0.9 # Laser ending radius
+@export var laser_primary_color: Color = Color(212, 16, 229) # Primary laser color
+@export var laser_secondary_color: Color = Color(0, 0, 0) # Secondary laser color
+@export var muzzle_flash_effect: String = "" # Cross-reference to effect
+@export var impact_effect: String = "" # Cross-reference to effect
+@export var explosion_effect: String = "" # Cross-reference to effect
+@export var projectile_trail_effect: String = "" # Cross-reference to trail effect
+@export var trail_config: TrailConfiguration
 
 # === COUNTERMEASURE INTERACTION ===
 @export_group("Countermeasures", "cm_")
@@ -137,13 +168,20 @@ class ParticleSpew extends Resource:
 
 # === SPECIAL CHARACTERISTICS ===
 @export_group("Special", "special_")
-@export var cargo_size_units: int = 1 # Cargo space required
+@export var cargo_size_units: float = 0.0 # Cargo space required (float in TBL)
 @export var is_bomb_type: bool = false # Requires bombing bay
 @export var is_huge_weapon: bool = false # Requires capital ship mount
 @export var no_shield_piercing: bool = false # Cannot penetrate shields
 @export var pierces_shields_only: bool = false # Only damages shields
 @export var drains_energy_on_hit: float = 0.0 # Energy drained from target
 @export var disables_subsystems_chance: float = 0.0 # Chance to disable subsystems
+@export var emp_intensity: float = 0.0 # EMP intensity
+@export var emp_time: float = 0.0 # EMP duration
+@export var swarm_count: int = 0 # Swarm missile count
+@export var swarm_wait: float = 0.0 # Wait between swarm shots
+@export var flags: int = 0 # Bitmask flags
+@export var impact_explosion: String = "" # Impact explosion ANI
+@export var impact_explosion_radius: float = 0.0 # Impact explosion radius
 
 # === AUDIO SYSTEMS ===
 @export_group("Audio", "audio_")

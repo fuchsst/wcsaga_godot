@@ -48,6 +48,7 @@ const FireballGenerator = preload("res://addons/wcs_import/generators/fireball_g
 const LightningGenerator = preload("res://addons/wcs_import/generators/lightning_generator.gd")
 const MuzzleFlashGenerator = preload("res://addons/wcs_import/generators/mflash_generator.gd")
 const WeaponExplosionGenerator = preload("res://addons/wcs_import/generators/weapon_expl_generator.gd")
+const WeaponSceneGenerator = preload("res://addons/wcs_import/generators/weapon_scene_generator.gd")
 const WCSPathResolver = preload("res://addons/wcs_import/core/path_resolver.gd")
 
 # Resource scripts
@@ -339,26 +340,24 @@ func _process_weapons(input_path: String, output_dir: String) -> bool:
 		
 	print("Parsed " + str(weapons.size()) + " weapons.")
 	
+	var generator = WeaponSceneGenerator.new()
+	
+	# Use base output dir (assets/weapons) as root for generator
+	# The generator handles subdirectories (category/weapon_name)
+	var weapons_root = output_dir.path_join("assets").path_join("weapons")
+	
+	# If output_dir already ends in assets/weapons, use it directly?
+	# _process calls this with output_dir.
+	# In _run: "weapons": success = _process_list_resource(..., _resolve_output_path(output_dir, "assets/weapons"), ...)
+	# Wait, _run calls _process_weapons directly:
+	# "weapons": success = _process_weapons(input_path, output_dir)
+	# So output_dir is the root target dir (e.g. target/).
+	
+	# We should resolve the root for weapons here.
+	weapons_root = _resolve_output_path(output_dir, "assets/weapons")
+	
 	for res in weapons:
-		# Determine output path
-		var pof_file = res.projectile_model
-		var save_dir = ""
-		
-		if not pof_file.is_empty():
-			var path_info = WCSPathResolver.determine_output_path(pof_file)
-			save_dir = output_dir.path_join(path_info[0]).path_join(path_info[1])
-		else:
-			# Fallback for weapons without models
-			save_dir = output_dir.path_join("weapons").path_join("misc")
-			
-		DirAccess.make_dir_recursive_absolute(save_dir)
-		
-		var save_path = save_dir.path_join(res.weapon_class + ".tres")
-		var err = ResourceSaver.save(res, save_path)
-		if err != OK:
-			print("Failed to save resource: " + save_path)
-		else:
-			print("Saved: " + save_path)
+		generator.generate_scene(res, weapons_root)
 			
 	return true
 
