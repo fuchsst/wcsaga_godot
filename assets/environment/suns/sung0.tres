@@ -1,0 +1,52 @@
+[gd_resource type="Resource" script_class="WCSSunData" load_steps=16 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/environment/stars/sun_flare.gd" id="1_2bl58"]
+[ext_resource type="Texture2D" path="res://../target/assets/environment/stars/coronaSunG0_001.png" id="2_thdln"]
+[ext_resource type="Texture2D" path="res://../target/assets/environment/stars/coronaSunG0_002.png" id="3_hrmy4"]
+[ext_resource type="Texture2D" path="res://../target/assets/environment/stars/corona003.png" id="4_3rm7d"]
+[ext_resource type="Texture2D" path="res://../target/assets/environment/stars/corona004.png" id="5_cdrgl"]
+[ext_resource type="Texture2D" path="res://../target/assets/environment/stars/corona005.png" id="6_pgkf4"]
+[ext_resource type="Texture2D" path="res://../target/assets/environment/stars/corona006.png" id="7_nfuuh"]
+[ext_resource type="Script" path="res://scripts/resources/environment/stars/sun_data.gd" id="8_8lcg2"]
+[ext_resource type="Texture2D" path="res://../target/assets/environment/stars/SunGlow01.png" id="9_c4e1c"]
+
+[sub_resource type="Resource" id="Resource_dfjlt"]
+script = ExtResource("1_2bl58")
+texture = ExtResource("2_thdln")
+scale = 5.0
+
+[sub_resource type="Resource" id="Resource_0h78v"]
+script = ExtResource("1_2bl58")
+texture = ExtResource("3_hrmy4")
+position = 0.1
+scale = 16.0
+
+[sub_resource type="Resource" id="Resource_70m80"]
+script = ExtResource("1_2bl58")
+texture = ExtResource("4_3rm7d")
+position = 0.3
+scale = 2.0
+
+[sub_resource type="Resource" id="Resource_s8crt"]
+script = ExtResource("1_2bl58")
+texture = ExtResource("5_cdrgl")
+position = 0.6
+
+[sub_resource type="Resource" id="Resource_e2j1g"]
+script = ExtResource("1_2bl58")
+texture = ExtResource("6_pgkf4")
+position = 1.2
+scale = 6.0
+
+[sub_resource type="Resource" id="Resource_wjgeo"]
+script = ExtResource("1_2bl58")
+texture = ExtResource("7_nfuuh")
+position = 1.8
+scale = 4.0
+
+[resource]
+script = ExtResource("8_8lcg2")
+sun_name = "SunG0"
+sunglow = ExtResource("9_c4e1c")
+color = Color(1, 0.96, 0.92, 1)
+flares = Array[Resource]([SubResource("Resource_dfjlt"), SubResource("Resource_0h78v"), SubResource("Resource_70m80"), SubResource("Resource_s8crt"), SubResource("Resource_e2j1g"), SubResource("Resource_wjgeo")])

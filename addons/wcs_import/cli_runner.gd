@@ -203,7 +203,7 @@ func _run():
 		"ssm":
 			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "assets/weapons"), WCSSSMParser, "", "name")
 		"stars":
-			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "assets/environment/stars"), WCSStarParser, "", "filename")
+			success = _process_stars(input_path, _resolve_output_path(output_dir, "assets/environment/stars"))
 		"tips":
 			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes"), WCSTipsParser, "", "tips.tres")
 		"traitor":
@@ -439,7 +439,9 @@ func _find_source_asset(root_dir: String, filename: String, extensions: Array = 
 	# Use 'find' command via OS.execute for speed and coverage
 	var output = []
 	var args = [root_dir, "-iname", filename + "*"] # simplified
+	print("Searching in: " + root_dir + " for " + filename)
 	OS.execute("find", args, output)
+	print("Find output: " + str(output))
 	if output.size() > 0 and not output[0].is_empty():
 		var lines = output[0].split("\n", false)
 		for line in lines:
@@ -454,7 +456,8 @@ func _find_source_asset(root_dir: String, filename: String, extensions: Array = 
 func _convert_asset(source_path: String, output_dir: String, type: String) -> void:
 	# Trigger Python converter
 	# uv run python -m converter convert <source> <output> --type <type>
-	var args = ["run", "python", "-m", "converter", "convert", source_path, output_dir, "--type", type]
+	var global_output_dir = ProjectSettings.globalize_path(output_dir)
+	var args = ["run", "python", "-m", "converter", "convert", source_path, global_output_dir, "--type", type]
 	var output = []
 	var exit_code = OS.execute("uv", args, output, true)
 	if exit_code != 0:
@@ -795,6 +798,147 @@ func _resolve_output_path(base_output_dir: String, subpath: String) -> String:
 			
 	# Otherwise, use base output dir (target/assets)
 	return base_output_dir.path_join(subpath)
+
+const WCSSunData = preload("res://scripts/resources/environment/stars/sun_data.gd")
+const WCSSunFlare = preload("res://scripts/resources/environment/stars/sun_flare.gd")
+
+func _process_stars(input_path: String, output_dir: String) -> bool:
+	var parser = WCSStarParser.new()
+	var result = parser.parse(input_path)
+	
+	if result == null or result.is_empty():
+		print("Failed to parse stars.")
+		return false
+		
+	print("Parsed stars data.")
+	
+	var success = true
+	var source_root = ProjectSettings.globalize_path(input_path.get_base_dir().get_base_dir()) # Assuming input is in hermes_core
+	
+	# Output directories based on user request:
+	# images -> target/assets/environment/stars/ (which is output_dir passed in)
+	# suns -> target/assets/environment/suns/
+	# debris -> target/assets/environment/debris/
+	
+	var stars_dir = output_dir # target/assets/environment/stars
+	var suns_dir = output_dir.get_base_dir().path_join("suns") # target/assets/environment/suns
+	var debris_dir = output_dir.get_base_dir().path_join("debris") # target/assets/environment/debris
+	var debris_neb_dir = output_dir.get_base_dir().path_join("debris_neb") # target/assets/environment/debris_neb
+	
+	DirAccess.make_dir_recursive_absolute(stars_dir)
+	DirAccess.make_dir_recursive_absolute(suns_dir)
+	DirAccess.make_dir_recursive_absolute(debris_dir)
+	DirAccess.make_dir_recursive_absolute(debris_neb_dir)
+	
+	# Process Bitmaps (Convert to PNG in stars_dir)
+	for star in result.get("bitmaps", []):
+		# star is WCSStarBitmapData, has filename
+		var tex_filename = star.filename
+		if not tex_filename.is_empty():
+			var source_file = _find_source_asset(source_root, tex_filename, [".pcx", ".dds", ".png", ".tga"])
+			if not source_file.is_empty():
+				_convert_asset(source_file, stars_dir, "texture")
+				
+				var png_filename = source_file.get_file().get_basename() + ".png"
+				var png_path = stars_dir.path_join(png_filename)
+				
+				# Ensure path is res://
+				var res_path = png_path
+				if not res_path.begins_with("res://"):
+					res_path = ProjectSettings.localize_path(res_path)
+				
+				var tex = PlaceholderTexture2D.new()
+				tex.resource_path = res_path
+				star.texture = tex
+			else:
+				print("Warning: Could not find source for star bitmap: " + tex_filename)
+			
+	# Process Suns
+	for sun_dict in result.get("suns", []):
+		var sun_res = WCSSunData.new()
+		sun_res.sun_name = sun_dict.get("sun_name", "")
+		sun_res.color = sun_dict.get("color", Color.WHITE)
+		sun_res.scale = sun_dict.get("scale", 1.0)
+		
+		# Handle sunglow texture
+		var sunglow_name = sun_dict.get("sunglow_filename", "")
+		if not sunglow_name.is_empty():
+			var source_file = _find_source_asset(source_root, sunglow_name, [".pcx", ".dds", ".png", ".tga"])
+			if not source_file.is_empty():
+				_convert_asset(source_file, stars_dir, "texture") # Save texture to stars dir? Or suns dir? User said images go to stars/
+				# Load the converted texture using PlaceholderTexture2D to ensure path is saved
+				var png_filename = source_file.get_file().get_basename() + ".png"
+				var png_path = stars_dir.path_join(png_filename)
+				
+				# Ensure path is res://
+				var res_path = png_path
+				if not res_path.begins_with("res://"):
+					res_path = ProjectSettings.localize_path(res_path)
+				
+				var tex = PlaceholderTexture2D.new()
+				tex.resource_path = res_path
+				sun_res.sunglow = tex
+			else:
+				print("Warning: Could not find source for sunglow: " + sunglow_name)
+				
+		# Handle flares
+		for flare_dict in sun_dict.get("flares", []):
+			var flare_res = WCSSunFlare.new()
+			flare_res.position = flare_dict.get("position", 0.0)
+			flare_res.scale = flare_dict.get("scale", 1.0)
+			
+			var flare_tex_name = flare_dict.get("texture_filename", "")
+			if not flare_tex_name.is_empty():
+				var source_file = _find_source_asset(source_root, flare_tex_name, [".pcx", ".dds", ".png", ".tga"])
+				if not source_file.is_empty():
+					_convert_asset(source_file, stars_dir, "texture") # Save texture to stars dir
+					var png_filename = source_file.get_file().get_basename() + ".png"
+					var png_path = stars_dir.path_join(png_filename)
+					
+					# Ensure path is res://
+					var res_path = png_path
+					if not res_path.begins_with("res://"):
+						res_path = ProjectSettings.localize_path(res_path)
+					
+					var tex = PlaceholderTexture2D.new()
+					tex.resource_path = res_path
+					flare_res.texture = tex
+				else:
+					print("Warning: Could not find source for flare: " + flare_tex_name)
+			
+			sun_res.flares.append(flare_res)
+			
+		var filename = sun_res.sun_name.to_lower().replace(" ", "_") + ".tres"
+		var save_path = suns_dir.path_join(filename)
+		if ResourceSaver.save(sun_res, save_path) != OK:
+			print("Failed to save sun: " + save_path)
+			success = false
+			
+	# Process Debris
+	# Directories created at top of function
+	
+	for debris in result.get("debris", []):
+		# debris is WCSDebrisData, has filename and is_nebula_debris
+		var tex_filename = debris.filename
+		var target_dir = debris_dir
+		if debris.is_nebula_debris:
+			target_dir = debris_neb_dir
+			
+		if not tex_filename.is_empty():
+			var source_file = _find_source_asset(source_root, tex_filename, [".pcx", ".dds", ".png", ".tga", ".ani", ".eff"])
+			if not source_file.is_empty():
+				var ext = source_file.get_extension().to_lower()
+				if ext == "ani" or ext == "eff":
+					# Convert animation (creates spritesheet PNG and SpriteFrames TRES)
+					_convert_asset(source_file, target_dir, "animation")
+					print("Converted " + ext.to_upper() + " to spritesheet: " + tex_filename)
+				else:
+					# Standard texture conversion
+					_convert_asset(source_file, target_dir, "texture")
+			else:
+				print("Warning: Could not find source for debris: " + tex_filename)
+			
+	return success
 
 func _process_nebula(input_path: String, output_dir: String) -> bool:
 	var parser = WCSNebulaParser.new()
