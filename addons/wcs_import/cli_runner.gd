@@ -123,7 +123,7 @@ func _initialize():
 
 func _process(_delta):
 	_run()
-	return true  # Exit loop
+	return true # Exit loop
 
 
 func _process_campaign(input_path: String, output_dir: String) -> bool:
@@ -137,7 +137,7 @@ func _process_campaign(input_path: String, output_dir: String) -> bool:
 	print("Parsed campaign: " + manifest.campaign_name)
 
 	# Save to campaigns/{campaign}/campaign.tres
-	var campaign_name = "hermes"  # Default or derive
+	var campaign_name = "hermes" # Default or derive
 	# If input path contains campaign name, use it
 	if input_path.contains("hermes"):
 		campaign_name = "hermes"
@@ -251,7 +251,7 @@ func _run():
 		for fname in _file_map:
 			if fname.ends_with(".fs2"):
 				mission_files.append(fname)
-		mission_files.sort()  # Ensure consistent order
+		mission_files.sort() # Ensure consistent order
 
 		for fname in mission_files:
 			if not filter_pattern.is_empty() and not fname.matchn(filter_pattern):
@@ -299,12 +299,8 @@ func _process_file(input_path: String, output_dir: String, type: String) -> bool
 				input_path, _resolve_output_path(output_dir, "campaigns/hermes/ai_profiles")
 			)
 		"ai_classes":
-			return _process_list_resource(
-				input_path,
-				_resolve_output_path(output_dir, "campaigns/hermes/ai_classes"),
-				WCSAIClassParser,
-				"",
-				"class_name"
+			return _process_ai_classes(
+				input_path, _resolve_output_path(output_dir, "campaigns/hermes/ai_classes")
 			)
 		"asteroids":
 			return _process_asteroids(
@@ -321,7 +317,7 @@ func _process_file(input_path: String, output_dir: String, type: String) -> bool
 		"credits":
 			return _process_simple_resource(
 				input_path,
-				_resolve_output_path(output_dir, "campaigns/hermes"),
+				_resolve_output_path(output_dir, "campaigns/hermes/ui/localisation"),
 				WCSCreditsParser,
 				"",
 				"credits.tres"
@@ -349,7 +345,7 @@ func _process_file(input_path: String, output_dir: String, type: String) -> bool
 		"help":
 			return _process_simple_resource(
 				input_path,
-				_resolve_output_path(output_dir, "campaigns/hermes"),
+				_resolve_output_path(output_dir, "campaigns/hermes/ui/localisation"),
 				WCSHelpParser,
 				"",
 				"help.tres"
@@ -371,7 +367,7 @@ func _process_file(input_path: String, output_dir: String, type: String) -> bool
 		"iff_defs":
 			return _process_simple_resource(
 				input_path,
-				_resolve_output_path(output_dir, "campaigns/hermes/iff_defs"),
+				_resolve_output_path(output_dir, "campaigns/hermes"),
 				WCSIffParser,
 				"",
 				"iff_defs.tres"
@@ -379,7 +375,7 @@ func _process_file(input_path: String, output_dir: String, type: String) -> bool
 		"launchhelp":
 			return _process_simple_resource(
 				input_path,
-				_resolve_output_path(output_dir, "campaigns/hermes"),
+				_resolve_output_path(output_dir, "campaigns/hermes/ui/localisation"),
 				WCSLaunchHelpParser,
 				"",
 				"launchhelp.tres"
@@ -440,10 +436,15 @@ func _process_file(input_path: String, output_dir: String, type: String) -> bool
 			)
 		"sounds":
 			return _process_sounds(input_path, _resolve_output_path(output_dir, "assets/sounds"))
+		"species_defs":
+			return _process_species_defs(
+				input_path,
+				_resolve_output_path(output_dir, "campaigns/hermes/species_defs")
+			)
 		"species":
 			return _process_species(
 				input_path,
-				_resolve_output_path(output_dir, "campaigns/hermes/fiction/star_systems")
+				_resolve_output_path(output_dir, "campaigns/fiction/species")
 			)
 		"ssm":
 			return _process_list_resource(
@@ -461,7 +462,7 @@ func _process_file(input_path: String, output_dir: String, type: String) -> bool
 			return _process_tips(input_path, _resolve_output_path(output_dir, "campaigns/hermes"))
 		"traitor":
 			return _process_traitor(
-				input_path, _resolve_output_path(output_dir, "campaigns/hermes")
+				input_path, _resolve_output_path(output_dir, "campaigns/hermes/ui/localisation")
 			)
 		"weapon_expl":
 			return _process_weapon_expl(
@@ -496,80 +497,28 @@ func _parse_args() -> Dictionary:
 
 func _detect_type(path: String) -> String:
 	var filename = path.get_file().to_lower()
-	if filename == "ships.tbl":
-		return "ships"
-	if filename == "weapons.tbl":
-		return "weapons"
-	if filename == "ai_profiles.tbl":
-		return "ai_profiles"
-	if filename == "ai.tbl":
-		return "ai_classes"
+	
+	# Special extensions
 	if filename.ends_with(".fs2") or filename.ends_with(".fc2"):
 		return "mission"
-	if filename == "asteroid.tbl":
-		return "asteroids"
-	if filename == "autopilot.tbl":
-		return "autopilot"
-	if filename == "medals.tbl":
-		return "medals"
-	if filename == "rank.tbl":
-		return "rank"
-	if filename == "traitor.tbl":
-		return "traitor"
-	if filename == "tips.tbl":
-		return "tips"
-	if filename == "strings.tbl" or filename == "tstrings.tbl":
-		return "localization"
-	if filename == "species.tbl" or filename == "species_defs.tbl":
-		return "species"
-	if filename == "credits.tbl":
-		return "credits"
-	if filename == "cutscenes.tbl":
-		return "cutscenes"
-	if filename == "fireball.tbl":
-		return "fireball"
-	if filename == "fonts.tbl":
-		return "fonts"
-	if filename == "help.tbl":
-		return "help"
-	if filename == "hud_gauges.tbl":
-		return "hud_gauges"
-	if filename == "icons.tbl":
-		return "icons"
-	if filename == "iff_defs.tbl":
-		return "iff_defs"
-	if filename == "launchhelp.tbl":
-		return "launchhelp"
-	if filename == "lightning.tbl":
-		return "lightning"
-	if filename == "mainhall.tbl":
-		return "mainhall"
-	if filename == "menu.tbl":
-		return "menu"
-	if filename == "messages.tbl":
-		return "messages"
-	if filename == "mflash.tbl":
-		return "mflash"
-	if filename == "music.tbl":
-		return "music"
-	if filename == "nebula.tbl":
-		return "nebula"
-	if filename == "pixels.tbl":
-		return "pixels"
-	if filename == "scripting.tbl":
-		return "scripting"
-	if filename == "sounds.tbl":
-		return "sounds"
-	if filename == "species.tbl" or filename == "species_defs.tbl":
-		return "species"
-	if filename == "ssm.tbl":
-		return "ssm"
-	if filename == "stars.tbl":
-		return "stars"
-	if filename == "weapon_expl.tbl":
-		return "weapon_expl"
 	if filename.ends_with(".hcf"):
 		return "hud_config"
+
+	# Special mappings
+	var special_mappings = {
+		"ai.tbl": "ai_classes",
+		"strings.tbl": "localization",
+		"tstrings.tbl": "localization",
+		"species_defs.tbl": "species_defs"
+	}
+	
+	if special_mappings.has(filename):
+		return special_mappings[filename]
+
+	# Default: filename without extension
+	if filename.ends_with(".tbl"):
+		return filename.get_basename()
+
 	return "unknown"
 
 
@@ -1004,7 +953,7 @@ func _resolve_output_path(base_output_dir: String, subpath: String) -> String:
 		# base_output_dir is usually .../target/assets
 		# We want .../target/campaigns/...
 		# So we go up one level from assets
-		var project_root = base_output_dir.get_base_dir()  # .../target
+		var project_root = base_output_dir.get_base_dir() # .../target
 		if base_output_dir.ends_with("assets"):
 			return project_root.path_join(subpath)
 
@@ -1212,6 +1161,20 @@ func _process_sounds(input_path: String, output_dir: String) -> bool:
 	return generator.generate(manifest, output_dir, source_root)
 
 
+func _process_species_defs(input_path: String, output_dir: String) -> bool:
+	var parser = WCSSpeciesParser.new()
+	var manifest = parser.parse(input_path)
+
+	if manifest == null:
+		print("Failed to parse species defs.")
+		return false
+
+	var source_root = ProjectSettings.globalize_path(input_path.get_base_dir().get_base_dir())
+	var generator = SpeciesGenerator.new()
+
+	return generator.generate_defs(manifest, output_dir, source_root)
+
+
 func _process_species(input_path: String, output_dir: String) -> bool:
 	var parser = WCSSpeciesParser.new()
 	var manifest = parser.parse(input_path)
@@ -1223,4 +1186,4 @@ func _process_species(input_path: String, output_dir: String) -> bool:
 	var source_root = ProjectSettings.globalize_path(input_path.get_base_dir().get_base_dir())
 	var generator = SpeciesGenerator.new()
 
-	return generator.generate(manifest, output_dir, source_root)
+	return generator.generate_species_assets(manifest, output_dir, source_root)

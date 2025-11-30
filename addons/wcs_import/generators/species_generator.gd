@@ -5,21 +5,49 @@ const SpeciesManifest = preload("res://scripts/resources/species/species_manifes
 const SpeciesData = preload("res://scripts/resources/species/species_data.gd")
 
 
-func generate(manifest: SpeciesManifest, output_dir: String, source_root: String) -> bool:
-	var save_dir = output_dir
-	if not DirAccess.dir_exists_absolute(save_dir):
-		DirAccess.make_dir_recursive_absolute(save_dir)
+func generate_defs(manifest: SpeciesManifest, output_dir: String, source_root: String) -> bool:
+	if not DirAccess.dir_exists_absolute(output_dir):
+		DirAccess.make_dir_recursive_absolute(output_dir)
+
+	var saved_count = 0
+	for species in manifest.species_list:
+		# Convert assets to the same directory
+		_convert_species_assets(species, source_root, output_dir)
+		
+		# For species_defs, we just save the resource data
+		# We might need to convert assets if they are referenced here, but user instruction
+		# emphasized "one tres per species_name" for species_defs.
+		# If assets are present, we should probably convert them too, but maybe to a common location?
+		# Or maybe species_defs doesn't have assets.
+		# Let's assume we just save the data for now.
+		var filename = species.species_name.to_lower().replace(" ", "_") + ".tres"
+		var save_path = output_dir.path_join(filename)
+		var err = ResourceSaver.save(species, save_path)
+		if err != OK:
+			print("Failed to save species def: " + save_path)
+		else:
+			print("Saved species def: " + save_path)
+			saved_count += 1
+
+	return saved_count == manifest.species_list.size()
+
+
+func generate_species_assets(manifest: SpeciesManifest, output_dir: String, source_root: String) -> bool:
+	if not DirAccess.dir_exists_absolute(output_dir):
+		DirAccess.make_dir_recursive_absolute(output_dir)
 
 	for species in manifest.species_list:
-		_convert_species_assets(species, source_root, save_dir)
+		var species_dir = output_dir.path_join(species.species_name.to_lower().replace(" ", "_"))
+		if not DirAccess.dir_exists_absolute(species_dir):
+			DirAccess.make_dir_recursive_absolute(species_dir)
+			
+		_convert_species_assets(species, source_root, species_dir)
+		
+		# Also save the resource in the folder
+		var save_path = species_dir.path_join("species_data.tres")
+		ResourceSaver.save(species, save_path)
+		print("Saved species assets and data to: " + species_dir)
 
-	var save_path = save_dir.path_join("species_defs.tres")
-	var err = ResourceSaver.save(manifest, save_path)
-	if err != OK:
-		print("Failed to save species manifest: " + save_path)
-		return false
-
-	print("Saved species manifest: " + save_path)
 	return true
 
 
@@ -44,7 +72,7 @@ func _convert_species_assets(species: Resource, source_root: String, output_dir:
 				if type == "texture":
 					converted_filename += ".png"
 				elif type == "animation":
-					converted_filename += ".tres"  # SpriteFrames
+					converted_filename += ".tres" # SpriteFrames
 
 				var converted_path = output_dir.path_join(converted_filename)
 				var res_path = converted_path
@@ -77,6 +105,7 @@ func _convert_species_assets(species: Resource, source_root: String, output_dir:
 	convert_and_load.call("glow_afterburn_filename", "glow_afterburn", "texture")
 	convert_and_load.call("debris_texture_filename", "debris_texture", "texture")
 	convert_and_load.call("shield_hit_anim_filename", "shield_hit_anim", "animation")
+	convert_and_load.call("fiction_anim_filename", "fiction_anim", "animation")
 
 
 func _find_source_asset(root_path: String, filename: String, extensions: Array = []) -> String:

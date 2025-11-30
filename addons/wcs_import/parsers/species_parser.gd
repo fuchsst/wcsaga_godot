@@ -24,8 +24,59 @@ func _parse_content() -> Variant:
 			current_species.species_name = _extract_string_value(line, "$Species_Name:")
 			manifest.species_list.append(current_species)
 
+		elif line.begins_with("$Entry:"):
+			current_species = SpeciesData.new()
+			manifest.species_list.append(current_species)
+
 		elif current_species:
-			if line.begins_with("$Default IFF:"):
+			if line.begins_with("$Name:"):
+				# Handle XSTR or plain text
+				var raw_name = _extract_string_value(line, "$Name:")
+				if raw_name.begins_with("XSTR"):
+					current_species.species_name = _parse_xstr(raw_name)
+				else:
+					current_species.species_name = raw_name
+			elif line.begins_with("$Anim:"):
+				current_species.set_meta(
+					"fiction_anim_filename", _extract_string_value(line, "$Anim:")
+				)
+			elif line.begins_with("$Description:"):
+				# Description might be multi-line or XSTR
+				var desc = ""
+				if line.contains("XSTR"):
+					desc = _parse_xstr(line)
+				else:
+					# Check next lines for XSTR or text
+					pass # Simplified for now, usually description follows
+				
+				# If description is multi-line (starts with XSTR on next line or is multi-text)
+				# For now, let's try to capture simple XSTR on same line or next line
+				# The example showed:
+				# $Description:
+				# XSTR("...", -1)
+				# $end_multi_text
+				
+				if desc.is_empty():
+					# Read until $end_multi_text or next field
+					var buffer = ""
+					while _has_more_lines():
+						var next_line = _peek_next_line()
+						if next_line.begins_with("$") and not next_line.begins_with("$end_multi_text"):
+							break
+						if next_line.begins_with("$end_multi_text"):
+							_get_next_line() # Consume
+							break
+						
+						var l = _get_next_line()
+						if l.contains("XSTR"):
+							buffer += _parse_xstr(l) + "\n"
+						else:
+							buffer += l + "\n"
+					desc = buffer.strip_edges()
+				
+				current_species.description = desc
+
+			elif line.begins_with("$Default IFF:"):
 				current_species.default_iff = _extract_string_value(line, "$Default IFF:")
 			elif line.begins_with("$FRED Color:") or line.begins_with("$FRED Colour:"):
 				current_species.fred_color = _parse_color(line)
@@ -81,6 +132,17 @@ func _parse_content() -> Variant:
 				current_species.awacs_multiplier = _extract_float_value(line, "$AwacsMultiplier:")
 
 	return manifest
+
+
+func _parse_xstr(line: String) -> String:
+	# Format: XSTR("text", id)
+	var start = line.find('"')
+	if start == -1:
+		return line
+	var end = line.rfind('"')
+	if end == -1 or end <= start:
+		return line
+	return line.substr(start + 1, end - start - 1)
 
 
 func _load_texture(name: String) -> Texture2D:

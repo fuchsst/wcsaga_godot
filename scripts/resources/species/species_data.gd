@@ -30,3 +30,8 @@ extends Resource
 
 # Sensors
 @export var awacs_multiplier: float = 1.0
+
+# Fiction / Intel Data
+@export_group("Fiction Data")
+@export_multiline var description: String = ""
+@export var fiction_anim: SpriteFrames

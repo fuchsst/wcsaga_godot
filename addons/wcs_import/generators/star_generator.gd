@@ -13,10 +13,10 @@ func generate(result: Dictionary, output_dir: String, source_root: String) -> bo
 	# suns -> target/assets/environment/suns/
 	# debris -> target/assets/environment/debris/
 
-	var stars_dir = output_dir  # target/assets/environment/stars
-	var suns_dir = output_dir.get_base_dir().path_join("suns")  # target/assets/environment/suns
-	var debris_dir = output_dir.get_base_dir().path_join("debris")  # target/assets/environment/debris
-	var debris_neb_dir = output_dir.get_base_dir().path_join("debris_neb")  # target/assets/environment/debris_neb
+	var stars_dir = output_dir # target/assets/environment/stars
+	var suns_dir = output_dir.get_base_dir().path_join("suns") # target/assets/environment/suns
+	var debris_dir = output_dir.get_base_dir().path_join("debris") # target/assets/environment/debris
+	var debris_neb_dir = output_dir.get_base_dir().path_join("debris_neb") # target/assets/environment/debris_neb
 
 	DirAccess.make_dir_recursive_absolute(stars_dir)
 	DirAccess.make_dir_recursive_absolute(suns_dir)
@@ -38,13 +38,13 @@ func generate(result: Dictionary, output_dir: String, source_root: String) -> bo
 				var png_path = stars_dir.path_join(png_filename)
 
 				# Ensure path is res://
-				var res_path = png_path
-				if not res_path.begins_with("res://"):
-					res_path = ProjectSettings.localize_path(res_path)
+				var res_path = _to_target_res_path(png_path)
 
 				var tex = PlaceholderTexture2D.new()
 				tex.resource_path = res_path
-				star.texture = tex
+				
+				# StarBitmapData doesn't have texture property and isn't saved as resource
+				# star.texture = tex
 			else:
 				print("Warning: Could not find source for star bitmap: " + tex_filename)
 
@@ -62,15 +62,13 @@ func generate(result: Dictionary, output_dir: String, source_root: String) -> bo
 				source_root, sunglow_name, [".pcx", ".dds", ".png", ".tga"]
 			)
 			if not source_file.is_empty():
-				_convert_asset(source_file, stars_dir, "texture")  # Save texture to stars dir? Or suns dir? User said images go to stars/
+				_convert_asset(source_file, stars_dir, "texture") # Save texture to stars dir? Or suns dir? User said images go to stars/
 				# Load the converted texture using PlaceholderTexture2D to ensure path is saved
 				var png_filename = source_file.get_file().get_basename() + ".png"
 				var png_path = stars_dir.path_join(png_filename)
 
 				# Ensure path is res://
-				var res_path = png_path
-				if not res_path.begins_with("res://"):
-					res_path = ProjectSettings.localize_path(res_path)
+				var res_path = _to_target_res_path(png_path)
 
 				var tex = PlaceholderTexture2D.new()
 				tex.resource_path = res_path
@@ -90,14 +88,12 @@ func generate(result: Dictionary, output_dir: String, source_root: String) -> bo
 					source_root, flare_tex_name, [".pcx", ".dds", ".png", ".tga"]
 				)
 				if not source_file.is_empty():
-					_convert_asset(source_file, stars_dir, "texture")  # Save texture to stars dir
+					_convert_asset(source_file, stars_dir, "texture") # Save texture to stars dir
 					var png_filename = source_file.get_file().get_basename() + ".png"
 					var png_path = stars_dir.path_join(png_filename)
 
 					# Ensure path is res://
-					var res_path = png_path
-					if not res_path.begins_with("res://"):
-						res_path = ProjectSettings.localize_path(res_path)
+					var res_path = _to_target_res_path(png_path)
 
 					var tex = PlaceholderTexture2D.new()
 					tex.resource_path = res_path
@@ -192,3 +188,13 @@ func _convert_asset(source_path: String, target_dir: String, type: String) -> bo
 		return false
 
 	return true
+
+
+func _to_target_res_path(path: String) -> String:
+	var abs_path = ProjectSettings.globalize_path(path).replace("\\", "/")
+	var assets_idx = abs_path.find("/assets/")
+	if assets_idx != -1:
+		return "res://" + abs_path.substr(assets_idx + 1)
+	
+	# Fallback
+	return ProjectSettings.localize_path(path)
