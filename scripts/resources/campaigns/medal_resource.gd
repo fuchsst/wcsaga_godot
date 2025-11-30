@@ -2,7 +2,7 @@ extends Resource
 
 
 @export var name: String
-@export var bitmap: String
+@export var bitmap: Texture2D
 @export var promotion_text: String
 @export var num_mods: int = 0
 @export var kills_needed: int = 0
@@ -10,3 +10,6 @@ extends Resource
 @export var wavefile_1: String = ""
 @export var wavefile_2: String = ""
 @export var badge_num: int = -1
+
+# Temporary field for conversion
+var _bitmap_filename: String = ""

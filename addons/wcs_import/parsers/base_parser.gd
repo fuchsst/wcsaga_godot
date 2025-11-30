@@ -90,14 +90,24 @@ func _extract_string_value(line: String, prefix: String) -> String:
 		return line.substr(prefix.length()).strip_edges()
 	return ""
 
-func _extract_int_value(line: String, prefix: String) -> int:
-	var s = _extract_string_value(line, prefix)
+func _extract_int_value(line: String, prefix: String, alt_prefix: String = "") -> int:
+	var s = ""
+	if line.begins_with(prefix):
+		s = _extract_string_value(line, prefix)
+	elif alt_prefix != "" and line.begins_with(alt_prefix):
+		s = _extract_string_value(line, alt_prefix)
+		
 	if s.is_valid_int():
 		return s.to_int()
 	return 0
 
-func _extract_float_value(line: String, prefix: String) -> float:
-	var s = _extract_string_value(line, prefix)
+func _extract_float_value(line: String, prefix: String, alt_prefix: String = "") -> float:
+	var s = ""
+	if line.begins_with(prefix):
+		s = _extract_string_value(line, prefix)
+	elif alt_prefix != "" and line.begins_with(alt_prefix):
+		s = _extract_string_value(line, alt_prefix)
+		
 	if s.is_valid_float():
 		return s.to_float()
 	return 0.0

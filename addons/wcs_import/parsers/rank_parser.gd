@@ -41,12 +41,10 @@ func _parse_content() -> Variant:
 				current_rank.points = _extract_int_value(line, "$Points:")
 
 		elif line.begins_with("$Bitmap:"):
-			if current_rank:
-				current_rank.bitmap = _extract_string_value(line, "$Bitmap:")
+			current_rank._bitmap_filename = _extract_string_value(line, "$Bitmap:")
 				
 		elif line.begins_with("$Promotion Voice Base:"):
-			if current_rank:
-				current_rank.promotion_voice_base = _extract_string_value(line, "$Promotion Voice Base:")
+			current_rank._promotion_voice_base = _extract_string_value(line, "$Promotion Voice Base:")
 				
 		elif line.begins_with("$Promotion Text:"):
 			in_promotion_text = true

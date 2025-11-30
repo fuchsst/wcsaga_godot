@@ -10,6 +10,40 @@ extends "res://scripts/resources/core/wcs_base_resource.gd"
 @export var weapon_class: String = "" # Allowed weapon type
 @export var category: String = "" # Weapon category (Primary, Secondary, etc.)
 
+enum WeaponType {
+	ENERGY = 0,
+	BALLISTIC = 1,
+	MISSILE = 2,
+	SPECIAL = 3
+}
+
+enum HomingType {
+	NONE = 0,
+	ASPECT = 1,
+	HEAT = 2,
+	IMAGE = 3,
+	FRIEND_FOE = 4
+}
+
+enum WeaponFlags {
+	BALLISTIC = 1 << 0,
+	BEAM = 1 << 1,
+	HUGE = 1 << 2,
+	BOMB = 1 << 3,
+	PARTICLE_SPEW = 1 << 4,
+	TAGGED = 1 << 5,
+	SWARM = 1 << 6,
+	CORKSCREW = 1 << 7,
+	FLAK = 1 << 8,
+	ELECTRONICS = 1 << 9,
+	SPAWN_CHILD = 1 << 10,
+	REMOTE_DETONATE = 1 << 11,
+	PUNCTURE = 1 << 12,
+	SHIELD_PIERCE = 1 << 13,
+	PLAYER_ALLOWED = 1 << 14,
+	BOMBER_PLUS = 1 << 15,
+}
+
 class BeamConfiguration extends Resource:
 	"""Beam weapon specific configuration"""
 	@export var beam_type: int = 0 # 0=Standard, 1=Slash
@@ -38,7 +72,7 @@ class ParticleSpew extends Resource:
 @export var weapon_family: String = "" # Weapon family classification
 @export var manufacturer_species: String = "" # Cross-reference to SpeciesData
 @export var tech_level: int = 0 # Technology era (0=WC1, 1=WC2, etc.)
-@export var weapon_type: int = 0 # 0=Energy, 1=Ballistic, 2=Missile, 3=Special
+@export var weapon_type: WeaponType = WeaponType.ENERGY # 0=Energy, 1=Ballistic, 2=Missile, 3=Special
 @export var is_player_allowed: bool = true # Available to players
 @export var appears_in_tech_db: bool = false # Shows in tech database
 @export var is_stealth_weapon: bool = false # Undetectable when fired
@@ -104,9 +138,51 @@ class ParticleSpew extends Resource:
 @export_group("Beam Configuration", "beam_")
 @export var beam_config: BeamConfiguration
 
+# === CORKSCREW CONFIGURATION ===
+@export_group("Corkscrew Configuration", "corkscrew_")
+@export var corkscrew_config: CorkscrewConfiguration
+
+class CorkscrewConfiguration extends Resource:
+	"""Corkscrew missile configuration"""
+	@export var num_missiles: int = 4 # Number of missiles fired
+	@export var radius: float = 1.25 # Radius of the corkscrew
+	@export var twist_rate: float = 5.0 # Twist rate in degrees/second
+	@export var shrink_rate: float = 0.0 # Rate at which radius shrinks
+	@export var fire_delay: float = 0.03 # Delay between missile firings (s)
+	@export var counter_rotate: bool = true # Counter-rotate every other missile
+	@export var helix: bool = true # Point missile in direction of spiral
+	@export var down_first: bool = true # Go down first
+
+# === FLAK CONFIGURATION ===
+@export_group("Flak Configuration", "flak_")
+@export var flak_config: FlakConfiguration
+
+class FlakConfiguration extends Resource:
+	"""Flak weapon configuration"""
+	@export var target_range: float = 100.0 # Range to detonate
+	@export var range_variance: float = 0.0 # Variance in detonation range
+	@export var explosion_radius: float = 10.0 # Radius of flak explosion
+	@export var damage_falloff: bool = true # Damage falls off with distance
+	@export var jitter: float = 0.0 # Jitter in detonation position
+	@export var offset: float = 0.0 # Offset from target center
+
+# === SWARM CONFIGURATION ===
+@export_group("Swarm Configuration", "swarm_")
+@export var swarm_config: SwarmConfiguration
+
+class SwarmConfiguration extends Resource:
+	"""Swarm missile configuration"""
+	@export var count: int = 0 # Number of missiles in swarm
+	@export var wait_time: float = 0.1 # Time between shots
+	@export var spread_angle: float = 0.0 # Spread angle
+	@export var path_jitter: float = 0.0 # Random path variation
+
 # === PARTICLE SPEW CONFIGURATION ===
 @export_group("Particle Spew", "pspew_")
 @export var particle_spew: ParticleSpew
+
+@export_group("Trail", "trail_")
+@export var trail_config: TrailConfiguration
 
 class TrailConfiguration extends Resource:
 	"""Weapon trail configuration"""
@@ -118,7 +194,7 @@ class TrailConfiguration extends Resource:
 	@export var max_life: float = 1.0
 
 @export_group("Targeting", "targeting_")
-@export var homing_type: int = 0 # 0=None, 1=Aspect, 2=Heat, 3=Image, 4=Friend/Foe
+@export var homing_type: HomingType = HomingType.NONE # 0=None, 1=Aspect, 2=Heat, 3=Image, 4=Friend/Foe
 @export var guidance_package: String = "" # Cross-reference to guidance system
 @export var lock_time_seconds: float = 2.0 # Time to achieve lock (default 2.0)
 @export var min_lock_time: float = 0.0 # Minimum lock time (override?)
@@ -144,20 +220,7 @@ class TrailConfiguration extends Resource:
 @export var rearm_rate: float = 0.0 # Rate of rearming
 
 # === VISUAL EFFECTS ===
-@export_group("Visual Effects", "visual_")
-@export var projectile_model: String = "" # Cross-reference to 3D model
-@export var laser_bitmap: String = "" # Cross-reference to 2D texture
-@export var laser_glow: String = "" # Cross-reference to glow effect
-@export var laser_length_meters: float = 10.0 # Visible laser length
-@export var laser_head_radius: float = 0.9 # Laser starting radius
-@export var laser_tail_radius: float = 0.9 # Laser ending radius
-@export var laser_primary_color: Color = Color(212, 16, 229) # Primary laser color
-@export var laser_secondary_color: Color = Color(0, 0, 0) # Secondary laser color
-@export var muzzle_flash_effect: String = "" # Cross-reference to effect
-@export var impact_effect: String = "" # Cross-reference to effect
-@export var explosion_effect: String = "" # Cross-reference to effect
-@export var projectile_trail_effect: String = "" # Cross-reference to trail effect
-@export var trail_config: TrailConfiguration
+
 
 # === COUNTERMEASURE INTERACTION ===
 @export_group("Countermeasures", "cm_")
@@ -179,7 +242,7 @@ class TrailConfiguration extends Resource:
 @export var emp_time: float = 0.0 # EMP duration
 @export var swarm_count: int = 0 # Swarm missile count
 @export var swarm_wait: float = 0.0 # Wait between swarm shots
-@export var flags: int = 0 # Bitmask flags
+@export var flags: int = 0 # Bitmask flags (WeaponFlags)
 @export var impact_explosion: String = "" # Impact explosion ANI
 @export var impact_explosion_radius: float = 0.0 # Impact explosion radius
 

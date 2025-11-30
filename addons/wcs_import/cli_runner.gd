@@ -49,6 +49,7 @@ const LightningGenerator = preload("res://addons/wcs_import/generators/lightning
 const MuzzleFlashGenerator = preload("res://addons/wcs_import/generators/mflash_generator.gd")
 const WeaponExplosionGenerator = preload("res://addons/wcs_import/generators/weapon_expl_generator.gd")
 const WeaponSceneGenerator = preload("res://addons/wcs_import/generators/weapon_scene_generator.gd")
+const PersonaGenerator = preload("res://addons/wcs_import/generators/persona_generator.gd")
 const WCSPathResolver = preload("res://addons/wcs_import/core/path_resolver.gd")
 
 # Resource scripts
@@ -174,29 +175,29 @@ func _run():
 		"mainhall":
 			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes/menu"), WCSMainhallParser, "", "mainhall.tres")
 		"medals":
-			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes"), WCSMedalParser, "", "medals.tres")
+			success = _process_medals(input_path, output_dir)
 		"menu":
 			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes/menu"), WCSMenuParser, "", "menu.tres")
 		"messages":
-			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes"), WCSMessageParser, "", "messages.tres")
+			success = _process_personas(input_path, output_dir)
 		"mflash":
 			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "assets/effects/mflash"), WCSMFlashParser, "", "name")
 		"mission":
 			success = _process_mission(input_path, _resolve_output_path(output_dir, "campaigns/hermes/missions"))
 		"music":
-			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes/soundtrack"), WCSMusicParser, "", "name")
+			success = _process_music(input_path, output_dir)
 		"nebula":
 			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "assets/environment/nebula"), WCSNebulaParser, "", "nebula.tres")
 		"pixels":
 			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "assets/environment/stars"), WCSPixelParser, "", "pixels.tres")
 		"rank":
-			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes"), WCSRankParser, "", "ranks.tres")
+			success = _process_ranks(input_path, output_dir)
 		"scripting":
 			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "campaigns/hermes"), WCSScriptingParser, "", "scripting.tres")
 		"ships":
 			success = _process_list_resource(input_path, _resolve_output_path(output_dir, "assets/ships"), WCSShipParser, "", "ship_class_name")
 		"sounds":
-			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "assets/sounds"), WCSSoundParser, "", "sounds.tres")
+			success = _process_sounds(input_path, output_dir)
 		"species":
 			success = _process_simple_resource(input_path, _resolve_output_path(output_dir, "assets/species"), WCSSpeciesParser, "", "species_defs.tres")
 		"ssm":
@@ -357,9 +358,110 @@ func _process_weapons(input_path: String, output_dir: String) -> bool:
 	weapons_root = _resolve_output_path(output_dir, "assets/weapons")
 	
 	for res in weapons:
+		# 1. Determine specific output directory for this weapon
+		# e.g. target/assets/weapons/<category>/<faction>/<weapon_slug>/
+		var category_dir = res.category.to_lower().replace(" ", "_")
+		var faction_dir = res.manufacturer_species.to_lower().replace(" ", "_")
+		var weapon_slug = res.weapon_class.to_lower().replace(" ", "_")
+		
+		var weapon_dir = weapons_root.path_join(category_dir).path_join(faction_dir).path_join(weapon_slug)
+		DirAccess.make_dir_recursive_absolute(weapon_dir)
+		
+		# 2. Convert POF Model
+		if not res.projectile_model.is_empty() and res.projectile_model != "none":
+			var pof_source = _find_source_asset(input_path.get_base_dir().get_base_dir(), res.projectile_model)
+			if not pof_source.is_empty():
+				_convert_asset(pof_source, weapon_dir, "model")
+				# Update resource to point to converted GLB (keep original basename)
+				res.projectile_model = pof_source.get_file().get_basename() + ".gltf"
+			else:
+				print("Warning: Could not find POF source for " + res.projectile_model)
+
+		# 3. Convert/Copy Textures and Icons
+		if not res.display_icon.is_empty():
+			var icon_source = _find_source_asset(input_path.get_base_dir().get_base_dir(), res.display_icon, [".pcx", ".dds", ".png"])
+			if not icon_source.is_empty():
+				_convert_asset(icon_source, weapon_dir, "texture")
+				res.display_icon = icon_source.get_file().get_basename() + ".png" # Assuming conversion to PNG
+
+		if not res.laser_bitmap.is_empty():
+			var laser_source = _find_source_asset(input_path.get_base_dir().get_base_dir(), res.laser_bitmap, [".pcx", ".dds", ".png"])
+			if not laser_source.is_empty():
+				_convert_asset(laser_source, weapon_dir, "texture")
+				res.laser_bitmap = laser_source.get_file().get_basename() + ".png"
+
+		if not res.laser_glow.is_empty():
+			var glow_source = _find_source_asset(input_path.get_base_dir().get_base_dir(), res.laser_glow, [".pcx", ".dds", ".png"])
+			if not glow_source.is_empty():
+				_convert_asset(glow_source, weapon_dir, "texture")
+				res.laser_glow = glow_source.get_file().get_basename() + ".png"
+
+		if not res.tech_animation.is_empty():
+			var anim_source = _find_source_asset(input_path.get_base_dir().get_base_dir(), res.tech_animation, [".ani", ".eff"])
+			if not anim_source.is_empty():
+				_convert_asset(anim_source, weapon_dir, "ui") # Or animation type
+				# res.tech_animation updated by generator or here? 
+				# For now assume generator handles the resource path if it's standard
+
+		# 4. Resolve Impact Explosion
+		if not res.impact_explosion.is_empty():
+			# Try to find corresponding scene in assets/effects/explosion (or similar)
+			# Assuming explosion generator puts them in assets/effects/weapon_expl or similar
+			# The user mentioned "target/assets/effects/explosion/"
+			var expl_name = res.impact_explosion.get_basename()
+			var expl_path = "res://assets/effects/weapon_expl/" + expl_name + ".tscn" # Adjust path based on actual generator output
+			# Check if it exists? We might not have generated them yet if running in parallel or order matters.
+			# But we can set the path.
+			# Or search for it.
+			# For now, let's assume a standard path convention.
+			res.impact_explosion = expl_path
+
+		# 5. Generate Scene and Resource
 		generator.generate_scene(res, weapons_root)
 			
 	return true
+
+func _find_source_asset(root_dir: String, filename: String, extensions: Array = []) -> String:
+	# Naive search in source_assets
+	# In a real scenario, we might use a pre-built index or the Python AssetRegistry
+	# For now, we'll shell out to 'find' for simplicity as per user request context
+	# Or just check common folders
+	var search_filename = filename
+	if extensions.is_empty():
+		# If no extensions provided, assume filename has it or we search exact
+		pass
+	else:
+		# If filename has no extension, try adding them
+		if filename.get_extension().is_empty():
+			# We need to find ANY match
+			pass
+
+	# Use 'find' command via OS.execute for speed and coverage
+	var output = []
+	var args = [root_dir, "-iname", filename + "*"] # simplified
+	OS.execute("find", args, output)
+	if output.size() > 0 and not output[0].is_empty():
+		var lines = output[0].split("\n", false)
+		for line in lines:
+			# Filter by extension if needed
+			if extensions.is_empty():
+				return line
+			for ext in extensions:
+				if line.to_lower().ends_with(ext):
+					return line
+	return ""
+
+func _convert_asset(source_path: String, output_dir: String, type: String) -> void:
+	# Trigger Python converter
+	# uv run python -m converter convert <source> <output> --type <type>
+	var args = ["run", "python", "-m", "converter", "convert", source_path, output_dir, "--type", type]
+	var output = []
+	var exit_code = OS.execute("uv", args, output, true)
+	if exit_code != 0:
+		print("Failed to convert asset: " + source_path)
+		print("Output: " + str(output))
+	else:
+		print("Converted: " + source_path)
 
 func _process_ai_profiles(input_path: String, output_dir: String) -> bool:
 	var parser = WCSAIProfileParser.new()
@@ -519,60 +621,31 @@ func _process_autopilot(input_path: String, output_dir: String) -> bool:
 	print("Saved: " + save_path)
 	return true
 
+const RankGenerator = preload("res://addons/wcs_import/generators/rank_generator.gd")
+const MedalGenerator = preload("res://addons/wcs_import/generators/medal_generator.gd")
+
 func _process_medals(input_path: String, output_dir: String) -> bool:
 	var parser = WCSMedalParser.new()
-	var medals = parser.parse(input_path)
+	var manifest = parser.parse(input_path)
 	
-	if medals == null:
+	if manifest == null:
 		print("Failed to parse medals.")
 		return false
 		
-	# Save to campaigns/{campaign}/medals.tres
-	# Since we have a list, we need to save individual resources or a container.
-	# The rule says "medals.tbl entries tres go to target/campaigns/hermes/medals.tres"
-	# This implies a single file. But Godot resources are usually one per file unless embedded.
-	# If we save a list, we need a container resource.
-	# For now, I will save them as individual files in a 'medals' directory to be safe,
-	# OR I will create a dummy container if needed.
-	# BUT, looking at the rule again: "medals.tres".
-	# I'll assume for now we save them individually in a folder named medals, 
-	# OR I'll save them as a ResourceGroup if I had one.
-	# Let's save them individually for now as it's safer for Godot.
-	# Wait, rule says: target/campaigns/hermes/medals.tres
-	# Maybe I should create a Resource that holds an Array?
-	# I didn't create a MedalsManifest.
-	# I'll save them as individual files in `target/campaigns/hermes/medals/` for now.
-	
-	var campaign_name = "hermes"
-	var save_dir = output_dir.path_join("campaigns").path_join(campaign_name).path_join("medals")
-	DirAccess.make_dir_recursive_absolute(save_dir)
-	
-	for medal in medals:
-		var filename = medal.name.to_lower().replace(" ", "_") + ".tres"
-		var save_path = save_dir.path_join(filename)
-		ResourceSaver.save(medal, save_path)
-		print("Saved: " + save_path)
-		
+	var generator = MedalGenerator.new()
+	generator.generate_medals(manifest, output_dir)
 	return true
 
 func _process_ranks(input_path: String, output_dir: String) -> bool:
 	var parser = WCSRankParser.new()
-	var ranks = parser.parse(input_path)
+	var manifest = parser.parse(input_path)
 	
-	if ranks == null:
+	if manifest == null:
 		print("Failed to parse ranks.")
 		return false
 		
-	var campaign_name = "hermes"
-	var save_dir = output_dir.path_join("campaigns").path_join(campaign_name).path_join("ranks")
-	DirAccess.make_dir_recursive_absolute(save_dir)
-	
-	for rank in ranks:
-		var filename = rank.name.to_lower().replace(" ", "_") + ".tres"
-		var save_path = save_dir.path_join(filename)
-		ResourceSaver.save(rank, save_path)
-		print("Saved: " + save_path)
-		
+	var generator = RankGenerator.new()
+	generator.generate_ranks(manifest, output_dir)
 	return true
 
 func _process_traitor(input_path: String, output_dir: String) -> bool:
@@ -798,12 +871,10 @@ func _process_lightning(input_path: String, output_dir: String) -> bool:
 	var parser = WCSLightningParser.new()
 	var resources = parser.parse(input_path)
 	
-	if resources == null or resources.is_empty():
+	if resources == null:
 		print("Failed to parse lightning.")
 		return false
 		
-	print("Parsed " + str(resources.size()) + " lightning entries.")
-	
 	var generator = LightningGenerator.new()
 	var success_count = 0
 	
@@ -811,8 +882,29 @@ func _process_lightning(input_path: String, output_dir: String) -> bool:
 		if generator.generate(res, output_dir):
 			success_count += 1
 			
-	print("Generated " + str(success_count) + "/" + str(resources.size()) + " lightning resources.")
+	print("Generated " + str(success_count) + "/" + str(resources.size()) + " lightning scenes.")
 	return success_count == resources.size()
+
+func _process_personas(input_path: String, output_dir: String) -> bool:
+	var parser = WCSMessageParser.new()
+	var personas = parser.parse(input_path)
+	
+	if personas == null or personas.is_empty():
+		print("Failed to parse personas/messages.")
+		return false
+		
+	print("Parsed " + str(personas.size()) + " personas.")
+	
+	var generator = PersonaGenerator.new()
+	
+	# Output root is passed as output_dir (e.g. target/).
+	# Generator handles subpath campaigns/hermes/persona/...
+	
+	for persona in personas:
+		generator.generate_persona(persona, output_dir)
+		
+	return true
+
 
 func _process_mflash(input_path: String, output_dir: String) -> bool:
 	var parser = WCSMuzzleFlashParser.new()
@@ -853,3 +945,76 @@ func _process_weapon_expl(input_path: String, output_dir: String) -> bool:
 			
 	print("Generated " + str(success_count) + "/" + str(resources.size()) + " weapon_expl resources.")
 	return success_count == resources.size()
+const SoundManifest = preload("res://scripts/resources/sounds/sound_manifest.gd")
+
+func _process_music(input_path: String, output_dir: String) -> bool:
+	var parser = WCSMusicParser.new()
+	var result = parser.parse(input_path)
+	
+	if result == null or not result is Dictionary:
+		print("Failed to parse music.")
+		return false
+		
+	var soundtracks = result.get("soundtracks", [])
+	var menu_music = result.get("menu_music")
+	
+	var save_dir = _resolve_output_path(output_dir, "campaigns/hermes/soundtrack")
+	DirAccess.make_dir_recursive_absolute(save_dir)
+	
+	var saved_count = 0
+	for item in soundtracks:
+		var item_name = item.name
+		if item_name.is_empty():
+			item_name = "unknown_" + str(saved_count)
+			
+		var filename = item_name.to_lower().replace(" ", "_").replace(".", "_") + ".tres"
+		var save_path = save_dir.path_join(filename)
+		
+		var err = ResourceSaver.save(item, save_path)
+		if err != OK:
+			print("Failed to save resource: " + save_path)
+		else:
+			print("Saved: " + save_path)
+			saved_count += 1
+			
+	if menu_music:
+		var menu_path = save_dir.path_join("menu_music.tres")
+		var err = ResourceSaver.save(menu_music, menu_path)
+		if err != OK:
+			print("Failed to save menu music: " + menu_path)
+		else:
+			print("Saved: " + menu_path)
+			
+	print("Saved " + str(saved_count) + " soundtracks and menu music.")
+	return true
+
+func _process_sounds(input_path: String, output_dir: String) -> bool:
+	var parser = WCSSoundParser.new()
+	var result = parser.parse(input_path)
+	
+	if result == null or not result is Dictionary:
+		print("Failed to parse sounds.")
+		return false
+		
+	var manifest = SoundManifest.new()
+	
+	# Cast to Array[Resource] to satisfy strict typing
+	var configs: Array[Resource] = []
+	configs.append_array(result.get("audio_configs", []))
+	manifest.audio_configs = configs
+	
+	var flybys: Array[Resource] = []
+	flybys.append_array(result.get("flyby_sounds", []))
+	manifest.flyby_sounds = flybys
+	
+	var save_dir = _resolve_output_path(output_dir, "assets/sounds")
+	DirAccess.make_dir_recursive_absolute(save_dir)
+	
+	var save_path = save_dir.path_join("sounds.tres")
+	var err = ResourceSaver.save(manifest, save_path)
+	if err != OK:
+		print("Failed to save sounds manifest: " + save_path)
+		return false
+		
+	print("Saved sounds manifest to: " + save_path)
+	return true

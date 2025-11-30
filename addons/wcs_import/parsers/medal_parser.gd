@@ -28,7 +28,7 @@ func _parse_content() -> Variant:
 			
 		elif line.begins_with("$Bitmap:"):
 			if current_medal:
-				current_medal.bitmap = _extract_string_value(line, "$Bitmap:")
+				current_medal._bitmap_filename = _extract_string_value(line, "$Bitmap:")
 				
 		elif line.begins_with("$Num mods:"):
 			if current_medal:

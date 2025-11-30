@@ -3,9 +3,10 @@ extends "res://addons/wcs_import/parsers/base_parser.gd"
 
 ## Parser for weapons.tbl files.
 ## Converts weapon data into WeaponData resources.
-const WCSWeaponData = preload("res://scripts/resources/weapons/weapon_data.gd")
+const WeaponDataScript = preload("res://scripts/resources/weapons/weapon_data.gd")
+
 func _parse_content() -> Variant:
-	var weapons: Array[WCSWeaponData] = []
+	var weapons: Array[Resource] = []
 	
 	_current_line_index = 0
 	
@@ -23,25 +24,30 @@ func _parse_content() -> Variant:
 			
 		if line.begins_with("$Name:"):
 			var weapon = _parse_weapon(line)
-			weapon.category = current_category
+			# Only use TBL category if we didn't determine a more specific one from the model
+			if weapon.category == "weapon" or weapon.category.is_empty():
+				weapon.category = current_category
 			weapons.append(weapon)
 			
 	return weapons
 
-func _parse_weapon(first_line: String) -> WCSWeaponData:
-	var weapon = WCSWeaponData.new()
-	weapon.weapon_class = _extract_string_value(first_line, "$Name:")
+func _parse_weapon(first_line: String) -> Resource:
+	var weapon = WeaponDataScript.new()
+	var raw_name = _extract_string_value(first_line, "$Name:")
+	weapon.weapon_class = raw_name.trim_prefix("@")
 	weapon.display_name = weapon.weapon_class # Default
-	weapon.manufacturer_species = "Terran" # Default to Terran as TBL doesn't specify
+	
+	# Default to Terran
+	weapon.manufacturer_species = "Terran"
 	
 	while _has_more_lines():
 		var line = _peek_next_line()
 		if line.begins_with("$Name:") or line.begins_with("#"):
 			break
 			
-		_get_next_line() # Consume
+		line = _get_next_line() # Consume
 		
-		elif line.begins_with("+Title:"):
+		if line.begins_with("+Title:"):
 			weapon.display_name = _extract_string_value(line, "+Title:")
 		elif line.begins_with("+Tech Description:"):
 			weapon.tech_description = _parse_multiline_text()
@@ -66,6 +72,11 @@ func _parse_weapon(first_line: String) -> WCSWeaponData:
 			weapon.effective_range_meters = _extract_float_value(line, "$Weapon Range:", "+Weapon Range:")
 		elif line.begins_with("$Model File:"):
 			weapon.projectile_model = _extract_string_value(line, "$Model File:")
+			if weapon.projectile_model != "none" and not weapon.projectile_model.is_empty():
+				var mapping = _determine_faction_path(weapon.projectile_model)
+				if mapping.faction != "unknown":
+					weapon.category = mapping.category
+					weapon.manufacturer_species = mapping.faction
 		elif line.begins_with("$Icon:"):
 			weapon.display_icon = _extract_string_value(line, "$Icon:")
 		elif line.begins_with("$Anim:"):
@@ -90,18 +101,26 @@ func _parse_weapon(first_line: String) -> WCSWeaponData:
 			weapon.cargo_size_units = _extract_float_value(line, "$Cargo Size:")
 		elif line.begins_with("$Homing:"):
 			var homing_val = _extract_string_value(line, "$Homing:")
-			if homing_val == "YES": weapon.homing_type = 1 # Default to Aspect? Or Heat? Usually implies homing capability
-			elif homing_val == "NO": weapon.homing_type = 0
-			elif homing_val == "ASPECT": weapon.homing_type = 1
-			elif homing_val == "HEAT": weapon.homing_type = 2
+			if homing_val == "YES": weapon.homing_type = WeaponDataScript.HomingType.ASPECT
+			elif homing_val == "NO": weapon.homing_type = WeaponDataScript.HomingType.NONE
+			elif homing_val == "ASPECT": weapon.homing_type = WeaponDataScript.HomingType.ASPECT
+			elif homing_val == "HEAT": weapon.homing_type = WeaponDataScript.HomingType.HEAT
 		elif line.begins_with("$Impact Explosion:"):
 			weapon.impact_explosion = _extract_string_value(line, "$Impact Explosion:")
 		elif line.begins_with("$Impact Explosion Radius:"):
 			weapon.impact_explosion_radius = _extract_float_value(line, "$Impact Explosion Radius:")
+		elif line.begins_with("$Impact Explosion Radius:"):
+			weapon.impact_explosion_radius = _extract_float_value(line, "$Impact Explosion Radius:")
 		elif line.begins_with("$Swarm:"):
-			weapon.swarm_count = _extract_int_value(line, "$Swarm:")
+			if weapon.swarm_config == null: weapon.swarm_config = WeaponDataScript.SwarmConfiguration.new()
+			weapon.swarm_config.count = _extract_int_value(line, "$Swarm:")
 		elif line.begins_with("$SwarmWait:"):
-			weapon.swarm_wait = _extract_float_value(line, "$SwarmWait:")
+			if weapon.swarm_config == null: weapon.swarm_config = WeaponDataScript.SwarmConfiguration.new()
+			weapon.swarm_config.wait_time = _extract_float_value(line, "$SwarmWait:")
+		elif line.begins_with("$Corkscrew:"):
+			_parse_corkscrew_info(weapon)
+		elif line.begins_with("$Flak:"): # Assuming Flak might be a block or we handle flak fields
+			pass # Placeholder if Flak is a block, otherwise handle fields below
 		elif line.begins_with("$Free Flight Time:"):
 			weapon.free_flight_time = _extract_float_value(line, "$Free Flight Time:")
 		elif line.begins_with("$Turn Time:"):
@@ -137,6 +156,25 @@ func _parse_weapon(first_line: String) -> WCSWeaponData:
 			_parse_pspew_info(weapon)
 		elif line.begins_with("$BeamInfo:"):
 			_parse_beam_info(weapon)
+		elif line.begins_with("$EMP Intensity:"):
+			weapon.emp_intensity = _extract_float_value(line, "$EMP Intensity:")
+		elif line.begins_with("$EMP Time:"):
+			weapon.emp_time = _extract_float_value(line, "$EMP Time:")
+		# Handle @Laser syntax (WCS specific?)
+		elif line.begins_with("@Laser Bitmap:"):
+			weapon.laser_bitmap = _extract_string_value(line, "@Laser Bitmap:")
+		elif line.begins_with("@Laser Glow:"):
+			weapon.laser_glow = _extract_string_value(line, "@Laser Glow:")
+		elif line.begins_with("@Laser Color:"):
+			weapon.laser_primary_color = _extract_color_value(line, "@Laser Color:")
+		elif line.begins_with("@Laser Color2:"):
+			weapon.laser_secondary_color = _extract_color_value(line, "@Laser Color2:")
+		elif line.begins_with("@Laser Length:"):
+			weapon.laser_length_meters = _extract_float_value(line, "@Laser Length:")
+		elif line.begins_with("@Laser Head Radius:"):
+			weapon.laser_head_radius = _extract_float_value(line, "@Laser Head Radius:")
+		elif line.begins_with("@Laser Tail Radius:"):
+			weapon.laser_tail_radius = _extract_float_value(line, "@Laser Tail Radius:")
 			
 	# Calculate derived values if missing
 	if weapon.effective_range_meters == 0 and weapon.muzzle_velocity_mps > 0 and weapon.projectile_lifetime > 0:
@@ -144,9 +182,9 @@ func _parse_weapon(first_line: String) -> WCSWeaponData:
 			
 	return weapon
 
-func _parse_beam_info(weapon: WCSWeaponData) -> void:
+func _parse_beam_info(weapon) -> void:
 	if weapon.beam_config == null:
-		weapon.beam_config = WCSWeaponData.BeamConfiguration.new()
+		weapon.beam_config = WeaponDataScript.BeamConfiguration.new()
 		
 	while _has_more_lines():
 		var line = _peek_next_line()
@@ -180,9 +218,9 @@ func _parse_beam_info(weapon: WCSWeaponData) -> void:
 			# Particle count
 			pass
 
-func _parse_trail_info(weapon: WCSWeaponData) -> void:
+func _parse_trail_info(weapon) -> void:
 	if weapon.trail_config == null:
-		weapon.trail_config = WCSWeaponData.TrailConfiguration.new()
+		weapon.trail_config = WeaponDataScript.TrailConfiguration.new()
 		
 	while _has_more_lines():
 		var line = _peek_next_line()
@@ -210,9 +248,9 @@ func _parse_trail_info(weapon: WCSWeaponData) -> void:
 		elif line.begins_with("+Max Life:"):
 			weapon.trail_config.max_life = _extract_float_value(line, "+Max Life:")
 
-func _parse_pspew_info(weapon: WCSWeaponData) -> void:
+func _parse_pspew_info(weapon) -> void:
 	if weapon.particle_spew == null:
-		weapon.particle_spew = WCSWeaponData.ParticleSpew.new()
+		weapon.particle_spew = WeaponDataScript.ParticleSpew.new()
 		
 	while _has_more_lines():
 		var line = _peek_next_line()
@@ -239,25 +277,42 @@ func _parse_pspew_info(weapon: WCSWeaponData) -> void:
 		elif line.begins_with("+Bitmap:"):
 			weapon.particle_spew.bitmap = _extract_string_value(line, "+Bitmap:")
 
-func _parse_flags(line: String, weapon: WCSWeaponData) -> void:
+func _parse_flags(line: String, weapon) -> void:
 	var flags_str = _extract_string_value(line, "$Flags:")
 	# Remove parens and quotes
 	flags_str = flags_str.replace("(", "").replace(")", "").replace("\"", "")
 	var flags_list = flags_str.split(" ", false)
 	
 	for flag in flags_list:
-		match flag:
-			"player allowed": weapon.is_player_allowed = true
-			"in tech database": weapon.appears_in_tech_db = true
-			"beam": weapon.is_beam = true
-			"stream": weapon.fire_rate_hz = 10.0 # Arbitrary high rate for stream? Or handle differently
+		match flag.to_lower():
+			"player allowed": weapon.flags |= WeaponDataScript.WeaponFlags.PLAYER_ALLOWED
+			"in tech database": weapon.appears_in_tech_db = true # Keep bool for now or map to flag
+			"beam":
+				weapon.is_beam = true
+				weapon.flags |= WeaponDataScript.WeaponFlags.BEAM
+			"stream": weapon.fire_rate_hz = 10.0
 			"no pierce shields": weapon.no_shield_piercing = true
-			"bomb": weapon.is_bomb_type = true
-			"huge": weapon.is_huge_weapon = true
+			"bomb":
+				weapon.is_bomb_type = true
+				weapon.flags |= WeaponDataScript.WeaponFlags.BOMB
+			"huge":
+				weapon.is_huge_weapon = true
+				weapon.flags |= WeaponDataScript.WeaponFlags.HUGE
 			"particle spew":
+				weapon.flags |= WeaponDataScript.WeaponFlags.PARTICLE_SPEW
 				if weapon.particle_spew == null:
-					weapon.particle_spew = WCSWeaponData.ParticleSpew.new()
-			# Add other flags as needed
+					weapon.particle_spew = WeaponDataScript.ParticleSpew.new()
+			"ballistic": weapon.flags |= WeaponDataScript.WeaponFlags.BALLISTIC
+			"swarm": weapon.flags |= WeaponDataScript.WeaponFlags.SWARM
+			"corkscrew": weapon.flags |= WeaponDataScript.WeaponFlags.CORKSCREW
+			"flak": weapon.flags |= WeaponDataScript.WeaponFlags.FLAK
+			"electronics": weapon.flags |= WeaponDataScript.WeaponFlags.ELECTRONICS
+			"spawn child": weapon.flags |= WeaponDataScript.WeaponFlags.SPAWN_CHILD
+			"remote detonate": weapon.flags |= WeaponDataScript.WeaponFlags.REMOTE_DETONATE
+			"puncture": weapon.flags |= WeaponDataScript.WeaponFlags.PUNCTURE
+			"shield pierce": weapon.flags |= WeaponDataScript.WeaponFlags.SHIELD_PIERCE
+			"bomber+": weapon.flags |= WeaponDataScript.WeaponFlags.BOMBER_PLUS
+			"tagged": weapon.flags |= WeaponDataScript.WeaponFlags.TAGGED
 
 func _parse_multiline_text() -> String:
 	var text = ""
@@ -268,3 +323,70 @@ func _parse_multiline_text() -> String:
 			break
 		text += _get_next_line() + "\n"
 	return text.strip_edges()
+
+func _extract_color_value(line: String, prefix: String) -> Color:
+	var value_str = _extract_string_value(line, prefix)
+	var parts = value_str.split(",", false)
+	if parts.size() >= 3:
+		return Color(
+			parts[0].to_float() / 255.0,
+			parts[1].to_float() / 255.0,
+			parts[2].to_float() / 255.0
+		)
+	return Color.WHITE
+
+func _parse_corkscrew_info(weapon) -> void:
+	if weapon.corkscrew_config == null:
+		weapon.corkscrew_config = WeaponDataScript.CorkscrewConfiguration.new()
+		
+	while _has_more_lines():
+		var line = _peek_next_line()
+		if line.begins_with("$Name:") or line.begins_with("#"):
+			break
+			
+		if not (line.strip_edges().begins_with("+") or line.strip_edges().is_empty()):
+			break
+			
+		line = _get_next_line()
+		
+		if line.begins_with("+Num:"):
+			weapon.corkscrew_config.num_missiles = _extract_int_value(line, "+Num:")
+		elif line.begins_with("+Radius:"):
+			weapon.corkscrew_config.radius = _extract_float_value(line, "+Radius:")
+		elif line.begins_with("+Twist:"):
+			weapon.corkscrew_config.twist_rate = _extract_float_value(line, "+Twist:")
+		elif line.begins_with("+Shrink:"):
+			weapon.corkscrew_config.shrink_rate = _extract_float_value(line, "+Shrink:")
+		elif line.begins_with("+Delay:"):
+			weapon.corkscrew_config.fire_delay = _extract_float_value(line, "+Delay:")
+		elif line.begins_with("+Counter:"):
+			weapon.corkscrew_config.counter_rotate = line.to_lower().contains("yes") or line.to_lower().contains("true")
+		elif line.begins_with("+Helix:"):
+			weapon.corkscrew_config.helix = line.to_lower().contains("yes") or line.to_lower().contains("true")
+
+func _determine_faction_path(weapon_name: String) -> Dictionary:
+	var name = weapon_name.to_lower()
+	
+	# Mapping rules based on paths.py and standard WCS conventions
+	# Prefixes
+	if name.begins_with("kif_"): return {"category": "fighter", "faction": "kilrathi"}
+	if name.begins_with("kib_"): return {"category": "bomber", "faction": "kilrathi"}
+	if name.begins_with("kim_"): return {"category": "missile", "faction": "kilrathi"}
+	if name.begins_with("kis_"): return {"category": "capital", "faction": "kilrathi"}
+	if name.begins_with("kb_"): return {"category": "station", "faction": "kilrathi"}
+	
+	if name.begins_with("tcf_"): return {"category": "fighter", "faction": "terran"}
+	if name.begins_with("tcb_"): return {"category": "bomber", "faction": "terran"}
+	if name.begins_with("tcm_"): return {"category": "missile", "faction": "terran"}
+	if name.begins_with("tcs_"): return {"category": "capital", "faction": "terran"}
+	if name.begins_with("tb_"): return {"category": "station", "faction": "terran"}
+	
+	if name.begins_with("prf_"): return {"category": "fighter", "faction": "pirate"}
+	if name.begins_with("prs_"): return {"category": "capital", "faction": "pirate"}
+	
+	# Special cases
+	if name == "stormfire": return {"category": "weapon", "faction": "special"}
+	if name == "infyrno": return {"category": "weapon", "faction": "special"}
+	
+	# Default fallback
+	return {"category": "weapon", "faction": "unknown"}

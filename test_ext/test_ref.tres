@@ -1,0 +1,11 @@
+[gd_resource type="Resource" load_steps=3 format=3]
+
+[ext_resource type="AudioStream" path="res://target/test_ext/test.ogg" id="1_gc8jc"]
+
+[sub_resource type="GDScript" id="GDScript_5e03u"]
+script/source = "extends Resource
+@export var stream: AudioStream"
+
+[resource]
+script = SubResource("GDScript_5e03u")
+stream = ExtResource("1_gc8jc")

@@ -5,14 +5,18 @@ const WCSWeaponData = preload("res://scripts/resources/weapons/weapon_data.gd")
 const Weapon = preload("res://scripts/entities/weapon.gd")
 const Missile = preload("res://scripts/entities/missile.gd")
 const BeamWeapon = preload("res://scripts/entities/beam_weapon.gd")
+const FlakWeapon = preload("res://scripts/entities/flak_weapon.gd")
 
 func generate_scene(weapon_data: WCSWeaponData, output_root: String) -> void:
 	# Determine folder structure: target/assets/weapons/<category>/<faction>/<weapon>/
+	# The parser now populates category and manufacturer_species based on path mapping rules
 	var category_slug = weapon_data.category.to_lower().replace(" ", "_")
 	var faction_slug = weapon_data.manufacturer_species.to_lower()
-	if faction_slug.is_empty():
+	
+	if faction_slug.is_empty() or faction_slug == "unknown":
 		faction_slug = "common"
-	var weapon_slug = weapon_data.weapon_class
+		
+	var weapon_slug = weapon_data.weapon_class.to_lower().replace(" ", "_")
 	
 	var target_dir = output_root.path_join(category_slug).path_join(faction_slug).path_join(weapon_slug)
 	
@@ -32,6 +36,9 @@ func generate_scene(weapon_data: WCSWeaponData, output_root: String) -> void:
 	if weapon_data.is_beam:
 		root_node = BeamWeapon.new()
 		root_node.name = "BeamWeapon"
+	elif weapon_data.flak_config != null:
+		root_node = FlakWeapon.new()
+		root_node.name = "FlakWeapon"
 	elif weapon_data.homing_type > 0:
 		root_node = Missile.new()
 		root_node.name = "Missile"
@@ -41,12 +48,19 @@ func generate_scene(weapon_data: WCSWeaponData, output_root: String) -> void:
 		
 	root_node.weapon_data = weapon_data
 	
-	# Add visual placeholder (MeshInstance3D)
-	# In a real scenario, we would load the GLB if available
-	var mesh_instance = MeshInstance3D.new()
-	mesh_instance.name = "Visual"
-	root_node.add_child(mesh_instance)
-	mesh_instance.owner = root_node
+	# 5. Instantiate Visuals
+	if not weapon_data.projectile_model.is_empty() and weapon_data.projectile_model.ends_with(".glb"):
+		var model_path = target_dir.path_join(weapon_data.projectile_model)
+		if FileAccess.file_exists(model_path):
+			var model_scene = load(model_path)
+			if model_scene:
+				var model_instance = model_scene.instantiate()
+				root_node.add_child(model_instance)
+				model_instance.owner = root_node
+				model_instance.name = "Visuals"
+		else:
+			print("Warning: Model file not found at " + model_path)
+
 	
 	# Pack and Save Scene
 	var packed_scene = PackedScene.new()

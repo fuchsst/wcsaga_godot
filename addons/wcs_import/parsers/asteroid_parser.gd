@@ -125,9 +125,9 @@ func _extract_string_value(line: String, prefix: String) -> String:
 	
 	return value
 
-func _extract_float_value(line: String, prefix: String) -> float:
+func _extract_float_value(line: String, prefix: String, alt_prefix: String = "") -> float:
 	"""Extract float value after prefix"""
-	return super._extract_float_value(line, prefix)
+	return super._extract_float_value(line, prefix, alt_prefix)
 
 func _extract_tuple_values(line: String, prefix: String) -> Array[float]:
 	"""Extract tuple values like (0, 12000, 24000)"""
