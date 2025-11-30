@@ -29,39 +29,29 @@ func _parse_content() -> Variant:
 			elif line.begins_with("$FRED Color:") or line.begins_with("$FRED Colour:"):
 				current_species.fred_color = _parse_color(line)
 			elif line.begins_with("+Debris_Texture:"):
-				var tex_name = _extract_string_value(line, "+Debris_Texture:")
-				current_species.debris_texture = _load_texture(tex_name)
+				current_species.set_meta("debris_texture_filename", _extract_string_value(line, "+Debris_Texture:"))
 			elif line.begins_with("+Shield_Hit_ani:"):
-				var anim_name = _extract_string_value(line, "+Shield_Hit_ani:")
-				current_species.shield_hit_anim = _load_animation(anim_name)
+				current_species.set_meta("shield_hit_anim_filename", _extract_string_value(line, "+Shield_Hit_ani:"))
 			
 			# Thruster Anims
 			elif line.begins_with("+Pri_Normal:"):
-				var anim_name = _extract_string_value(line, "+Pri_Normal:")
-				current_species.thruster_normal = _load_animation(anim_name)
+				current_species.set_meta("thruster_normal_filename", _extract_string_value(line, "+Pri_Normal:"))
 			elif line.begins_with("+Pri_Afterburn:"):
-				var anim_name = _extract_string_value(line, "+Pri_Afterburn:")
-				current_species.thruster_afterburn = _load_animation(anim_name)
+				current_species.set_meta("thruster_afterburn_filename", _extract_string_value(line, "+Pri_Afterburn:"))
 			elif line.begins_with("+Sec_Normal:"):
-				var anim_name = _extract_string_value(line, "+Sec_Normal:")
-				current_species.thruster_secondary_normal = _load_animation(anim_name)
+				current_species.set_meta("thruster_secondary_normal_filename", _extract_string_value(line, "+Sec_Normal:"))
 			elif line.begins_with("+Sec_Afterburn:"):
-				var anim_name = _extract_string_value(line, "+Sec_Afterburn:")
-				current_species.thruster_secondary_afterburn = _load_animation(anim_name)
+				current_species.set_meta("thruster_secondary_afterburn_filename", _extract_string_value(line, "+Sec_Afterburn:"))
 			elif line.begins_with("+Ter_Normal:"):
-				var anim_name = _extract_string_value(line, "+Ter_Normal:")
-				current_species.thruster_tertiary_normal = _load_animation(anim_name)
+				current_species.set_meta("thruster_tertiary_normal_filename", _extract_string_value(line, "+Ter_Normal:"))
 			elif line.begins_with("+Ter_Afterburn:"):
-				var anim_name = _extract_string_value(line, "+Ter_Afterburn:")
-				current_species.thruster_tertiary_afterburn = _load_animation(anim_name)
+				current_species.set_meta("thruster_tertiary_afterburn_filename", _extract_string_value(line, "+Ter_Afterburn:"))
 				
 			# Thruster Glows
 			elif line.begins_with("+Normal:"):
-				var tex_name = _extract_string_value(line, "+Normal:")
-				current_species.glow_normal = _load_texture(tex_name)
+				current_species.set_meta("glow_normal_filename", _extract_string_value(line, "+Normal:"))
 			elif line.begins_with("+Afterburn:"):
-				var tex_name = _extract_string_value(line, "+Afterburn:")
-				current_species.glow_afterburn = _load_texture(tex_name)
+				current_species.set_meta("glow_afterburn_filename", _extract_string_value(line, "+Afterburn:"))
 				
 			elif line.begins_with("$AwacsMultiplier:"):
 				current_species.awacs_multiplier = _extract_float_value(line, "$AwacsMultiplier:")

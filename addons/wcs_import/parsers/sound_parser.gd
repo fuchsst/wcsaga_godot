@@ -66,19 +66,12 @@ func _parse_audio_entry(line: String, config: AudioConfigResource, prefix_len: i
 			config.signature = first_part[0].to_int()
 			var filename = first_part[1]
 			
-			# Load AudioStream
-			var path = SOUND_BASE_PATH + filename
-			if not FileAccess.file_exists(path):
-				# Try swapping extension
-				if filename.ends_with(".wav"):
-					path = SOUND_BASE_PATH + filename.replace(".wav", ".ogg")
-				elif filename.ends_with(".ogg"):
-					path = SOUND_BASE_PATH + filename.replace(".ogg", ".wav")
+			config.filename = filename
 			
-			if FileAccess.file_exists(path):
-				config.audio_stream = load(path)
-			else:
-				push_warning("Sound file not found: " + filename + " (checked " + path + ")")
+			# Stream will be loaded by CLI runner after conversion
+			# var path = SOUND_BASE_PATH + filename
+			# if FileAccess.file_exists(path):
+			# 	config.audio_stream = load(path)
 	
 	if parts.size() > 1:
 		config.preload_sound = parts[1].strip_edges().to_int() == 1

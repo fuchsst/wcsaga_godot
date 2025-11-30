@@ -61,17 +61,39 @@ func _parse_content() -> Variant:
 						push_warning("Menu music file not found: " + filename)
 						
 					match label:
-						"Command Brief": menu_music.command_brief = stream
-						"Brief1": menu_music.briefing_1 = stream
-						"Brief2": menu_music.briefing_2 = stream
-						"Brief3": menu_music.briefing_3 = stream
-						"Brief4": menu_music.briefing_4 = stream
-						"Success": menu_music.debriefing_success = stream
-						"Average": menu_music.debriefing_average = stream
-						"Failure": menu_music.debriefing_failure = stream
-						"Hermes": menu_music.fiction_viewer = stream
-						"Wellington": menu_music.prologue_menu = stream
-						"Cinema": menu_music.credits = stream
+						"Command Brief":
+							menu_music.command_brief = stream
+							menu_music.command_brief_filename = filename
+						"Brief1":
+							menu_music.briefing_1 = stream
+							menu_music.briefing_1_filename = filename
+						"Brief2":
+							menu_music.briefing_2 = stream
+							menu_music.briefing_2_filename = filename
+						"Brief3":
+							menu_music.briefing_3 = stream
+							menu_music.briefing_3_filename = filename
+						"Brief4":
+							menu_music.briefing_4 = stream
+							menu_music.briefing_4_filename = filename
+						"Success":
+							menu_music.debriefing_success = stream
+							menu_music.debriefing_success_filename = filename
+						"Average":
+							menu_music.debriefing_average = stream
+							menu_music.debriefing_average_filename = filename
+						"Failure":
+							menu_music.debriefing_failure = stream
+							menu_music.debriefing_failure_filename = filename
+						"Hermes":
+							menu_music.fiction_viewer = stream
+							menu_music.fiction_viewer_filename = filename
+						"Wellington":
+							menu_music.prologue_menu = stream
+							menu_music.prologue_menu_filename = filename
+						"Cinema":
+							menu_music.credits = stream
+							menu_music.credits_filename = filename
 			continue
 
 		if current_soundtrack == null:
@@ -87,9 +109,10 @@ func _parse_content() -> Variant:
 			# Format: $Name: filename.wav num_measures samples_per_measure ; usage
 			var parts = line.substr(6).strip_edges().split(" ", false)
 			var stream: AudioStream = null
+			var filename = ""
 			
 			if parts.size() >= 1:
-				var filename = parts[0]
+				filename = parts[0]
 				
 				# We always convert music to .ogg, so force the extension
 				if filename.ends_with(".wav"):
@@ -104,18 +127,42 @@ func _parse_content() -> Variant:
 
 			# Assign to explicit field based on index
 			match track_index:
-				0: current_soundtrack.ambience = stream
-				1: current_soundtrack.arrival_allied_normal = stream
-				2: current_soundtrack.arrival_enemy_normal = stream
-				3: current_soundtrack.battle_1 = stream
-				4: current_soundtrack.battle_2 = stream
-				5: current_soundtrack.battle_3 = stream
-				6: current_soundtrack.arrival_allied_battle = stream
-				7: current_soundtrack.arrival_enemy_battle = stream
-				8: current_soundtrack.victory_1 = stream
-				9: current_soundtrack.victory_2 = stream
-				10: current_soundtrack.goal_failed = stream
-				11: current_soundtrack.player_dead = stream
+				0:
+					current_soundtrack.ambience = stream
+					current_soundtrack.ambience_filename = filename
+				1:
+					current_soundtrack.arrival_allied_normal = stream
+					current_soundtrack.arrival_allied_normal_filename = filename
+				2:
+					current_soundtrack.arrival_enemy_normal = stream
+					current_soundtrack.arrival_enemy_normal_filename = filename
+				3:
+					current_soundtrack.battle_1 = stream
+					current_soundtrack.battle_1_filename = filename
+				4:
+					current_soundtrack.battle_2 = stream
+					current_soundtrack.battle_2_filename = filename
+				5:
+					current_soundtrack.battle_3 = stream
+					current_soundtrack.battle_3_filename = filename
+				6:
+					current_soundtrack.arrival_allied_battle = stream
+					current_soundtrack.arrival_allied_battle_filename = filename
+				7:
+					current_soundtrack.arrival_enemy_battle = stream
+					current_soundtrack.arrival_enemy_battle_filename = filename
+				8:
+					current_soundtrack.victory_1 = stream
+					current_soundtrack.victory_1_filename = filename
+				9:
+					current_soundtrack.victory_2 = stream
+					current_soundtrack.victory_2_filename = filename
+				10:
+					current_soundtrack.goal_failed = stream
+					current_soundtrack.goal_failed_filename = filename
+				11:
+					current_soundtrack.player_dead = stream
+					current_soundtrack.player_dead_filename = filename
 				
 			track_index += 1
 				

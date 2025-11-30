@@ -7,6 +7,7 @@ extends "res://scripts/resources/core/wcs_base_resource.gd"
 ## Maps to sounds.tbl entries.
 
 @export var signature: int = -1
+@export var filename: String = ""
 @export var audio_stream: AudioStream
 @export var preload_sound: bool = false
 @export var default_volume: float = 1.0
