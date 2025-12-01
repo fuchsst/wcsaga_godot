@@ -5,5 +5,11 @@ const StarBitmapData = preload("res://scripts/resources/environment/stars/star_b
 ## A set of background elements (suns + star bitmaps)
 ## Multiple sets can exist in a mission
 
+const MissionEnums = preload("res://scripts/resources/missions/mission_enums.gd")
+
 @export var suns: Array[SunData] = []
 @export var bitmaps: Array[StarBitmapData] = []
+
+# Skybox overrides if any
+@export var skybox: Sky = null # Godot Sky resource
+@export var skybox_flags: Array[MissionEnums.SkyboxFlags] = []

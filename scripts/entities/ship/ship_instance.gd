@@ -11,15 +11,15 @@ var faction: String = ""
 var pilot_name: String = ""
 
 # Core TRES data references
-var ship_stats: ShipStats = null  # Converted ship data from TBL
-var species_data: SpeciesData = null  # Associated species data
+var ship_stats: ShipStats = null # Converted ship data from TBL
+var species_data: SpeciesData = null # Associated species data
 
 # System integration components
-var physics_data: ShipPhysicsData = null  # Physics state and properties
-var weapon_systems: Array[WeaponSystem] = []  # Integrated weapon systems
-var visual_instance: Node3D = null  # Visual/model representation
-var audio_data: ShipAudioData = null  # Audio cues and effects
-var mission_data: Dictionary = {}  # Mission-specific data
+var physics_data: ShipPhysicsData = null # Physics state and properties
+var weapon_systems: Array[WeaponSystem] = [] # Integrated weapon systems
+var visual_instance: Node3D = null # Visual/model representation
+var audio_data: ShipAudioData = null # Audio cues and effects
+var mission_data: Dictionary = {} # Mission-specific data
 
 # Current state
 var current_position: Vector3 = Vector3.ZERO
@@ -27,7 +27,7 @@ var current_velocity: Vector3 = Vector3.ZERO
 var current_rotation: Vector3 = Vector3.ZERO
 var current_angular_velocity: Vector3 = Vector3.ZERO
 
-// Health and damage system
+# Health and damage system
 var current_hitpoints: int = 100
 var current_shield_strength: float = 0.0
 var current_weapon_energy: float = 0.0
@@ -35,7 +35,7 @@ var current_afterburner_fuel: float = 0.0
 var damage_feedback: Array[DamageResult] = []
 var last_damage_time: float = 0.0
 
-// Systems status
+# Systemsstatus
 var systems_online: bool = true
 var shield_generators_online: bool = true
 var weapon_systems_online: bool = true
@@ -44,9 +44,9 @@ var life_support_online: bool = true
 var sensors_online: bool = true
 var communications_online: bool = true
 
-var subsystem_damage_status: Dictionary = {}  # Subsystem name -> damage percent
+var subsystem_damage_status: Dictionary = {} # Subsystem name -> damage percent
 
-// Performance tracking
+# Performancetracking
 var last_access_time: float = 0.0
 var frame_count: int = 0
 var performance_stats: Dictionary = {
@@ -57,13 +57,13 @@ var performance_stats: Dictionary = {
 	"damage_applications": 0
 }
 
-// Visual effects
+# Visualeffects
 var shield_effect: Node = null
 var engine_trail_effect: Node = null
 var weapon_flash_effects: Array = []
 var damage_spark_effects: Array = []
 
-// TRES-based game mechanics
+# TRES - basedgamemechanics
 func initialize_from_tres_data() -> void:
 	"""Initialize ship based on converted TRES data"""
 	if not ship_stats:
@@ -118,7 +118,7 @@ func connect_internal_signals() -> void:
 	# Add signal connections for various events
 	pass
 
-// TRES-based ship mechanics
+# TRES-based ship mechanics
 func apply_damage(damage_type: String, damage_amount: float, impact_point: Vector3, damage_source) -> DamageResult:
 	"""Apply damage based on TRES ship armor and shield data"""
 	performance_stats["damage_applications"] += 1
@@ -164,7 +164,7 @@ func calculate_tres_based_damage(damage_type: String, damage_amount: float, impa
 	result.impact_point = impact_point
 
 	# Calculate impact angle and surface multipliers
-	var impact_normal = Vector3(0, 0, 1)  # Simplified - would be calculated from geometry
+	var impact_normal = Vector3(0, 0, 1) # Simplified - would be calculated from geometry
 	var impact_angle = calculate_impact_angle(impact_point, impact_normal)
 
 	# Apply armor multipliers based on hit location
@@ -174,7 +174,7 @@ func calculate_tres_based_damage(damage_type: String, damage_amount: float, impa
 	var right_mult = ship_stats.armor_thickness.get("right_cm", 1.0)
 
 	# Use angle to determine which armor face
-	result.surface_multiplier = 1.0  # Simplified calculation
+	result.surface_multiplier = 1.0 # Simplified calculation
 
 	# Apply shield effectiveness
 	var shield_modifier = 1.0 - (current_shield_strength / max(ship_stats.shield_strength, 1.0))
@@ -220,12 +220,12 @@ func update_system_status_from_subsystems() -> void:
 	systems_online = average_damage < 0.9
 	shield_generators_online = average_damage < 0.7
 	weapon_systems_online = average_damage < 0.8
-	engine_systems_online = average_damage < 0.6  # Engines fail fastest
+	engine_systems_online = average_damage < 0.6 # Engines fail fastest
 	life_support_online = average_damage < 0.5
 	sensors_online = average_damage < 0.3
 	communications_online = average_damage < 0.2
 
-// Ship systems management
+# Ship systems management
 func update_ai_behavior(delta: float, target_info: Dictionary) -> void:
 	"""Update AI behavior based on species and ship characteristics"""
 	if not species_data:
@@ -240,7 +240,7 @@ func update_ai_behavior(delta: float, target_info: Dictionary) -> void:
 
 	# Modify behavior based on ship damage
 	var damage_factor = 1.0 - (current_hitpoints / max(ship_stats.hull_hitpoints, 1.0))
-	aggression_level *= (1.0 - damage_factor * 0.5)  # Damage reduces aggression
+	aggression_level *= (1.0 - damage_factor * 0.5) # Damage reduces aggression
 
 	# Implement AI behavior logic here
 	pass
@@ -273,7 +273,7 @@ func update_energy_management(delta: float) -> void:
 
 	current_weapon_energy = min(max_energy, current_weapon_energy + energy_regen * delta)
 
-// Physics and movement
+# Physics and movement
 func update_physics_data(delta: float, input_state: Dictionary) -> ShipPhysicsUpdate:
 	"""Update physics based on TRES ship characteristics"""
 	if not physics_data or not engine_systems_online:
@@ -338,11 +338,11 @@ func update_damage_effects() -> void:
 	var current_time = Time.get_ticks_msec() / 1000.0
 	var time_since_last_damage = current_time - last_damage_time
 
-	if time_since_last_damage < 2.0:  # Show effects for 2 seconds after damage
+	if time_since_last_damage < 2.0: # Show effects for 2 seconds after damage
 		# Show spark effects
 		pass
 
-// Navigation and targeting (TRES-based)
+# Navigation and targeting (TRES-based)
 func calculate_targeting_solution(target_info: Dictionary) -> Dictionary:
 	"""Calculate targeting solution based on TRES weapon and ship data"""
 	if not weapon_systems_online or weapon_systems.is_empty():
@@ -373,7 +373,7 @@ func calculate_weapon_targeting_solution(weapon_system: WeaponSystem, target_inf
 	var weapon_data = weapon_system.weapon_data
 	var range_factor = 1.0 - (current_position.distance_to(target_info.position) / weapon_data.range_meters)
 	var velocity_factor = min(1.0, target_info.velocity.length() / weapon_data.velocity_mps)
-	var skill_factor = 1.0  # Would use pilot skill
+	var skill_factor = 1.0 # Would use pilot skill
 
 	var hit_probability = range_factor * velocity_factor * skill_factor
 
@@ -398,7 +398,7 @@ func find_optimal_weapon_for_target(target_info: Dictionary, weapon_solutions: D
 
 	return best_weapon
 
-// API for external systems
+# API for external systems
 func get_ship_status() -> Dictionary:
 	"""Get comprehensive ship status"""
 	return {

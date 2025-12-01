@@ -1,10 +1,13 @@
-class_name GameStateMachine
 extends LimboHSM
 
 # Global State Machine (LimboAI Refactor)
 # Manages high-level game states using Hierarchical State Machine
 
 # State Nodes
+const GameStateIntro = preload("res://scripts/core/game_state/states/GameStateIntro.gd")
+const GameStateMainMenu = preload("res://scripts/core/game_state/states/GameStateMainMenu.gd")
+const GameStateGameplay = preload("res://scripts/core/game_state/states/GameStateGameplay.gd")
+
 var state_intro: GameStateIntro
 var state_main_menu: GameStateMainMenu
 var state_gameplay: GameStateGameplay

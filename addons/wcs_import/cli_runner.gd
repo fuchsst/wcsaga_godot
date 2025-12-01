@@ -66,6 +66,7 @@ const MenuGenerator = preload("res://addons/wcs_import/generators/menu_generator
 const MusicGenerator = preload("res://addons/wcs_import/generators/music_generator.gd")
 const SoundGenerator = preload("res://addons/wcs_import/generators/sound_generator.gd")
 const SpeciesGenerator = preload("res://addons/wcs_import/generators/species_generator.gd")
+const MissionGenerator = preload("res://addons/wcs_import/generators/mission_generator.gd")
 
 # Core
 const WCSPathResolver = preload("res://addons/wcs_import/core/path_resolver.gd")
@@ -644,38 +645,12 @@ func _process_ai_classes(input_path: String, output_dir: String) -> bool:
 
 
 func _process_mission(input_path: String, output_dir: String) -> bool:
-	var parser = WCSMissionParser.new()
-
 	# Check extension first
 	if input_path.get_extension() == "fc2":
 		return _process_campaign(input_path, output_dir)
 
-	var res = parser.parse(input_path)
-
-	if res == null:
-		print("Failed to parse mission.")
-		return false
-
-	# Determine output path
-	# Determine output path
-	# output_dir is .../campaigns/{campaign}/missions
-	# We want subfolders based on mission filename?
-	# output_dir is the root for missions, for each mission a subfolder is created, where all assets, directly related to the mission go (e.g. mission.tres, cutscenes, audio)
-
-	var save_dir = output_dir
-
-	DirAccess.make_dir_recursive_absolute(save_dir)
-
-	var filename = input_path.get_file().get_basename() + ".tres"
-	var save_path = save_dir.path_join(filename)
-
-	var err = ResourceSaver.save(res, save_path)
-	if err != OK:
-		print("Failed to save resource: " + save_path)
-	else:
-		print("Saved: " + save_path)
-
-	return true
+	var generator = MissionGenerator.new()
+	return generator.process_mission(input_path, output_dir)
 
 
 func _process_asteroids(input_path: String, output_dir: String) -> bool:

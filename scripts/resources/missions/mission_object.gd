@@ -1,55 +1,61 @@
 extends Resource
 class_name MissionObject
 
-## Mission object/ship instance configuration
-const ObjectSubsystem = preload("res://scripts/resources/missions/object_subsystem.gd")
-# Basic Identity
+const MissionEnums = preload("res://scripts/resources/missions/mission_enums.gd")
+const ShipStats = preload("res://scripts/resources/ships/ship_stats.gd")
+const TextureReplacement = preload("res://scripts/resources/missions/texture_replacement.gd")
+const AIClassResource = preload("res://scripts/resources/ai_classes/ai_class_resource.gd")
+
+## Mission Object (Ship/Wing/Waypoint)
+
 @export var object_name: String = ""
-@export var ship_class: String = ""
+@export var ship: ShipStats = null # Reference to the Ship resource
+
+@export var team: MissionEnums.Team = MissionEnums.Team.UNKNOWN
 @export var team_name: String = ""
 
-# Transform
+@export var callsign: String = ""
 @export var position: Vector3 = Vector3.ZERO
 @export var orientation: Basis = Basis.IDENTITY
-@export var velocity: Vector3 = Vector3.ZERO
 
-# Object State
-@export var flags: Array[String] = []
-@export var flags2: Array[String] = []
-@export var ai_behavior: String = ""
-@export var status: String = ""
+# AI
+@export var ai_behavior: MissionEnums.AIBehavior = MissionEnums.AIBehavior.NONE
+@export var ai_behavior_name: String = ""
+@export var ai_class: AIClassResource = null # Reference to AIClassResource
+@export var ai_goals: String = "" # Formula string
+
+# Status
 @export var cargo: String = ""
+@export var initial_hull: int = 100
+@export var initial_shields: int = 100
+@export var initial_subsystems: Array[String] = []
 
-# Initial Condition
-@export var initial_hull: float = 100.0
-@export var initial_shields: float = 100.0
-@export var initial_velocity: float = 0.0
+# Flags
+@export var flags: Array[MissionEnums.ShipFlags] = []
+@export var flags2: Array[MissionEnums.ShipFlags2] = []
 
-# Arrival
-@export var arrival_location: String = ""
-@export var arrival_distance: float = 0.0
-@export var arrival_anchor: String = ""
-@export var arrival_delay: float = 0.0
-@export var arrival_cue: String = ""
+# Arrival/Departure
+@export var arrival_location: MissionEnums.ArrivalLocation = MissionEnums.ArrivalLocation.HYPERSPACE
+@export var arrival_cue: String = "" # Formula
+@export var departure_location: MissionEnums.DepartureLocation = MissionEnums.DepartureLocation.HYPERSPACE
+@export var departure_cue: String = "" # Formula
+@export var determination: int = 10
 
-# Departure
-@export var departure_location: String = ""
-@export var departure_anchor: String = ""
-@export var departure_delay: float = 0.0
-@export var departure_cue: String = ""
+# Misc
+@export var respawn_priority: int = 0
+@export var orders_accepted: Array[MissionEnums.OrdersAccepted] = []
 
-# Orders and AI
-@export var orders: String = ""
-@export var determination: String = ""
+@export var group: int = 0
+@export var score: int = 0
+@export var persona_index: int = 0
+@export var use_table_score: bool = false
 
-# Multiplayer/Identification
-@export var callsign: String = ""
-@export var alt_name: String = ""
-@export var net_type: String = ""
-@export var respawn: String = ""
+@export var texture_replacements: Array[TextureReplacement] = []
 
-# Alternative ship classes
-@export var alt_classes: Array[String] = []
+@export var escort_priority: int = 0
+@export var respawn_count: int = 0
+@export var special_explosion: String = ""
+@export var kamikaze_damage: int = 0
 
-# Subsystems
-@export var subsystems: Array[ObjectSubsystem] = []
+@export var special_hitpoints: int = -1
+@export var special_shield_points: int = -1

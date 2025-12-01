@@ -47,7 +47,13 @@ func _parse_content() -> Variant:
 func _get_next_line() -> String:
 	if _current_line_index >= _lines.size():
 		return ""
-	var line = _lines[_current_line_index].strip_edges()
+	var line = _lines[_current_line_index]
+	# Strip comments
+	var comment_idx = line.find(";")
+	if comment_idx != -1:
+		line = line.substr(0, comment_idx)
+	
+	line = line.strip_edges()
 	_current_line_index += 1
 	return line
 
@@ -55,7 +61,13 @@ func _get_next_line() -> String:
 func _peek_next_line() -> String:
 	if _current_line_index >= _lines.size():
 		return ""
-	return _lines[_current_line_index].strip_edges()
+	var line = _lines[_current_line_index]
+	# Strip comments
+	var comment_idx = line.find(";")
+	if comment_idx != -1:
+		line = line.substr(0, comment_idx)
+		
+	return line.strip_edges()
 
 
 func _has_more_lines() -> bool:
@@ -65,7 +77,7 @@ func _has_more_lines() -> bool:
 func _skip_empty_lines():
 	while _has_more_lines():
 		var line = _lines[_current_line_index].strip_edges()
-		if line.is_empty() or line.begins_with(";"):  # Skip comments too
+		if line.is_empty() or line.begins_with(";"): # Skip comments too
 			_current_line_index += 1
 		else:
 			break
@@ -108,7 +120,20 @@ func _parse_color(line: String) -> Color:
 
 func _extract_string_value(line: String, prefix: String) -> String:
 	if line.begins_with(prefix):
-		return line.substr(prefix.length()).strip_edges()
+		var val = line.substr(prefix.length()).strip_edges()
+		# Strip XSTR("...", -1) wrapper if present
+		if val.begins_with("XSTR(\""):
+			var end_quote = val.rfind("\",")
+			if end_quote != -1:
+				return val.substr(6, end_quote - 6)
+			# Handle case where it might just be XSTR("text", -1) or similar variations
+			end_quote = val.rfind("\"")
+			if end_quote > 6:
+				return val.substr(6, end_quote - 6)
+		# Also strip simple quotes if present
+		if val.begins_with("\"") and val.ends_with("\""):
+			return val.substr(1, val.length() - 2)
+		return val
 	return ""
 
 

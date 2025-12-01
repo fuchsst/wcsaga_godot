@@ -63,13 +63,3 @@ func _handle_movement(delta: float) -> void:
 	torque += forward_dir * roll * rotation_speed.z
 	
 	apply_torque(torque)
-
-# IFF Interface
-func get_iff_color() -> Color:
-	return IFFManager.get_iff_color(iff_team)
-
-func is_enemy(other_ship: Ship) -> bool:
-	return IFFInterface.are_enemies(iff_team, other_ship.iff_team)
-
-func get_perceived_color_of(other_ship: Ship) -> Color:
-	return IFFInterface.get_perceived_color(iff_team, other_ship.iff_team)

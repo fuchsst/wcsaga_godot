@@ -1,12 +1,9 @@
 extends Resource
 class_name MissionMessage
 
-## In-mission communication message
+const MissionEnums = preload("res://scripts/resources/missions/mission_enums.gd")
+const PersonaResource = preload("res://scripts/resources/persona/persona_resource.gd")
 
-@export var message_name: String = ""
-@export var team: String = ""  # Team the message relates to
-@export var message_text: String = ""
-@export var persona_name: String = ""  # Persona delivering the message
-@export var avi_filename: String = ""  # Video file (if any)
-@export var wave_filename: String = ""  # Audio file path
-@export var wave_audio: AudioStream = null  # Loaded audio stream
+@export var team: MissionEnums.Team = MissionEnums.Team.UNKNOWN
+@export var persona: PersonaResource = null
+@export var message_key: String = "" # Key in the persona's message dictionary

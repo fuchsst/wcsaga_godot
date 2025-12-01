@@ -1,4 +1,3 @@
-class_name InputManager
 extends Node
 
 # Centralized Input Management
