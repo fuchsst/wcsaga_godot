@@ -1,5 +1,5 @@
 class_name PlayerParser
-extends BaseSectionParser
+extends "res://addons/wcs_import/parsers/mission_sections/base_section_parser.gd"
 
 ## Parses the Players section (#Players)
 ## Handles starting ship, ship choices, and weaponry pool

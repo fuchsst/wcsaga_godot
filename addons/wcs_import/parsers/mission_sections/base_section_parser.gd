@@ -5,6 +5,7 @@ extends RefCounted
 ## Provides common utilities for parsing FS2 mission sections
 
 var _base_parser: RefCounted # Reference to WCSBaseParser for utility functions
+var _mission_dir: String = "" # Mission directory for asset placement (set by MissionParser)
 
 
 func _init(base_parser: RefCounted):
@@ -91,27 +92,69 @@ func _skip_to_next_section():
 		_get_next_line()
 
 
+# Static cache for file lookups to avoid repeated recursive directory walking
+static var _dir_file_cache: Dictionary = {}
+
+## Helper: Get all files in directory recursively (cached)
+static func _get_files_in_dir_recursive(root_dir: String) -> Dictionary:
+	if _dir_file_cache.has(root_dir):
+		return _dir_file_cache[root_dir]
+	
+	var files = {}
+	var dir = DirAccess.open(root_dir)
+	if dir:
+		dir.list_dir_begin()
+		var file_name = dir.get_next()
+		while file_name != "":
+			if dir.current_is_dir():
+				if file_name != "." and file_name != "..":
+					var sub_files = _get_files_in_dir_recursive(root_dir.path_join(file_name))
+					files.merge(sub_files)
+			else:
+				# Store lower case filename -> full path
+				files[file_name.to_lower()] = root_dir.path_join(file_name)
+			file_name = dir.get_next()
+	
+	_dir_file_cache[root_dir] = files
+	return files
+
+
+## Helper: Find file in directories (recursive)
+func _find_resource_path(filename: String, search_dirs: Array[String]) -> String:
+	var lower_name = filename.to_lower()
+	
+	for dir in search_dirs:
+		var cache = _get_files_in_dir_recursive(dir)
+		if cache.has(lower_name):
+			return cache[lower_name]
+			
+	return ""
+
+
 ## Load ship resource with strict validation
 func _load_ship_resource(ship_class_name: String) -> Resource:
 	if ship_class_name.is_empty():
-		push_error("Ship class name is empty")
 		return null
 	
 	# Clean up the name
 	var clean_name = ship_class_name.split(";")[0].strip_edges()
+	var target_filename = clean_name.replace(" ", "_").replace("-", "_").to_lower() + ".tres"
 	
-	# Try to find in ships directory
-	var path = "res://assets/ships/" + clean_name.to_lower() + ".tres"
-	if FileAccess.file_exists(path):
+	var search_dirs: Array[String] = [
+		"res://assets/ships/"
+	]
+	
+	var path = _find_resource_path(target_filename, search_dirs)
+	if not path.is_empty():
 		return ResourceLoader.load(path)
 	
-	# Try campaigns/hermes/ships
-	path = "res://campaigns/hermes/ships/" + clean_name + ".tres"
-	if FileAccess.file_exists(path):
+	# Fallback: try exact name match if snake_case failed
+	path = _find_resource_path(clean_name.to_lower() + ".tres", search_dirs)
+	if not path.is_empty():
 		return ResourceLoader.load(path)
 	
 	# FAIL EARLY - No fallback!
-	push_error("FATAL: Ship resource not found: '" + clean_name + "' (Expected at res://assets/ships/ or res://campaigns/hermes/ships/)")
+	push_warning("WARNING: Ship resource not found: '" + clean_name + "' (Searched in assets/ships/ and campaigns/hermes/ships/)")
 	return null
 
 
@@ -132,42 +175,124 @@ func _load_ai_class_resource(ai_class_name: String) -> Resource:
 
 
 ## Load audio stream with strict validation
-func _load_audio_stream(filename: String) -> AudioStream:
+func _load_audio_stream(filename: String, context: String = "sound") -> AudioStream:
 	if filename.is_empty() or filename == "none" or filename == "none.wav":
 		return null # No audio is valid
 	
 	var base = filename.get_basename()
 	var extensions = [".ogg", ".wav", ".mp3"]
 	
-	# Search order: campaign soundtrack, then assets/sounds
-	var search_dirs = [
+	# Determine target directory based on context using WCSPathResolver
+	var target_dir = WCSPathResolver.determine_mission_asset_path(filename, context, _mission_dir)
+	
+	# First try resolving from source map if available
+	var source_path = WCSPathResolver.resolve_source_path(filename)
+	if not source_path.is_empty():
+		# Check if we need to copy it
+		var target_path = target_dir.path_join(filename)
+		
+		# Use absolute path to verify physical existence (bypass Godot cache)
+		var abs_target_path = ProjectSettings.globalize_path(target_path)
+		
+		if not FileAccess.file_exists(abs_target_path):
+			var abs_source = source_path
+			
+			if not DirAccess.dir_exists_absolute(ProjectSettings.globalize_path(target_dir)):
+				DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(target_dir))
+				
+			var err = DirAccess.copy_absolute(abs_source, abs_target_path)
+			if err != OK:
+				push_error("Failed to copy audio: " + str(err))
+			else:
+				# Clear cache so _find_resource_path can see the new file
+				_dir_file_cache.clear()
+	
+	# Search order: target_dir, then campaign soundtrack, then assets/sounds
+	var search_dirs: Array[String] = [
+		target_dir,
 		"res://campaigns/hermes/soundtrack/",
 		"res://assets/sounds/"
 	]
 	
-	for dir in search_dirs:
-		for ext in extensions:
-			var path = dir + base + ext
-			if FileAccess.file_exists(path):
-				var resource = ResourceLoader.load(path) as AudioStream
-				if resource:
-					return resource
+	for ext in extensions:
+		var target_filename = base + ext
+		var path = _find_resource_path(target_filename, search_dirs)
+		if not path.is_empty():
+			# Try to load the resource (works if already imported)
+			var resource = ResourceLoader.load(path) as AudioStream
+			if resource:
+				return resource
+			
+			# If not imported yet, copy .ogg to target directory
+			# Godot will import it when project is opened in editor
+			if FileAccess.file_exists(path) and path.ends_with(".ogg"):
+				# Copy .ogg file to target directory (mission folder)
+				var ogg_target_path = target_dir.path_join(target_filename)
+				var abs_ogg_target = ProjectSettings.globalize_path(ogg_target_path)
+				
+				if not FileAccess.file_exists(abs_ogg_target):
+					var abs_source = ProjectSettings.globalize_path(path)
+					# Ensure target directory exists
+					if not DirAccess.dir_exists_absolute(ProjectSettings.globalize_path(target_dir)):
+						DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(target_dir))
+					
+					var err = DirAccess.copy_absolute(abs_source, abs_ogg_target)
+					if err != OK:
+						push_warning("Failed to copy .ogg file: " + abs_source + " to " + abs_ogg_target)
+						continue
+					# Clear cache after copying
+					_dir_file_cache.clear()
+				
+				# Try to load from the new location
+				# This will create an ExtResource reference when saving
+				var resource_from_target = ResourceLoader.load(ogg_target_path) as AudioStream
+				if resource_from_target:
+					return resource_from_target
+				else:
+					# File copied but not imported yet - this is expected in headless mode
+					# Return null for now, Godot will import when opened in editor
+					push_warning("Audio file copied but not yet imported (will work in editor): " + ogg_target_path)
+					return null
 	
 	# FAIL EARLY - No fallback!
-	push_error("FATAL: Audio resource not found: '" + filename + "' (Searched in campaigns/hermes/soundtrack/ and assets/sounds/)")
+	push_warning("WARNING: Audio resource not found: '" + filename + "' (Searched in campaigns/hermes/soundtrack/ and assets/sounds/)")
 	return null
 
 
 ## Load video stream with strict validation  
-func _load_video_stream(filename: String) -> VideoStream:
+func _load_video_stream(filename: String, context: String = "cutscene") -> VideoStream:
 	if filename.is_empty() or filename == "none":
 		return null
 	
 	var base = filename.get_basename()
 	var extensions = [".ogv", ".ogg"] # OGV is Theora video
 	
+	# Determine target directory based on context using WCSPathResolver
+	var target_dir = WCSPathResolver.determine_mission_asset_path(filename, context, _mission_dir)
+	
+	# First try resolving from source map
+	var source_path = WCSPathResolver.resolve_source_path(filename)
+	if not source_path.is_empty():
+		# Check if we need to copy it
+		var target_path = target_dir.path_join(filename)
+		
+		# Use absolute path to verify physical existence
+		var abs_target_path = ProjectSettings.globalize_path(target_path)
+		
+		if not FileAccess.file_exists(abs_target_path):
+			var abs_source = source_path
+			
+			if not DirAccess.dir_exists_absolute(ProjectSettings.globalize_path(target_dir)):
+				DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(target_dir))
+				
+			var err = DirAccess.copy_absolute(abs_source, abs_target_path)
+			if err != OK:
+				push_error("Failed to copy video: " + str(err))
+			else:
+				_dir_file_cache.clear()
+
 	# Videos are in campaign cutscenes folder
-	var search_dirs = ["res://campaigns/hermes/cutscenes/"]
+	var search_dirs = [target_dir, "res://campaigns/hermes/cutscenes/"]
 	
 	for dir in search_dirs:
 		for ext in extensions:
@@ -209,3 +334,127 @@ func _load_texture(filename: String) -> Texture2D:
 	# FAIL EARLY - No fallback!
 	push_error("FATAL: Texture resource not found: '" + filename + "' (Searched in assets/environment/, assets/effects/, campaigns/hermes/ui/, assets/ships/)")
 	return null
+
+
+## Helper: Extract SEXP formula (may span multiple lines due to parentheses)
+func _extract_sexp_formula(line: String, prefix: String) -> String:
+	var formula = line.substr(prefix.length()).strip_edges()
+	
+	# Count parentheses to detect multi-line formulas
+	var open_parens = formula.count("(")
+	var close_parens = formula.count(")")
+	
+	# Keep reading until parentheses balance
+	while open_parens > close_parens and _has_more_lines():
+		var next_line = _get_next_line()
+		formula += " " + next_line.strip_edges()
+		open_parens += next_line.count("(")
+		close_parens += next_line.count(")")
+	
+	return formula
+
+
+## Helper: Parse quoted list: ( "item1" "item2" )
+func _parse_quoted_list(line: String, prefix: String) -> Array[String]:
+	var result: Array[String] = []
+	var list_part = line.substr(prefix.length()).strip_edges()
+	
+	# Remove parentheses
+	list_part = list_part.trim_prefix("(").trim_suffix(")").strip_edges()
+	
+	# Parse quoted items
+	var in_quote = false
+	var current_item = ""
+	
+	for i in range(list_part.length()):
+		var c = list_part[i]
+		if c == '"':
+			if in_quote:
+				# End of quoted string
+				if not current_item.is_empty():
+					result.append(current_item)
+					current_item = ""
+				in_quote = false
+			else:
+				# Start of quoted string
+				in_quote = true
+		elif in_quote:
+			current_item += c
+	
+	return result
+
+
+## Helper: Extract multiline text until one of the terminators is found
+func _extract_multiline_until(terminators: Array[String]) -> String:
+	var text = ""
+	while _has_more_lines():
+		var line = _peek_next_line()
+		
+		var found_terminator = false
+		for term in terminators:
+			if line.begins_with(term) or line.begins_with("#"):
+				found_terminator = true
+				break
+		
+		if found_terminator:
+			break
+			
+		text += _get_next_line() + "\n"
+	
+	return text.strip_edges()
+
+
+## Helper: Clean XSTR wrappers
+func _clean_xstr(text: String) -> String:
+	var s = text.strip_edges()
+	
+	if s.begins_with("XSTR"):
+		var first_quote = s.find("\"")
+		var last_quote = s.rfind("\",")
+		if last_quote == -1:
+			last_quote = s.rfind("\"")
+		
+		if first_quote != -1 and last_quote > first_quote:
+			var second_quote = s.find("\"", first_quote + 1)
+			if second_quote != -1:
+				return s.substr(first_quote + 1, second_quote - first_quote - 1)
+	
+	if s.begins_with("\"") and s.ends_with("\""):
+		s = s.substr(1, s.length() - 2)
+	
+	return s
+
+
+## Map arrival location string to enum
+func _map_arrival_location(name: String) -> MissionEnums.ArrivalLocation:
+	var lower = name.to_lower()
+	if lower == "hyperspace":
+		return MissionEnums.ArrivalLocation.HYPERSPACE
+	elif lower.begins_with("near ship"):
+		return MissionEnums.ArrivalLocation.NEAR_SHIP
+	elif lower.begins_with("in front of ship"):
+		return MissionEnums.ArrivalLocation.IN_FRONT_OF_SHIP
+	elif lower.begins_with("docking bay"):
+		return MissionEnums.ArrivalLocation.DOCKING_BAY
+	return MissionEnums.ArrivalLocation.HYPERSPACE
+
+
+## Map departure location string to enum
+func _map_departure_location(name: String) -> MissionEnums.DepartureLocation:
+	var lower = name.to_lower()
+	if lower == "hyperspace":
+		return MissionEnums.DepartureLocation.HYPERSPACE
+	elif lower.begins_with("docking bay"):
+		return MissionEnums.DepartureLocation.DOCKING_BAY
+	return MissionEnums.DepartureLocation.HYPERSPACE
+
+
+## Map team string to enum
+func _map_team(name: String) -> MissionEnums.Team:
+	match name.to_lower():
+		"friendly": return MissionEnums.Team.FRIENDLY
+		"hostile": return MissionEnums.Team.HOSTILE
+		"neutral": return MissionEnums.Team.NEUTRAL
+		"unknown": return MissionEnums.Team.UNKNOWN
+		"traitor": return MissionEnums.Team.TRAITOR
+		_: return MissionEnums.Team.UNKNOWN

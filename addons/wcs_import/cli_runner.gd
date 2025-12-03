@@ -210,7 +210,8 @@ func _run():
 
 	# Build file map first
 	_build_file_map(default_source_root)
-
+	WCSPathResolver.file_map = _file_map
+	
 	if args.has("input"):
 		# Single file mode
 		var input_path = args["input"]

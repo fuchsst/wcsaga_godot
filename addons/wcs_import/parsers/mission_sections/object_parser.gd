@@ -1,12 +1,9 @@
 class_name ObjectParser
-extends BaseSectionParser
+extends "res://addons/wcs_import/parsers/mission_sections/base_section_parser.gd"
 
-## Parses the Objects section (#Objects)
-## Handles ships, stations, and all mission objects
-
-const MissionEnums = preload("res://scripts/resources/missions/mission_enums.gd")
+# MissionObject is loaded dynamically to avoid cyclic dependency issues if any
 const MissionObject = preload("res://scripts/resources/missions/mission_object.gd")
-
+# MissionEnums is used via global class_name
 
 func parse_section(start_index: int, manifest: Resource) -> int:
 	# Objects are parsed one at a time, each starting with $Name:
@@ -61,8 +58,8 @@ func _parse_single_object(manifest: Resource):
 
 func _parse_object_field(line: String, obj: MissionObject):
 	if line.begins_with("$Class:"):
-		var class_name = _extract_string_value(line, "$Class:")
-		obj.ship = _load_ship_resource(class_name )
+		var ship_class_name = _extract_string_value(line, "$Class:")
+		obj.ship = _load_ship_resource(ship_class_name)
 	
 	elif line.begins_with("$Callsign:"):
 		obj.callsign = _extract_string_value(line, "$Callsign:")
@@ -95,7 +92,7 @@ func _parse_object_field(line: String, obj: MissionObject):
 		obj.ai_goals = _extract_sexp_formula(line, "$AI Goals:")
 	
 	elif line.begins_with("$Cargo 1:"):
-		obj.cargo = _clean_xstr(_extract_string_value(line, "$Cargo 1:"))
+		obj.cargo = _extract_string_value(line, "$Cargo 1:")
 	
 	elif line.begins_with("+Initial Hull:"):
 		obj.initial_hull = _extract_int_value(line, "+Initial Hull:")
@@ -158,24 +155,6 @@ func _parse_object_field(line: String, obj: MissionObject):
 		obj.escort_priority = _extract_int_value(line, "+Escort Priority:")
 
 
-## Helper: Extract SEXP formula (may span multiple lines due to parentheses)
-func _extract_sexp_formula(line: String, prefix: String) -> String:
-	var formula = line.substr(prefix.length()).strip_edges()
-	
-	# Count parentheses to detect multi-line formulas
-	var open_parens = formula.count("(")
-	var close_parens = formula.count(")")
-	
-	# Keep reading until parentheses balance
-	while open_parens > close_parens and _has_more_lines():
-		var next_line = _get_next_line()
-		formula += " " + next_line.strip_edges()
-		open_parens += next_line.count("(")
-		close_parens += next_line.count(")")
-	
-	return formula
-
-
 ## Helper: Parse flag list from parenthesized string list
 func _parse_flag_list(line: String, prefix: String) -> Array[MissionEnums.ShipFlags]:
 	var result: Array[MissionEnums.ShipFlags] = []
@@ -202,68 +181,6 @@ func _parse_flag2_list(line: String, prefix: String) -> Array[MissionEnums.ShipF
 	return result
 
 
-## Helper: Parse quoted list: ( "item1" "item2" )
-func _parse_quoted_list(line: String, prefix: String) -> Array[String]:
-	var result: Array[String] = []
-	var list_part = line.substr(prefix.length()).strip_edges()
-	
-	# Remove parentheses
-	list_part = list_part.trim_prefix("(").trim_suffix(")").strip_edges()
-	
-	# Parse quoted items
-	var in_quote = false
-	var current_item = ""
-	
-	for i in range(list_part.length()):
-		var c = list_part[i]
-		if c == '"':
-			if in_quote:
-				# End of quoted string
-				if not current_item.is_empty():
-					result.append(current_item)
-					current_item = ""
-				in_quote = false
-			else:
-				# Start of quoted string
-				in_quote = true
-		elif in_quote:
-			current_item += c
-	
-	return result
-
-
-## Helper: Clean XSTR wrappers
-func _clean_xstr(text: String) -> String:
-	var s = text.strip_edges()
-	
-	if s.begins_with("XSTR"):
-		var first_quote = s.find("\"")
-		var last_quote = s.rfind("\",")
-		if last_quote == -1:
-			last_quote = s.rfind("\"")
-		
-		if first_quote != -1 and last_quote > first_quote:
-			var second_quote = s.find("\"", first_quote + 1)
-			if second_quote != -1:
-				return s.substr(first_quote + 1, second_quote - first_quote - 1)
-	
-	if s.begins_with("\"") and s.ends_with("\""):
-		s = s.substr(1, s.length() - 2)
-	
-	return s
-
-
-## Map team string to enum
-func _map_team(name: String) -> MissionEnums.Team:
-	match name.to_lower():
-		"friendly": return MissionEnums.Team.FRIENDLY
-		"hostile": return MissionEnums.Team.HOSTILE
-		"neutral": return MissionEnums.Team.NEUTRAL
-		"unknown": return MissionEnums.Team.UNKNOWN
-		"traitor": return MissionEnums.Team.TRAITOR
-		_: return MissionEnums.Team.UNKNOWN
-
-
 ## Map AI behavior string to enum
 func _map_ai_behavior(name: String) -> MissionEnums.AIBehavior:
 	match name.to_lower():
@@ -278,30 +195,6 @@ func _map_ai_behavior(name: String) -> MissionEnums.AIBehavior:
 		"waypoints": return MissionEnums.AIBehavior.WAYPOINTS
 		"dock": return MissionEnums.AIBehavior.DOCK
 		_: return MissionEnums.AIBehavior.NONE
-
-
-## Map arrival location string to enum
-func _map_arrival_location(name: String) -> MissionEnums.ArrivalLocation:
-	var lower = name.to_lower()
-	if lower == "hyperspace":
-		return MissionEnums.ArrivalLocation.HYPERSPACE
-	elif lower.begins_with("near ship"):
-		return MissionEnums.ArrivalLocation.NEAR_SHIP
-	elif lower.begins_with("in front of ship"):
-		return MissionEnums.ArrivalLocation.IN_FRONT_OF_SHIP
-	elif lower.begins_with("docking bay"):
-		return MissionEnums.ArrivalLocation.DOCKING_BAY
-	return MissionEnums.ArrivalLocation.HYPERSPACE
-
-
-## Map departure location string to enum
-func _map_departure_location(name: String) -> MissionEnums.DepartureLocation:
-	var lower = name.to_lower()
-	if lower == "hyperspace":
-		return MissionEnums.DepartureLocation.HYPERSPACE
-	elif lower.begins_with("docking bay"):
-		return MissionEnums.DepartureLocation.DOCKING_BAY
-	return MissionEnums.DepartureLocation.HYPERSPACE
 
 
 ## Map ship flag string to enum

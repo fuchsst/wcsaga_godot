@@ -24,18 +24,23 @@ func process_mission(source_path: String, output_dir: String) -> bool:
 			return false
 
 	# Determine output filename
-	var filename = source_path.get_file().get_basename() + ".tres"
+	var mission_name = source_path.get_file().get_basename()
+	var filename = "mission.tres"
+	
 	# Force output to target/campaigns/hermes/missions/
 	var mission_output_dir = "res://campaigns/hermes/missions/"
+	var specific_mission_dir = mission_output_dir.path_join(mission_name)
+	
 	# Ensure directory exists (using DirAccess with absolute path)
-	var abs_output_dir = ProjectSettings.globalize_path(mission_output_dir)
+	var abs_output_dir = ProjectSettings.globalize_path(specific_mission_dir)
 	if not DirAccess.dir_exists_absolute(abs_output_dir):
-		DirAccess.make_dir_recursive_absolute(abs_output_dir)
+		var err = DirAccess.make_dir_recursive_absolute(abs_output_dir)
+		if err != OK:
+			push_error("Failed to create mission directory: " + str(err))
 		
-	var output_path = mission_output_dir.path_join(filename)
+	var output_path = specific_mission_dir.path_join(filename)
 
 	# Set source file metadata
-	manifest.source_file = source_path
 	manifest.mission_id = source_path.get_file().get_basename()
 
 	# Save resource

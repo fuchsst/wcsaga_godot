@@ -4,6 +4,21 @@ extends RefCounted
 ## Handles path resolution for WCS assets.
 ## Ports logic from Python PathManager.
 
+static var file_map: Dictionary = {}
+
+static func resolve_source_path(filename: String) -> String:
+	var lower_name = filename.to_lower()
+	if file_map.has(lower_name):
+		return file_map[lower_name]
+	
+	# Try without extension if not found
+	var base_name = filename.get_basename().to_lower()
+	for key in file_map:
+		if key.get_basename() == base_name:
+			return file_map[key]
+			
+	return ""
+
 const MODEL_MAPPINGS = {
 	# Kilrathi models
 	"kif": ["fighter", "kilrathi"],
@@ -172,3 +187,33 @@ static func determine_asset_output_path(filename: String) -> Array:
 			return mapping
 
 	return ["misc", "unknown"]
+
+
+## Determine output path for mission-referenced assets
+## Returns full res:// path where the asset should be placed/searched
+## @param filename: The filename referenced in the mission file
+## @param context: The parsing context ("voice", "cutscene", "music", "sound", etc.)
+## @param mission_dir: Optional mission directory (e.g., "res://campaigns/hermes/missions/Demo-01/")
+static func determine_mission_asset_path(filename: String, context: String, mission_dir: String = "") -> String:
+	var ext = filename.get_extension().to_lower()
+	
+	match context:
+		"voice", "debriefing_voice", "briefing_voice":
+			# Voice files go to the mission folder (same as mission.tres)
+			if not mission_dir.is_empty():
+				return mission_dir
+			# Fallback if mission_dir not provided
+			return "res://campaigns/hermes/voices/"
+		"cutscene", "briefing_cutscene":
+			# Cutscenes go to campaign cutscenes folder
+			return "res://campaigns/hermes/cutscenes/"
+		"music", "soundtrack":
+			# Music goes to campaign soundtrack folder
+			return "res://campaigns/hermes/soundtrack/"
+		"sound", "generic_audio":
+			# Generic sounds go to assets
+			return "res://assets/sounds/"
+		_:
+			# Fallback: use determine_asset_output_path
+			var path_info = determine_asset_output_path(filename)
+			return "res://assets/" + path_info[0] + "/" + path_info[1] + "/"

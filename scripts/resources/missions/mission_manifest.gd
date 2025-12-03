@@ -15,6 +15,7 @@ const CommandBriefingStage = preload("res://scripts/resources/missions/command_b
 const MissionEnums = preload("res://scripts/resources/missions/mission_enums.gd")
 const MissionMetadata = preload("res://scripts/resources/missions/mission_metadata.gd")
 const SexpVariable = preload("res://scripts/resources/missions/sexp_variable.gd")
+const WaypointList = preload("res://scripts/resources/missions/waypoint_list.gd")
 
 ## Root resource for a converted FS2 mission
 
@@ -47,6 +48,7 @@ const SexpVariable = preload("res://scripts/resources/missions/sexp_variable.gd"
 @export var events: Array[MissionEvent] = []
 @export var messages: Array[MissionMessage] = []
 @export var cutscenes: Array[MissionCutscene] = []
+@export var waypoints: Array[WaypointList] = []
 @export var callsigns: Array[String] = []
 
 # Environment

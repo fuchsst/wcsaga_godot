@@ -1,5 +1,5 @@
 class_name MissionInfoParser
-extends BaseSectionParser
+extends "res://addons/wcs_import/parsers/mission_sections/base_section_parser.gd"
 
 ## Parses the Mission Info section (#Mission Info)
 ## Handles version, name, author, dates, flags, wing names, AI profile, skybox, etc.
@@ -45,10 +45,10 @@ func _parse_mission_info_field(line: String, manifest: Resource):
 		manifest.metadata.modified = _extract_string_value(line, "$Modified:")
 	
 	elif line.begins_with("$Notes:"):
-		manifest.metadata.notes = _extract_multiline_until("$End Notes:")
+		manifest.metadata.notes = _extract_multiline_until(["$End Notes:"])
 	
 	elif line.begins_with("$Mission Desc:"):
-		manifest.metadata.description = _clean_xstr(_extract_multiline_until("$end_multi_text"))
+		manifest.metadata.description = _clean_xstr(_extract_multiline_until(["$end_multi_text"]))
 	
 	elif line.begins_with("+Game Type Flags:"):
 		var flags_int = _extract_int_value(line, "+Game Type Flags:")
@@ -104,40 +104,6 @@ func _parse_mission_info_field(line: String, manifest: Resource):
 	
 	elif line.begins_with("$AI Profile:"):
 		manifest.ai_profile = _extract_string_value(line, "$AI Profile:")
-
-
-## Helper: Clean XSTR wrappers from strings
-func _clean_xstr(text: String) -> String:
-	var s = text.strip_edges()
-	
-	# Handle XSTR("Value", -1) format
-	if s.begins_with("XSTR"):
-		var first_quote = s.find("\"")
-		var last_quote = s.rfind("\",")
-		if last_quote == -1:
-			last_quote = s.rfind("\"")
-		
-		if first_quote != -1 and last_quote > first_quote:
-			var second_quote = s.find("\"", first_quote + 1)
-			if second_quote != -1:
-				return s.substr(first_quote + 1, second_quote - first_quote - 1)
-	
-	# Remove surrounding quotes
-	if s.begins_with("\"") and s.ends_with("\""):
-		s = s.substr(1, s.length() - 2)
-	
-	return s
-
-
-## Helper: Extract multiline text until end marker
-func _extract_multiline_until(end_marker: String) -> String:
-	var text = ""
-	while _has_more_lines():
-		var line = _get_next_line()
-		if line.strip_edges() == end_marker:
-			break
-		text += line + "\n"
-	return text.strip_edges()
 
 
 ## Helper: Parse list in parentheses format: ( "Item1" "Item2" )
