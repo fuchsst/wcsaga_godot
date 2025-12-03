@@ -91,7 +91,7 @@ func _convert_asset(source_path: String, target_dir: String, type: String) -> bo
 
 	# uv run python -m converter convert input output --type type
 	var args = [
-		"run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type
+		"run", "--directory", "..", "python", "-m", "converter", global_source, global_target, "--type", type
 	]
 
 	# print("Converting " + type + ": " + global_source + " -> " + global_target)

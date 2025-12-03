@@ -242,6 +242,12 @@ func _load_audio_stream(filename: String, context: String = "sound") -> AudioStr
 						continue
 					# Clear cache after copying
 					_dir_file_cache.clear()
+					
+					# TRIGGER IMPORT: Force Godot to recognize the new file
+					# In headless mode, we need to ensure the importer runs
+					# We can try to append the .import extension to check if it exists, or just load it
+					# Using ResourceLoader with CACHE_MODE_IGNORE might force a re-check
+					var _temp = ResourceLoader.load(ogg_target_path, "", ResourceLoader.CACHE_MODE_IGNORE)
 				
 				# Try to load from the new location
 				# This will create an ExtResource reference when saving
@@ -249,9 +255,18 @@ func _load_audio_stream(filename: String, context: String = "sound") -> AudioStr
 				if resource_from_target:
 					return resource_from_target
 				else:
-					# File copied but not imported yet - this is expected in headless mode
-					# Return null for now, Godot will import when opened in editor
-					push_warning("Audio file copied but not yet imported (will work in editor): " + ogg_target_path)
+					# If standard load fails, try one more time with cache ignore
+					resource_from_target = ResourceLoader.load(ogg_target_path, "", ResourceLoader.CACHE_MODE_IGNORE) as AudioStream
+					if resource_from_target:
+						return resource_from_target
+						
+					# File copied but not imported yet - this is expected in headless mode if auto-import doesn't trigger
+					# However, we need to return the path so it can be referenced
+					# We can return a placeholder or just the path string if the caller supports it?
+					# The caller expects AudioStream.
+					# If we return null, the field is empty.
+					# We really need that import to happen.
+					push_warning("Audio file copied but import failed (headless mode limitation?): " + ogg_target_path)
 					return null
 	
 	# FAIL EARLY - No fallback!

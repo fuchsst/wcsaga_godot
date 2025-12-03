@@ -7,7 +7,7 @@ const PersonaResource = preload("res://scripts/resources/persona/persona_resourc
 # We use globalized paths for source to ensure we can find them outside the project if needed,
 # but here they are in the project source_assets folder.
 const SOURCE_SOUNDS_DIR = "res://../source_assets/wcs_hermes_campaign/hermes_sounds"
-const SOURCE_MOVIES_DIR = "res://../source_assets/wcs_hermes_campaign/hermes_movies"  # Assumption
+const SOURCE_MOVIES_DIR = "res://../source_assets/wcs_hermes_campaign/hermes_movies" # Assumption
 
 
 func generate_persona(persona: PersonaResource, output_root: String, source_root: String) -> void:
@@ -126,7 +126,7 @@ func _convert_asset(source_path: String, target_path: String, type: String) -> b
 
 	# uv run python -m converter convert input output --type type
 	var args = [
-		"run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type
+		"run", "--directory", "..", "python", "-m", "converter", global_source, global_target, "--type", type
 	]
 
 	print("Converting " + type + ": " + global_source + " -> " + global_target)

@@ -11,7 +11,7 @@ func generate(ships: Array, output_dir: String, source_root: String) -> bool:
 		# Determine output path using PathResolver
 		var pof_file = res.model_file
 		if pof_file.is_empty():
-			pof_file = res.ship_class + ".pof"  # Fallback
+			pof_file = res.ship_class + ".pof" # Fallback
 			res.model_file = pof_file
 
 		var path_info = WCSPathResolver.determine_output_path(pof_file)
@@ -50,6 +50,8 @@ func _normalize_filename(name: String) -> String:
 	n = n.replace(" ", "_")
 	n = n.replace("-", "_")
 	n = n.replace("#", "_")
+	n = n.replace("/", "_")
+	n = n.replace("\\", "_")
 	return n
 
 
@@ -93,7 +95,7 @@ func _convert_asset(
 	var global_target = ProjectSettings.globalize_path(target_dir)
 
 	var args = [
-		"run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type
+		"run", "--directory", "..", "python", "-m", "converter", global_source, global_target, "--type", type
 	]
 	args.append_array(extra_args)
 

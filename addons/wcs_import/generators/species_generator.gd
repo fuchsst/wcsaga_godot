@@ -37,16 +37,28 @@ func generate_species_assets(manifest: SpeciesManifest, output_dir: String, sour
 		DirAccess.make_dir_recursive_absolute(output_dir)
 
 	for species in manifest.species_list:
-		var species_dir = output_dir.path_join(species.species_name.to_lower().replace(" ", "_"))
+		var raw_name = species.species_name
+		var folder_name = raw_name.to_lower().replace(" ", "_")
+		
+		# Handle Category: Name format (e.g. Ace: Bloodmist -> ace/bloodmist)
+		if ":" in raw_name:
+			var parts = raw_name.split(":", true, 1)
+			var category = parts[0].strip_edges().to_lower().replace(" ", "_")
+			var name = parts[1].strip_edges().to_lower().replace(" ", "_")
+			folder_name = category.path_join(name)
+			
+		var species_dir = output_dir.path_join(folder_name)
 		if not DirAccess.dir_exists_absolute(species_dir):
 			DirAccess.make_dir_recursive_absolute(species_dir)
 			
 		_convert_species_assets(species, source_root, species_dir)
 		
-		# Also save the resource in the folder
-		var save_path = species_dir.path_join("species_data.tres")
+		# Save the resource as a sibling to the folder (or just in the category folder)
+		# e.g. .../fiction/ace/bloodmist.tres
+		var save_path = output_dir.path_join(folder_name + ".tres")
 		ResourceSaver.save(species, save_path)
-		print("Saved species assets and data to: " + species_dir)
+		print("Saved species data to: " + save_path)
+		print("Saved species assets to: " + species_dir)
 
 	return true
 
@@ -156,7 +168,7 @@ func _convert_asset(source_path: String, target_dir: String, type: String) -> bo
 
 	# uv run python -m converter convert input output --type type
 	var args = [
-		"run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type
+		"run", "--directory", "..", "python", "-m", "converter", global_source, global_target, "--type", type
 	]
 
 	# print("Converting " + type + ": " + global_source + " -> " + global_target)

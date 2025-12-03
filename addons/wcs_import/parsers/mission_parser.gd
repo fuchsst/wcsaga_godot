@@ -77,14 +77,17 @@ func _parse_content() -> Variant:
 			"Command Briefing":
 				# Delegate to CommandBriefingParser
 				var parser = CommandBriefingParser.new(self)
+				parser._mission_dir = mission_dir
 				_current_line_index = parser.parse_section(_current_line_index, manifest)
 			"Briefing":
 				# Delegate to BriefingParser
 				var parser = BriefingParser.new(self)
+				parser._mission_dir = mission_dir
 				_current_line_index = parser.parse_section(_current_line_index, manifest)
 			"Debriefing_info":
 				# Delegate to DebriefingParser
 				var parser = DebriefingParser.new(self)
+				parser._mission_dir = mission_dir
 				_current_line_index = parser.parse_section(_current_line_index, manifest)
 			"Players":
 				# Delegate to PlayerParser

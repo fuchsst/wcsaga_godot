@@ -48,6 +48,7 @@ const HudSceneGenerator = preload("res://addons/wcs_import/generators/hud_scene_
 const AsteroidGenerator = preload("res://addons/wcs_import/generators/asteroid_generator.gd")
 const FireballGenerator = preload("res://addons/wcs_import/generators/fireball_generator.gd")
 const LightningGenerator = preload("res://addons/wcs_import/generators/lightning_generator.gd")
+const AnimationGenerator = preload("res://addons/wcs_import/generators/animation_generator.gd")
 const MuzzleFlashGenerator = preload("res://addons/wcs_import/generators/mflash_generator.gd")
 const WeaponExplosionGenerator = preload(
 	"res://addons/wcs_import/generators/weapon_expl_generator.gd"
@@ -282,6 +283,23 @@ func _run():
 				print("Failed to process campaign: " + fname)
 				failure_count += 1
 
+		# 4. Process Animations (*.eff, *.ani)
+		var anim_files = []
+		for fname in _file_map:
+			if fname.ends_with(".eff") or fname.ends_with(".ani"):
+				anim_files.append(fname)
+		anim_files.sort()
+
+		for fname in anim_files:
+			if not filter_pattern.is_empty() and not fname.matchn(filter_pattern):
+				continue
+
+			var full_path = _file_map[fname]
+			print("Processing Animation: " + fname)
+			if not _process_file(full_path, output_dir, "animation"):
+				print("Failed to process animation: " + fname)
+				failure_count += 1
+
 		if failure_count == 0:
 			print("Batch processing completed successfully.")
 			_exit_code = 0
@@ -354,7 +372,7 @@ func _process_file(input_path: String, output_dir: String, type: String) -> bool
 			)
 		"hud_gauges":
 			return _process_hud_gauges(
-				input_path, _resolve_output_path(output_dir, "campaigns/hermes/cockpits/hud_gauges")
+				input_path, _resolve_output_path(output_dir, "assets/cockpits/hud_gauges")
 			)
 		"hud_config":
 			return _process_simple_resource(
@@ -399,6 +417,18 @@ func _process_file(input_path: String, output_dir: String, type: String) -> bool
 		"menu":
 			return _process_menu(
 				input_path, _resolve_output_path(output_dir, "campaigns/hermes/menu")
+			)
+		"animation":
+			var subfolder = "assets/animations/misc"
+			if input_path.contains("/hermes_cbanims/"):
+				subfolder = "campaigns/hermes/animations/command_briefings"
+			elif input_path.contains("/hermes_effects/"):
+				subfolder = "assets/animations/effects"
+			elif input_path.contains("/hermes_interface/"):
+				subfolder = "assets/animations/interface"
+			
+			return _process_animation(
+				input_path, _resolve_output_path(output_dir, subfolder)
 			)
 		"messages":
 			return _process_personas(
@@ -446,7 +476,7 @@ func _process_file(input_path: String, output_dir: String, type: String) -> bool
 		"species":
 			return _process_species(
 				input_path,
-				_resolve_output_path(output_dir, "campaigns/fiction/species")
+				_resolve_output_path(output_dir, "campaigns/hermes/fiction")
 			)
 		"ssm":
 			return _process_list_resource(
@@ -505,6 +535,8 @@ func _detect_type(path: String) -> String:
 		return "mission"
 	if filename.ends_with(".hcf"):
 		return "hud_config"
+	if filename.ends_with(".eff") or filename.ends_with(".ani"):
+		return "animation"
 
 	# Special mappings
 	var special_mappings = {
@@ -522,6 +554,12 @@ func _detect_type(path: String) -> String:
 		return filename.get_basename()
 
 	return "unknown"
+
+
+func _process_animation(input_path: String, output_dir: String) -> bool:
+	var generator = AnimationGenerator.new()
+	var source_root = ProjectSettings.globalize_path(input_path.get_base_dir().get_base_dir())
+	return generator.generate(input_path, output_dir, source_root)
 
 
 func _process_ships(input_path: String, output_dir: String) -> bool:
@@ -818,47 +856,49 @@ func _process_tips(input_path: String, output_dir: String) -> bool:
 
 func _process_localization(input_path: String, output_dir: String) -> bool:
 	var parser = WCSLocalizationParser.new()
-	var strings = parser.parse(input_path)
+	var strings_by_locale = parser.parse(input_path)
 
-	if strings == null:
+	if strings_by_locale == null or strings_by_locale.is_empty():
 		print("Failed to parse localization.")
 		return false
 
-	# output_dir is .../campaigns/{campaign} (passed as campaigns/hermes/ui/localisation? No, passed as campaigns/hermes/ui/localisation/strings?)
-	# User passed output_dir for localization?
-	# "localization": return _process_localization(input_path, output_dir)
-	# Wait, user didn't change localization call in _process_file?
-	# Let's check _process_file again.
-	# "localization": return _process_localization(input_path, output_dir)
-	# It seems user didn't change localization.
-	# But I should probably assume output_dir is the base.
-	# If output_dir is just "assets", then I still need to append path.
-	# But if I want to be consistent, I should update _process_file for localization too.
-	# For now, let's keep it as is if user didn't change it, OR update it to be consistent.
-	# User said "refactor the rest of the script to work with my changes".
-	# User changed MOST of them.
-	# Let's assume output_dir passed here is the target directory for localization.
-
-	var save_dir = output_dir.path_join("ui").path_join("localisation")
+	# Save as Godot Translation resource
+	# Destination: campaigns/hermes/ui/localisation/strings.tres (for English)
+	# And strings_de.tres, strings_fr.tres etc. for others.
+	
+	var save_dir = output_dir.path_join("campaigns/hermes/ui/localisation")
 	DirAccess.make_dir_recursive_absolute(save_dir)
+	
+	var base_filename = input_path.get_file().get_basename()
+	var total_entries = 0
 
-	# Save as individual files? Or one big file?
-	# Usually localization is one big file/resource.
-	# But I defined LocalizationResource as single string.
-	# I should probably save them as individual files for now or change the resource to be a dictionary.
-	# Given the quantity (thousands), individual files is bad.
-	# But I didn't create a LocalizationManifest.
-	# I'll save them in a folder `strings` for now.
+	for locale in strings_by_locale.keys():
+		var strings = strings_by_locale[locale]
+		if strings.is_empty():
+			continue
+			
+		var filename = base_filename
+		if locale != "en":
+			filename += "_" + locale
+		filename += ".tres"
+		
+		var save_path = save_dir.path_join(filename)
+		
+		var translation = Translation.new()
+		translation.locale = locale
+		
+		for s in strings:
+			# Use ID as key
+			translation.add_message(str(s.id), s.text)
+			
+		var err = ResourceSaver.save(translation, save_path)
+		if err != OK:
+			print("Failed to save translation resource: " + save_path)
+			continue
+			
+		print("Saved translation resource: " + save_path + " (" + str(strings.size()) + " entries)")
+		total_entries += strings.size()
 
-	var strings_dir = save_dir.path_join("strings")
-	DirAccess.make_dir_recursive_absolute(strings_dir)
-
-	for s in strings:
-		var filename = str(s.id) + ".tres"
-		var save_path = strings_dir.path_join(filename)
-		ResourceSaver.save(s, save_path)
-
-	print("Saved " + str(strings.size()) + " localization strings.")
 	return true
 
 

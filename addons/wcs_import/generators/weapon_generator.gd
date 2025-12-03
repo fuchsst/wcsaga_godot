@@ -45,7 +45,7 @@ func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 			)
 			if not icon_source.is_empty():
 				_convert_asset(icon_source, weapon_dir, "texture")
-				res.display_icon = icon_source.get_file().get_basename() + ".png"  # Assuming conversion to PNG
+				res.display_icon = icon_source.get_file().get_basename() + ".png" # Assuming conversion to PNG
 
 		if not res.laser_bitmap.is_empty():
 			var laser_source = _find_source_asset(
@@ -66,7 +66,7 @@ func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 		if not res.tech_animation.is_empty():
 			var anim_source = _find_source_asset(source_root, res.tech_animation, [".ani", ".eff"])
 			if not anim_source.is_empty():
-				_convert_asset(anim_source, weapon_dir, "ui")  # Or animation type
+				_convert_asset(anim_source, weapon_dir, "ui") # Or animation type
 				# res.tech_animation updated by generator or here?
 				# For now assume generator handles the resource path if it's standard
 
@@ -76,7 +76,7 @@ func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 			# Assuming explosion generator puts them in assets/effects/weapon_expl or similar
 			# The user mentioned "target/assets/effects/explosion/"
 			var expl_name = res.impact_explosion.get_basename()
-			var expl_path = "res://assets/effects/explosions/" + expl_name + ".tscn"  # Adjust path based on actual generator output
+			var expl_path = "res://assets/effects/explosions/" + expl_name + ".tscn" # Adjust path based on actual generator output
 			res.impact_explosion = expl_path
 
 		# 5. Generate Scene and Resource
@@ -130,7 +130,7 @@ func _convert_asset(source_path: String, target_dir: String, type: String) -> bo
 	var global_target = ProjectSettings.globalize_path(target_dir)
 
 	var args = [
-		"run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type
+		"run", "--directory", "..", "python", "-m", "converter", global_source, global_target, "--type", type
 	]
 
 	var output = []

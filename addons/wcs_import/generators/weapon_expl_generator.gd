@@ -44,9 +44,9 @@ func generate(resource: WeaponExplosionResource, output_dir: String, source_root
 	var base_lod_path = (
 		"res://assets/effects/explosions/"
 		+ resource.name.to_lower()
-		+ "/"
+		+"/"
 		+ resource.name.to_lower()
-		+ ".tres"
+		+".tres"
 	)
 	resource.lod_paths.append(base_lod_path)
 
@@ -57,9 +57,9 @@ func generate(resource: WeaponExplosionResource, output_dir: String, source_root
 		var lod_path = (
 			"res://assets/effects/explosions/"
 			+ lod_name.to_lower()
-			+ "/"
+			+"/"
 			+ lod_name.to_lower()
-			+ ".tres"
+			+".tres"
 		)
 		resource.lod_paths.append(lod_path)
 
@@ -154,7 +154,7 @@ func _convert_asset(source_path: String, target_dir: String, type: String) -> bo
 	var global_target = ProjectSettings.globalize_path(target_dir)
 
 	var args = [
-		"run", "python", "-m", "converter", "convert", global_source, global_target, "--type", type
+		"run", "--directory", "..", "python", "-m", "converter", global_source, global_target, "--type", type
 	]
 
 	var output = []

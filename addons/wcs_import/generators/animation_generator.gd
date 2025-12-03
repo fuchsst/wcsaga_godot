@@ -1,56 +1,29 @@
-class_name MedalGenerator
+class_name AnimationGenerator
 extends RefCounted
 
-const MedalResource = preload("res://scripts/resources/campaigns/medal_resource.gd")
-const MedalManifest = preload("res://scripts/resources/campaigns/medal_manifest.gd")
-
-
-func generate_medals(manifest: MedalManifest, output_root: String, source_root: String) -> bool:
-	# Target: target/campaigns/hermes/medals/
-	var output_dir = output_root
+func generate(input_path: String, output_dir: String, source_root: String) -> bool:
 	if not DirAccess.dir_exists_absolute(output_dir):
 		DirAccess.make_dir_recursive_absolute(output_dir)
 
-	print("Processing " + str(manifest.medals.size()) + " medals...")
+	var filename = input_path.get_file()
+	var source_file = _find_source_asset(source_root, filename)
 
-	# Process each medal
-	for medal in manifest.medals:
-		if medal == null:
-			continue
+	if source_file.is_empty():
+		# Try with extensions if input path doesn't have one or if not found
+		var base = filename.get_basename()
+		source_file = _find_source_asset(source_root, base, [".eff", ".ani"])
 
-		var medal_name = medal.name.to_lower().replace(" ", "_")
-		var medal_output_path = output_dir.path_join(medal_name + ".tres")
-
-		if medal._bitmap_filename != "":
-			var bitmap_name = medal._bitmap_filename
-			var source_path = _find_source_asset(source_root, bitmap_name, [".pcx", ".dds", ".png"])
-
-			if source_path != "":
-				# Convert to PNG
-				_convert_asset(source_path, output_dir, "texture")
-
-				var target_filename = source_path.get_file().get_basename() + ".png"
-				var target_path = output_dir.path_join(target_filename)
-
-				# Load Texture (Embedded ImageTexture)
-				var image = Image.load_from_file(target_path)
-				if image:
-					var texture = ImageTexture.create_from_image(image)
-					medal.bitmap = texture
-				else:
-					print("Failed to load image: " + target_path)
-			else:
-				print("Could not find bitmap: " + bitmap_name)
-
-		# Save individual medal resource
-		var error = ResourceSaver.save(medal, medal_output_path)
-		if error != OK:
-			print("Failed to save medal: " + medal_output_path)
+	if not source_file.is_empty():
+		# Convert asset
+		if _convert_asset(source_file, output_dir, "animation"):
+			print("Converted animation: " + source_file)
+			return true
 		else:
-			print("Saved medal: " + medal_output_path)
-
-	print("Medal processing complete.")
-	return true
+			print("Failed to convert animation: " + source_file)
+			return false
+	else:
+		print("Warning: Could not find source for animation: " + input_path)
+		return false
 
 
 func _find_source_asset(root_path: String, filename: String, extensions: Array = []) -> String:
@@ -90,6 +63,7 @@ func _convert_asset(source_path: String, target_dir: String, type: String) -> bo
 	var global_source = ProjectSettings.globalize_path(source_path)
 	var global_target = ProjectSettings.globalize_path(target_dir)
 
+	# uv run python -m converter convert input output --type type
 	var args = [
 		"run", "--directory", "..", "python", "-m", "converter", global_source, global_target, "--type", type
 	]

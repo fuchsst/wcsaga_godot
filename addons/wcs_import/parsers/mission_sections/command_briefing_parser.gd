@@ -57,7 +57,14 @@ func _parse_stage(manifest: Resource):
 			stage.ani_filename = _extract_string_value(line, "$Ani Filename:")
 			# Try to load as video stream first
 			stage.anim_stream = _load_video_stream(stage.ani_filename)
-			# If not found as video, it might be a sprite animation (TODO: handle .eff conversion)
+			
+			# If not found as video, try to load as sprite animation
+			if stage.anim_stream == null:
+				var anim_basename = stage.ani_filename.get_basename()
+				# Check in the new reorganized location
+				var anim_path = "res://campaigns/hermes/animations/command_briefings/" + anim_basename + ".tres"
+				if FileAccess.file_exists(anim_path):
+					stage.anim_stream = load(anim_path)
 		
 		elif line.begins_with("$Wave Filename:") or line.begins_with("+Wave Name:"):
 			var prefix = "$Wave Filename:" if line.begins_with("$Wave Filename:") else "+Wave Name:"
