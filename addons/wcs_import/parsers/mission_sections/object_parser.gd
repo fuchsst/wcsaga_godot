@@ -4,6 +4,8 @@ extends "res://addons/wcs_import/parsers/mission_sections/base_section_parser.gd
 # MissionObject is loaded dynamically to avoid cyclic dependency issues if any
 const MissionObject = preload("res://scripts/resources/missions/mission_object.gd")
 # MissionEnums is used via global class_name
+const SexpParser = preload("res://addons/wcs_import/sexp/sexp_parser.gd")
+const SexpCompiler = preload("res://addons/wcs_import/sexp/sexp_compiler.gd")
 
 func parse_section(start_index: int, manifest: Resource) -> int:
 	# Objects are parsed one at a time, each starting with $Name:
@@ -90,6 +92,10 @@ func _parse_object_field(line: String, obj: MissionObject):
 	elif line.begins_with("$AI Goals:"):
 		# AI Goals can span multiple lines (SEXP formula)
 		obj.ai_goals = _extract_sexp_formula(line, "$AI Goals:")
+		if not obj.ai_goals.is_empty():
+			var ast = SexpParser.parse(obj.ai_goals)
+			if ast:
+				obj.ai_goals_bt = SexpCompiler.compile(ast)
 	
 	elif line.begins_with("$Cargo 1:"):
 		obj.cargo = _extract_string_value(line, "$Cargo 1:")
@@ -109,6 +115,10 @@ func _parse_object_field(line: String, obj: MissionObject):
 	
 	elif line.begins_with("$Arrival Cue:"):
 		obj.arrival_cue = _extract_sexp_formula(line, "$Arrival Cue:")
+		if not obj.arrival_cue.is_empty():
+			var ast = SexpParser.parse(obj.arrival_cue)
+			if ast:
+				obj.arrival_cue_bt = SexpCompiler.compile(ast)
 	
 	elif line.begins_with("$Departure Location:"):
 		var loc_str = _extract_string_value(line, "$Departure Location:")
@@ -116,6 +126,10 @@ func _parse_object_field(line: String, obj: MissionObject):
 	
 	elif line.begins_with("$Departure Cue:"):
 		obj.departure_cue = _extract_sexp_formula(line, "$Departure Cue:")
+		if not obj.departure_cue.is_empty():
+			var ast = SexpParser.parse(obj.departure_cue)
+			if ast:
+				obj.departure_cue_bt = SexpCompiler.compile(ast)
 	
 	elif line.begins_with("$Determination:"):
 		obj.determination = _extract_int_value(line, "$Determination:")

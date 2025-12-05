@@ -4,6 +4,7 @@ class_name MissionManifest
 const MissionObject = preload("res://scripts/resources/missions/mission_object.gd")
 const MissionWing = preload("res://scripts/resources/missions/mission_wing.gd")
 const MissionEvent = preload("res://scripts/resources/missions/mission_event.gd")
+const MissionGoal = preload("res://scripts/resources/missions/mission_goal.gd")
 const MissionMessage = preload("res://scripts/resources/missions/mission_message.gd")
 const MissionCutscene = preload("res://scripts/resources/missions/mission_cutscene.gd")
 const BackgroundData = preload("res://scripts/resources/missions/background_data.gd")
@@ -46,6 +47,7 @@ const WaypointList = preload("res://scripts/resources/missions/waypoint_list.gd"
 @export var objects: Array[MissionObject] = []
 @export var wings: Array[MissionWing] = []
 @export var events: Array[MissionEvent] = []
+@export var goals: Array[MissionGoal] = []
 @export var messages: Array[MissionMessage] = []
 @export var cutscenes: Array[MissionCutscene] = []
 @export var waypoints: Array[WaypointList] = []

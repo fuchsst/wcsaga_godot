@@ -57,4 +57,5 @@ asset_catalog.db
 hermes_campaign_mapping.json
 
 # TEMPORARY deactivate assets folder
-#assets/
+assets/
+campaigns/

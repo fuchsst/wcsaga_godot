@@ -23,6 +23,7 @@ const AIClassResource = preload("res://scripts/resources/ai_classes/ai_class_res
 @export var ai_behavior_name: String = ""
 @export var ai_class: AIClassResource = null # Reference to AIClassResource
 @export var ai_goals: String = "" # Formula string
+@export var ai_goals_bt: Resource # Compiled LimboAI BehaviorTree
 
 # Status
 @export var cargo: String = ""
@@ -37,8 +38,10 @@ const AIClassResource = preload("res://scripts/resources/ai_classes/ai_class_res
 # Arrival/Departure
 @export var arrival_location: MissionEnums.ArrivalLocation = MissionEnums.ArrivalLocation.HYPERSPACE
 @export var arrival_cue: String = "" # Formula
+@export var arrival_cue_bt: Resource # Compiled LimboAI BehaviorTree
 @export var departure_location: MissionEnums.DepartureLocation = MissionEnums.DepartureLocation.HYPERSPACE
 @export var departure_cue: String = "" # Formula
+@export var departure_cue_bt: Resource # Compiled LimboAI BehaviorTree
 @export var determination: int = 10
 
 # Misc

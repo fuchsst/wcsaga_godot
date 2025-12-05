@@ -33,6 +33,7 @@ const ObjectParser = preload("res://addons/wcs_import/parsers/mission_sections/o
 const PlayerParser = preload("res://addons/wcs_import/parsers/mission_sections/player_parser.gd")
 const WingParser = preload("res://addons/wcs_import/parsers/mission_sections/wing_parser.gd")
 const EventParser = preload("res://addons/wcs_import/parsers/mission_sections/event_parser.gd")
+const GoalParser = preload("res://addons/wcs_import/parsers/mission_sections/goal_parser.gd")
 const MessageParser = preload("res://addons/wcs_import/parsers/mission_sections/message_parser.gd")
 const WaypointParser = preload("res://addons/wcs_import/parsers/mission_sections/waypoint_parser.gd")
 const CommandBriefingParser = preload("res://addons/wcs_import/parsers/mission_sections/command_briefing_parser.gd")
@@ -109,6 +110,11 @@ func _parse_content() -> Variant:
 				var parser = EventParser.new(self)
 				parser._mission_dir = mission_dir
 				_current_line_index = parser.parse_section(_current_line_index, manifest)
+			"Goals":
+				# Delegate to GoalParser
+				var parser = GoalParser.new(self)
+				parser._mission_dir = mission_dir
+				_current_line_index = parser.parse_section(_current_line_index, manifest)
 			"Messages":
 				# Delegate to MessageParser
 				var parser = MessageParser.new(self)
@@ -158,12 +164,6 @@ func _get_mission_dir() -> String:
 	
 	var mission_name = _file_path.get_file().get_basename()
 	return "res://campaigns/hermes/missions/" + mission_name + "/"
-
-
-func _get_current_line() -> String:
-	if _current_line_index > 0 and _current_line_index <= _lines.size():
-		return _lines[_current_line_index - 1]
-	return ""
 
 # Helper to clean FS2 strings (remove XSTR, comments, quotes)
 func _clean_fs2_string(raw: String) -> String:

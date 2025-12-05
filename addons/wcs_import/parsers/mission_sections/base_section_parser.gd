@@ -64,6 +64,20 @@ func _parse_vector3(text: String) -> Vector3:
 	return _base_parser._parse_vector3(text)
 
 
+## Helper: Extract multiline string
+func _extract_multiline_string(first_line: String, prefix: String) -> String:
+	if _base_parser.has_method("_extract_multiline_string"):
+		return _base_parser.call("_extract_multiline_string", first_line, prefix)
+	return _base_parser.call("_extract_string_value", first_line, prefix) # Fallback
+
+
+## Helper: Extract SEXP formula
+func _extract_sexp_formula(line: String, prefix: String) -> String:
+	if _base_parser.has_method("_extract_sexp_formula"):
+		return _base_parser.call("_extract_sexp_formula", line, prefix)
+	return ""
+
+
 ## Helper: Parse list of values (comma or space separated)
 func _extract_list_value(line: String) -> Array[String]:
 	var result: Array[String] = []
@@ -349,24 +363,6 @@ func _load_texture(filename: String) -> Texture2D:
 	# FAIL EARLY - No fallback!
 	push_error("FATAL: Texture resource not found: '" + filename + "' (Searched in assets/environment/, assets/effects/, campaigns/hermes/ui/, assets/ships/)")
 	return null
-
-
-## Helper: Extract SEXP formula (may span multiple lines due to parentheses)
-func _extract_sexp_formula(line: String, prefix: String) -> String:
-	var formula = line.substr(prefix.length()).strip_edges()
-	
-	# Count parentheses to detect multi-line formulas
-	var open_parens = formula.count("(")
-	var close_parens = formula.count(")")
-	
-	# Keep reading until parentheses balance
-	while open_parens > close_parens and _has_more_lines():
-		var next_line = _get_next_line()
-		formula += " " + next_line.strip_edges()
-		open_parens += next_line.count("(")
-		close_parens += next_line.count(")")
-	
-	return formula
 
 
 ## Helper: Parse quoted list: ( "item1" "item2" )

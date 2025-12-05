@@ -6,6 +6,8 @@ extends "res://addons/wcs_import/parsers/mission_sections/base_section_parser.gd
 
 const MissionEnums = preload("res://scripts/resources/missions/mission_enums.gd")
 const MissionWing = preload("res://scripts/resources/missions/mission_wing.gd")
+const SexpParser = preload("res://addons/wcs_import/sexp/sexp_parser.gd")
+const SexpCompiler = preload("res://addons/wcs_import/sexp/sexp_compiler.gd")
 
 
 func parse_section(start_index: int, manifest: Resource) -> int:
@@ -77,6 +79,10 @@ func _parse_wing_field(line: String, wing: MissionWing):
 	
 	elif line.begins_with("$Arrival Cue:"):
 		wing.arrival_cue = _extract_sexp_formula(line, "$Arrival Cue:")
+		if not wing.arrival_cue.is_empty():
+			var ast = SexpParser.parse(wing.arrival_cue)
+			if ast:
+				wing.arrival_cue_bt = SexpCompiler.compile(ast)
 	
 	elif line.begins_with("$Departure Location:"):
 		var loc_str = _extract_string_value(line, "$Departure Location:")
@@ -90,6 +96,10 @@ func _parse_wing_field(line: String, wing: MissionWing):
 	
 	elif line.begins_with("$Departure Cue:"):
 		wing.departure_cue = _extract_sexp_formula(line, "$Departure Cue:")
+		if not wing.departure_cue.is_empty():
+			var ast = SexpParser.parse(wing.departure_cue)
+			if ast:
+				wing.departure_cue_bt = SexpCompiler.compile(ast)
 	
 	elif line.begins_with("$Ships:"):
 		wing.ships = _parse_quoted_list(line, "$Ships:")

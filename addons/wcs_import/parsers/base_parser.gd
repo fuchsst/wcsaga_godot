@@ -70,6 +70,12 @@ func _peek_next_line() -> String:
 	return line.strip_edges()
 
 
+func _get_current_line() -> String:
+	if _current_line_index > 0 and _current_line_index <= _lines.size():
+		return _lines[_current_line_index - 1]
+	return ""
+
+
 func _has_more_lines() -> bool:
 	return _current_line_index < _lines.size()
 
@@ -185,6 +191,31 @@ func _extract_sexp(first_line: String, prefix: String) -> String:
 		close_count += line.count(")")
 
 	return expr
+
+
+## Helper: Extract SEXP formula (alias for _extract_sexp to match other parsers)
+func _extract_sexp_formula(line: String, prefix: String) -> String:
+	return _extract_sexp(line, prefix)
+
+
+## Helper: Extract multiline string (reads until next section/token)
+func _extract_multiline_string(first_line: String, prefix: String) -> String:
+	var text = _extract_string_value(first_line, prefix)
+	
+	while _has_more_lines():
+		var line = _peek_next_line()
+		
+		# Stop at new token or section
+		if line.begins_with("$") or line.begins_with("#") or line.begins_with("+"):
+			break
+			
+		var next_line = _get_next_line()
+		
+		# Skip comments/empty lines within text or treat as newline?
+		# Usually we just append.
+		text += "\n" + next_line.strip_edges()
+		
+	return text.strip_edges()
 
 
 func _extract_int_value(line: String, prefix: String, alt_prefix: String = "") -> int:
