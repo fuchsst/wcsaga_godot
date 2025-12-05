@@ -6,6 +6,8 @@ extends "res://addons/wcs_import/parsers/mission_sections/base_section_parser.gd
 
 const MissionEnums = preload("res://scripts/resources/missions/mission_enums.gd")
 const MissionEvent = preload("res://scripts/resources/missions/mission_event.gd")
+const SexpParser = preload("res://addons/wcs_import/sexp/sexp_parser.gd")
+const SexpCompiler = preload("res://addons/wcs_import/sexp/sexp_compiler.gd")
 
 
 func parse_section(start_index: int, manifest: Resource) -> int:
@@ -37,6 +39,14 @@ func _parse_single_event(manifest: Resource):
 	# First line is the formula
 	var formula_line = _get_next_line()
 	event.formula = _extract_sexp_formula(formula_line, "$Formula:")
+	
+	# Compile SEXP to BehaviorTree
+	if not event.formula.is_empty():
+		var ast = SexpParser.parse(event.formula)
+		if ast:
+			event.behavior_tree = SexpCompiler.compile(ast)
+		else:
+			push_warning("Failed to parse SEXP for event: " + event.formula.substr(0, 50) + "...")
 	
 	# Parse event properties until we hit the next $Formula: or section
 	while _has_more_lines():

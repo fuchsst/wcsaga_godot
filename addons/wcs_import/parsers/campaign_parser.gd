@@ -80,6 +80,9 @@ func _parse_content() -> Variant:
 	return manifest
 
 
+const SexpParser = preload("res://addons/wcs_import/sexp/sexp_parser.gd")
+const SexpCompiler = preload("res://addons/wcs_import/sexp/sexp_compiler.gd")
+
 func _parse_mission_block(first_line: String) -> CampaignMission:
 	var mission = CampaignMission.new()
 	var filename = _extract_string_value(first_line, "$Mission:")
@@ -105,7 +108,11 @@ func _parse_mission_block(first_line: String) -> CampaignMission:
 				"+Debriefing Persona Index:"
 			)
 		elif line.begins_with("+Formula:"):
-			mission.formula = _extract_sexp(line, "+Formula:")
+			mission.formula = _extract_sexp_formula(line, "+Formula:") # Use standard name
+			if not mission.formula.is_empty():
+				var ast = SexpParser.parse(mission.formula)
+				if ast:
+					mission.behavior_tree = SexpCompiler.compile(ast)
 		elif line.begins_with("+Level:"):
 			mission.level = _extract_int_value(line, "+Level:")
 		elif line.begins_with("+Position:"):

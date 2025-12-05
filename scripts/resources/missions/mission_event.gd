@@ -13,3 +13,4 @@ const MissionEnums = preload("res://scripts/resources/missions/mission_enums.gd"
 @export var chain_delay: int = 0
 @export var objective: String = "" # Objective text
 @export var objective_desc: String = "" # Objective description
+@export var behavior_tree: Resource # Compiled LimboAI BehaviorTree
