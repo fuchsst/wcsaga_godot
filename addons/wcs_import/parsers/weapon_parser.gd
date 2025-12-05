@@ -37,7 +37,7 @@ func _parse_weapon(first_line: String) -> Resource:
 	var weapon = WeaponDataScript.new()
 	var raw_name = _extract_string_value(first_line, "$Name:")
 	weapon.weapon_class = raw_name.trim_prefix("@")
-	weapon.display_name = weapon.weapon_class  # Default
+	weapon.display_name = weapon.weapon_class # Default
 
 	# Default to Terran
 	weapon.manufacturer_species = "Terran"
@@ -47,17 +47,23 @@ func _parse_weapon(first_line: String) -> Resource:
 		if line.begins_with("$Name:") or line.begins_with("#"):
 			break
 
-		line = _get_next_line()  # Consume
+		line = _get_next_line() # Consume
 
 		if line.begins_with("+Title:"):
 			weapon.display_name = _extract_string_value(line, "+Title:")
 		elif line.begins_with("+Tech Description:"):
-			weapon.tech_description = _parse_multiline_text()
+			weapon.tech_description = _extract_multiline_text(line, "+Tech Description:")
 		elif line.begins_with("+Description:"):
 			if weapon.tech_description.is_empty():
-				weapon.tech_description = _parse_multiline_text()
+				# If we haven't found tech desc, try to use regular description
+				# But wait, regular description might be short? 
+				# Reuse extract_multiline_text if it is multiline block.
+				# Sometimes +Description is single line? WCS usually uses defaults.
+				# Let's use the robust extractor.
+				weapon.tech_description = _extract_multiline_text(line, "+Description:")
 			else:
-				_parse_multiline_text()  # Consume but ignore if tech desc exists
+				# Consume but ignore
+				_extract_multiline_text(line, "+Description:")
 		elif line.begins_with("$Damage:"):
 			weapon.base_damage_energy = _extract_float_value(line, "$Damage:")
 		elif line.begins_with("$Mass:"):
@@ -129,8 +135,8 @@ func _parse_weapon(first_line: String) -> Resource:
 			weapon.swarm_config.wait_time = _extract_float_value(line, "$SwarmWait:")
 		elif line.begins_with("$Corkscrew:"):
 			_parse_corkscrew_info(weapon)
-		elif line.begins_with("$Flak:"):  # Assuming Flak might be a block or we handle flak fields
-			pass  # Placeholder if Flak is a block, otherwise handle fields below
+		elif line.begins_with("$Flak:"): # Assuming Flak might be a block or we handle flak fields
+			pass # Placeholder if Flak is a block, otherwise handle fields below
 		elif line.begins_with("$Free Flight Time:"):
 			weapon.free_flight_time = _extract_float_value(line, "$Free Flight Time:")
 		elif line.begins_with("$Turn Time:"):
@@ -172,9 +178,9 @@ func _parse_weapon(first_line: String) -> Resource:
 			weapon.emp_time = _extract_float_value(line, "$EMP Time:")
 		# Handle @Laser syntax (WCS specific?)
 		elif line.begins_with("@Laser Bitmap:"):
-			weapon.laser_bitmap = _extract_string_value(line, "@Laser Bitmap:")
+			weapon._laser_bitmap_source = _extract_string_value(line, "@Laser Bitmap:")
 		elif line.begins_with("@Laser Glow:"):
-			weapon.laser_glow = _extract_string_value(line, "@Laser Glow:")
+			weapon._laser_glow_source = _extract_string_value(line, "@Laser Glow:")
 		elif line.begins_with("@Laser Color:"):
 			weapon.laser_primary_color = _extract_color_value(line, "@Laser Color:")
 		elif line.begins_with("@Laser Color2:"):
@@ -209,7 +215,7 @@ func _parse_beam_info(weapon) -> void:
 			continue
 
 		if line.begins_with("$Name:") or line.begins_with("#"):
-			break  # End of weapon
+			break # End of weapon
 
 		line = _get_next_line()
 
@@ -218,13 +224,13 @@ func _parse_beam_info(weapon) -> void:
 		elif line.begins_with("+Life:"):
 			weapon.beam_config.beam_life = _extract_float_value(line, "+Life:")
 		elif line.begins_with("+Warmup:"):
-			weapon.beam_config.beam_warmup = _extract_float_value(line, "+Warmup:") / 1000.0  # ms to s
+			weapon.beam_config.beam_warmup = _extract_float_value(line, "+Warmup:") / 1000.0 # ms to s
 		elif line.begins_with("+Warmdown:"):
-			weapon.beam_config.beam_warmdown = _extract_float_value(line, "+Warmdown:") / 1000.0  # ms to s
+			weapon.beam_config.beam_warmdown = _extract_float_value(line, "+Warmdown:") / 1000.0 # ms to s
 		elif line.begins_with("+Radius:"):
 			weapon.beam_config.beam_width = _extract_float_value(line, "+Radius:") * 2.0
 		elif line.begins_with("+Range:"):
-			weapon.beam_config.range_multiplier = 1.0  # Range is usually absolute in TBL?
+			weapon.beam_config.range_multiplier = 1.0 # Range is usually absolute in TBL?
 			# If TBL has +Range, it overrides standard range logic
 			var range_val = _extract_float_value(line, "+Range:")
 			if range_val > 0:
@@ -306,7 +312,7 @@ func _parse_flags(line: String, weapon) -> void:
 			"player allowed":
 				weapon.flags |= WeaponDataScript.WeaponFlags.PLAYER_ALLOWED
 			"in tech database":
-				weapon.appears_in_tech_db = true  # Keep bool for now or map to flag
+				weapon.appears_in_tech_db = true # Keep bool for now or map to flag
 			"beam":
 				weapon.is_beam = true
 				weapon.flags |= WeaponDataScript.WeaponFlags.BEAM
@@ -346,17 +352,6 @@ func _parse_flags(line: String, weapon) -> void:
 				weapon.flags |= WeaponDataScript.WeaponFlags.BOMBER_PLUS
 			"tagged":
 				weapon.flags |= WeaponDataScript.WeaponFlags.TAGGED
-
-
-func _parse_multiline_text() -> String:
-	var text = ""
-	while _has_more_lines():
-		var line = _peek_next_line()
-		if line.begins_with("$end_multi_text"):
-			_get_next_line()  # Consume end marker
-			break
-		text += _get_next_line() + "\n"
-	return text.strip_edges()
 
 
 func _extract_color_value(line: String, prefix: String) -> Color:

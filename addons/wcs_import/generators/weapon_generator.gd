@@ -40,35 +40,59 @@ func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 
 		# 3. Convert/Copy Textures and Icons
 		if not res.display_icon.is_empty():
-			var icon_source = _find_source_asset(
-				source_root, res.display_icon, [".pcx", ".dds", ".png"]
-			)
-			if not icon_source.is_empty():
-				_convert_asset(icon_source, weapon_dir, "texture")
-				res.display_icon = icon_source.get_file().get_basename() + ".png" # Assuming conversion to PNG
+			if res.display_icon.begins_with("empty"):
+				res.display_icon = "res://assets/shared/empty.tres"
+			else:
+				var icon_source = _find_source_asset(
+					source_root, res.display_icon, [".pcx", ".dds", ".png"]
+				)
+				if not icon_source.is_empty():
+					_convert_asset(icon_source, weapon_dir, "texture")
+					res.display_icon = icon_source.get_file().get_basename() + ".png" # Assuming conversion to PNG
 
-		if not res.laser_bitmap.is_empty():
-			var laser_source = _find_source_asset(
-				source_root, res.laser_bitmap, [".pcx", ".dds", ".png"]
-			)
-			if not laser_source.is_empty():
-				_convert_asset(laser_source, weapon_dir, "texture")
-				res.laser_bitmap = laser_source.get_file().get_basename() + ".png"
+		if not res._laser_bitmap_source.is_empty():
+			if res._laser_bitmap_source.begins_with("empty"):
+				# res.laser_bitmap = load("res://assets/shared/empty.tres")
+				pass
+			else:
+				var laser_source = _find_source_asset(
+					source_root, res._laser_bitmap_source, [".pcx", ".dds", ".png"]
+				)
+				if not laser_source.is_empty():
+					_convert_asset(laser_source, weapon_dir, "texture")
+					var tex_path = weapon_dir.path_join(laser_source.get_file().get_basename() + ".png")
+					if ResourceLoader.exists(tex_path):
+						res.laser_bitmap = load(tex_path)
+					else:
+						# Fallback for CLI context: create placeholder to force ExtResource reference if possible?
+						# Or just warning. ResourceSaver might not write ExtResource if we can't load it.
+						print("Warning: Texture created but failed to load (import pending?): " + tex_path)
 
-		if not res.laser_glow.is_empty():
-			var glow_source = _find_source_asset(
-				source_root, res.laser_glow, [".pcx", ".dds", ".png"]
-			)
-			if not glow_source.is_empty():
-				_convert_asset(glow_source, weapon_dir, "texture")
-				res.laser_glow = glow_source.get_file().get_basename() + ".png"
+		if not res._laser_glow_source.is_empty():
+			if res._laser_glow_source.begins_with("empty"):
+				# res.laser_glow = load("res://assets/shared/empty.tres")
+				pass
+			else:
+				var glow_source = _find_source_asset(
+					source_root, res._laser_glow_source, [".pcx", ".dds", ".png"]
+				)
+				if not glow_source.is_empty():
+					_convert_asset(glow_source, weapon_dir, "texture")
+					var tex_path = weapon_dir.path_join(glow_source.get_file().get_basename() + ".png")
+					if ResourceLoader.exists(tex_path):
+						res.laser_glow = load(tex_path)
+					else:
+						print("Warning: Texture created but failed to load (import pending?): " + tex_path)
 
 		if not res.tech_animation.is_empty():
-			var anim_source = _find_source_asset(source_root, res.tech_animation, [".ani", ".eff"])
-			if not anim_source.is_empty():
-				_convert_asset(anim_source, weapon_dir, "ui") # Or animation type
-				# res.tech_animation updated by generator or here?
-				# For now assume generator handles the resource path if it's standard
+			if res.tech_animation.begins_with("empty"):
+				res.tech_animation = "res://assets/shared/empty.tres"
+			else:
+				var anim_source = _find_source_asset(source_root, res.tech_animation, [".ani", ".eff"])
+				if not anim_source.is_empty():
+					_convert_asset(anim_source, weapon_dir, "ui") # Or animation type
+					# res.tech_animation updated by generator or here?
+					# For now assume generator handles the resource path if it's standard
 
 		# 4. Resolve Impact Explosion
 		if not res.impact_explosion.is_empty():

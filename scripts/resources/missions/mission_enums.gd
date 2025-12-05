@@ -213,3 +213,14 @@ enum WingFlags {
 	NO_DYNAMIC_GOALS = 29,
 	UNKNOWN = 30
 }
+enum CampaignFlags {
+	CUSTOM_TECH_DATABASE = 0,
+	RESET_RANK = 1,
+	UNKNOWN = 2
+}
+
+enum CampaignMissionFlags {
+	BASTION = 0,
+	SKIPPED = 1,
+	UNKNOWN = 2
+}

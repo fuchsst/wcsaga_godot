@@ -71,13 +71,42 @@ func _convert_species_assets(species: Resource, source_root: String, output_dir:
 
 		var filename = species.get_meta(filename_prop)
 		if not filename.is_empty():
+			if filename.begins_with("empty"):
+				species.set(resource_prop, load("res://assets/shared/empty.tres"))
+				return
+
 			var exts = [".pcx", ".dds", ".png", ".tga"]
 			if type == "animation":
 				exts = [".ani", ".eff"]
 
 			var source_file = _find_source_asset(source_root, filename, exts)
 			if not source_file.is_empty():
-				_convert_asset(source_file, output_dir, type)
+				var target_dir_for_asset = output_dir
+				
+				# If asset is a Command Briefing animation, use the shared location
+				if source_file.contains("/hermes_cbanims/"):
+					# We assume cli_runner runs generic animation processing first for these files
+					# Target: campaigns/hermes/animations/command_briefings
+					# We need to construct the absolute path to the shared folder
+					# output_dir is .../assets/species_defs
+					# We want .../campaigns/hermes/animations/command_briefings
+					# HACK: Assume standard project structure relative to output_dir or just use absolute path logic
+					# output_dir should be absolute or res://
+					# Let's try to construct it relative to the project root if possible, or just hardcode the expected path
+					# Since we don't have easy access to project root here without assumptions, let's use the fact that
+					# output_dir usually ends with "assets/species_defs"
+					# Better: Use "res://campaigns/hermes/animations/command_briefings" and globalize it if needed
+					# But _convert_asset expects a target directory to write to (if it needs to convert).
+					# If cli_runner ran first, the file exists there.
+					# If we pass the shared dir to _convert_asset, it will overwrite/update it there.
+					# This is fine and ensures it exists.
+					target_dir_for_asset = "res://campaigns/hermes/animations/command_briefings"
+					target_dir_for_asset = ProjectSettings.globalize_path(target_dir_for_asset)
+					
+					if not DirAccess.dir_exists_absolute(target_dir_for_asset):
+						DirAccess.make_dir_recursive_absolute(target_dir_for_asset)
+
+				_convert_asset(source_file, target_dir_for_asset, type)
 
 				# Determine converted filename
 				var converted_filename = source_file.get_file().get_basename()
@@ -86,7 +115,7 @@ func _convert_species_assets(species: Resource, source_root: String, output_dir:
 				elif type == "animation":
 					converted_filename += ".tres" # SpriteFrames
 
-				var converted_path = output_dir.path_join(converted_filename)
+				var converted_path = target_dir_for_asset.path_join(converted_filename)
 				var res_path = converted_path
 				if not res_path.begins_with("res://"):
 					res_path = ProjectSettings.localize_path(res_path)

@@ -68,6 +68,7 @@ const MusicGenerator = preload("res://addons/wcs_import/generators/music_generat
 const SoundGenerator = preload("res://addons/wcs_import/generators/sound_generator.gd")
 const SpeciesGenerator = preload("res://addons/wcs_import/generators/species_generator.gd")
 const MissionGenerator = preload("res://addons/wcs_import/generators/mission_generator.gd")
+const CampaignGenerator = preload("res://addons/wcs_import/generators/campaign_generator.gd")
 
 # Core
 const WCSPathResolver = preload("res://addons/wcs_import/core/path_resolver.gd")
@@ -125,37 +126,12 @@ func _initialize():
 
 func _process(_delta):
 	_run()
-	return true # Exit loop
+	return true  # Exit loop
 
 
 func _process_campaign(input_path: String, output_dir: String) -> bool:
-	var parser = WCSCampaignParser.new()
-	var manifest = parser.parse(input_path)
-
-	if manifest == null:
-		print("Failed to parse campaign.")
-		return false
-
-	print("Parsed campaign: " + manifest.campaign_name)
-
-	# Save to campaigns/{campaign}/campaign.tres
-	var campaign_name = "hermes" # Default or derive
-	# If input path contains campaign name, use it
-	if input_path.contains("hermes"):
-		campaign_name = "hermes"
-
-	var save_dir = output_dir.path_join("campaigns").path_join(campaign_name)
-	DirAccess.make_dir_recursive_absolute(save_dir)
-
-	var save_path = save_dir.path_join("campaign.tres")
-	var err = ResourceSaver.save(manifest, save_path)
-
-	if err != OK:
-		print("Failed to save campaign resource: " + save_path)
-		return false
-
-	print("Saved: " + save_path)
-	return true
+	var generator = CampaignGenerator.new()
+	return generator.process_campaign(input_path, output_dir)
 
 
 func _build_file_map(root_dir: String) -> void:
@@ -179,6 +155,16 @@ func _scan_dir_recursive(dir_path: String) -> void:
 				# Store full path, keyed by lowercase filename
 				# If duplicate, we might overwrite, but usually unique enough or we don't care which one
 				_file_map[lower_name] = dir_path.path_join(file_name)
+
+				if lower_name.contains("hp_sil_arrow"):
+					print(
+						(
+							"DEBUG: Added to file map: '"
+							+ lower_name
+							+ "' -> "
+							+ dir_path.path_join(file_name)
+						)
+					)
 			file_name = dir.get_next()
 	else:
 		print("Failed to open directory: " + dir_path)
@@ -212,12 +198,15 @@ func _run():
 	# Build file map first
 	_build_file_map(default_source_root)
 	WCSPathResolver.file_map = _file_map
-	
+
 	if args.has("input"):
 		# Single file mode
 		var input_path = args["input"]
 		if not input_path.begins_with("/"):
-			input_path = project_root.path_join(input_path)
+			if input_path.begins_with("../"):
+				input_path = res_path.path_join(input_path).simplify_path()
+			else:
+				input_path = project_root.path_join(input_path).simplify_path()
 
 		var type = args.get("type", "auto")
 		if type == "auto":
@@ -233,7 +222,80 @@ func _run():
 		print("Starting batch processing...")
 		var failure_count = 0
 
-		# 1. Process ordered TBLs
+		# 1. Process Animations (*.eff, *.ani) - RUN FIRST to establish canonical locations for shared assets
+		# Only process Command Briefing animations here. Effects and Interface are handled by TBLs.
+		var anim_files = []
+		for fname in _file_map:
+			if fname.ends_with(".eff") or fname.ends_with(".ani"):
+				anim_files.append(fname)
+		anim_files.sort()
+
+		for fname in anim_files:
+			if not filter_pattern.is_empty() and not fname.matchn(filter_pattern):
+				continue
+
+			var full_path = _file_map[fname]
+
+			# Handle shared empty resource
+			if fname.begins_with("empty."):
+				# print("Skipping empty asset: " + fname)
+				continue
+
+			# Filter out assets handled by TBLs to avoid duplicates
+			# Check for hermes_effects or hermes_interface in the path
+			if full_path.contains("hermes_effects") or full_path.contains("hermes_interface"):
+				# print("Skipping animation handled by TBL: " + fname)
+				continue
+
+			# Filter out specific duplicates handled by other generators
+			if (
+				fname.begins_with("ExpMissileHit")
+				or fname.begins_with("Shivan_Impact")
+				or fname.begins_with("rockEXP")
+				or fname.begins_with("exp")
+				or fname.begins_with("Fade")
+				or fname.begins_with("Icon")
+				or fname.begins_with("shieldhit")
+			):
+				# print("Skipping duplicate handled by other generator: " + fname)
+				continue
+
+			# Determine specific output directory based on filename/type
+			var specific_output_dir = output_dir.path_join("assets/animations/effects")
+
+			if full_path.contains("/hermes_cbanims/"):
+				# Command Briefing Animations -> campaigns/hermes/animations/command_briefings
+				# We need to construct the path relative to output_dir (which is target/)
+				# output_dir is passed as "res://" usually in batch mode? No, it's "target" usually.
+				# Let's check how output_dir is passed.
+				# In batch mode, output_dir is "target" (or whatever user arg).
+				# We want "target/campaigns/hermes/animations/command_briefings"
+				specific_output_dir = output_dir.path_join(
+					"campaigns/hermes/animations/command_briefings"
+				)
+			elif (
+				fname.begins_with("Exp")
+				or fname.begins_with("exp")
+				or fname.begins_with("rockEXP")
+				or fname.begins_with("Shivan_Impact")
+				or fname.begins_with("shieldhit")
+			):
+				# Explosions/Effects -> assets/effects/explosions
+				# Note: FireballGenerator puts them in assets/effects/fireball/<name> or assets/effects/explosions
+				# Let's try to match FireballGenerator's likely output or a generic explosions folder
+				specific_output_dir = output_dir.path_join("assets/effects/explosions")
+			elif (
+				fname.begins_with("Icon") or fname.begins_with("Fade") or fname.begins_with("bicon")
+			):
+				# Interface animations -> assets/animations/interface
+				specific_output_dir = output_dir.path_join("assets/animations/interface")
+
+			print("Processing Animation: " + fname + " -> " + specific_output_dir)
+			if not _process_file(full_path, specific_output_dir, "animation"):
+				print("Failed to process animation: " + fname)
+				failure_count += 1
+
+		# 2. Process ordered TBLs
 		for filename in PROCESSING_ORDER:
 			if not filter_pattern.is_empty() and not filename.matchn(filter_pattern):
 				continue
@@ -248,13 +310,13 @@ func _run():
 			else:
 				print("Warning: File not found in source: " + filename)
 
-		# 2. Process Missions (*.fs2)
+		# 3. Process Missions (*.fs2)
 		# Find all .fs2 files in map
 		var mission_files = []
 		for fname in _file_map:
 			if fname.ends_with(".fs2"):
 				mission_files.append(fname)
-		mission_files.sort() # Ensure consistent order
+		mission_files.sort()  # Ensure consistent order
 
 		for fname in mission_files:
 			if not filter_pattern.is_empty() and not fname.matchn(filter_pattern):
@@ -266,7 +328,7 @@ func _run():
 				print("Failed to process mission: " + fname)
 				failure_count += 1
 
-		# 3. Process Campaigns (*.fc2)
+		# 4. Process Campaigns (*.fc2)
 		var campaign_files = []
 		for fname in _file_map:
 			if fname.ends_with(".fc2"):
@@ -281,23 +343,6 @@ func _run():
 			print("Processing Campaign: " + fname)
 			if not _process_file(full_path, output_dir, "campaign"):
 				print("Failed to process campaign: " + fname)
-				failure_count += 1
-
-		# 4. Process Animations (*.eff, *.ani)
-		var anim_files = []
-		for fname in _file_map:
-			if fname.ends_with(".eff") or fname.ends_with(".ani"):
-				anim_files.append(fname)
-		anim_files.sort()
-
-		for fname in anim_files:
-			if not filter_pattern.is_empty() and not fname.matchn(filter_pattern):
-				continue
-
-			var full_path = _file_map[fname]
-			print("Processing Animation: " + fname)
-			if not _process_file(full_path, output_dir, "animation"):
-				print("Failed to process animation: " + fname)
 				failure_count += 1
 
 		if failure_count == 0:
@@ -408,7 +453,7 @@ func _process_file(input_path: String, output_dir: String, type: String) -> bool
 			return _process_mflash(input_path, _resolve_output_path(output_dir, "assets/effects"))
 		"mainhall":
 			return _process_mainhall(
-				input_path, _resolve_output_path(output_dir, "campaigns/hermes/menu")
+				input_path, _resolve_output_path(output_dir, "campaigns/hermes/ui/menu")
 			)
 		"medals":
 			return _process_medals(
@@ -416,7 +461,7 @@ func _process_file(input_path: String, output_dir: String, type: String) -> bool
 			)
 		"menu":
 			return _process_menu(
-				input_path, _resolve_output_path(output_dir, "campaigns/hermes/menu")
+				input_path, _resolve_output_path(output_dir, "campaigns/hermes/ui/menu")
 			)
 		"animation":
 			var subfolder = "assets/animations/misc"
@@ -426,10 +471,8 @@ func _process_file(input_path: String, output_dir: String, type: String) -> bool
 				subfolder = "assets/animations/effects"
 			elif input_path.contains("/hermes_interface/"):
 				subfolder = "assets/animations/interface"
-			
-			return _process_animation(
-				input_path, _resolve_output_path(output_dir, subfolder)
-			)
+
+			return _process_animation(input_path, _resolve_output_path(output_dir, subfolder))
 		"messages":
 			return _process_personas(
 				input_path, _resolve_output_path(output_dir, "campaigns/hermes/personas")
@@ -470,13 +513,11 @@ func _process_file(input_path: String, output_dir: String, type: String) -> bool
 			return _process_sounds(input_path, _resolve_output_path(output_dir, "assets/sounds"))
 		"species_defs":
 			return _process_species_defs(
-				input_path,
-				_resolve_output_path(output_dir, "campaigns/hermes/species_defs")
+				input_path, _resolve_output_path(output_dir, "assets/species_defs")
 			)
 		"species":
 			return _process_species(
-				input_path,
-				_resolve_output_path(output_dir, "campaigns/hermes/fiction")
+				input_path, _resolve_output_path(output_dir, "campaigns/hermes/fiction")
 			)
 		"ssm":
 			return _process_list_resource(
@@ -529,10 +570,12 @@ func _parse_args() -> Dictionary:
 
 func _detect_type(path: String) -> String:
 	var filename = path.get_file().to_lower()
-	
+
 	# Special extensions
-	if filename.ends_with(".fs2") or filename.ends_with(".fc2"):
+	if filename.ends_with(".fs2"):
 		return "mission"
+	if filename.ends_with(".fc2"):
+		return "campaign"
 	if filename.ends_with(".hcf"):
 		return "hud_config"
 	if filename.ends_with(".eff") or filename.ends_with(".ani"):
@@ -545,7 +588,7 @@ func _detect_type(path: String) -> String:
 		"tstrings.tbl": "localization",
 		"species_defs.tbl": "species_defs"
 	}
-	
+
 	if special_mappings.has(filename):
 		return special_mappings[filename]
 
@@ -865,10 +908,10 @@ func _process_localization(input_path: String, output_dir: String) -> bool:
 	# Save as Godot Translation resource
 	# Destination: campaigns/hermes/ui/localisation/strings.tres (for English)
 	# And strings_de.tres, strings_fr.tres etc. for others.
-	
+
 	var save_dir = output_dir.path_join("campaigns/hermes/ui/localisation")
 	DirAccess.make_dir_recursive_absolute(save_dir)
-	
+
 	var base_filename = input_path.get_file().get_basename()
 	var total_entries = 0
 
@@ -876,26 +919,26 @@ func _process_localization(input_path: String, output_dir: String) -> bool:
 		var strings = strings_by_locale[locale]
 		if strings.is_empty():
 			continue
-			
+
 		var filename = base_filename
 		if locale != "en":
 			filename += "_" + locale
 		filename += ".tres"
-		
+
 		var save_path = save_dir.path_join(filename)
-		
+
 		var translation = Translation.new()
 		translation.locale = locale
-		
+
 		for s in strings:
 			# Use ID as key
 			translation.add_message(str(s.id), s.text)
-			
+
 		var err = ResourceSaver.save(translation, save_path)
 		if err != OK:
 			print("Failed to save translation resource: " + save_path)
 			continue
-			
+
 		print("Saved translation resource: " + save_path + " (" + str(strings.size()) + " entries)")
 		total_entries += strings.size()
 
@@ -969,7 +1012,7 @@ func _resolve_output_path(base_output_dir: String, subpath: String) -> String:
 		# base_output_dir is usually .../target/assets
 		# We want .../target/campaigns/...
 		# So we go up one level from assets
-		var project_root = base_output_dir.get_base_dir() # .../target
+		var project_root = base_output_dir.get_base_dir()  # .../target
 		if base_output_dir.ends_with("assets"):
 			return project_root.path_join(subpath)
 

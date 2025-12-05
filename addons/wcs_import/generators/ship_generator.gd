@@ -28,9 +28,11 @@ func generate(ships: Array, output_dir: String, source_root: String) -> bool:
 		var pof_source = _find_source_asset(source_root, pof_file)
 		if not pof_source.is_empty():
 			# Pass --textures flag for models
-			_convert_asset(pof_source, ship_dir, "model", ["--textures"])
-			# Update resource to point to converted GLB (keep original basename)
-			res.model_file = pof_source.get_file().get_basename() + ".gltf"
+			if _convert_asset(pof_source, ship_dir, "model"):
+				# Update resource to point to converted GLB (keep original basename)
+				res.model_file = pof_source.get_file().get_basename() + ".gltf"
+			else:
+				print("Failed to convert POF: " + pof_source)
 		else:
 			print("Warning: Could not find POF source for " + pof_file)
 

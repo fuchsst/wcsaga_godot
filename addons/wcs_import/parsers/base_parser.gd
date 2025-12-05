@@ -121,20 +121,70 @@ func _parse_color(line: String) -> Color:
 func _extract_string_value(line: String, prefix: String) -> String:
 	if line.begins_with(prefix):
 		var val = line.substr(prefix.length()).strip_edges()
-		# Strip XSTR("...", -1) wrapper if present
-		if val.begins_with("XSTR(\""):
-			var end_quote = val.rfind("\",")
-			if end_quote != -1:
-				return val.substr(6, end_quote - 6)
-			# Handle case where it might just be XSTR("text", -1) or similar variations
-			end_quote = val.rfind("\"")
-			if end_quote > 6:
-				return val.substr(6, end_quote - 6)
-		# Also strip simple quotes if present
-		if val.begins_with("\"") and val.ends_with("\""):
-			return val.substr(1, val.length() - 2)
-		return val
+		return _clean_xstr_block(val)
 	return ""
+
+
+func _clean_xstr_block(text: String) -> String:
+	var clean = text.strip_edges()
+	# Check for XSTR( "...", ... ) wrapper
+	if clean.begins_with("XSTR(\""):
+		# Find the last closing quote followed by comma or just closing part
+		var last_comma = clean.rfind("\",")
+		if last_comma != -1:
+			return clean.substr(6, last_comma - 6)
+		# Sometimes might be just space separator? 
+		# Or if it fails to find ", try last quote
+		var last_quote = clean.rfind("\"")
+		if last_quote > 6:
+			return clean.substr(6, last_quote - 6)
+			
+	# Also strip simple quotes if it's just "Text"
+	if clean.begins_with("\"") and clean.ends_with("\""):
+		return clean.substr(1, clean.length() - 2)
+		
+	return text
+
+
+func _extract_multiline_text(first_line: String, prefix: String) -> String:
+	var text = _extract_string_value(first_line, prefix)
+
+	# If we didn't find the end on the same line (if it was even possible)
+	# FC2 descriptions usually end with $end_multi_text on a new line
+
+	while _has_more_lines():
+		var line = _peek_next_line()
+		if line.begins_with("$end_multi_text"):
+			_get_next_line() # Consume terminator
+			break
+
+		if line.begins_with("$"): # Safety break for new section
+			break
+
+		var next_line = _get_next_line()
+		
+		# Explicitly clean XSTR tags from every line
+		# BaseParser _extract_string_value does this for values with prefix, 
+		# but here we pass empty prefix.
+		var cleaned_line = _extract_string_value(next_line, "")
+		
+		text += "\n" + cleaned_line
+
+	return _clean_xstr_block(text)
+
+
+func _extract_sexp(first_line: String, prefix: String) -> String:
+	var expr = first_line.substr(prefix.length()).strip_edges()
+	var open_count = expr.count("(")
+	var close_count = expr.count(")")
+
+	while open_count > close_count and _has_more_lines():
+		var line = _get_next_line()
+		expr += "\n" + line
+		open_count += line.count("(")
+		close_count += line.count(")")
+
+	return expr
 
 
 func _extract_int_value(line: String, prefix: String, alt_prefix: String = "") -> int:

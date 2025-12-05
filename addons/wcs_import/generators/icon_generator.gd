@@ -18,6 +18,9 @@ func generate(icons: Array, output_dir: String, source_root: String) -> bool:
 
 		# Convert image if present
 		if not search_filename.is_empty():
+			if search_filename.begins_with("empty"):
+				continue
+				
 			var source_file = _find_source_asset(
 				source_root, search_filename, [".pcx", ".dds", ".png", ".ani"]
 			)

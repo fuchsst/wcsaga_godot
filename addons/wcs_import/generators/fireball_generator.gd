@@ -23,7 +23,10 @@ func generate(resource: FireballResource, output_dir: String, source_root: Strin
 	# Convert animation
 	var source_file = _find_source_asset(source_root, fireball_name, [".ani", ".eff"])
 	if not source_file.is_empty():
-		_convert_asset(source_file, asset_dir, "animation")
+		if fireball_name == "empty":
+			print("Using shared empty resource for fireball: empty")
+		else:
+			_convert_asset(source_file, asset_dir, "animation")
 	else:
 		print("Warning: Could not find source for fireball: " + fireball_name)
 
@@ -40,6 +43,8 @@ func generate(resource: FireballResource, output_dir: String, source_root: Strin
 
 	# Manual .tscn generation to avoid load() issues
 	var sequence_path = asset_dir.path_join(fireball_name + ".tres")
+	if fireball_name == "empty":
+		sequence_path = "res://assets/shared/empty.tres"
 
 	# Convert absolute path to res:// path
 	var res_path = sequence_path
