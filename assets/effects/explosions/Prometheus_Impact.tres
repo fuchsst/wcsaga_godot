@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="WeaponExplosionResource" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/effects/weapon_expl_resource.gd" id="1_4fjxx"]
+[ext_resource type="Script" path="res://scripts/resources/effects/weapon_expl_resource.gd" id="1_pgs2i"]
 
 [resource]
-script = ExtResource("1_4fjxx")
+script = ExtResource("1_pgs2i")
 name = "Prometheus_Impact"
 lod_paths = Array[String](["res://assets/effects/explosions/prometheus_impact/prometheus_impact.tres"])

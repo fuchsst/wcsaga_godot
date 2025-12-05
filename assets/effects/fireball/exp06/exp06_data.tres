@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="FireballResource" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/effects/fireball_resource.gd" id="1_xbsji"]
+[ext_resource type="Script" path="res://scripts/resources/effects/fireball_resource.gd" id="1_hmpfe"]
 
 [resource]
-script = ExtResource("1_xbsji")
+script = ExtResource("1_hmpfe")
 name = "exp06"
 render_type = 6
