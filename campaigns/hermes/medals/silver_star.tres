@@ -1,8 +1,8 @@
 [gd_resource type="Resource" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/campaigns/medal_resource.gd" id="1_thxhp"]
+[ext_resource type="Script" path="res://scripts/resources/campaigns/medal_resource.gd" id="1_2t0dt"]
 
 [resource]
-script = ExtResource("1_thxhp")
+script = ExtResource("1_2t0dt")
 name = "Silver Star"
 num_mods = 5

@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="AIClassResource" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/ai_classes/ai_class_resource.gd" id="1_p8xd7"]
+[ext_resource type="Script" path="res://scripts/resources/ai_classes/ai_class_resource.gd" id="1_8d7q0"]
 
 [resource]
-script = ExtResource("1_p8xd7")
+script = ExtResource("1_8d7q0")
 ai_class_name = "Coward"
 difficulty_level = "3_medium"
 accuracy = 0.9

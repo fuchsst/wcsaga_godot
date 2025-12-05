@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="AIClassResource" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/ai_classes/ai_class_resource.gd" id="1_qavr2"]
+[ext_resource type="Script" path="res://scripts/resources/ai_classes/ai_class_resource.gd" id="1_lft10"]
 
 [resource]
-script = ExtResource("1_qavr2")
+script = ExtResource("1_lft10")
 ai_class_name = "Captain"
 difficulty_level = "1_very_easy"
 evasion = 10.0

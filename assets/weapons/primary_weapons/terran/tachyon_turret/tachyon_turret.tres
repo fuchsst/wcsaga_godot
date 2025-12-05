@@ -1,9 +1,11 @@
-[gd_resource type="Resource" script_class="WCSWeaponData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="WCSWeaponData" load_steps=4 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/weapons/weapon_data.gd" id="1_8dq67"]
+[ext_resource type="Texture2D" path="res://assets/weapons/primary_weapons/terran/tachyon_turret/tachyon.png" id="1_04227"]
+[ext_resource type="Texture2D" path="res://assets/weapons/primary_weapons/terran/tachyon_turret/tachyon_glow.png" id="2_kvoco"]
+[ext_resource type="Script" path="res://scripts/resources/weapons/weapon_data.gd" id="3_uhh3x"]
 
 [resource]
-script = ExtResource("1_8dq67")
+script = ExtResource("3_uhh3x")
 weapon_class = "Tachyon Turret"
 category = "Primary Weapons"
 display_name = "Tachyon Turret"
@@ -16,8 +18,8 @@ base_damage_energy = 60.0
 subsystem_damage_factor = 0.2
 energy_per_shot = 2.0
 projectile_model = "none"
-laser_bitmap = "tachyon.png"
-laser_glow = "tachyon_glow.png"
+laser_bitmap = ExtResource("1_04227")
+laser_glow = ExtResource("2_kvoco")
 laser_length_meters = 32.0
 laser_head_radius = 3.75
 laser_tail_radius = 3.0

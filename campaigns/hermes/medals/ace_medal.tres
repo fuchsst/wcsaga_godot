@@ -1,9 +1,9 @@
 [gd_resource type="Resource" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/campaigns/medal_resource.gd" id="1_7vi1h"]
+[ext_resource type="Script" path="res://scripts/resources/campaigns/medal_resource.gd" id="1_uudj8"]
 
 [resource]
-script = ExtResource("1_7vi1h")
+script = ExtResource("1_uudj8")
 name = "Ace Medal"
 promotion_text = "$end_multi_text"
 num_mods = 1

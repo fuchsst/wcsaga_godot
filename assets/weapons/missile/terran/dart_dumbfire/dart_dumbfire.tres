@@ -2,10 +2,10 @@
 
 [ext_resource type="Script" path="res://scripts/resources/weapons/weapon_data.gd" id="1_qooh5"]
 
-[sub_resource type="GDScript" id="GDScript_1c6gj"]
+[sub_resource type="GDScript" id="GDScript_830sb"]
 
 [sub_resource type="Resource" id="Resource_pl8no"]
-script = SubResource("GDScript_1c6gj")
+script = SubResource("GDScript_830sb")
 bitmap = "newmiss3"
 start_width = 0.2
 end_width = 0.45
@@ -19,7 +19,8 @@ weapon_class = "Dart Dumbfire"
 category = "missile"
 display_name = "Dart Dumbfire"
 manufacturer_species = "terran"
-tech_description = "XSTR(\"A simple weapon, the Dart dumbfire (DF) missile is a point-and-shoot weapon carried on almost every fighter in the Terran fleet. It is unjammable due to the absence of guidance systems, and costs less than any other missile type. The dumbfire doesn't require any type of lock and has no homing capability. Pilots find it most useful against targets with predictable reactions - at close range, a single dumbfire can diminish shields enough to plant a few devastating shots from an energy gun.\", -1)"
+tech_description = "
+A simple weapon, the Dart dumbfire (DF) missile is a point-and-shoot weapon carried on almost every fighter in the Terran fleet. It is unjammable due to the absence of guidance systems, and costs less than any other missile type. The dumbfire doesn't require any type of lock and has no homing capability. Pilots find it most useful against targets with predictable reactions - at close range, a single dumbfire can diminish shields enough to plant a few devastating shots from an energy gun."
 projectile_mass_kg = 3.0
 muzzle_velocity_mps = 468.0
 fire_rate_hz = 2.0

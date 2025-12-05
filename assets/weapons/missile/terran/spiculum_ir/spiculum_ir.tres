@@ -2,10 +2,10 @@
 
 [ext_resource type="Script" path="res://scripts/resources/weapons/weapon_data.gd" id="1_bvtxl"]
 
-[sub_resource type="GDScript" id="GDScript_1c6gj"]
+[sub_resource type="GDScript" id="GDScript_830sb"]
 
 [sub_resource type="Resource" id="Resource_lf1rn"]
-script = SubResource("GDScript_1c6gj")
+script = SubResource("GDScript_830sb")
 bitmap = "newmiss3"
 start_width = 0.2
 end_width = 0.45
@@ -19,9 +19,10 @@ weapon_class = "Spiculum IR"
 category = "missile"
 display_name = "Spiculum IR"
 manufacturer_species = "terran"
-tech_description = "XSTR(\"The Spiculum image-recognition (IR) missile uses computer imaging to identify and 'memorize' a targeted ship. Once a fighter gains a lock and launches the IR, electronic and visual signatures specific to that target are copied to the missile's AI program. It's difficult to evade.\", -1)"
+tech_description = "
+The Spiculum image-recognition (IR) missile uses computer imaging to identify and 'memorize' a targeted ship. Once a fighter gains a lock and launches the IR, electronic and visual signatures specific to that target are copied to the missile's AI program. It's difficult to evade."
 projectile_mass_kg = 3.0
-muzzle_velocity_mps = 0.0
+muzzle_velocity_mps = 320.0
 fire_rate_hz = 2.0
 base_damage_energy = 385.0
 shield_penetration_factor = 0.6

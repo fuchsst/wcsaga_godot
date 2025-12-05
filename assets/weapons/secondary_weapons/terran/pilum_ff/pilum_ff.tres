@@ -2,10 +2,10 @@
 
 [ext_resource type="Script" path="res://scripts/resources/weapons/weapon_data.gd" id="1_5w85g"]
 
-[sub_resource type="GDScript" id="GDScript_1c6gj"]
+[sub_resource type="GDScript" id="GDScript_830sb"]
 
 [sub_resource type="Resource" id="Resource_8pnup"]
-script = SubResource("GDScript_1c6gj")
+script = SubResource("GDScript_830sb")
 bitmap = "empty"
 start_width = 0.0
 end_width = 0.0
@@ -19,7 +19,8 @@ weapon_class = "Pilum FF"
 category = "Secondary Weapons"
 display_name = "Pilum FF"
 manufacturer_species = "Terran"
-tech_description = "XSTR(\"The Pilum friend-or-foe (FF) missile was developed once ship systems were able to distinguish between friendly and enemy ships. Capable of identifying the distinctive Confederation ship signal, it makes a beeline for the nearest ship that isn't broadcasting that signal. This has resulted in the destruction of several Terran ships whose communications systems were damaged. In spite of this inherent danger, both sides continue to use the FF as standard armament for medium and heavy fighters. This missile doesn't require a lock, and it will acquire a new target if the current one is destroyed before detonation..\", -1)"
+tech_description = "
+The Pilum friend-or-foe (FF) missile was developed once ship systems were able to distinguish between friendly and enemy ships. Capable of identifying the distinctive Confederation ship signal, it makes a beeline for the nearest ship that isn't broadcasting that signal. This has resulted in the destruction of several Terran ships whose communications systems were damaged. In spite of this inherent danger, both sides continue to use the FF as standard armament for medium and heavy fighters. This missile doesn't require a lock, and it will acquire a new target if the current one is destroyed before detonation.."
 projectile_mass_kg = 3.0
 muzzle_velocity_mps = 200.0
 fire_rate_hz = 2.0

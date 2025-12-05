@@ -1,8 +1,8 @@
 [gd_resource type="Resource" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/campaigns/medal_resource.gd" id="1_nyob0"]
+[ext_resource type="Script" path="res://scripts/resources/campaigns/medal_resource.gd" id="1_agh1r"]
 
 [resource]
-script = ExtResource("1_nyob0")
+script = ExtResource("1_agh1r")
 name = "Vega Evacuation"
 num_mods = 1

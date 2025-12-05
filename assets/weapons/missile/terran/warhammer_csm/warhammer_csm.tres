@@ -2,10 +2,10 @@
 
 [ext_resource type="Script" path="res://scripts/resources/weapons/weapon_data.gd" id="1_13ubj"]
 
-[sub_resource type="GDScript" id="GDScript_1c6gj"]
+[sub_resource type="GDScript" id="GDScript_830sb"]
 
 [sub_resource type="Resource" id="Resource_th02n"]
-script = SubResource("GDScript_1c6gj")
+script = SubResource("GDScript_830sb")
 bitmap = "newmiss1"
 start_width = 0.5
 end_width = 2.5
@@ -19,7 +19,8 @@ weapon_class = "Warhammer CSM"
 category = "missile"
 display_name = "Warhammer CSM"
 manufacturer_species = "terran"
-tech_description = "XSTR(\"Deployed exclusively from capships, the CapShip missile is a huge, lockable missile that carries a powerful anti-matter warhead capable of taking out other capital ships and tactical planetary targets. Mostly found on launch batteries aboard modern warships, it is best used for long range and standoff attacks. This missile is highly effective and not easily destroyed by point defense weaponry.\", -1)"
+tech_description = "
+Deployed exclusively from capships, the CapShip missile is a huge, lockable missile that carries a powerful anti-matter warhead capable of taking out other capital ships and tactical planetary targets. Mostly found on launch batteries aboard modern warships, it is best used for long range and standoff attacks. This missile is highly effective and not easily destroyed by point defense weaponry."
 projectile_mass_kg = 6.0
 muzzle_velocity_mps = 156.0
 fire_rate_hz = 0.03333333333333333

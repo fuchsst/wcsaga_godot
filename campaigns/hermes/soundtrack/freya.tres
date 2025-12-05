@@ -1,40 +1,40 @@
 [gd_resource type="Resource" script_class="SoundtrackResource" load_steps=11 format=3]
 
-[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/ambient_c_01.ogg" id="1_hd85y"]
-[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/aarrival_normal_e_01.ogg" id="2_yaexw"]
-[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/earrival_battle_e_01.ogg" id="3_x7uqv"]
-[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/earrival_normal_e_01.ogg" id="4_64rvh"]
-[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/battle1_e_04.ogg" id="5_4evvt"]
-[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/goal_failed_b_01.ogg" id="6_0rsqa"]
-[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/player_dead_b_01.ogg" id="7_cojpi"]
-[ext_resource type="Script" path="res://scripts/resources/sounds/soundtrack_resource.gd" id="8_tjlxo"]
-[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/goal_achieved_e_01.ogg" id="9_ocimx"]
-[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/victory_e_01.ogg" id="10_837h8"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/ambient_c_01.ogg" id="1_m77w4"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/aarrival_normal_e_01.ogg" id="2_02heg"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/earrival_battle_e_01.ogg" id="3_jwbvt"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/earrival_normal_e_01.ogg" id="4_4fipo"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/battle1_e_04.ogg" id="5_ieeal"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/goal_failed_b_01.ogg" id="6_or3m6"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/player_dead_b_01.ogg" id="7_3y1vx"]
+[ext_resource type="Script" path="res://scripts/resources/sounds/soundtrack_resource.gd" id="8_w1y2h"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/goal_achieved_e_01.ogg" id="9_0lw16"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/victory_e_01.ogg" id="10_fdshx"]
 
 [resource]
-script = ExtResource("8_tjlxo")
+script = ExtResource("8_w1y2h")
 name = "Freya"
-ambience = ExtResource("1_hd85y")
+ambience = ExtResource("1_m77w4")
 ambience_filename = "ambient_c_01.ogg"
-arrival_allied_normal = ExtResource("2_yaexw")
+arrival_allied_normal = ExtResource("2_02heg")
 arrival_allied_normal_filename = "aarrival_normal_e_01.ogg"
-arrival_enemy_normal = ExtResource("4_64rvh")
+arrival_enemy_normal = ExtResource("4_4fipo")
 arrival_enemy_normal_filename = "earrival_normal_e_01.ogg"
-battle_1 = ExtResource("5_4evvt")
+battle_1 = ExtResource("5_ieeal")
 battle_1_filename = "battle1_e_04.ogg"
-battle_2 = ExtResource("5_4evvt")
+battle_2 = ExtResource("5_ieeal")
 battle_2_filename = "battle1_e_04.ogg"
-battle_3 = ExtResource("5_4evvt")
+battle_3 = ExtResource("5_ieeal")
 battle_3_filename = "battle1_e_04.ogg"
-arrival_allied_battle = ExtResource("2_yaexw")
+arrival_allied_battle = ExtResource("2_02heg")
 arrival_allied_battle_filename = "aarrival_normal_e_01.ogg"
-arrival_enemy_battle = ExtResource("3_x7uqv")
+arrival_enemy_battle = ExtResource("3_jwbvt")
 arrival_enemy_battle_filename = "earrival_battle_e_01.ogg"
-victory_1 = ExtResource("9_ocimx")
+victory_1 = ExtResource("9_0lw16")
 victory_1_filename = "goal_achieved_e_01.ogg"
-victory_2 = ExtResource("10_837h8")
+victory_2 = ExtResource("10_fdshx")
 victory_2_filename = "victory_e_01.ogg"
-goal_failed = ExtResource("6_0rsqa")
+goal_failed = ExtResource("6_or3m6")
 goal_failed_filename = "goal_failed_b_01.ogg"
-player_dead = ExtResource("7_cojpi")
+player_dead = ExtResource("7_3y1vx")
 player_dead_filename = "player_dead_b_01.ogg"

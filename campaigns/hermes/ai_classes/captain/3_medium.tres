@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="AIClassResource" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/ai_classes/ai_class_resource.gd" id="1_8e7fk"]
+[ext_resource type="Script" path="res://scripts/resources/ai_classes/ai_class_resource.gd" id="1_51j0s"]
 
 [resource]
-script = ExtResource("1_8e7fk")
+script = ExtResource("1_51j0s")
 ai_class_name = "Captain"
 difficulty_level = "3_medium"
 accuracy = 0.6

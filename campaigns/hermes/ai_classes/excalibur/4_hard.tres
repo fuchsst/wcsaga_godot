@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="AIClassResource" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/ai_classes/ai_class_resource.gd" id="1_wyo0q"]
+[ext_resource type="Script" path="res://scripts/resources/ai_classes/ai_class_resource.gd" id="1_wa2y0"]
 
 [resource]
-script = ExtResource("1_wyo0q")
+script = ExtResource("1_wa2y0")
 ai_class_name = "Excalibur"
 difficulty_level = "4_hard"
 accuracy = 0.75

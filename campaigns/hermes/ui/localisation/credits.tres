@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="CreditsResource" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/ui/localisation/credits_resource.gd" id="1_10jn8"]
+[ext_resource type="Script" path="res://scripts/resources/ui/localisation/credits_resource.gd" id="1_lmsgf"]
 
 [resource]
-script = ExtResource("1_10jn8")
+script = ExtResource("1_lmsgf")

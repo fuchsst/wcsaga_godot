@@ -1,10 +1,10 @@
 [gd_resource type="Resource" script_class="IFFManifest" load_steps=9 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/iff_defs/iff_resource.gd" id="1_7b5ig"]
-[ext_resource type="Script" path="res://scripts/resources/iff_defs/iff_manifest.gd" id="2_1uw6r"]
+[ext_resource type="Script" path="res://scripts/resources/iff_defs/iff_resource.gd" id="1_o83vl"]
+[ext_resource type="Script" path="res://scripts/resources/iff_defs/iff_manifest.gd" id="2_7qv54"]
 
-[sub_resource type="Resource" id="Resource_nth86"]
-script = ExtResource("1_7b5ig")
+[sub_resource type="Resource" id="Resource_yfltl"]
+script = ExtResource("1_o83vl")
 iff_name = "Friendly"
 color = Color(0, 0.09411765, 0.28235295, 0.9098039)
 attacks = Array[String](["Hostile", "Neutral", "Traitor"])
@@ -12,8 +12,8 @@ flags = Array[int]([2])
 default_ship_flags = Array[String](["cargo-known"])
 default_ship_flags2 = Array[String](["no-subspace-drive"])
 
-[sub_resource type="Resource" id="Resource_sebcr"]
-script = ExtResource("1_7b5ig")
+[sub_resource type="Resource" id="Resource_txars"]
+script = ExtResource("1_o83vl")
 iff_name = "Hostile"
 color = Color(0, 0.9254902, 0.21960784, 0.09411765)
 attacks = Array[String](["Friendly", "Neutral", "Traitor"])
@@ -24,8 +24,8 @@ perceptions = {
 flags = Array[int]([2, 4])
 default_ship_flags2 = Array[String](["no-subspace-drive"])
 
-[sub_resource type="Resource" id="Resource_bsmo0"]
-script = ExtResource("1_7b5ig")
+[sub_resource type="Resource" id="Resource_ej8mh"]
+script = ExtResource("1_o83vl")
 iff_name = "Neutral"
 color = Color(0, 0.9254902, 0.21960784, 0.09411765)
 attacks = Array[String](["Friendly", "Traitor"])
@@ -37,8 +37,8 @@ perceptions = {
 flags = Array[int]([2, 4])
 default_ship_flags2 = Array[String](["no-subspace-drive"])
 
-[sub_resource type="Resource" id="Resource_kvkgm"]
-script = ExtResource("1_7b5ig")
+[sub_resource type="Resource" id="Resource_o7g3v"]
+script = ExtResource("1_o83vl")
 iff_name = "Unknown"
 color = Color(0, 0.7647059, 0.28627452, 0.7137255)
 attacks = Array[String](["Hostile"])
@@ -49,8 +49,8 @@ perceptions = {
 flags = Array[int]([1, 2, 4])
 default_ship_flags2 = Array[String](["no-subspace-drive"])
 
-[sub_resource type="Resource" id="Resource_dnqmf"]
-script = ExtResource("1_7b5ig")
+[sub_resource type="Resource" id="Resource_hirls"]
+script = ExtResource("1_o83vl")
 iff_name = "Traitor"
 color = Color(0, 0.9254902, 0.21960784, 0.09411765)
 attacks = Array[String](["Friendly", "Hostile", "Neutral", "Traitor"])
@@ -60,13 +60,13 @@ perceptions = {
 flags = Array[int]([2, 4])
 default_ship_flags2 = Array[String](["no-subspace-drive"])
 
-[sub_resource type="Resource" id="Resource_alwey"]
-script = ExtResource("1_7b5ig")
+[sub_resource type="Resource" id="Resource_cqpj1"]
+script = ExtResource("1_o83vl")
 iff_name = "Non Combatant"
 color = Color(0, 0, 0, 1)
 flags = Array[int]([1, 2, 4])
 default_ship_flags2 = Array[String](["no-subspace-drive"])
 
 [resource]
-script = ExtResource("2_1uw6r")
-iffs = Array[Resource]([SubResource("Resource_nth86"), SubResource("Resource_sebcr"), SubResource("Resource_bsmo0"), SubResource("Resource_kvkgm"), SubResource("Resource_dnqmf"), SubResource("Resource_alwey")])
+script = ExtResource("2_7qv54")
+iffs = Array[Resource]([SubResource("Resource_yfltl"), SubResource("Resource_txars"), SubResource("Resource_ej8mh"), SubResource("Resource_o7g3v"), SubResource("Resource_hirls"), SubResource("Resource_cqpj1")])

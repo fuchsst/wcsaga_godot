@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="AIClassResource" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/ai_classes/ai_class_resource.gd" id="1_h64p7"]
+[ext_resource type="Script" path="res://scripts/resources/ai_classes/ai_class_resource.gd" id="1_a5c21"]
 
 [resource]
-script = ExtResource("1_h64p7")
+script = ExtResource("1_a5c21")
 ai_class_name = "CS#Skipper"
 difficulty_level = "2_easy"
 accuracy = 0.2

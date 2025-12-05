@@ -283,6 +283,18 @@
       "byteLength": 122912
     }
   ],
+  "images": [
+    {
+      "uri": "kim_cruise_missile_1_albedo.png",
+      "mimeType": "image/png",
+      "name": "kim_cruise_missile_1_albedo_image"
+    },
+    {
+      "uri": "kim_cruise_missile_1_orm.png",
+      "mimeType": "image/png",
+      "name": "kim_cruise_missile_1_orm_image"
+    }
+  ],
   "materials": [
     {
       "pbrMetallicRoughness": {
@@ -293,7 +305,19 @@
           1.0
         ],
         "metallicFactor": 0.15,
-        "roughnessFactor": 0.75
+        "roughnessFactor": 0.75,
+        "baseColorTexture": {
+          "index": 0,
+          "texCoord": 0
+        },
+        "metallicRoughnessTexture": {
+          "index": 1,
+          "texCoord": 0
+        }
+      },
+      "occlusionTexture": {
+        "index": 1,
+        "texCoord": 0
       },
       "emissiveFactor": [
         0.0,
@@ -334,6 +358,16 @@
       "nodes": [
         0
       ]
+    }
+  ],
+  "textures": [
+    {
+      "source": 0,
+      "name": "kim_cruise_missile_1_albedo_texture"
+    },
+    {
+      "source": 1,
+      "name": "kim_cruise_missile_1_orm_texture"
     }
   ]
 }

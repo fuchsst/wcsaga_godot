@@ -2,10 +2,10 @@
 
 [ext_resource type="Script" path="res://scripts/resources/weapons/weapon_data.gd" id="1_27rjp"]
 
-[sub_resource type="GDScript" id="GDScript_1c6gj"]
+[sub_resource type="GDScript" id="GDScript_830sb"]
 
 [sub_resource type="Resource" id="Resource_faru6"]
-script = SubResource("GDScript_1c6gj")
+script = SubResource("GDScript_830sb")
 bitmap = "empty"
 start_width = 0.0
 end_width = 0.0
@@ -19,7 +19,8 @@ weapon_class = "Scratch"
 category = "Secondary Weapons"
 display_name = "Scratch"
 manufacturer_species = "Terran"
-tech_description = "XSTR(\"Just like the Terrans, the Kilrathi love to deploy mines as well. Mines can be used to channel enemy forces into an ambush zone, deter enemy shipping, sabotage jump points, or just be tossed off the back towards that fighter that's on your tail. Just like the Terrans, the Scratch mine has a powerful warhead and has limited guidance systems that let it seek out any nearby targets.\", -1)"
+tech_description = "
+Just like the Terrans, the Kilrathi love to deploy mines as well. Mines can be used to channel enemy forces into an ambush zone, deter enemy shipping, sabotage jump points, or just be tossed off the back towards that fighter that's on your tail. Just like the Terrans, the Scratch mine has a powerful warhead and has limited guidance systems that let it seek out any nearby targets."
 projectile_mass_kg = 3.0
 muzzle_velocity_mps = 200.0
 fire_rate_hz = 0.5
@@ -37,4 +38,4 @@ impact_explosion = "res://assets/effects/explosions/empty.tscn"
 launch_sound_id = 87
 impact_sound_id = 107
 display_icon = "IconFF"
-tech_animation = "empty"
+tech_animation = "res://assets/shared/empty.tres"

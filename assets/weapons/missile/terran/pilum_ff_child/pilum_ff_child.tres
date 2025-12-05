@@ -2,10 +2,10 @@
 
 [ext_resource type="Script" path="res://scripts/resources/weapons/weapon_data.gd" id="1_pphyo"]
 
-[sub_resource type="GDScript" id="GDScript_1c6gj"]
+[sub_resource type="GDScript" id="GDScript_830sb"]
 
 [sub_resource type="Resource" id="Resource_dlx1m"]
-script = SubResource("GDScript_1c6gj")
+script = SubResource("GDScript_830sb")
 bitmap = "newmiss3"
 start_width = 0.2
 end_width = 0.45
@@ -20,7 +20,7 @@ category = "missile"
 display_name = "Pilum FF Child"
 manufacturer_species = "terran"
 projectile_mass_kg = 3.0
-muzzle_velocity_mps = 0.0
+muzzle_velocity_mps = 300.0
 fire_rate_hz = 2.0
 base_damage_energy = 308.0
 shield_penetration_factor = 0.7
@@ -38,4 +38,4 @@ impact_explosion_radius = 20.0
 launch_sound_id = 87
 impact_sound_id = 88
 display_icon = "IconFF"
-tech_animation = "empty"
+tech_animation = "res://assets/shared/empty.tres"

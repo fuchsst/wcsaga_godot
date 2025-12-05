@@ -1,23 +1,24 @@
-[gd_resource type="Resource" script_class="WCSWeaponData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="WCSWeaponData" load_steps=3 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/weapons/weapon_data.gd" id="1_5gt44"]
+[ext_resource type="Texture2D" path="res://assets/weapons/primary_weapons/terran/photon/Photon_Glow.png" id="1_osnbl"]
+[ext_resource type="Script" path="res://scripts/resources/weapons/weapon_data.gd" id="2_mleeu"]
 
 [resource]
-script = ExtResource("1_5gt44")
+script = ExtResource("2_mleeu")
 weapon_class = "Photon"
 category = "Primary Weapons"
 display_name = "Photon"
 manufacturer_species = "Terran"
-tech_description = "XSTR(\"When Terran forces first went to war, the photon cannon was the most popular gun next to the standard laser. It emits laser pulses and solicits similar effects upon impact. However, the photon cannon drains more energy and has a slower refire rate. This gun requires little maintenance - the mirror robotics are the only adjustable component - and functions best in deep-space combat.\", -1)"
+tech_description = "
+When Terran forces first went to war, the photon cannon was the most popular gun next to the standard laser. It emits laser pulses and solicits similar effects upon impact. However, the photon cannon drains more energy and has a slower refire rate. This gun requires little maintenance - the mirror robotics are the only adjustable component - and functions best in deep-space combat."
 muzzle_velocity_mps = 800.0
 effective_range_meters = 500.0
 fire_rate_hz = 10.0
 shield_penetration_factor = 1.0
 subsystem_damage_factor = 0.4
-energy_per_shot = 0.0
+energy_per_shot = 3.2
 projectile_model = "none"
-laser_bitmap = "Photon"
-laser_glow = "Photon_Glow.png"
+laser_glow = ExtResource("1_osnbl")
 laser_head_radius = 0.7
 laser_tail_radius = 0.7
 laser_primary_color = Color(0.8980392, 0.83137256, 0.07058824, 1)

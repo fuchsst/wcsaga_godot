@@ -103,6 +103,18 @@
       "byteLength": 68948
     }
   ],
+  "images": [
+    {
+      "uri": "tcm_javelin_albedo.png",
+      "mimeType": "image/png",
+      "name": "tcm_javelin_albedo_image"
+    },
+    {
+      "uri": "tcm_javelin_orm.png",
+      "mimeType": "image/png",
+      "name": "tcm_javelin_orm_image"
+    }
+  ],
   "materials": [
     {
       "pbrMetallicRoughness": {
@@ -113,7 +125,19 @@
           1.0
         ],
         "metallicFactor": 0.15,
-        "roughnessFactor": 0.75
+        "roughnessFactor": 0.75,
+        "baseColorTexture": {
+          "index": 0,
+          "texCoord": 0
+        },
+        "metallicRoughnessTexture": {
+          "index": 1,
+          "texCoord": 0
+        }
+      },
+      "occlusionTexture": {
+        "index": 1,
+        "texCoord": 0
       },
       "emissiveFactor": [
         0.0,
@@ -154,6 +178,16 @@
       "nodes": [
         0
       ]
+    }
+  ],
+  "textures": [
+    {
+      "source": 0,
+      "name": "tcm_javelin_albedo_texture"
+    },
+    {
+      "source": 1,
+      "name": "tcm_javelin_orm_texture"
     }
   ]
 }

@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="AIProfileResource" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/ai_profiles/ai_profile_resource.gd" id="1_640sf"]
+[ext_resource type="Script" path="res://scripts/resources/ai_profiles/ai_profile_resource.gd" id="1_h3cql"]
 
 [resource]
-script = ExtResource("1_640sf")
+script = ExtResource("1_h3cql")
 difficulty_level = "1_very_easy"
 profile_name = "1_very_easy"
 disable_linked_fire_penalty = true

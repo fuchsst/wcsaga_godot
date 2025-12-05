@@ -1,18 +1,20 @@
-[gd_resource type="Resource" script_class="WCSWeaponData" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="WCSWeaponData" load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/weapons/weapon_data.gd" id="1_3uu70"]
+[ext_resource type="Texture2D" path="res://assets/weapons/primary_weapons/terran/anti-mater_turret/AMG_Bitmap.png" id="1_vknno"]
+[ext_resource type="Texture2D" path="res://assets/weapons/primary_weapons/terran/anti-mater_turret/Laser_Glow.png" id="2_gup8q"]
+[ext_resource type="Script" path="res://scripts/resources/weapons/weapon_data.gd" id="3_td56q"]
 
-[sub_resource type="GDScript" id="GDScript_r0rle"]
+[sub_resource type="GDScript" id="GDScript_cdfai"]
 
-[sub_resource type="Resource" id="Resource_vknno"]
-script = SubResource("GDScript_r0rle")
+[sub_resource type="Resource" id="Resource_sgfy8"]
+script = SubResource("GDScript_cdfai")
 count = 2
 wait_time = 0.1
 spread_angle = 0.0
 path_jitter = 0.0
 
 [resource]
-script = ExtResource("1_3uu70")
+script = ExtResource("3_td56q")
 weapon_class = "Anti-Mater Turret"
 category = "Primary Weapons"
 display_name = "Anti-Mater Turret"
@@ -26,13 +28,13 @@ subsystem_damage_factor = 0.8
 blast_radius = 28.0
 energy_per_shot = 0.3
 projectile_model = "none"
-laser_bitmap = "AMG_Bitmap.png"
-laser_glow = "Laser_Glow.png"
+laser_bitmap = ExtResource("1_vknno")
+laser_glow = ExtResource("2_gup8q")
 laser_length_meters = 20.0
 laser_head_radius = 8.5
 laser_tail_radius = 8.5
 laser_primary_color = Color(0.8980392, 0.8156863, 0.0627451, 1)
-swarm_config = SubResource("Resource_vknno")
+swarm_config = SubResource("Resource_sgfy8")
 is_huge_weapon = true
 flags = 4
 impact_explosion = "res://assets/effects/explosions/expmissilehit1.tscn"

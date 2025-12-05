@@ -1,8 +1,8 @@
 [gd_resource type="Resource" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/campaigns/medal_resource.gd" id="1_a3ely"]
+[ext_resource type="Script" path="res://scripts/resources/campaigns/medal_resource.gd" id="1_fdea4"]
 
 [resource]
-script = ExtResource("1_a3ely")
+script = ExtResource("1_fdea4")
 name = "Medal of Honor"
 num_mods = 1

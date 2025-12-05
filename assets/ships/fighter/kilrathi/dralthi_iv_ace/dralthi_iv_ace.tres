@@ -1,19 +1,19 @@
 [gd_resource type="Resource" script_class="ShipStats" load_steps=7 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/ships/ship_stats.gd" id="1_7opam"]
+[ext_resource type="Script" path="res://scripts/resources/ships/ship_stats.gd" id="1_1pj4v"]
 
-[sub_resource type="GDScript" id="GDScript_t8xbw"]
+[sub_resource type="GDScript" id="GDScript_appqk"]
 
-[sub_resource type="GDScript" id="GDScript_chs1k"]
+[sub_resource type="GDScript" id="GDScript_f0v7g"]
 
-[sub_resource type="GDScript" id="GDScript_jecvk"]
+[sub_resource type="GDScript" id="GDScript_dyq7w"]
 
-[sub_resource type="GDScript" id="GDScript_0hh3c"]
+[sub_resource type="GDScript" id="GDScript_gu4du"]
 
-[sub_resource type="GDScript" id="GDScript_6xcd0"]
+[sub_resource type="GDScript" id="GDScript_4kec4"]
 
 [resource]
-script = ExtResource("1_7opam")
+script = ExtResource("1_1pj4v")
 ship_class = "Dralthi IV#Ace"
 display_name = "Dralthi IV#Ace"
 ship_short_name = "Deathstroke"

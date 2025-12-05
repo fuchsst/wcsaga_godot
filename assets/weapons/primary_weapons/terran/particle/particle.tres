@@ -1,14 +1,17 @@
-[gd_resource type="Resource" script_class="WCSWeaponData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="WCSWeaponData" load_steps=4 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/weapons/weapon_data.gd" id="1_k3xet"]
+[ext_resource type="Texture2D" path="res://assets/weapons/primary_weapons/terran/particle/Particle_Bitmap.png" id="1_nhrrx"]
+[ext_resource type="Texture2D" path="res://assets/weapons/primary_weapons/terran/particle/Particle_Glow.png" id="2_d77sq"]
+[ext_resource type="Script" path="res://scripts/resources/weapons/weapon_data.gd" id="3_w84q4"]
 
 [resource]
-script = ExtResource("1_k3xet")
+script = ExtResource("3_w84q4")
 weapon_class = "Particle"
 category = "Primary Weapons"
 display_name = "Particle"
 manufacturer_species = "Terran"
-tech_description = "XSTR(\"The particle cannon is perhaps the most significant energy technology we possess. Prototypes were first developed three years into the war, when a similar cannon was extracted from a captured Kilrathi fighter. Engineers built a comparable version capable of hurling minute nuclear particles at high speeds. Any impact results in a small nuclear explosion that gives off blast, heat and radiation damage. This cannon is useless, however, in atmospheric conditions.\", -1)"
+tech_description = "
+The particle cannon is perhaps the most significant energy technology we possess. Prototypes were first developed three years into the war, when a similar cannon was extracted from a captured Kilrathi fighter. Engineers built a comparable version capable of hurling minute nuclear particles at high speeds. Any impact results in a small nuclear explosion that gives off blast, heat and radiation damage. This cannon is useless, however, in atmospheric conditions."
 projectile_mass_kg = 0.4
 muzzle_velocity_mps = 945.0
 effective_range_meters = 840.0
@@ -18,8 +21,8 @@ shield_penetration_factor = 1.0
 subsystem_damage_factor = 0.35
 energy_per_shot = 2.2
 projectile_model = "none"
-laser_bitmap = "Particle_Bitmap.png"
-laser_glow = "Particle_Glow.png"
+laser_bitmap = ExtResource("1_nhrrx")
+laser_glow = ExtResource("2_d77sq")
 laser_length_meters = 5.0
 laser_head_radius = 2.0
 laser_tail_radius = 2.0

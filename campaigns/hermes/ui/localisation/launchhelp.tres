@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="HelpResource" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/ui/localisation/help_resource.gd" id="1_e73r6"]
+[ext_resource type="Script" path="res://scripts/resources/ui/localisation/help_resource.gd" id="1_d468h"]
 
 [resource]
-script = ExtResource("1_e73r6")
+script = ExtResource("1_d468h")
 topic = "Launch Help"
 text = "XSTR(\"
 ----------------------------------------------

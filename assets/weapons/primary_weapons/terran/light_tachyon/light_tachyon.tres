@@ -1,14 +1,17 @@
-[gd_resource type="Resource" script_class="WCSWeaponData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="WCSWeaponData" load_steps=4 format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/weapons/weapon_data.gd" id="1_shmgq"]
+[ext_resource type="Texture2D" path="res://assets/weapons/primary_weapons/terran/light_tachyon/tachyon.png" id="1_ok4sk"]
+[ext_resource type="Texture2D" path="res://assets/weapons/primary_weapons/terran/light_tachyon/tachyon_glow.png" id="2_r0pm0"]
+[ext_resource type="Script" path="res://scripts/resources/weapons/weapon_data.gd" id="3_pdoax"]
 
 [resource]
-script = ExtResource("1_shmgq")
+script = ExtResource("3_pdoax")
 weapon_class = "Light Tachyon"
 category = "Primary Weapons"
 display_name = "Light Tachyon"
 manufacturer_species = "Terran"
-tech_description = "XSTR(\"A light version of power-hungry blaster, the light tachyon gun is one of the most devastating energy gun found on Terran fighters. It slows down tachyon particles, which naturally travel faster than the speed of light. Once these particles ore decelerated and forced into streams, their potential damage increases monumentally. In several documented cases, the powerful tachyon gun has been used to attack the shields of capital ships.\", -1)"
+tech_description = "
+A light version of power-hungry blaster, the light tachyon gun is one of the most devastating energy gun found on Terran fighters. It slows down tachyon particles, which naturally travel faster than the speed of light. Once these particles ore decelerated and forced into streams, their potential damage increases monumentally. In several documented cases, the powerful tachyon gun has been used to attack the shields of capital ships."
 projectile_mass_kg = 0.3
 muzzle_velocity_mps = 855.0
 effective_range_meters = 750.0
@@ -19,8 +22,8 @@ shield_penetration_factor = 0.75
 subsystem_damage_factor = 0.3
 energy_per_shot = 3.14
 projectile_model = "none"
-laser_bitmap = "tachyon.png"
-laser_glow = "tachyon_glow.png"
+laser_bitmap = ExtResource("1_ok4sk")
+laser_glow = ExtResource("2_r0pm0")
 laser_length_meters = 14.0
 laser_head_radius = 0.75
 laser_tail_radius = 0.65

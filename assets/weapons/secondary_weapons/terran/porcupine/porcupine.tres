@@ -2,10 +2,10 @@
 
 [ext_resource type="Script" path="res://scripts/resources/weapons/weapon_data.gd" id="1_h1gx7"]
 
-[sub_resource type="GDScript" id="GDScript_1c6gj"]
+[sub_resource type="GDScript" id="GDScript_830sb"]
 
 [sub_resource type="Resource" id="Resource_efqyo"]
-script = SubResource("GDScript_1c6gj")
+script = SubResource("GDScript_830sb")
 bitmap = "empty"
 start_width = 0.0
 end_width = 0.0
@@ -19,7 +19,8 @@ weapon_class = "Porcupine"
 category = "Secondary Weapons"
 display_name = "Porcupine"
 manufacturer_species = "Terran"
-tech_description = "XSTR(\"Mines are useful for booby-trapping areas that the enemy may pass through such as jump points, gaps in asteroid fields and pulsar shadows. The Confederation and Kilrathi's latest mines have simplified guidance systems that can seek out disabled ships. Since mines move so slowly and have a low radar cross signature, ship detection systems are hard pressed to track them with sensors or radar. This deadly device has limited homing capabilities and built-in proximity sensors, detonation does not require contact.\", -1)"
+tech_description = "
+Mines are useful for booby-trapping areas that the enemy may pass through such as jump points, gaps in asteroid fields and pulsar shadows. The Confederation and Kilrathi's latest mines have simplified guidance systems that can seek out disabled ships. Since mines move so slowly and have a low radar cross signature, ship detection systems are hard pressed to track them with sensors or radar. This deadly device has limited homing capabilities and built-in proximity sensors, detonation does not require contact."
 projectile_mass_kg = 3.0
 muzzle_velocity_mps = 200.0
 fire_rate_hz = 0.5

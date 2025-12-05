@@ -1,38 +1,38 @@
 [gd_resource type="Resource" script_class="MenuMusicResource" load_steps=12 format=3]
 
-[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/briefing_a_01.ogg" id="1_6eg7y"]
-[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/briefing_b_01.ogg" id="2_j7pri"]
-[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/briefing_b_02.ogg" id="3_pj7wr"]
-[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/briefing_b_03.ogg" id="4_scqic"]
-[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/briefing_e_02.ogg" id="5_8yj82"]
-[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/credits.ogg" id="6_vq2tm"]
-[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/briefing_e_01.ogg" id="7_ql1qf"]
-[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/debriefing_failure_e_01.ogg" id="8_mxtai"]
-[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/main_e_02.ogg" id="9_t17c7"]
-[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/main_f_01.ogg" id="10_p0kmc"]
-[ext_resource type="Script" path="res://scripts/resources/sounds/menu_music_resource.gd" id="11_s0rr3"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/briefing_a_01.ogg" id="1_uy0r0"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/briefing_b_01.ogg" id="2_fy5p6"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/briefing_b_02.ogg" id="3_hsixn"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/briefing_b_03.ogg" id="4_mhjfu"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/briefing_e_02.ogg" id="5_nftqx"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/credits.ogg" id="6_c51ym"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/briefing_e_01.ogg" id="7_hotj6"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/debriefing_failure_e_01.ogg" id="8_6u0tx"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/main_e_02.ogg" id="9_7bi5c"]
+[ext_resource type="AudioStream" path="res://campaigns/hermes/soundtrack/main_f_01.ogg" id="10_5piik"]
+[ext_resource type="Script" path="res://scripts/resources/sounds/menu_music_resource.gd" id="11_51fw8"]
 
 [resource]
-script = ExtResource("11_s0rr3")
-command_brief = ExtResource("5_8yj82")
+script = ExtResource("11_51fw8")
+command_brief = ExtResource("5_nftqx")
 command_brief_filename = "briefing_e_02.ogg"
-briefing_1 = ExtResource("1_6eg7y")
+briefing_1 = ExtResource("1_uy0r0")
 briefing_1_filename = "briefing_a_01.ogg"
-briefing_2 = ExtResource("2_j7pri")
+briefing_2 = ExtResource("2_fy5p6")
 briefing_2_filename = "briefing_b_01.ogg"
-briefing_3 = ExtResource("3_pj7wr")
+briefing_3 = ExtResource("3_hsixn")
 briefing_3_filename = "briefing_b_02.ogg"
-briefing_4 = ExtResource("4_scqic")
+briefing_4 = ExtResource("4_mhjfu")
 briefing_4_filename = "briefing_b_03.ogg"
-debriefing_success = ExtResource("7_ql1qf")
+debriefing_success = ExtResource("7_hotj6")
 debriefing_success_filename = "briefing_e_01.ogg"
-debriefing_average = ExtResource("7_ql1qf")
+debriefing_average = ExtResource("7_hotj6")
 debriefing_average_filename = "briefing_e_01.ogg"
-debriefing_failure = ExtResource("8_mxtai")
+debriefing_failure = ExtResource("8_6u0tx")
 debriefing_failure_filename = "debriefing_failure_e_01.ogg"
-fiction_viewer = ExtResource("9_t17c7")
+fiction_viewer = ExtResource("9_7bi5c")
 fiction_viewer_filename = "main_e_02.ogg"
-prologue_menu = ExtResource("10_p0kmc")
+prologue_menu = ExtResource("10_5piik")
 prologue_menu_filename = "main_f_01.ogg"
-credits = ExtResource("6_vq2tm")
+credits = ExtResource("6_c51ym")
 credits_filename = "credits.ogg"
