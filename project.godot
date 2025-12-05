@@ -20,10 +20,10 @@ config/icon="uid://cc58gpsbqci8y"
 Signal_Debugger="*res://addons/SignalVisualizer/Debugger/SignalDebugger.gd"
 SceneManager="*res://addons/scene_manager/SceneManager.tscn"
 GlobalIFFManager="*res://autoload/iff_manager.gd"
-Main="*res://scripts/core/main/Main.gd"
-InputManager="*res://scripts/core/input/InputManager.gd"
-GameStateMachine="*res://scripts/core/game_state/GameStateMachine.gd"
-WCS="*res://scripts/core/utils/WCS.gd"
+Main="*res://autoload/Main.gd"
+InputManager="*res://scripts/input/InputManager.gd"
+GameStateMachine="*res://scripts/game_state/GameStateMachine.gd"
+WCS="*res://scripts/utilities/WCS.gd"
 
 [display]
 
