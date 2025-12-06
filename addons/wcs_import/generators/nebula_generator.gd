@@ -8,45 +8,54 @@ func generate(assets: Resource, output_dir: String, source_root: String) -> bool
 	# Process background bitmaps
 	for bitmap_name in assets.backgrounds.keys():
 		var source = _find_source_asset(source_root, bitmap_name, [".pcx", ".dds", ".png", ".tga"])
-		if not source.is_empty():
-			_convert_asset(source, output_dir, "texture")
-			var texture_path = output_dir.path_join(source.get_file().get_basename() + ".png")
-			# Use PlaceholderTexture2D to create a reference to the file
-			# This ensures ResourceSaver writes ExtResource("path") even if the file isn't imported yet
-			var texture = PlaceholderTexture2D.new()
-			# Ensure path is res://
-			var res_path = texture_path
+		if source.is_empty():
+			push_error("Error: Source not found for background: " + bitmap_name)
+			return false
+			
+		if not _convert_asset(source, output_dir, "texture"):
+			push_error("Error: Failed to convert background: " + source)
+			return false
+			
+		var texture_path = output_dir.path_join(source.get_file().get_basename() + ".png")
+		# Use PlaceholderTexture2D to create a reference to the file
+		# This ensures ResourceSaver writes ExtResource("path") even if the file isn't imported yet
+		var texture = PlaceholderTexture2D.new()
+		# Ensure path is res://
+		var res_path = texture_path
+		if not res_path.begins_with("res://"):
+			# Assuming running from project root, relative paths are res://
+			# Strip ./ if present
+			res_path = res_path.replace("./", "")
+			# If it doesn't start with res://, prepend it
 			if not res_path.begins_with("res://"):
-				# Assuming running from project root, relative paths are res://
-				# Strip ./ if present
-				res_path = res_path.replace("./", "")
-				# If it doesn't start with res://, prepend it
-				if not res_path.begins_with("res://"):
-					res_path = "res://" + res_path.lstrip("/")
+				res_path = "res://" + res_path.lstrip("/")
 
-			texture.resource_path = res_path
-			assets.backgrounds[bitmap_name] = texture
-		else:
-			print("Source not found for: " + bitmap_name)
+		texture.resource_path = res_path
+		assets.backgrounds[bitmap_name] = texture
+
 
 	# Process poof bitmaps
 	for poof_name in assets.poofs.keys():
 		var source = _find_source_asset(source_root, poof_name, [".pcx", ".dds", ".png", ".tga"])
-		if not source.is_empty():
-			_convert_asset(source, output_dir, "texture")
-			var texture_path = output_dir.path_join(source.get_file().get_basename() + ".png")
+		if source.is_empty():
+			push_error("Error: Source not found for poof: " + poof_name)
+			return false
+			
+		if not _convert_asset(source, output_dir, "texture"):
+			push_error("Error: Failed to convert poof: " + source)
+			return false
+			
+		var texture_path = output_dir.path_join(source.get_file().get_basename() + ".png")
 
-			var texture = PlaceholderTexture2D.new()
-			var res_path = texture_path
+		var texture = PlaceholderTexture2D.new()
+		var res_path = texture_path
+		if not res_path.begins_with("res://"):
+			res_path = res_path.replace("./", "")
 			if not res_path.begins_with("res://"):
-				res_path = res_path.replace("./", "")
-				if not res_path.begins_with("res://"):
-					res_path = "res://" + res_path.lstrip("/")
+				res_path = "res://" + res_path.lstrip("/")
 
-			texture.resource_path = res_path
-			assets.poofs[poof_name] = texture
-		else:
-			print("Source not found for: " + poof_name)
+		texture.resource_path = res_path
+		assets.poofs[poof_name] = texture
 
 	var save_path = output_dir.path_join("nebula.tres")
 	var err = ResourceSaver.save(assets, save_path)

@@ -1,8 +1,0 @@
-[gd_scene load_steps=3 format=3]
-
-[ext_resource type="Script" path="res://scripts/entities/missile.gd" id="1_lk5ca"]
-[ext_resource type="Resource" path="./assets/weapons/missile/terran/pilum_ff_child/pilum_ff_child.tres" id="2_i7rc1"]
-
-[node name="Missile" type="Area3D"]
-script = ExtResource("1_lk5ca")
-weapon_data = ExtResource("2_i7rc1")

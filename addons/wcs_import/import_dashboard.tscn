@@ -1,0 +1,89 @@
+[gd_scene load_steps=2 format=3 uid="uid://8rhf5nou6ht8"]
+
+[ext_resource type="Script" uid="uid://cec7g0prrisb8" path="res://addons/wcs_import/import_dashboard.gd" id="1_r4x7v"]
+
+[node name="ImportDashboard" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_r4x7v")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -120.0
+offset_right = 150.0
+offset_bottom = 120.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "WCS Import Dashboard"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Import Type: "
+
+[node name="TypeOptionButton" type="OptionButton" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+selected = 0
+item_count = 16
+popup/item_0/text = "All"
+popup/item_0/id = 0
+popup/item_1/text = "ships"
+popup/item_1/id = 1
+popup/item_2/text = "weapons"
+popup/item_2/id = 2
+popup/item_3/text = "mission"
+popup/item_3/id = 3
+popup/item_4/text = "campaign"
+popup/item_4/id = 4
+popup/item_5/text = "animation"
+popup/item_5/id = 5
+popup/item_6/text = "sounds"
+popup/item_6/id = 6
+popup/item_7/text = "music"
+popup/item_7/id = 7
+popup/item_8/text = "asteroids"
+popup/item_8/id = 8
+popup/item_9/text = "nebula"
+popup/item_9/id = 9
+popup/item_10/text = "stars"
+popup/item_10/id = 10
+popup/item_11/text = "species"
+popup/item_11/id = 11
+popup/item_12/text = "icons"
+popup/item_12/id = 12
+popup/item_13/text = "hud_gauges"
+popup/item_13/id = 13
+popup/item_14/text = "ai_profiles"
+popup/item_14/id = 14
+popup/item_15/text = "ai_classes"
+popup/item_15/id = 15
+
+[node name="RunButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Run Import"
+
+[node name="StatusLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Ready to import."
+horizontal_alignment = 1
+autowrap_mode = 2

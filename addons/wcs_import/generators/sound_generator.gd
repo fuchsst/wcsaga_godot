@@ -12,10 +12,12 @@ func generate(manifest: SoundManifest, output_dir: String, source_root: String) 
 
 	# Convert assets
 	for config in manifest.audio_configs:
-		_convert_audio_config(config, source_root, save_dir)
+		if not _convert_audio_config(config, source_root, save_dir):
+			return false
 
 	for flyby in manifest.flyby_sounds:
-		_convert_audio_config(flyby, source_root, save_dir)
+		if not _convert_audio_config(flyby, source_root, save_dir):
+			return false
 
 	var save_path = save_dir.path_join("sounds.tres")
 	var err = ResourceSaver.save(manifest, save_path)
@@ -27,28 +29,43 @@ func generate(manifest: SoundManifest, output_dir: String, source_root: String) 
 	return true
 
 
-func _convert_audio_config(config: Resource, source_root: String, output_dir: String) -> void:
+func _convert_audio_config(config: Resource, source_root: String, output_dir: String) -> bool:
 	var filename = config.filename
-	if not filename.is_empty():
-		var search_name = filename.get_basename()
-		var source_file = _find_source_asset(source_root, search_name, [".wav", ".ogg"])
+	if filename.is_empty():
+		return true
 
-		if not source_file.is_empty():
-			_convert_asset(source_file, output_dir, "audio")
+	var search_name = filename.get_basename()
+	var source_file = _find_source_asset(source_root, search_name, [".wav", ".ogg"])
 
-			var converted_filename = source_file.get_file().get_basename() + ".ogg"
-			var converted_path = output_dir.path_join(converted_filename)
+	if source_file.is_empty():
+		push_error("Error: Could not find source for sound: " + filename)
+		return false
 
-			var res_path = converted_path
-			if not res_path.begins_with("res://"):
-				res_path = ProjectSettings.localize_path(res_path)
+	if not _convert_asset(source_file, output_dir, "audio"):
+		push_error("Error: Failed to convert sound asset: " + source_file)
+		return false
 
-			if FileAccess.file_exists(res_path):
-				config.audio_stream = load(res_path)
-			else:
-				print("Warning: Converted file not found: " + res_path)
-		else:
-			print("Warning: Could not find source for sound: " + filename)
+	var converted_filename = source_file.get_file().get_basename() + ".ogg"
+	var converted_path = output_dir.path_join(converted_filename)
+
+	var res_path = converted_path
+	if not res_path.begins_with("res://"):
+		res_path = ProjectSettings.localize_path(res_path)
+
+	if not FileAccess.file_exists(res_path):
+		push_error("Error: Converted file not found: " + res_path)
+		return false
+
+	# Fail early logic: Just try to load. If it fails (e.g. not imported), it fails.
+	# We rely on the build system/CLI to handle imports or accept the error.
+	var stream = load(res_path)
+	if stream:
+		config.audio_stream = stream
+	else:
+		push_error("Error: Failed to load sound resource: " + res_path)
+		return false
+	
+	return true
 
 
 func _find_source_asset(root_path: String, filename: String, extensions: Array = []) -> String:

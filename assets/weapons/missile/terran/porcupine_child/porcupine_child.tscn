@@ -1,8 +1,0 @@
-[gd_scene load_steps=3 format=3]
-
-[ext_resource type="Script" path="res://scripts/entities/missile.gd" id="1_d6d8p"]
-[ext_resource type="Resource" path="./assets/weapons/missile/terran/porcupine_child/porcupine_child.tres" id="2_ae05j"]
-
-[node name="Missile" type="Area3D"]
-script = ExtResource("1_d6d8p")
-weapon_data = ExtResource("2_ae05j")

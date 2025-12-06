@@ -1,8 +1,0 @@
-[gd_scene load_steps=3 format=3]
-
-[ext_resource type="Script" path="res://scripts/entities/weapon.gd" id="1_x3ojf"]
-[ext_resource type="Resource" path="./assets/weapons/secondary_weapons/terran/porcupine/porcupine.tres" id="2_vsf7j"]
-
-[node name="Weapon" type="Area3D"]
-script = ExtResource("1_x3ojf")
-weapon_data = ExtResource("2_vsf7j")

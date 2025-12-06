@@ -1,8 +1,0 @@
-[gd_resource type="Resource" load_steps=2 format=3]
-
-[ext_resource type="Script" path="res://scripts/resources/campaigns/medal_resource.gd" id="1_uuojp"]
-
-[resource]
-script = ExtResource("1_uuojp")
-name = "Combat Action Medal"
-num_mods = 1

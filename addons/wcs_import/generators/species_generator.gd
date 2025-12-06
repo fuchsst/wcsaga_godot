@@ -12,7 +12,8 @@ func generate_defs(manifest: SpeciesManifest, output_dir: String, source_root: S
 	var saved_count = 0
 	for species in manifest.species_list:
 		# Convert assets to the same directory
-		_convert_species_assets(species, source_root, output_dir)
+		if not _convert_species_assets(species, source_root, output_dir):
+			return false
 		
 		# For species_defs, we just save the resource data
 		# We might need to convert assets if they are referenced here, but user instruction
@@ -51,7 +52,8 @@ func generate_species_assets(manifest: SpeciesManifest, output_dir: String, sour
 		if not DirAccess.dir_exists_absolute(species_dir):
 			DirAccess.make_dir_recursive_absolute(species_dir)
 			
-		_convert_species_assets(species, source_root, species_dir)
+		if not _convert_species_assets(species, source_root, species_dir):
+			return false
 		
 		# Save the resource as a sibling to the folder (or just in the category folder)
 		# e.g. .../fiction/ace/bloodmist.tres
@@ -63,90 +65,80 @@ func generate_species_assets(manifest: SpeciesManifest, output_dir: String, sour
 	return true
 
 
-func _convert_species_assets(species: Resource, source_root: String, output_dir: String) -> void:
-	# Helper to convert and load
-	var convert_and_load = func(filename_prop: String, resource_prop: String, type: String):
-		if not species.has_meta(filename_prop):
-			return
+func _convert_species_assets(species: Resource, source_root: String, output_dir: String) -> bool:
+	if not _process_asset_field(species, source_root, output_dir, "thruster_normal_filename", "thruster_normal", "animation"): return false
+	if not _process_asset_field(species, source_root, output_dir, "thruster_afterburn_filename", "thruster_afterburn", "animation"): return false
+	if not _process_asset_field(species, source_root, output_dir, "thruster_secondary_normal_filename", "thruster_secondary_normal", "animation"): return false
+	if not _process_asset_field(species, source_root, output_dir, "thruster_secondary_afterburn_filename", "thruster_secondary_afterburn", "animation"): return false
+	if not _process_asset_field(species, source_root, output_dir, "thruster_tertiary_normal_filename", "thruster_tertiary_normal", "animation"): return false
+	if not _process_asset_field(species, source_root, output_dir, "thruster_tertiary_afterburn_filename", "thruster_tertiary_afterburn", "animation"): return false
 
-		var filename = species.get_meta(filename_prop)
-		if not filename.is_empty():
-			if filename.begins_with("empty"):
-				species.set(resource_prop, load("res://assets/shared/empty.tres"))
-				return
+	if not _process_asset_field(species, source_root, output_dir, "glow_normal_filename", "glow_normal", "texture"): return false
+	if not _process_asset_field(species, source_root, output_dir, "glow_afterburn_filename", "glow_afterburn", "texture"): return false
+	if not _process_asset_field(species, source_root, output_dir, "debris_texture_filename", "debris_texture", "texture"): return false
+	if not _process_asset_field(species, source_root, output_dir, "shield_hit_anim_filename", "shield_hit_anim", "animation"): return false
+	if not _process_asset_field(species, source_root, output_dir, "fiction_anim_filename", "fiction_anim", "animation"): return false
+	
+	return true
 
-			var exts = [".pcx", ".dds", ".png", ".tga"]
-			if type == "animation":
-				exts = [".ani", ".eff"]
 
-			var source_file = _find_source_asset(source_root, filename, exts)
-			if not source_file.is_empty():
-				var target_dir_for_asset = output_dir
-				
-				# If asset is a Command Briefing animation, use the shared location
-				if source_file.contains("/hermes_cbanims/"):
-					# We assume cli_runner runs generic animation processing first for these files
-					# Target: campaigns/hermes/animations/command_briefings
-					# We need to construct the absolute path to the shared folder
-					# output_dir is .../assets/species_defs
-					# We want .../campaigns/hermes/animations/command_briefings
-					# HACK: Assume standard project structure relative to output_dir or just use absolute path logic
-					# output_dir should be absolute or res://
-					# Let's try to construct it relative to the project root if possible, or just hardcode the expected path
-					# Since we don't have easy access to project root here without assumptions, let's use the fact that
-					# output_dir usually ends with "assets/species_defs"
-					# Better: Use "res://campaigns/hermes/animations/command_briefings" and globalize it if needed
-					# But _convert_asset expects a target directory to write to (if it needs to convert).
-					# If cli_runner ran first, the file exists there.
-					# If we pass the shared dir to _convert_asset, it will overwrite/update it there.
-					# This is fine and ensures it exists.
-					target_dir_for_asset = "res://campaigns/hermes/animations/command_briefings"
-					target_dir_for_asset = ProjectSettings.globalize_path(target_dir_for_asset)
-					
-					if not DirAccess.dir_exists_absolute(target_dir_for_asset):
-						DirAccess.make_dir_recursive_absolute(target_dir_for_asset)
+func _process_asset_field(species: Resource, source_root: String, output_dir: String, filename_prop: String, resource_prop: String, type: String) -> bool:
+	if not species.has_meta(filename_prop):
+		return true
 
-				_convert_asset(source_file, target_dir_for_asset, type)
+	var filename = species.get_meta(filename_prop)
+	if filename.is_empty():
+		return true
 
-				# Determine converted filename
-				var converted_filename = source_file.get_file().get_basename()
-				if type == "texture":
-					converted_filename += ".png"
-				elif type == "animation":
-					converted_filename += ".tres" # SpriteFrames
+	if filename.begins_with("empty"):
+		species.set(resource_prop, load("res://assets/shared/empty.tres"))
+		return true
 
-				var converted_path = target_dir_for_asset.path_join(converted_filename)
-				var res_path = converted_path
-				if not res_path.begins_with("res://"):
-					res_path = ProjectSettings.localize_path(res_path)
+	var exts = [".pcx", ".dds", ".png", ".tga"]
+	if type == "animation":
+		exts = [".ani", ".eff"]
 
-				if FileAccess.file_exists(res_path):
-					species.set(resource_prop, load(res_path))
-				else:
-					print("Warning: Converted file not found: " + res_path)
-			else:
-				print("Warning: Could not find source for species asset: " + filename)
+	var source_file = _find_source_asset(source_root, filename, exts)
+	if source_file.is_empty():
+		push_error("Error: Could not find source for species asset: " + filename)
+		return false
+		
+	var target_dir_for_asset = output_dir
+	
+	# If asset is a Command Briefing animation, use the shared location
+	if source_file.contains("/hermes_cbanims/"):
+		target_dir_for_asset = ProjectSettings.globalize_path("res://campaigns/hermes/animations/command_briefings")
+		if not DirAccess.dir_exists_absolute(target_dir_for_asset):
+			DirAccess.make_dir_recursive_absolute(target_dir_for_asset)
 
-	convert_and_load.call("thruster_normal_filename", "thruster_normal", "animation")
-	convert_and_load.call("thruster_afterburn_filename", "thruster_afterburn", "animation")
-	convert_and_load.call(
-		"thruster_secondary_normal_filename", "thruster_secondary_normal", "animation"
-	)
-	convert_and_load.call(
-		"thruster_secondary_afterburn_filename", "thruster_secondary_afterburn", "animation"
-	)
-	convert_and_load.call(
-		"thruster_tertiary_normal_filename", "thruster_tertiary_normal", "animation"
-	)
-	convert_and_load.call(
-		"thruster_tertiary_afterburn_filename", "thruster_tertiary_afterburn", "animation"
-	)
+	if not _convert_asset(source_file, target_dir_for_asset, type):
+		push_error("Error: Failed to convert species asset: " + source_file)
+		return false
 
-	convert_and_load.call("glow_normal_filename", "glow_normal", "texture")
-	convert_and_load.call("glow_afterburn_filename", "glow_afterburn", "texture")
-	convert_and_load.call("debris_texture_filename", "debris_texture", "texture")
-	convert_and_load.call("shield_hit_anim_filename", "shield_hit_anim", "animation")
-	convert_and_load.call("fiction_anim_filename", "fiction_anim", "animation")
+	# Determine converted filename
+	var converted_filename = source_file.get_file().get_basename()
+	if type == "texture":
+		converted_filename += ".png"
+	elif type == "animation":
+		converted_filename += ".tres" # SpriteFrames
+
+	var converted_path = target_dir_for_asset.path_join(converted_filename)
+	var res_path = converted_path
+	if not res_path.begins_with("res://"):
+		res_path = ProjectSettings.localize_path(res_path)
+
+	if not FileAccess.file_exists(res_path):
+		push_error("Error: Converted file not found: " + res_path)
+		return false
+		
+	var loaded_resource = load(res_path)
+	if loaded_resource:
+		species.set(resource_prop, loaded_resource)
+	else:
+		push_error("Error: Failed to load species resource: " + res_path)
+		return false
+		
+	return true
 
 
 func _find_source_asset(root_path: String, filename: String, extensions: Array = []) -> String:

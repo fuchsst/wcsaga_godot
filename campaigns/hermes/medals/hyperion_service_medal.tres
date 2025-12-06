@@ -1,8 +1,0 @@
-[gd_resource type="Resource" load_steps=2 format=3]
-
-[ext_resource type="Script" path="res://scripts/resources/campaigns/medal_resource.gd" id="1_mcavh"]
-
-[resource]
-script = ExtResource("1_mcavh")
-name = "Hyperion Service Medal"
-num_mods = 1

@@ -32,7 +32,9 @@ func generate(result: Dictionary, output_dir: String, source_root: String) -> bo
 				source_root, tex_filename, [".pcx", ".dds", ".png", ".tga"]
 			)
 			if not source_file.is_empty():
-				_convert_asset(source_file, stars_dir, "texture")
+				if not _convert_asset(source_file, stars_dir, "texture"):
+					push_error("Error: Failed to convert star bitmap: " + source_file)
+					return false
 
 				var png_filename = source_file.get_file().get_basename() + ".png"
 				var png_path = stars_dir.path_join(png_filename)
@@ -46,7 +48,8 @@ func generate(result: Dictionary, output_dir: String, source_root: String) -> bo
 				# StarBitmapData doesn't have texture property and isn't saved as resource
 				# star.texture = tex
 			else:
-				print("Warning: Could not find source for star bitmap: " + tex_filename)
+				push_error("Error: Could not find source for star bitmap: " + tex_filename)
+				return false
 
 	# Process Suns
 	for sun_dict in result.get("suns", []):
@@ -62,7 +65,10 @@ func generate(result: Dictionary, output_dir: String, source_root: String) -> bo
 				source_root, sunglow_name, [".pcx", ".dds", ".png", ".tga"]
 			)
 			if not source_file.is_empty():
-				_convert_asset(source_file, stars_dir, "texture") # Save texture to stars dir? Or suns dir? User said images go to stars/
+				if not _convert_asset(source_file, stars_dir, "texture"):
+					push_error("Error: Failed to convert sunglow: " + source_file)
+					return false
+
 				# Load the converted texture using PlaceholderTexture2D to ensure path is saved
 				var png_filename = source_file.get_file().get_basename() + ".png"
 				var png_path = stars_dir.path_join(png_filename)
@@ -74,7 +80,8 @@ func generate(result: Dictionary, output_dir: String, source_root: String) -> bo
 				tex.resource_path = res_path
 				sun_res.sunglow = tex
 			else:
-				print("Warning: Could not find source for sunglow: " + sunglow_name)
+				push_error("Error: Could not find source for sunglow: " + sunglow_name)
+				return false
 
 		# Handle flares
 		for flare_dict in sun_dict.get("flares", []):
@@ -88,7 +95,10 @@ func generate(result: Dictionary, output_dir: String, source_root: String) -> bo
 					source_root, flare_tex_name, [".pcx", ".dds", ".png", ".tga"]
 				)
 				if not source_file.is_empty():
-					_convert_asset(source_file, stars_dir, "texture") # Save texture to stars dir
+					if not _convert_asset(source_file, stars_dir, "texture"):
+						push_error("Error: Failed to convert flare: " + source_file)
+						return false
+
 					var png_filename = source_file.get_file().get_basename() + ".png"
 					var png_path = stars_dir.path_join(png_filename)
 
@@ -99,15 +109,16 @@ func generate(result: Dictionary, output_dir: String, source_root: String) -> bo
 					tex.resource_path = res_path
 					flare_res.texture = tex
 				else:
-					print("Warning: Could not find source for flare: " + flare_tex_name)
+					push_error("Error: Could not find source for flare: " + flare_tex_name)
+					return false
 
 			sun_res.flares.append(flare_res)
 
 		var filename = sun_res.sun_name.to_lower().replace(" ", "_") + ".tres"
 		var save_path = suns_dir.path_join(filename)
 		if ResourceSaver.save(sun_res, save_path) != OK:
-			print("Failed to save sun: " + save_path)
-			success = false
+			push_error("Error: Failed to save sun: " + save_path)
+			return false
 
 	# Process Debris
 	# Directories created at top of function
@@ -127,13 +138,18 @@ func generate(result: Dictionary, output_dir: String, source_root: String) -> bo
 				var ext = source_file.get_extension().to_lower()
 				if ext == "ani" or ext == "eff":
 					# Convert animation (creates spritesheet PNG and SpriteFrames TRES)
-					_convert_asset(source_file, target_dir, "animation")
+					if not _convert_asset(source_file, target_dir, "animation"):
+						push_error("Error: Failed to convert debris animation: " + source_file)
+						return false
 					print("Converted " + ext.to_upper() + " to spritesheet: " + tex_filename)
 				else:
 					# Standard texture conversion
-					_convert_asset(source_file, target_dir, "texture")
+					if not _convert_asset(source_file, target_dir, "texture"):
+						push_error("Error: Failed to convert debris texture: " + source_file)
+						return false
 			else:
-				print("Warning: Could not find source for debris: " + tex_filename)
+				push_error("Error: Could not find source for debris: " + tex_filename)
+				return false
 
 	return success
 

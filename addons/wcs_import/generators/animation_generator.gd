@@ -19,10 +19,10 @@ func generate(input_path: String, output_dir: String, source_root: String) -> bo
 			print("Converted animation: " + source_file)
 			return true
 		else:
-			print("Failed to convert animation: " + source_file)
+			push_error("Error: Failed to convert animation: " + source_file)
 			return false
 	else:
-		print("Warning: Could not find source for animation: " + input_path)
+		push_error("Error: Could not find source for animation: " + input_path)
 		return false
 
 

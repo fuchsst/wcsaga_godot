@@ -31,15 +31,18 @@ func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 		# 2. Convert POF Model
 		if not res.projectile_model.is_empty() and res.projectile_model != "none":
 			var pof_source = _find_source_asset(source_root, res.projectile_model)
-			if not pof_source.is_empty():
-				_convert_asset(pof_source, weapon_dir, "model")
-				# Update resource to point to converted GLB (keep original basename)
-				res.projectile_model = pof_source.get_file().get_basename() + ".gltf"
-			else:
-				print("Warning: Could not find POF source for " + res.projectile_model)
+			if pof_source.is_empty():
+				push_error("Error: Could not find POF source for " + res.projectile_model)
+				return false
+			
+			if not _convert_asset(pof_source, weapon_dir, "model"):
+				push_error("Error: Failed to convert POF model: " + pof_source)
+				return false
+
+			# Update resource to point to converted GLB (keep original basename)
+			res.projectile_model = pof_source.get_file().get_basename() + ".gltf"
 
 			# Attempt to generate ModelData for the weapon model if available
-			# This ensures we have thruster data for missiles even if not strictly linked to a Ship resource
 			if not res.projectile_model.is_empty() and res.projectile_model.ends_with(".gltf"):
 				var basename = res.projectile_model.get_basename()
 				var json_access_path = weapon_dir.path_join(basename + "_data.json")
@@ -50,7 +53,12 @@ func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 					if generated_data:
 						print("Generated ModelData for weapon: " + basename)
 					else:
-						print("Failed to generate ModelData for weapon: " + basename)
+						# If model data generation fails, is it critical? Maybe not, but let's error for consistency if expected
+						# Actually ModelData is optional enrichment. Let's warn but maybe not fail hard unless needed.
+						# But purely purely "fail early if referenced resource not available": The JSON was available.
+						# Let's print error.
+						push_error("Error: Failed to generate ModelData for weapon: " + basename)
+						return false
 
 		# 3. Convert/Copy Textures and Icons
 		if not res.display_icon.is_empty():
@@ -60,61 +68,96 @@ func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 				var icon_source = _find_source_asset(
 					source_root, res.display_icon, [".pcx", ".dds", ".png"]
 				)
-				if not icon_source.is_empty():
-					_convert_asset(icon_source, weapon_dir, "texture")
-					res.display_icon = icon_source.get_file().get_basename() + ".png" # Assuming conversion to PNG
+				if icon_source.is_empty():
+					push_error("Error: Could not find icon source: " + res.display_icon)
+					# Some icons are truly optional or shared? But usually if referenced it should exist.
+					return false
+				
+				if not _convert_asset(icon_source, weapon_dir, "texture"):
+					push_error("Error: Failed to convert icon: " + icon_source)
+					return false
+
+				res.display_icon = icon_source.get_file().get_basename() + ".png" # Assuming conversion to PNG
 
 		if not res._laser_bitmap_source.is_empty():
-			if res._laser_bitmap_source.begins_with("empty"):
-				# res.laser_bitmap = load("res://assets/shared/empty.tres")
-				pass
-			else:
+			if not res._laser_bitmap_source.begins_with("empty"):
 				var laser_source = _find_source_asset(
 					source_root, res._laser_bitmap_source, [".pcx", ".dds", ".png"]
 				)
-				if not laser_source.is_empty():
-					_convert_asset(laser_source, weapon_dir, "texture")
-					var tex_path = weapon_dir.path_join(laser_source.get_file().get_basename() + ".png")
-					if ResourceLoader.exists(tex_path):
-						res.laser_bitmap = load(tex_path)
-					else:
-						# Fallback for CLI context: create placeholder to force ExtResource reference if possible?
-						# Or just warning. ResourceSaver might not write ExtResource if we can't load it.
-						print("Warning: Texture created but failed to load (import pending?): " + tex_path)
+				if laser_source.is_empty():
+					push_error("Error: Could not find laser bitmap source: " + res._laser_bitmap_source)
+					return false
+				
+				if not _convert_asset(laser_source, weapon_dir, "texture"):
+					push_error("Error: Failed to convert laser bitmap: " + laser_source)
+					return false
+					
+				var tex_path = weapon_dir.path_join(laser_source.get_file().get_basename() + ".png")
+				if not FileAccess.file_exists(tex_path):
+					push_error("Error: Converted laser bitmap not found: " + tex_path)
+					return false
+					
+				var loaded_tex = load(tex_path)
+				if loaded_tex:
+					res.laser_bitmap = loaded_tex
+				else:
+					push_error("Error: Failed to load laser bitmap: " + tex_path)
+					return false
 
 		if not res._laser_glow_source.is_empty():
-			if res._laser_glow_source.begins_with("empty"):
-				# res.laser_glow = load("res://assets/shared/empty.tres")
-				pass
-			else:
+			if not res._laser_glow_source.begins_with("empty"):
 				var glow_source = _find_source_asset(
 					source_root, res._laser_glow_source, [".pcx", ".dds", ".png"]
 				)
-				if not glow_source.is_empty():
-					_convert_asset(glow_source, weapon_dir, "texture")
-					var tex_path = weapon_dir.path_join(glow_source.get_file().get_basename() + ".png")
-					if ResourceLoader.exists(tex_path):
-						res.laser_glow = load(tex_path)
-					else:
-						print("Warning: Texture created but failed to load (import pending?): " + tex_path)
+				if glow_source.is_empty():
+					push_error("Error: Could not find laser glow source: " + res._laser_glow_source)
+					return false
+				
+				if not _convert_asset(glow_source, weapon_dir, "texture"):
+					push_error("Error: Failed to convert laser glow: " + glow_source)
+					return false
+
+				var tex_path = weapon_dir.path_join(glow_source.get_file().get_basename() + ".png")
+				if not FileAccess.file_exists(tex_path):
+					push_error("Error: Converted laser glow not found: " + tex_path)
+					return false
+					
+				var loaded_tex = load(tex_path)
+				if loaded_tex:
+					res.laser_glow = loaded_tex
+				else:
+					push_error("Error: Failed to load laser glow: " + tex_path)
+					return false
 
 		if not res.tech_animation.is_empty():
 			if res.tech_animation.begins_with("empty"):
 				res.tech_animation = "res://assets/shared/empty.tres"
 			else:
 				var anim_source = _find_source_asset(source_root, res.tech_animation, [".ani", ".eff"])
-				if not anim_source.is_empty():
-					_convert_asset(anim_source, weapon_dir, "ui") # Or animation type
-					# res.tech_animation updated by generator or here?
-					# For now assume generator handles the resource path if it's standard
+				if anim_source.is_empty():
+					push_error("Error: Could not find tech animation source: " + res.tech_animation)
+					return false
+				
+				if not _convert_asset(anim_source, weapon_dir, "ui"):
+					push_error("Error: Failed to convert tech animation: " + anim_source)
+					return false
 
 		# 4. Resolve Impact Explosion
 		if not res.impact_explosion.is_empty():
-			# Try to find corresponding scene in assets/effects/explosion (or similar)
-			# Assuming explosion generator puts them in assets/effects/weapon_expl or similar
-			# The user mentioned "target/assets/effects/explosion/"
+			# This references another resource. We assume it exists or will exist.
+			# But if we want to fail early, we should check availability.
+			# However, explosions might be generated in a different pass.
+			# The logic here just constructs a path.
 			var expl_name = res.impact_explosion.get_basename()
-			var expl_path = "res://assets/effects/explosions/" + expl_name + ".tscn" # Adjust path based on actual generator output
+			var expl_path = "res://assets/effects/explosions/" + expl_name + ".tscn"
+			# We can check if it exists or if we expect it to exist later.
+			# Given we are generating weapons, explosions might be generated before or after.
+			# Strict dependency management would require order or checking.
+			# If we just leave the path, it's a weak reference.
+			# But if the file definitely doesn't exist at runtime, it's a problem.
+			# For now, let's keep the path setting logic but maybe add a check?
+			# res.impact_explosion = expl_path
+			# Let's assume explosions are handled separately and we just link.
 			res.impact_explosion = expl_path
 
 		# 5. Generate Scene and Resource

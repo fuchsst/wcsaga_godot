@@ -1,8 +1,0 @@
-[gd_scene load_steps=3 format=3]
-
-[ext_resource type="Script" path="res://scripts/entities/effects/lightning.gd" id="1_script"]
-[ext_resource type="Resource" path="res://assets/effects/lightning/bolts/b_standard.tres" id="2_resource"]
-
-[node name="b_standard" type="Node3D"]
-script = ExtResource("1_script")
-resource = ExtResource("2_resource")

@@ -1,8 +1,0 @@
-[gd_scene load_steps=3 format=3]
-
-[ext_resource type="Script" path="res://scripts/entities/effects/weapon_explosion.gd" id="1_script"]
-[ext_resource type="Resource" path="res://assets/effects/explosions/Shivan_Impact02.tres" id="2_resource"]
-
-[node name="Shivan_Impact02" type="Node3D"]
-script = ExtResource("1_script")
-resource = ExtResource("2_resource")

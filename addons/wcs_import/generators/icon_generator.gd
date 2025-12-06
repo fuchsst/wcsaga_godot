@@ -24,15 +24,19 @@ func generate(icons: Array, output_dir: String, source_root: String) -> bool:
 			var source_file = _find_source_asset(
 				source_root, search_filename, [".pcx", ".dds", ".png", ".ani"]
 			)
-			if not source_file.is_empty():
-				var type = "texture"
-				if source_file.ends_with(".ani"):
-					type = "animation"
+			if source_file.is_empty():
+				push_error("Error: Could not find source image for icon: " + search_filename)
+				return false
+				
+			var type = "texture"
+			if source_file.ends_with(".ani"):
+				type = "animation"
 
-				_convert_asset(source_file, save_dir, type)
-				saved_count += 1
-			else:
-				print("Warning: Could not find source image for icon: " + search_filename)
+			if not _convert_asset(source_file, save_dir, type):
+				push_error("Error: Failed to convert icon asset: " + source_file)
+				return false
+				
+			saved_count += 1
 
 	print("Converted assets for " + str(saved_count) + "/" + str(icons.size()) + " icons.")
 	return true

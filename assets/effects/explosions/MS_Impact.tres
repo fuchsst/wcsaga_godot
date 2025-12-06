@@ -1,8 +1,0 @@
-[gd_resource type="Resource" script_class="WeaponExplosionResource" load_steps=2 format=3]
-
-[ext_resource type="Script" path="res://scripts/resources/effects/weapon_expl_resource.gd" id="1_0rh6n"]
-
-[resource]
-script = ExtResource("1_0rh6n")
-name = "MS_Impact"
-lod_paths = Array[String](["res://assets/effects/explosions/ms_impact/ms_impact.tres"])

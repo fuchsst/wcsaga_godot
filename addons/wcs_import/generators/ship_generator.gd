@@ -26,46 +26,55 @@ func generate(ships: Array, output_dir: String, source_root: String) -> bool:
 
 		# Convert POF Model
 		var pof_source = _find_source_asset(source_root, pof_file)
-		if not pof_source.is_empty():
-			# Pass --textures flag for models
-			if _convert_asset(pof_source, ship_dir, "model"):
-				# Update resource to point to converted GLB (keep original basename)
-				res.model_file = pof_source.get_file().get_basename() + ".gltf"
-				
-				# Generate and Load ShipModelData
-				var basename = pof_source.get_file().get_basename()
-				var json_access_path = ship_dir.path_join(basename + "_data.json")
-				var model_data_path = ship_dir.path_join(basename + "_model.tres")
-				
-				# If JSON exists (new pipeline), generate TRES
-				# We use a dynamic script load or assume ModelDataGenerator is available
-				var md_generator = load("res://addons/wcs_import/generators/model_data_generator.gd").new()
-				if FileAccess.file_exists(json_access_path):
-					var generated_data = md_generator.generate(json_access_path)
-					if generated_data:
-						res.model_data = generated_data
-						print("Generated & Linked ShipModelData: " + model_data_path)
-					else:
-						print("Failed to generate ShipModelData from: " + json_access_path)
-				elif FileAccess.file_exists(model_data_path):
-					# Fallback to existing TRES (old pipeline or manual)
-					var model_data = load(model_data_path)
-					if model_data:
-						res.model_data = model_data
-						print("Linked existing ShipModelData: " + model_data_path)
-					else:
-						print("Failed to load existing ShipModelData: " + model_data_path)
-				else:
-					print("Warning: No model data (json or tres) found for " + basename)
-				
-				# Cleanup JSON file
-				if FileAccess.file_exists(json_access_path):
-					DirAccess.remove_absolute(json_access_path)
-					print("Cleaned up intermediate JSON: " + json_access_path)
+		if pof_source.is_empty():
+			push_error("Error: Could not find POF source for " + pof_file)
+			return false
+
+		# Pass --textures flag for models
+		if not _convert_asset(pof_source, ship_dir, "model"):
+			push_error("Error: Failed to convert POF: " + pof_source)
+			return false
+
+		# Update resource to point to converted GLB (keep original basename)
+		res.model_file = pof_source.get_file().get_basename() + ".gltf"
+		
+		# Generate and Load ShipModelData
+		var basename = pof_source.get_file().get_basename()
+		var json_access_path = ship_dir.path_join(basename + "_data.json")
+		var model_data_path = ship_dir.path_join(basename + "_model.tres")
+		
+		# If JSON exists (new pipeline), generate TRES
+		# We use a dynamic script load or assume ModelDataGenerator is available
+		var md_generator = load("res://addons/wcs_import/generators/model_data_generator.gd").new()
+		if FileAccess.file_exists(json_access_path):
+			var generated_data = md_generator.generate(json_access_path)
+			if generated_data:
+				res.model_data = generated_data
+				print("Generated & Linked ShipModelData: " + model_data_path)
 			else:
-				print("Failed to convert POF: " + pof_source)
+				push_error("Error: Failed to generate ShipModelData from: " + json_access_path)
+				return false
+		elif FileAccess.file_exists(model_data_path):
+			# Fallback to existing TRES (old pipeline or manual)
+			var model_data = load(model_data_path)
+			if model_data:
+				res.model_data = model_data
+				print("Linked existing ShipModelData: " + model_data_path)
+			else:
+				push_error("Error: Failed to load existing ShipModelData: " + model_data_path)
+				return false
 		else:
-			print("Warning: Could not find POF source for " + pof_file)
+			print("Warning: No model data (json or tres) found for " + basename)
+			# Is this critical? "fail early if referenced resource is not available".
+			# ModelData is implicit. If it's not found, maybe it's okay?
+			# But if we want to be strict, we might want to fail. 
+			# However, sticking to "referenced resource": POF is referenced. ModelData is derivative.
+			# I will stick to warning here unless told otherwise, but failure for explicit errors (generation failed).
+		
+		# Cleanup JSON file
+		if FileAccess.file_exists(json_access_path):
+			DirAccess.remove_absolute(json_access_path)
+			print("Cleaned up intermediate JSON: " + json_access_path)
 
 		# Save Resource
 		var save_path = ship_dir.path_join(filename + ".tres")
