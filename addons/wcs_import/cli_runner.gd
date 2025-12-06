@@ -6,7 +6,8 @@ extends MainLoop
 # Parsers
 const WCSBaseParser = preload("res://addons/wcs_import/parsers/base_parser.gd")
 const WCSShipParser = preload("res://addons/wcs_import/parsers/ship_parser.gd")
-const WCSWeaponParser = preload("res://addons/wcs_import/parsers/weapon_parser.gd")
+# const WCSWeaponParser = preload("res://addons/wcs_import/parsers/weapon_parser.gd")
+# const WCSHudParser = preload("res://addons/wcs_import/parsers/hud_parser.gd")
 const WCSMissionParser = preload("res://addons/wcs_import/parsers/mission_parser.gd")
 const WCSAIProfileParser = preload("res://addons/wcs_import/parsers/ai_profile_parser.gd")
 const WCSAIClassParser = preload("res://addons/wcs_import/parsers/ai_class_parser.gd")
@@ -634,7 +635,17 @@ func _process_ships(input_path: String, output_dir: String) -> bool:
 
 
 func _process_weapons(input_path: String, output_dir: String) -> bool:
-	var parser = WCSWeaponParser.new()
+	# Dynamic loading with check
+	var parser_script = load("res://addons/wcs_import/parsers/weapon_parser.gd")
+	if not parser_script:
+		print("ERROR: Could not load parser script.")
+		return false
+		
+	if not parser_script.can_instantiate():
+		print("ERROR: Parser script cannot be instantiated (compilation failed?).")
+		return false
+
+	var parser = parser_script.new()
 	var weapons = parser.parse(input_path)
 
 	if weapons == null or weapons.is_empty():

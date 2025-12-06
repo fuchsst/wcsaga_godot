@@ -1,5 +1,5 @@
 class_name WeaponData
-extends WCSBaseResource
+extends "res://scripts/resources/core/wcs_base_resource.gd"
 
 # Enums
 enum WeaponType {
@@ -75,16 +75,23 @@ enum WeaponFlags {
 	PUNCTURE = 1 << 12,
 	SHIELD_PIERCE = 1 << 13,
 	BOMBER_PLUS = 1 << 14,
-	TAGGED = 1 << 15,
 	ENERGY_SUCK = 1 << 16,
-	EMP = 1 << 17
+	EMP = 1 << 17,
+	TAGGED = 1 << 15, # Re-verify value? Defined as TAGGED above? No, WIF_TAG is 1<<27. WIF_TAGGED is legacy?
+	# Aligning with local consts if needed, or just adding new ones logic.
+	# C++ WIF_TAG = 1 << 27
+	TAG = 1 << 18,
+	SHUDDER = 1 << 19,
+	MUZZLE_FLASH = 1 << 20,
+	LOCK_ARM = 1 << 21,
+	STREAM = 1 << 22
 }
 
 # -------------------------------------------------------------------------
 # 1. Identification & UI
 # -------------------------------------------------------------------------
 @export_group("Identification")
-@export var weapon_class: String = ""
+@export var id: String = ""
 @export var display_name: String = "Generic Weapon"
 @export var category: String = "weapon"
 @export var manufacturer_species: String = "Terran"
@@ -93,7 +100,7 @@ enum WeaponFlags {
 @export var tech_animation: String = ""
 @export var tech_description: String = ""
 @export var display_icon: String = ""
-@export var anim_file: String = "" # Loadout animation
+@export var anim_file: String = "" # Loadout animation, TODO, make reference to spriteframes resource tres file
 
 # -------------------------------------------------------------------------
 # 2. Physics & Ballistics
@@ -120,6 +127,7 @@ enum WeaponFlags {
 @export var inner_radius: float = 0.0
 @export var outer_radius: float = 0.0
 @export var shockwave_speed: float = 0.0
+@export var shockwave_damage: float = 0.0
 
 # -------------------------------------------------------------------------
 # 4. Energy & Ammo
@@ -141,6 +149,17 @@ enum WeaponFlags {
 @export var catch_up_pixels_per_sec: float = 0.0
 @export var catch_up_penalty: float = 0.0
 @export var fof_field_of_view: float = 0.0 # $FOF
+
+@export_group("Arming & Safety")
+@export var arm_time: float = 0.0
+@export var arm_dist: float = 0.0
+@export var arm_radius: float = 0.0 # Safety radius
+
+@export_group("Special Effects")
+@export var tag_time: float = 0.0
+@export var tag_level: int = 0
+@export var shudder_amount: float = 0.0
+@export var muzzle_flash_id: int = -1 # TODO: make MuzzleFlashResource
 
 # -------------------------------------------------------------------------
 # 6. Visuals - Laser
@@ -253,7 +272,7 @@ func get_class_name() -> String:
 func validate() -> bool:
 	var valid = super.validate()
 	
-	if weapon_class.is_empty():
+	if id.is_empty():
 		_add_validation_error("Weapon class is empty")
 		valid = false
 		

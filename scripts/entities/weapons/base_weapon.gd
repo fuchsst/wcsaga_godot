@@ -73,6 +73,21 @@ func _on_body_entered(body: Node3D) -> void:
 	_detonate(body)
 
 func _detonate(hit_object: Node3D = null) -> void:
+	# Arming Checks
+	if weapon_data:
+		if life_time < weapon_data.arm_time:
+			print("DEBUG: Weapon hit before arm time (Dummy Hit)")
+			queue_free()
+			return
+		
+		# If we have a shooter, check arm distance
+		if fired_by and is_instance_valid(fired_by):
+			var dist = global_position.distance_to(fired_by.global_position)
+			if dist < weapon_data.arm_dist:
+				print("DEBUG: Weapon hit inside arm distance (Dummy Hit)")
+				queue_free()
+				return
+				
 	weapon_detonated.emit(global_position)
 	
 	if weapon_data.flags & WeaponData.WeaponFlags.PARTICLE_SPEW:

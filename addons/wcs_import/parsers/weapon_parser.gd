@@ -1,22 +1,21 @@
-class_name WCSWeaponParser
-extends "res://addons/wcs_import/parsers/base_parser.gd"
+class_name WCSWeaponParser extends "res://addons/wcs_import/parsers/base_parser.gd"
 
 ## Parser for weapons.tbl files.
 ## Converts weapon data into WeaponData resources.
-## Converts weapon data into WeaponData resources.
+
 const WeaponDataScript = preload("res://scripts/resources/weapons/weapon_data.gd")
-# var WeaponDataScript = load("res://scripts/resources/weapons/weapon_data.gd")
 
 
 func _parse_content() -> Variant:
 	var weapons: Array[Resource] = []
-
-	_current_line_index = 0
+	print("DEBUG: Entering _parse_content")
 
 	var current_category = ""
 
+	print("DEBUG: Starting _parse_content")
 	while _has_more_lines():
 		var line = _get_next_line()
+		# print("DEBUG: Main Loop Line: " + line)
 
 		if line.is_empty() or line.begins_with(";") or line.begins_with("//"):
 			continue
@@ -26,27 +25,34 @@ func _parse_content() -> Variant:
 			continue
 
 		if line.begins_with("$Name:"):
+			print("DEBUG: Found weapon: " + line)
 			var weapon = _parse_weapon(line)
 			if weapon == null:
-				continue
-				
+				print("DEBUG: _parse_weapon returned null. Aborting.")
+				return []
+			
+			print("DEBUG: Weapon parsed: " + weapon.id)
 			# Only use TBL category if we didn't determine a more specific one from the model
 			if weapon.category == "weapon" or weapon.category.is_empty():
 				weapon.category = current_category
 			weapons.append(weapon)
 
+	print("DEBUG: Finished _parse_content. Total weapons: " + str(weapons.size()))
 	return weapons
 
 
 func _parse_weapon(first_line: String) -> Resource:
+	print("DEBUG: Entering _parse_weapon with: " + first_line)
 	var weapon = WeaponDataScript.new()
 	if weapon == null:
 		print("ERROR: Failed to instantiate WeaponData!")
 		return null
+	print("DEBUG: _parse_weapon instantiated " + str(weapon))
 
 	var raw_name = _extract_string_value(first_line, "$Name:")
-	weapon.weapon_class = raw_name.trim_prefix("@")
-	weapon.display_name = weapon.weapon_class # Default
+	weapon.id = raw_name.trim_prefix("@")
+	if weapon.display_name.is_empty() or weapon.display_name == "Generic Weapon":
+		weapon.display_name = weapon.id # Default
 
 	# Default to Terran
 	weapon.manufacturer_species = "Terran"
@@ -88,7 +94,7 @@ func _parse_weapon(first_line: String) -> Resource:
 			if fire_wait > 0:
 				weapon.fire_rate_hz = 1.0 / fire_wait
 		elif line.begins_with("$Life:"):
-			weapon.projectile_lifetime = _extract_float_value(line, "$Life:")
+			weapon.lifetime = _extract_float_value(line, "$Life:")
 		elif line.begins_with("$Weapon Range:") or line.begins_with("+Weapon Range:"):
 			weapon.weapon_range_meters = _extract_float_value(
 				line, "$Weapon Range:", "+Weapon Range:"
@@ -121,7 +127,7 @@ func _parse_weapon(first_line: String) -> Resource:
 		elif line.begins_with("$Energy Consumed:"):
 			weapon.energy_per_shot = _extract_float_value(line, "$Energy Consumed:")
 		elif line.begins_with("$Cargo Size:"):
-			weapon.cargo_size_units = _extract_float_value(line, "$Cargo Size:")
+			weapon.cargo_size = _extract_float_value(line, "$Cargo Size:")
 		elif line.begins_with("$Homing:"):
 			var homing_val = _extract_string_value(line, "$Homing:")
 			if homing_val == "YES":
@@ -157,18 +163,15 @@ func _parse_weapon(first_line: String) -> Resource:
 			if weapon.turn_time > 0:
 				weapon.max_turn_rate_dps = 360.0 / weapon.turn_time
 		elif line.begins_with("$Shockwave damage:"):
-			weapon.explosion_damage = _extract_float_value(line, "$Shockwave damage:")
+			weapon.shockwave_damage = _extract_float_value(line, "$Shockwave damage:")
 		elif line.begins_with("$Blast Force:"):
-			# Not currently mapped in WeaponData, but could be added
-			pass
+			weapon.blast_force = _extract_float_value(line, "$Blast Force:")
 		elif line.begins_with("$Inner Radius:"):
-			# Map to blast_radius for now, or add specific inner/outer
-			weapon.blast_radius = _extract_float_value(line, "$Inner Radius:")
+			weapon.inner_radius = _extract_float_value(line, "$Inner Radius:")
 		elif line.begins_with("$Outer Radius:"):
-			# If we only have one radius, maybe use outer?
-			var outer = _extract_float_value(line, "$Outer Radius:")
-			if outer > weapon.blast_radius:
-				weapon.blast_radius = outer
+			weapon.outer_radius = _extract_float_value(line, "$Outer Radius:")
+			if weapon.outer_radius < weapon.inner_radius:
+				weapon.inner_radius = weapon.outer_radius # Sanity check
 		elif line.begins_with("$Shockwave Speed:"):
 			weapon.shockwave_speed = _extract_float_value(line, "$Shockwave Speed:")
 		elif line.begins_with("$Spawn Angle:"):
@@ -185,6 +188,26 @@ func _parse_weapon(first_line: String) -> Resource:
 			_parse_pspew_info(weapon)
 		elif line.begins_with("$BeamInfo:"):
 			_parse_beam_info(weapon)
+		elif line.begins_with("$Tag:"):
+			var raw = _extract_string_value(line, "$Tag:")
+			# Handle space or comma separators
+			var parts = raw.replace(",", " ").split(" ", false)
+			if parts.size() >= 1: weapon.tag_time = parts[0].to_float()
+			if parts.size() >= 2: weapon.tag_level = parts[1].to_int()
+		elif line.begins_with("$Shudder:"):
+			weapon.shudder_amount = _extract_float_value(line, "$Shudder:")
+		elif line.begins_with("$Arm time:"):
+			weapon.arm_time = _extract_float_value(line, "$Arm time:") / 1000.0 # ms to s
+		elif line.begins_with("$Arm distance:"):
+			weapon.arm_dist = _extract_float_value(line, "$Arm distance:")
+		elif line.begins_with("$Arm radius:"):
+			weapon.arm_radius = _extract_float_value(line, "$Arm radius:")
+		elif line.begins_with("$Muzzleflash:"):
+			# Assuming format: $Muzzleflash: index (or name?)
+			# TBL usually uses index or name. If name, we might need lookup. 
+			# For now, store raw int if it is one. But we need to integrate this with the muzzleflash assets (e.g. target/assets/effects/muzzleflash) generated by 
+			# target/addons/wcs_import/generators/mflash_generator.gd creating a target/scripts/resources/effects/muzzle_flash_resource.gd
+			weapon.muzzle_flash_id = _extract_int_value(line, "$Muzzleflash:")
 		elif line.begins_with("$EMP Intensity:"):
 			weapon.emp_intensity = _extract_float_value(line, "$EMP Intensity:")
 		elif line.begins_with("$EMP Time:"):
@@ -209,10 +232,11 @@ func _parse_weapon(first_line: String) -> Resource:
 	if (
 		weapon.weapon_range_meters == 0
 		and weapon.muzzle_velocity_mps > 0
-		and weapon.projectile_lifetime > 0
+		and weapon.lifetime > 0
 	):
-		weapon.weapon_range_meters = weapon.muzzle_velocity_mps * weapon.projectile_lifetime
+		weapon.weapon_range_meters = weapon.muzzle_velocity_mps * weapon.lifetime
 
+	print("DEBUG: _parse_weapon returning " + str(weapon))
 	return weapon
 
 
@@ -365,6 +389,14 @@ func _parse_flags(line: String, weapon) -> void:
 				weapon.flags |= WeaponDataScript.WeaponFlags.BOMBER_PLUS
 			"tagged":
 				weapon.flags |= WeaponDataScript.WeaponFlags.TAGGED
+			"tag":
+				weapon.flags |= WeaponDataScript.WeaponFlags.TAG # Also set implicit fields if needed?
+			"shudder":
+				weapon.flags |= WeaponDataScript.WeaponFlags.SHUDDER
+			"muzzleflash":
+				weapon.flags |= WeaponDataScript.WeaponFlags.MUZZLE_FLASH
+			"lockarm":
+				weapon.flags |= WeaponDataScript.WeaponFlags.LOCK_ARM
 			"energy suck":
 				weapon.flags |= WeaponDataScript.WeaponFlags.ENERGY_SUCK
 			"emp":

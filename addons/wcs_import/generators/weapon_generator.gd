@@ -21,7 +21,7 @@ func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 		# e.g. target/assets/weapons/<category>/<faction>/<weapon_slug>/
 		var category_dir = res.category.to_lower().replace(" ", "_")
 		var faction_dir = res.manufacturer_species.to_lower().replace(" ", "_")
-		var weapon_slug = res.weapon_class.to_lower().replace(" ", "_")
+		var weapon_slug = res.id.to_lower().replace(" ", "_")
 
 		var weapon_dir = weapons_root.path_join(category_dir).path_join(faction_dir).path_join(
 			weapon_slug

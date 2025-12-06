@@ -18,7 +18,7 @@ func generate_scene(weapon_data: WCSWeaponData, output_root: String) -> void:
 	if faction_slug.is_empty() or faction_slug == "unknown":
 		faction_slug = "common"
 
-	var weapon_slug = weapon_data.weapon_class.to_lower().replace(" ", "_")
+	var weapon_slug = weapon_data.id.to_lower().replace(" ", "_")
 
 	var target_dir = output_root.path_join(category_slug).path_join(faction_slug).path_join(
 		weapon_slug
