@@ -19,7 +19,6 @@ config/icon="uid://cc58gpsbqci8y"
 
 Signal_Debugger="*res://addons/SignalVisualizer/Debugger/SignalDebugger.gd"
 SceneManager="*res://addons/scene_manager/SceneManager.tscn"
-GlobalIFFManager="*res://autoload/iff_manager.gd"
 Main="*res://autoload/Main.gd"
 InputManager="*res://scripts/input/InputManager.gd"
 GameStateMachine="*res://scripts/game_state/GameStateMachine.gd"

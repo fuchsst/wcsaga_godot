@@ -19,6 +19,7 @@ func _parse_content() -> Variant:
 			continue
 
 		if line.begins_with("$Name:"):
+			print("Parsing Ship: " + line)
 			var ship = _parse_ship(line)
 			ships.append(ship)
 
@@ -28,14 +29,17 @@ func _parse_content() -> Variant:
 func _parse_ship(first_line: String) -> ShipStats:
 	var ship = ShipStats.new()
 	ship.ship_class = _extract_string_value(first_line, "$Name:")
-	ship.display_name = ship.ship_class  # Default
+	ship.display_name = ship.ship_class # Default
 
 	while _has_more_lines():
 		var line = _peek_next_line()
 		if line.begins_with("$Name:") or line.begins_with("#"):
 			break
+			
+		if ship.ship_class.contains("Hellcat"):
+			print("  Line: " + line)
 
-		_get_next_line()  # Consume
+		_get_next_line() # Consume
 
 		if line.begins_with("$Short name:"):
 			ship.ship_short_name = _extract_string_value(line, "$Short name:")
@@ -88,7 +92,7 @@ func _parse_multiline_text() -> String:
 	while _has_more_lines():
 		var line = _peek_next_line()
 		if line.begins_with("$end_multi_text"):
-			_get_next_line()  # Consume end marker
+			_get_next_line() # Consume end marker
 			break
 		text += _get_next_line() + "\n"
 	return text.strip_edges()

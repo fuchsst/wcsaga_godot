@@ -94,7 +94,7 @@ func _setup_ship_stats_test_data():
 	ship_stats.ship_class = "F-86C Hellcat V"
 	ship_stats.display_name = "Hellcat V"
 	ship_stats.ship_short_name = "Hellcat"
-	ship_stats.ship_role = 0  # Fighter
+	ship_stats.ship_role = 0 # Fighter
 	ship_stats.ship_category = "Medium"
 	species_data.species_mnemonic = "TERRAN"
 	ship_stats.ship_length_meters = 27.0
@@ -108,7 +108,7 @@ func _setup_ship_stats_test_data():
 func _setup_weapon_data_test_data():
 	weapon_data.weapon_class = "@Ion"
 	weapon_data.display_name = "Ion Cannon"
-	weapon_data.weapon_type = 0  # Energy
+	weapon_data.weapon_type = 0 # Energy
 	weapon_data.projectile_mass_kg = 0.2
 	weapon_data.muzzle_velocity_mps = 810.0
 	weapon_data.base_damage_energy = 30.0
@@ -118,7 +118,7 @@ func _setup_weapon_data_test_data():
 
 func _setup_asteroid_data_test_data():
 	asteroid_data.field_name = "Test Asteroid Belt"
-	asteroid_data.field_classification = 0  # Asteroid Belt
+	asteroid_data.field_classification = 0 # Asteroid Belt
 	asteroid_data.field_diameter_km = 10.0
 	asteroid_data.minimum_asteroid_diameter = 1.0
 	asteroid_data.maximum_asteroid_diameter = 5000.0
@@ -127,7 +127,7 @@ func _setup_asteroid_data_test_data():
 
 func _setup_nebula_data_test_data():
 	nebula_data.nebula_name = "Test Nebula"
-	nebula_data.nebula_classification = 0  # Gas Cloud
+	nebula_data.nebula_classification = 0 # Gas Cloud
 	nebula_data.gas_density_normalized = 0.5
 	nebula_data.visual_opacity_coefficient = 0.3
 	nebula_data.nebula_tint_color = Color(0.8, 0.6, 0.4, 0.3)
@@ -145,7 +145,7 @@ func test_wcs_base_resource_validation():
 	assert_int(base_resource.validation_errors.size()).is_equal(0)
 
 func test_wcs_base_resource_validation_with_missing_data():
-	base_resource.wcs_source_file = ""  # Invalid data
+	base_resource.wcs_source_file = "" # Invalid data
 	var result = base_resource.validate()
 	assert_bool(result).is_false()
 	assert_bool(base_resource.is_valid).is_false()
@@ -195,8 +195,8 @@ func test_wcs_base_resource_cross_reference_resolution():
 	var available_resources = ["res://existing.tres"]
 	var resolved_count = base_resource.resolve_cross_references(available_resources)
 
-	assert_int(resolved_count).is_equal(0)  # None should be resolved
-	assert_int(base_resource.xref_resolution_status).is_equal(0)  # Unresolved
+	assert_int(resolved_count).is_equal(0) # None should be resolved
+	assert_int(base_resource.xref_resolution_status).is_equal(0) # Unresolved
 
 # ================== SpeciesData Tests ==================
 
@@ -211,7 +211,7 @@ func test_species_data_validation():
 
 func test_species_data_validation_errors():
 	# Test invalid technology level
-	species_data.shield_technology_level = 6  # Invalid - max is 5
+	species_data.shield_technology_level = 6 # Invalid - max is 5
 	var result = species_data.validate()
 	assert_bool(result).is_false()
 
@@ -256,7 +256,7 @@ func test_ship_stats_weapon_mount_validation():
 	# Add a weapon mount
 	var weapon_mount = ShipStats.WeaponMount.new()
 	weapon_mount.mount_name = "Left Wing Mount"
-	weapon_mount.mount_type = 0  # Primary
+	weapon_mount.mount_type = 0 # Primary
 	weapon_mount.damage_multiplier = 1.0
 	weapon_mount.fire_cooldown = 0.35
 
@@ -276,7 +276,7 @@ func test_ship_stats_weapon_mount_retrieval():
 	for i in range(3):
 		var mount = ShipStats.WeaponMount.new()
 		mount.mount_name = "Mount %d" % i
-		mount.mount_type = i % 2  # Mix primary and secondary
+		mount.mount_type = i % 2 # Mix primary and secondary
 		ship_stats.weapon_mounts.append(mount)
 
 	var primary_mounts = ship_stats.get_primary_weapon_mounts()
@@ -316,10 +316,10 @@ func test_weapon_data_damage_calculation():
 	assert_dict(damage_result).contains_key("hull_damage")
 
 func test_weapon_data_explosive_detection():
-	assert_bool(weapon_data.is_explosive()).is_false()  # Default weapon isn't explosive
+	assert_bool(weapon_data.is_explosive()).is_false() # Default weapon isn't explosive
 
 func test_weapon_data_homing_detection():
-	assert_bool(weapon_data.is_homing()).is_false()  # Default weapon isn't homing
+	assert_bool(weapon_data.is_homing()).is_false() # Default weapon isn't homing
 
 func test_weapon_data_performance_metrics():
 	var dps = weapon_data.get_damage_per_second()
@@ -354,10 +354,10 @@ func test_asteroid_data_size_distribution_validation():
 	asteroid_data.size_distribution_percentages["huge"] = 0.02
 
 func test_asteroid_data_collision_damage_calculation():
-	var ship_mass = 15000.0  # kg
-	var impact_velocity = 150.0  # m/s
-	var asteroid_diameter = 50.0  # meters
-	var impact_angle = 90.0  # degrees
+	var ship_mass = 15000.0 # kg
+	var impact_velocity = 150.0 # m/s
+	var asteroid_diameter = 50.0 # meters
+	var impact_angle = 90.0 # degrees
 
 	var damage = asteroid_data.calculate_collision_damage(
 		ship_mass, impact_velocity, asteroid_diameter, impact_angle
@@ -366,7 +366,7 @@ func test_asteroid_data_collision_damage_calculation():
 	assert_float(damage).is_greater_than(0)
 
 func test_asteroid_data_mining_calculation():
-	var asteroid_diameter = 100.0  # meters
+	var asteroid_diameter = 100.0 # meters
 	var mining_equipment_tier = 2
 	var mining_skill = 1.0
 
@@ -395,11 +395,11 @@ func test_nebula_data_validation():
 func test_nebula_data_environmental_impact_calculation():
 	# Create a mock ship stats object
 	var mock_ship_stats = ShipStats.new()
-	mock_ship_stats.ship_role = 0  # Fighter
+	mock_ship_stats.ship_role = 0 # Fighter
 
 	var impact = nebula_data.calculate_environmental_impact(mock_ship_stats)
 
-n	assert_dict(impact).is_not_empty()
+	assert_dict(impact).is_not_empty()
 	assert_dict(impact).contains_key("velocity_impact")
 	assert_dict(impact).contains_key("shield_impact")
 	assert_dict(impact).contains_key("tactical_severity_score")
@@ -475,7 +475,7 @@ func test_mission_compatibility():
 
 func test_invalid_data_handling():
 	# Test handling of invalid data types
-	species_data.shield_technology_level = "invalid"  # Should be int
+	species_data.shield_technology_level = "invalid" # Should be int
 
 	# Validation should handle this gracefully
 	var result = species_data.validate()
@@ -495,7 +495,7 @@ func test_circular_reference_prevention():
 	var result = species_data.validate()
 
 	# Should handle this gracefully
-	assert_bool(result).is_true() or assert_bool(result).is_false()  # Either way is acceptable
+	assert_bool(result).is_true() or assert_bool(result).is_false() # Either way is acceptable
 
 # ================== Documentation Tests ==================
 

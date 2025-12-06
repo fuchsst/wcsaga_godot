@@ -80,7 +80,8 @@ func _setup_materials():
 
 	# Glow texture
 	var glow_mat = StandardMaterial3D.new()
-	glow_mat.transparency = BaseMaterial3D.TRANSPARENCY_ADD
+	glow_mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	glow_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	glow_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
 	glow_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	glow_mat.vertex_color_use_as_albedo = true
@@ -127,7 +128,7 @@ func _generate_segments():
 
 	# Recursive subdivision
 	# We'll do a fixed number of iterations or based on distance
-	var iterations = 4  # Adjust based on detail needed
+	var iterations = 4 # Adjust based on detail needed
 
 	for i in range(iterations):
 		var new_segments: Array[Vector3] = []
@@ -138,7 +139,7 @@ func _generate_segments():
 
 			# Displace
 			var dist = p1.distance_to(p2)
-			var displacement = dist * resource.b_scale * 0.5  # Scale factor
+			var displacement = dist * resource.b_scale * 0.5 # Scale factor
 
 			# Random direction perpendicular to the segment would be ideal,
 			# but random vector is easier and usually sufficient for lightning
@@ -146,7 +147,7 @@ func _generate_segments():
 				Vector3(randf_range(-1, 1), randf_range(-1, 1), randf_range(-1, 1)).normalized()
 				* displacement
 				* randf_range(0.0, 1.0)
-			)  # b_rand influence?
+			) # b_rand influence?
 
 			mid += offset
 
@@ -191,7 +192,7 @@ func _update_mesh():
 	glow_immediate_mesh.clear_surfaces()
 	glow_immediate_mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLE_STRIP)
 
-	var glow_width = width * resource.b_add  # b_add seems to be a multiplier or addition
+	var glow_width = width * resource.b_add # b_add seems to be a multiplier or addition
 	if glow_width <= width:
 		glow_width = width * 2.0
 

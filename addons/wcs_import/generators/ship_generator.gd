@@ -31,6 +31,19 @@ func generate(ships: Array, output_dir: String, source_root: String) -> bool:
 			if _convert_asset(pof_source, ship_dir, "model"):
 				# Update resource to point to converted GLB (keep original basename)
 				res.model_file = pof_source.get_file().get_basename() + ".gltf"
+				
+				# Load generated ShipModelData resource
+				var basename = pof_source.get_file().get_basename()
+				var model_data_path = ship_dir.path_join(basename + "_model.tres")
+				if FileAccess.file_exists(model_data_path):
+					var model_data = load(model_data_path)
+					if model_data:
+						res.model_data = model_data
+						print("Linked ShipModelData: " + model_data_path)
+					else:
+						print("Failed to load ShipModelData: " + model_data_path)
+				else:
+					print("Warning: ShipModelData not found at " + model_data_path)
 			else:
 				print("Failed to convert POF: " + pof_source)
 		else:
@@ -42,7 +55,7 @@ func generate(ships: Array, output_dir: String, source_root: String) -> bool:
 		if err != OK:
 			print("Failed to save resource: " + save_path)
 		else:
-			print("Saved: " + save_path)
+			print("Saved: " + save_path + " (Model: " + res.model_file + ")")
 
 	return true
 

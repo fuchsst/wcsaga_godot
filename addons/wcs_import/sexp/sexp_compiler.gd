@@ -4,8 +4,8 @@ class_name SexpCompiler
 
 const SexpNodeRef = preload("res://scripts/resources/sexp/sexp_node.gd")
 const SexpDefs = preload("res://addons/wcs_import/sexp/sexp_definitions.gd")
-const BTSexpConditionRef = preload("res://scripts/core/behavior_tree/tasks/bt_sexp_condition.gd")
-const BTSexpActionRef = preload("res://scripts/core/behavior_tree/tasks/bt_sexp_action.gd")
+const BTSexpConditionRef = preload("res://scripts/ai/behavior_tree/tasks/bt_sexp_condition.gd")
+const BTSexpActionRef = preload("res://scripts/ai/behavior_tree/tasks/bt_sexp_action.gd")
 
 static func compile(root_node: Resource) -> BehaviorTree:
 	if not root_node:

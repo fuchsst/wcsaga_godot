@@ -28,6 +28,7 @@ signal subsystem_configuration_changed
 # === VISUAL REPRESENTATION ===
 @export_group("Visual", "visual_")
 @export var model_file: String = "" # Cross-reference to POF resource
+@export var model_data: ShipModelData # Resource containing hardpoints and model spatial data
 @export var model_lod_target: int = 2 # Level of detail target
 @export var shield_icon: String = "" # Cross-reference to UI resource
 @export var detail_distances: Array[int] = [] # LOD switch distances [0, 250, 375]

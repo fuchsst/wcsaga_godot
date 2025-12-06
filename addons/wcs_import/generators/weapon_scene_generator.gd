@@ -2,10 +2,11 @@ class_name WeaponSceneGenerator
 extends RefCounted
 
 const WCSWeaponData = preload("res://scripts/resources/weapons/weapon_data.gd")
-const Weapon = preload("res://scripts/entities/weapon.gd")
-const Missile = preload("res://scripts/entities/missile.gd")
-const BeamWeapon = preload("res://scripts/entities/beam_weapon.gd")
-const FlakWeapon = preload("res://scripts/entities/flak_weapon.gd")
+const Weapon = preload("res://features/weapons/base_weapon.gd")
+const Missile = preload("res://features/weapons/missile_weapon.gd")
+const Projectile = preload("res://features/weapons/projectile_weapon.gd")
+const BeamWeapon = preload("res://features/weapons/beam_weapon.gd")
+const FlakWeapon = preload("res://features/weapons/flak_weapon.gd")
 
 
 func generate_scene(weapon_data: WCSWeaponData, output_root: String) -> void:
@@ -42,12 +43,12 @@ func generate_scene(weapon_data: WCSWeaponData, output_root: String) -> void:
 	elif weapon_data.flak_config != null:
 		root_node = FlakWeapon.new()
 		root_node.name = "FlakWeapon"
-	elif weapon_data.homing_type > 0:
+	if weapon_data.homing_type > 0:
 		root_node = Missile.new()
-		root_node.name = "Missile"
+		root_node.name = "MissileWeapon"
 	else:
-		root_node = Weapon.new()
-		root_node.name = "Weapon"
+		root_node = Projectile.new()
+		root_node.name = "ProjectileWeapon"
 
 	root_node.weapon_data = weapon_data
 

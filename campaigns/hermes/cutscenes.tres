@@ -1,47 +1,7 @@
-[gd_resource type="Resource" script_class="CutsceneManifest" load_steps=27 format=3]
+[gd_resource type="Resource" script_class="CutsceneManifest" load_steps=27 format=3 uid="uid://cdh6kdteysadf"]
 
-[ext_resource type="Script" path="res://scripts/resources/cutscenes/cutscene_resource.gd" id="1_vgdqe"]
-[ext_resource type="Script" path="res://scripts/resources/cutscenes/cutscene_manifest.gd" id="2_6ulfx"]
-
-[sub_resource type="VideoStreamTheora" id="VideoStreamTheora_08s8v"]
-file = "res://campaigns/hermes/cutscenes/intro.ogv"
-
-[sub_resource type="Resource" id="Resource_4mqiv"]
-script = ExtResource("1_vgdqe")
-name = "Introduction"
-description = "Wing Commander Saga Introduction"
-filename = "intro.ogg"
-video_stream = SubResource("VideoStreamTheora_08s8v")
-
-[sub_resource type="VideoStreamTheora" id="VideoStreamTheora_681bg"]
-file = "res://campaigns/hermes/cutscenes/prologue_intro.ogv"
-
-[sub_resource type="Resource" id="Resource_154hi"]
-script = ExtResource("1_vgdqe")
-name = "Reporting Aboard"
-description = "New flight cadets arrive on the TCS Wellington to start the final phase of their training."
-filename = "prologue_intro.ogg"
-video_stream = SubResource("VideoStreamTheora_681bg")
-
-[sub_resource type="VideoStreamTheora" id="VideoStreamTheora_8he0y"]
-file = "res://campaigns/hermes/cutscenes/prologue_outro.ogv"
-
-[sub_resource type="Resource" id="Resource_ep3qf"]
-script = ExtResource("1_vgdqe")
-name = "The Beginning in the End"
-description = "A cruel fate destroys the Wellington and turns the cadets into fully fledged pilots."
-filename = "prologue_outro.ogg"
-video_stream = SubResource("VideoStreamTheora_8he0y")
-
-[sub_resource type="VideoStreamTheora" id="VideoStreamTheora_khsah"]
-file = "res://campaigns/hermes/cutscenes/hermes_intro.ogv"
-
-[sub_resource type="Resource" id="Resource_up77r"]
-script = ExtResource("1_vgdqe")
-name = "Hit the Ground Running"
-description = "The Wellington survivors arrive on the TCS Hermes to start a new journey."
-filename = "hermes_intro.ogg"
-video_stream = SubResource("VideoStreamTheora_khsah")
+[ext_resource type="Script" uid="uid://cmptma8k317o" path="res://scripts/resources/cutscenes/cutscene_resource.gd" id="1_vgdqe"]
+[ext_resource type="Script" uid="uid://77jf8vh5lweh" path="res://scripts/resources/cutscenes/cutscene_manifest.gd" id="2_6ulfx"]
 
 [sub_resource type="VideoStreamTheora" id="VideoStreamTheora_pfnq6"]
 file = "res://campaigns/hermes/cutscenes/episode_01_outro.ogv"
@@ -103,6 +63,26 @@ description = "The end of the Kilrathi War is near. Confed rallies its entire fo
 filename = "episode_06_outro.ogg"
 video_stream = SubResource("VideoStreamTheora_oj62h")
 
+[sub_resource type="VideoStreamTheora" id="VideoStreamTheora_x8enf"]
+file = "res://campaigns/hermes/cutscenes/hermes_credits.ogv"
+
+[sub_resource type="Resource" id="Resource_pwmfm"]
+script = ExtResource("1_vgdqe")
+name = "Credits"
+description = "Meet the team that has poured countless hours of blood, sweat, and tears into creating Wing Commander Saga: The Darkest Dawn."
+filename = "hermes_credits.ogg"
+video_stream = SubResource("VideoStreamTheora_x8enf")
+
+[sub_resource type="VideoStreamTheora" id="VideoStreamTheora_khsah"]
+file = "res://campaigns/hermes/cutscenes/hermes_intro.ogv"
+
+[sub_resource type="Resource" id="Resource_up77r"]
+script = ExtResource("1_vgdqe")
+name = "Hit the Ground Running"
+description = "The Wellington survivors arrive on the TCS Hermes to start a new journey."
+filename = "hermes_intro.ogg"
+video_stream = SubResource("VideoStreamTheora_khsah")
+
 [sub_resource type="VideoStreamTheora" id="VideoStreamTheora_0iiyt"]
 file = "res://campaigns/hermes/cutscenes/hermes_outro.ogv"
 
@@ -113,15 +93,35 @@ description = "The War is finally over, and Sandman flies as part of the Honor G
 filename = "hermes_outro.ogg"
 video_stream = SubResource("VideoStreamTheora_0iiyt")
 
-[sub_resource type="VideoStreamTheora" id="VideoStreamTheora_x8enf"]
-file = "res://campaigns/hermes/cutscenes/hermes_credits.ogv"
+[sub_resource type="VideoStreamTheora" id="VideoStreamTheora_08s8v"]
+file = "res://campaigns/hermes/cutscenes/intro.ogv"
 
-[sub_resource type="Resource" id="Resource_pwmfm"]
+[sub_resource type="Resource" id="Resource_4mqiv"]
 script = ExtResource("1_vgdqe")
-name = "Credits"
-description = "Meet the team that has poured countless hours of blood, sweat, and tears into creating Wing Commander Saga: The Darkest Dawn."
-filename = "hermes_credits.ogg"
-video_stream = SubResource("VideoStreamTheora_x8enf")
+name = "Introduction"
+description = "Wing Commander Saga Introduction"
+filename = "intro.ogg"
+video_stream = SubResource("VideoStreamTheora_08s8v")
+
+[sub_resource type="VideoStreamTheora" id="VideoStreamTheora_681bg"]
+file = "res://campaigns/hermes/cutscenes/prologue_intro.ogv"
+
+[sub_resource type="Resource" id="Resource_154hi"]
+script = ExtResource("1_vgdqe")
+name = "Reporting Aboard"
+description = "New flight cadets arrive on the TCS Wellington to start the final phase of their training."
+filename = "prologue_intro.ogg"
+video_stream = SubResource("VideoStreamTheora_681bg")
+
+[sub_resource type="VideoStreamTheora" id="VideoStreamTheora_8he0y"]
+file = "res://campaigns/hermes/cutscenes/prologue_outro.ogv"
+
+[sub_resource type="Resource" id="Resource_ep3qf"]
+script = ExtResource("1_vgdqe")
+name = "The Beginning in the End"
+description = "A cruel fate destroys the Wellington and turns the cadets into fully fledged pilots."
+filename = "prologue_outro.ogg"
+video_stream = SubResource("VideoStreamTheora_8he0y")
 
 [resource]
 script = ExtResource("2_6ulfx")

@@ -60,6 +60,7 @@ const MedalGenerator = preload("res://addons/wcs_import/generators/medal_generat
 const StarGenerator = preload("res://addons/wcs_import/generators/star_generator.gd")
 const NebulaGenerator = preload("res://addons/wcs_import/generators/nebula_generator.gd")
 const ShipGenerator = preload("res://addons/wcs_import/generators/ship_generator.gd")
+const ShipSceneGenerator = preload("res://addons/wcs_import/generators/ship_scene_generator.gd")
 const WeaponGenerator = preload("res://addons/wcs_import/generators/weapon_generator.gd")
 const IconGenerator = preload("res://addons/wcs_import/generators/icon_generator.gd")
 const MainhallGenerator = preload("res://addons/wcs_import/generators/mainhall_generator.gd")
@@ -126,7 +127,7 @@ func _initialize():
 
 func _process(_delta):
 	_run()
-	return true  # Exit loop
+	return true # Exit loop
 
 
 func _process_campaign(input_path: String, output_dir: String) -> bool:
@@ -161,7 +162,7 @@ func _scan_dir_recursive(dir_path: String) -> void:
 						(
 							"DEBUG: Added to file map: '"
 							+ lower_name
-							+ "' -> "
+							+"' -> "
 							+ dir_path.path_join(file_name)
 						)
 					)
@@ -316,7 +317,7 @@ func _run():
 		for fname in _file_map:
 			if fname.ends_with(".fs2"):
 				mission_files.append(fname)
-		mission_files.sort()  # Ensure consistent order
+		mission_files.sort() # Ensure consistent order
 
 		for fname in mission_files:
 			if not filter_pattern.is_empty() and not fname.matchn(filter_pattern):
@@ -618,7 +619,18 @@ func _process_ships(input_path: String, output_dir: String) -> bool:
 	var generator = ShipGenerator.new()
 	var source_root = ProjectSettings.globalize_path(input_path.get_base_dir().get_base_dir())
 
-	return generator.generate(ships, output_dir, source_root)
+	var success = generator.generate(ships, output_dir, source_root)
+	
+	if success:
+		print("Generating ship scenes...")
+		var scene_generator = ShipSceneGenerator.new()
+		var scene_count = 0
+		for ship in ships:
+			if scene_generator.generate(ship, output_dir, source_root):
+				scene_count += 1
+		print("Generated " + str(scene_count) + " ship scenes.")
+		
+	return success
 
 
 func _process_weapons(input_path: String, output_dir: String) -> bool:
@@ -1012,7 +1024,7 @@ func _resolve_output_path(base_output_dir: String, subpath: String) -> String:
 		# base_output_dir is usually .../target/assets
 		# We want .../target/campaigns/...
 		# So we go up one level from assets
-		var project_root = base_output_dir.get_base_dir()  # .../target
+		var project_root = base_output_dir.get_base_dir() # .../target
 		if base_output_dir.ends_with("assets"):
 			return project_root.path_join(subpath)
 

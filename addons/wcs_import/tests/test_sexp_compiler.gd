@@ -3,7 +3,7 @@ extends SceneTree
 
 const SexpParser = preload("res://addons/wcs_import/sexp/sexp_parser.gd")
 const SexpCompiler = preload("res://addons/wcs_import/sexp/sexp_compiler.gd")
-const BTSexpConditionRef = preload("res://scripts/core/behavior_tree/tasks/bt_sexp_condition.gd")
+const BTSexpConditionRef = preload("res://scripts/ai/behavior_tree/tasks/bt_sexp_condition.gd")
 
 func _init():
 	_test_compile_sequence()
