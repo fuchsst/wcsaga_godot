@@ -38,6 +38,20 @@ func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 			else:
 				print("Warning: Could not find POF source for " + res.projectile_model)
 
+			# Attempt to generate ModelData for the weapon model if available
+			# This ensures we have thruster data for missiles even if not strictly linked to a Ship resource
+			if not res.projectile_model.is_empty() and res.projectile_model.ends_with(".gltf"):
+				var basename = res.projectile_model.get_basename()
+				var json_access_path = weapon_dir.path_join(basename + "_data.json")
+				
+				if FileAccess.file_exists(json_access_path):
+					var md_generator = load("res://addons/wcs_import/generators/model_data_generator.gd").new()
+					var generated_data = md_generator.generate(json_access_path)
+					if generated_data:
+						print("Generated ModelData for weapon: " + basename)
+					else:
+						print("Failed to generate ModelData for weapon: " + basename)
+
 		# 3. Convert/Copy Textures and Icons
 		if not res.display_icon.is_empty():
 			if res.display_icon.begins_with("empty"):

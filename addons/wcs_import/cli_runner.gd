@@ -628,7 +628,7 @@ func _process_ships(input_path: String, output_dir: String) -> bool:
 		for ship in ships:
 			if scene_generator.generate(ship, output_dir, source_root):
 				scene_count += 1
-		print("Generated " + str(scene_count) + " ship scenes.")
+		print("Generated " + str(scene_count) + "/" + str(ships.size()) + " ship scenes.")
 		
 	return success
 

@@ -13,7 +13,71 @@ enum HomingType {
 	NONE = 0,
 	HEAT_SEEKING = 1,
 	ASPECT_SEEKING = 2,
-	LASER_GUIDED = 3
+	LASER_GUIDED = 3,
+	# Aliases for Parser
+	HEAT = 1,
+	ASPECT = 2
+}
+
+# Inner Classes for Weapon Configurations
+class SwarmConfiguration extends Resource:
+	@export var count: int = 0
+	@export var wait_time: float = 0.0
+
+class BeamConfiguration extends Resource:
+	@export var beam_type: int = 0
+	@export var beam_life: float = 0.0
+	@export var beam_warmup: float = 0.0
+	@export var beam_warmdown: float = 0.0
+	@export var beam_width: float = 1.0
+	@export var range_multiplier: float = 1.0
+
+class TrailConfiguration extends Resource:
+	@export var bitmap: String = ""
+	@export var start_width: float = 0.0
+	@export var end_width: float = 0.0
+	@export var start_alpha: float = 0.0
+	@export var end_alpha: float = 0.0
+	@export var max_life: float = 0.0
+
+class CorkscrewConfiguration extends Resource:
+	@export var num_missiles: int = 0
+	@export var radius: float = 0.0
+	@export var twist_rate: float = 0.0
+	@export var shrink_rate: float = 0.0
+	@export var fire_delay: float = 0.0
+	@export var counter_rotate: bool = false
+	@export var helix: bool = false
+
+class ParticleSpew extends Resource:
+	@export var count: int = 0
+	@export var time: int = 0
+	@export var velocity: float = 0.0
+	@export var radius: float = 0.0
+	@export var lifetime: float = 0.0
+	@export var scale: float = 0.0
+	@export var bitmap: String = ""
+
+# Weapon Flags
+enum WeaponFlags {
+	PLAYER_ALLOWED = 1 << 0,
+	BEAM = 1 << 1,
+	BOMB = 1 << 2,
+	HUGE = 1 << 3,
+	PARTICLE_SPEW = 1 << 4,
+	BALLISTIC = 1 << 5,
+	SWARM = 1 << 6,
+	CORKSCREW = 1 << 7,
+	FLAK = 1 << 8,
+	ELECTRONICS = 1 << 9,
+	SPAWN_CHILD = 1 << 10,
+	REMOTE_DETONATE = 1 << 11,
+	PUNCTURE = 1 << 12,
+	SHIELD_PIERCE = 1 << 13,
+	BOMBER_PLUS = 1 << 14,
+	TAGGED = 1 << 15,
+	ENERGY_SUCK = 1 << 16,
+	EMP = 1 << 17
 }
 
 # -------------------------------------------------------------------------
@@ -22,11 +86,13 @@ enum HomingType {
 @export_group("Identification")
 @export var weapon_class: String = ""
 @export var display_name: String = "Generic Weapon"
+@export var category: String = "weapon"
+@export var manufacturer_species: String = "Terran"
 @export var weapon_type: WeaponType = WeaponType.ENERGY
 @export var tech_title: String = ""
-@export var tech_anim: String = ""
+@export var tech_animation: String = ""
 @export var tech_description: String = ""
-@export var icon_file: String = ""
+@export var display_icon: String = ""
 @export var anim_file: String = "" # Loadout animation
 
 # -------------------------------------------------------------------------
@@ -80,8 +146,10 @@ enum HomingType {
 # 6. Visuals - Laser
 # -------------------------------------------------------------------------
 @export_group("Visuals - Laser")
-@export var laser_bitmap: String = ""
-@export var laser_glow: String = ""
+var _laser_bitmap_source: String = ""
+var _laser_glow_source: String = ""
+@export var laser_bitmap: Texture2D
+@export var laser_glow: Texture2D
 @export var laser_color: Color = Color.WHITE
 @export var laser_color_2: Color = Color.BLACK
 @export var laser_length: float = 0.0
@@ -109,6 +177,16 @@ enum HomingType {
 @export var muzzle_flash_effect: String = "" # Usually implied by weapon type or separate tbl
 
 # -------------------------------------------------------------------------
+# 8.1 Advanced Configurations
+# -------------------------------------------------------------------------
+@export var swarm_config: Resource
+@export var beam_config: Resource
+@export var trail_config: Resource
+@export var corkscrew_config: Resource
+@export var flak_config: Resource
+@export var particle_spew: Resource
+
+# -------------------------------------------------------------------------
 # 9. Audio
 # -------------------------------------------------------------------------
 @export_group("Audio")
@@ -120,7 +198,12 @@ enum HomingType {
 # 10. Flags
 # -------------------------------------------------------------------------
 @export_group("Flags")
-@export var flags: Array[String] = []
+@export var flags: int = 0 # Bitmask using WeaponFlags
+@export var appears_in_tech_db: bool = false
+@export var is_beam: bool = false
+@export var no_shield_piercing: bool = false
+@export var is_bomb_type: bool = false
+@export var is_huge_weapon: bool = false
 
 # -------------------------------------------------------------------------
 # Logic & Helpers

@@ -32,18 +32,36 @@ func generate(ships: Array, output_dir: String, source_root: String) -> bool:
 				# Update resource to point to converted GLB (keep original basename)
 				res.model_file = pof_source.get_file().get_basename() + ".gltf"
 				
-				# Load generated ShipModelData resource
+				# Generate and Load ShipModelData
 				var basename = pof_source.get_file().get_basename()
+				var json_access_path = ship_dir.path_join(basename + "_data.json")
 				var model_data_path = ship_dir.path_join(basename + "_model.tres")
-				if FileAccess.file_exists(model_data_path):
+				
+				# If JSON exists (new pipeline), generate TRES
+				# We use a dynamic script load or assume ModelDataGenerator is available
+				var md_generator = load("res://addons/wcs_import/generators/model_data_generator.gd").new()
+				if FileAccess.file_exists(json_access_path):
+					var generated_data = md_generator.generate(json_access_path)
+					if generated_data:
+						res.model_data = generated_data
+						print("Generated & Linked ShipModelData: " + model_data_path)
+					else:
+						print("Failed to generate ShipModelData from: " + json_access_path)
+				elif FileAccess.file_exists(model_data_path):
+					# Fallback to existing TRES (old pipeline or manual)
 					var model_data = load(model_data_path)
 					if model_data:
 						res.model_data = model_data
-						print("Linked ShipModelData: " + model_data_path)
+						print("Linked existing ShipModelData: " + model_data_path)
 					else:
-						print("Failed to load ShipModelData: " + model_data_path)
+						print("Failed to load existing ShipModelData: " + model_data_path)
 				else:
-					print("Warning: ShipModelData not found at " + model_data_path)
+					print("Warning: No model data (json or tres) found for " + basename)
+				
+				# Cleanup JSON file
+				if FileAccess.file_exists(json_access_path):
+					DirAccess.remove_absolute(json_access_path)
+					print("Cleaned up intermediate JSON: " + json_access_path)
 			else:
 				print("Failed to convert POF: " + pof_source)
 		else:

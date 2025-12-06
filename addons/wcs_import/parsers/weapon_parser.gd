@@ -3,7 +3,9 @@ extends "res://addons/wcs_import/parsers/base_parser.gd"
 
 ## Parser for weapons.tbl files.
 ## Converts weapon data into WeaponData resources.
+## Converts weapon data into WeaponData resources.
 const WeaponDataScript = preload("res://scripts/resources/weapons/weapon_data.gd")
+# var WeaponDataScript = load("res://scripts/resources/weapons/weapon_data.gd")
 
 
 func _parse_content() -> Variant:
@@ -25,6 +27,9 @@ func _parse_content() -> Variant:
 
 		if line.begins_with("$Name:"):
 			var weapon = _parse_weapon(line)
+			if weapon == null:
+				continue
+				
 			# Only use TBL category if we didn't determine a more specific one from the model
 			if weapon.category == "weapon" or weapon.category.is_empty():
 				weapon.category = current_category
@@ -35,6 +40,10 @@ func _parse_content() -> Variant:
 
 func _parse_weapon(first_line: String) -> Resource:
 	var weapon = WeaponDataScript.new()
+	if weapon == null:
+		print("ERROR: Failed to instantiate WeaponData!")
+		return null
+
 	var raw_name = _extract_string_value(first_line, "$Name:")
 	weapon.weapon_class = raw_name.trim_prefix("@")
 	weapon.display_name = weapon.weapon_class # Default
@@ -44,6 +53,10 @@ func _parse_weapon(first_line: String) -> Resource:
 
 	while _has_more_lines():
 		var line = _peek_next_line()
+		if line == null:
+			print("DEBUG: _peek_next_line returned null! Index: " + str(_current_line_index))
+			break
+			
 		if line.begins_with("$Name:") or line.begins_with("#"):
 			break
 
@@ -77,7 +90,7 @@ func _parse_weapon(first_line: String) -> Resource:
 		elif line.begins_with("$Life:"):
 			weapon.projectile_lifetime = _extract_float_value(line, "$Life:")
 		elif line.begins_with("$Weapon Range:") or line.begins_with("+Weapon Range:"):
-			weapon.effective_range_meters = _extract_float_value(
+			weapon.weapon_range_meters = _extract_float_value(
 				line, "$Weapon Range:", "+Weapon Range:"
 			)
 		elif line.begins_with("$Model File:"):
@@ -92,19 +105,19 @@ func _parse_weapon(first_line: String) -> Resource:
 		elif line.begins_with("$Anim:"):
 			weapon.tech_animation = _extract_string_value(line, "$Anim:")
 		elif line.begins_with("$Launch Snd:") or line.begins_with("$LaunchSnd:"):
-			weapon.launch_sound_id = _extract_int_value(line, "$Launch Snd:", "$LaunchSnd:")
+			weapon.launch_sound_index = _extract_int_value(line, "$Launch Snd:", "$LaunchSnd:")
 		elif line.begins_with("$Impact Snd:") or line.begins_with("$ImpactSnd:"):
-			weapon.impact_sound_id = _extract_int_value(line, "$Impact Snd:", "$ImpactSnd:")
+			weapon.impact_sound_index = _extract_int_value(line, "$Impact Snd:", "$ImpactSnd:")
 		elif line.begins_with("$Flyby Snd:") or line.begins_with("$FlybySnd:"):
-			weapon.flyby_sound_id = _extract_int_value(line, "$Flyby Snd:", "$FlybySnd:")
+			weapon.flyby_sound_index = _extract_int_value(line, "$Flyby Snd:", "$FlybySnd:")
 		elif line.begins_with("$Flags:"):
 			_parse_flags(line, weapon)
 		elif line.begins_with("$Armor Factor:"):
-			weapon.armor_penetration_factor = _extract_float_value(line, "$Armor Factor:")
+			weapon.armor_factor = _extract_float_value(line, "$Armor Factor:")
 		elif line.begins_with("$Shield Factor:"):
-			weapon.shield_penetration_factor = _extract_float_value(line, "$Shield Factor:")
+			weapon.shield_factor = _extract_float_value(line, "$Shield Factor:")
 		elif line.begins_with("$Subsystem Factor:"):
-			weapon.subsystem_damage_factor = _extract_float_value(line, "$Subsystem Factor:")
+			weapon.subsystem_factor = _extract_float_value(line, "$Subsystem Factor:")
 		elif line.begins_with("$Energy Consumed:"):
 			weapon.energy_per_shot = _extract_float_value(line, "$Energy Consumed:")
 		elif line.begins_with("$Cargo Size:"):
@@ -182,11 +195,11 @@ func _parse_weapon(first_line: String) -> Resource:
 		elif line.begins_with("@Laser Glow:"):
 			weapon._laser_glow_source = _extract_string_value(line, "@Laser Glow:")
 		elif line.begins_with("@Laser Color:"):
-			weapon.laser_primary_color = _extract_color_value(line, "@Laser Color:")
+			weapon.laser_color = _extract_color_value(line, "@Laser Color:")
 		elif line.begins_with("@Laser Color2:"):
-			weapon.laser_secondary_color = _extract_color_value(line, "@Laser Color2:")
+			weapon.laser_color_2 = _extract_color_value(line, "@Laser Color2:")
 		elif line.begins_with("@Laser Length:"):
-			weapon.laser_length_meters = _extract_float_value(line, "@Laser Length:")
+			weapon.laser_length = _extract_float_value(line, "@Laser Length:")
 		elif line.begins_with("@Laser Head Radius:"):
 			weapon.laser_head_radius = _extract_float_value(line, "@Laser Head Radius:")
 		elif line.begins_with("@Laser Tail Radius:"):
@@ -194,11 +207,11 @@ func _parse_weapon(first_line: String) -> Resource:
 
 	# Calculate derived values if missing
 	if (
-		weapon.effective_range_meters == 0
+		weapon.weapon_range_meters == 0
 		and weapon.muzzle_velocity_mps > 0
 		and weapon.projectile_lifetime > 0
 	):
-		weapon.effective_range_meters = weapon.muzzle_velocity_mps * weapon.projectile_lifetime
+		weapon.weapon_range_meters = weapon.muzzle_velocity_mps * weapon.projectile_lifetime
 
 	return weapon
 
@@ -352,6 +365,10 @@ func _parse_flags(line: String, weapon) -> void:
 				weapon.flags |= WeaponDataScript.WeaponFlags.BOMBER_PLUS
 			"tagged":
 				weapon.flags |= WeaponDataScript.WeaponFlags.TAGGED
+			"energy suck":
+				weapon.flags |= WeaponDataScript.WeaponFlags.ENERGY_SUCK
+			"emp":
+				weapon.flags |= WeaponDataScript.WeaponFlags.EMP
 
 
 func _extract_color_value(line: String, prefix: String) -> Color:

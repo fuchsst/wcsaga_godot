@@ -103,19 +103,52 @@ func _process_energy(delta: float) -> void:
 func set_throttle(percent: float) -> void:
 	throttle_percent = clampf(percent, -0.3, 1.0) # Assuming -30% for reverse?
 
-func take_damage(amount: float, type: String = "generic") -> void:
-	# Basic stub
-	# TODO: Armor calculations
+func take_damage(damage_info: Dictionary, attacker: Node = null) -> void:
+	if not stats:
+		return
+
+	# 1. Apply Damage (Shields first)
+	var shield_damage = damage_info.get("shield_damage", 0.0)
+	var hull_damage = damage_info.get("hull_damage", 0.0)
+	
+	# Apply Shield Damage
 	if current_shields > 0:
-		current_shields -= amount
+		current_shields -= shield_damage
 		if current_shields < 0:
-			current_hull += current_shields # Overflow to hull
-			current_shields = 0
-	else:
-		current_hull -= amount
+			# If shields broken, overflow specific logic? 
+			# Usually FS2 handles shield leak separately, but here we simplify
+			pass
+		current_shields = max(0.0, current_shields)
+		
+	# Apply Hull Damage (if shields penetrated or down)
+	# TODO: Check for shield flags? Assume parser handled factors.
+	current_hull -= hull_damage
+	
+	# 2. Apply Effects
+	if damage_info.get("energy_suck", 0.0) > 0:
+		var suck = damage_info["energy_suck"]
+		weapon_energy = max(0.0, weapon_energy - suck)
+		afterburner_fuel = max(0.0, afterburner_fuel - suck)
+		
+	if damage_info.has("emp"):
+		var emp_data = damage_info["emp"]
+		apply_emp(emp_data.get("intensity", 0.0), emp_data.get("time", 0.0))
+		
+	if damage_info.get("electronics", false):
+		apply_electronics_disruption()
 		
 	if current_hull <= 0:
 		die()
+
+func apply_emp(intensity: float, duration: float) -> void:
+	print("Ship " + name + " hit by EMP! Intensity: " + str(intensity) + " Duration: " + str(duration))
+	# TODO: Implement HUD scramble / system disruption logic
+	pass
+
+func apply_electronics_disruption() -> void:
+	print("Ship " + name + " electronics hit!")
+	# TODO: Implement electronics scrambling
+	pass
 
 func die() -> void:
 	# TODO: Explosion effect, cleanup

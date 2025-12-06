@@ -3,7 +3,7 @@ extends RefCounted
 
 const WCSPathResolver = preload("res://addons/wcs_import/core/path_resolver.gd")
 
-func generate(res: ShipStats, output_dir: String, source_root: String) -> bool:
+func generate(res: Resource, output_dir: String, source_root: String) -> bool:
     print("Generating Scene for " + res.ship_class)
     
     # 1. Determine Output Path
@@ -12,17 +12,19 @@ func generate(res: ShipStats, output_dir: String, source_root: String) -> bool:
         pof_file = res.ship_class + ".pof"
         
     var path_info = WCSPathResolver.determine_output_path(pof_file)
-    var category = path_info[0] # e.g. "manual", "ships/fighter"
-    # Mapping "ships/fighter" -> "fighters" for simpler feature paths?
-    # Refinement doc says: features/fighters
-    # PathResolver uses "ships/fighter". We need to map this.
-    var feature_category = _map_category_to_feature(category)
+    var category = path_info[0]
+    var subcategory = path_info[1]
     
     var filename = _normalize_filename(res.ship_class)
-    var ship_feature_dir = "res://features".path_join(feature_category).path_join(filename)
+    
+    # User requested colocated assets: assets/ships/<category>/<subcategory>/<filename>
+    # output_dir usually points to "target" or project root.
+    # WCSPathResolver usually returns "ships" as category for ships.
+    
+    var ship_dir = output_dir.path_join(category).path_join(subcategory).path_join(filename)
     
     # Ensure directory exists
-    DirAccess.make_dir_recursive_absolute(ship_feature_dir)
+    DirAccess.make_dir_recursive_absolute(ship_dir)
     
     # 2. Create Root Node
     var ShipEntity = load("res://scripts/entities/ship/ship_entity.gd")
@@ -35,18 +37,17 @@ func generate(res: ShipStats, output_dir: String, source_root: String) -> bool:
     ship_node.stats = res # Assign stats
     
     # 3. Add Model Instance
+    # Model should be in the same directory
     var model_filename = res.model_file
-    var model_path = "res://assets".path_join(category).path_join(filename).path_join(model_filename)
-    # Check if model exists (converted by ship_generator)
+    var model_path = ship_dir.path_join(model_filename)
+    
     if not FileAccess.file_exists(model_path):
-        print("Warning: Model not found at " + model_path)
-        # Try finding it recursively or checking if path resolution was slightly off?
-        # Fallback: check standard paths if category was maybe partial
-        if not FileAccess.file_exists(model_path):
-             # Try appending "ships" to category if missing
-             var alt_path = "res://assets/ships".path_join(category).path_join(filename).path_join(model_filename)
-             if FileAccess.file_exists(alt_path):
-                 model_path = alt_path
+         print("Warning: Model not found at " + model_path)
+         # Try finding it in case of extension mismatch?
+         if FileAccess.file_exists(ship_dir.path_join(filename + ".gltf")):
+             model_path = ship_dir.path_join(filename + ".gltf")
+         elif FileAccess.file_exists(ship_dir.path_join(filename + ".glb")):
+             model_path = ship_dir.path_join(filename + ".glb")
     
     if FileAccess.file_exists(model_path):
         var model_scene = load(model_path)
@@ -77,7 +78,7 @@ func generate(res: ShipStats, output_dir: String, source_root: String) -> bool:
     var scene = PackedScene.new()
     var result = scene.pack(ship_node)
     if result == OK:
-        var scene_path = ship_feature_dir.path_join(filename + ".tscn")
+        var scene_path = ship_dir.path_join(filename + ".tscn")
         ResourceSaver.save(scene, scene_path)
         print("Saved Scene: " + scene_path)
         

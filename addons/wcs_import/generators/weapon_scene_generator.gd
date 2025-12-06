@@ -2,11 +2,11 @@ class_name WeaponSceneGenerator
 extends RefCounted
 
 const WCSWeaponData = preload("res://scripts/resources/weapons/weapon_data.gd")
-const Weapon = preload("res://features/weapons/base_weapon.gd")
-const Missile = preload("res://features/weapons/missile_weapon.gd")
-const Projectile = preload("res://features/weapons/projectile_weapon.gd")
-const BeamWeapon = preload("res://features/weapons/beam_weapon.gd")
-const FlakWeapon = preload("res://features/weapons/flak_weapon.gd")
+const Weapon = preload("res://scripts/entities/weapons/base_weapon.gd")
+const Missile = preload("res://scripts/entities/weapons/missile_weapon.gd")
+const Projectile = preload("res://scripts/entities/weapons/projectile_weapon.gd")
+const BeamWeapon = preload("res://scripts/entities/weapons/beam_weapon.gd")
+const FlakWeapon = preload("res://scripts/entities/weapons/flak_weapon.gd")
 
 
 func generate_scene(weapon_data: WCSWeaponData, output_root: String) -> void:

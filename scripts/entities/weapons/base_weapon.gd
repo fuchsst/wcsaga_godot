@@ -75,6 +75,9 @@ func _on_body_entered(body: Node3D) -> void:
 func _detonate(hit_object: Node3D = null) -> void:
 	weapon_detonated.emit(global_position)
 	
+	if weapon_data.flags & WeaponData.WeaponFlags.PARTICLE_SPEW:
+		_spawn_particle_spew()
+	
 	if hit_object and weapon_data:
 		# Apply damage
 		if hit_object.has_method("take_damage"):
@@ -86,6 +89,21 @@ func _detonate(hit_object: Node3D = null) -> void:
 				0.0, # Impact Angle
 				velocity.length()
 			)
+			
+			# Inject Effects
+			if weapon_data.flags & WeaponData.WeaponFlags.ENERGY_SUCK:
+				# Use total damage as base for suck amount if not specified otherwise
+				damage_info["energy_suck"] = damage_info.get("total_damage", 0.0)
+				
+			if weapon_data.flags & WeaponData.WeaponFlags.EMP:
+				damage_info["emp"] = {
+					"intensity": weapon_data.emp_intensity,
+					"time": weapon_data.emp_time
+				}
+				
+			if weapon_data.flags & WeaponData.WeaponFlags.ELECTRONICS:
+				damage_info["electronics"] = true
+			
 			hit_object.take_damage(damage_info, fired_by)
 			
 	queue_free()
@@ -93,3 +111,11 @@ func _detonate(hit_object: Node3D = null) -> void:
 func _on_lifetime_expired() -> void:
 	weapon_expired.emit()
 	queue_free()
+
+func _spawn_particle_spew() -> void:
+	if not weapon_data or not weapon_data.particle_spew:
+		return
+		
+	# Placeholder for particle spew implementation
+	# Ideally instantiate a GPUParticles3D or custom scene
+	print("DEBUG: Spawning particle spew: Count=" + str(weapon_data.particle_spew.count) + " Bitmap=" + weapon_data.particle_spew.bitmap)
