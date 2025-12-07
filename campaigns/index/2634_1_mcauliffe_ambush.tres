@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_resource")
 year = 2634
-order_index = 1
+order_index = 235
 era = "Early War Era"
 title = "The McAuliffe Ambush"
 short_description = "The 'Pearl Harbor' of the Kilrathi War. A devastating defeat that galvanizes the Confederation."

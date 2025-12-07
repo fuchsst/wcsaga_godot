@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_resource")
 year = 2669
-order_index = 2
+order_index = 217
 era = "Victory of 2669"
 title = "Wing Commander Saga: The Darkest Dawn"
 short_description = "Battlegroup Serpent. The TCS Hermes leads the diversionary offensive that makes the Victory's mission possible."

@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_resource")
 year = 2656
-order_index = 1
+order_index = 33
 era = "Dark Years Era"
 title = "The Loss of the Tiger's Claw"
 short_description = "The 'Queen of the Fleet' is destroyed in the K'Tithrak Mang system. Blair is blamed and exiled."

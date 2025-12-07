@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_resource")
 year = 2669
-order_index = 1
+order_index = 217
 era = "Victory of 2669"
 title = "Wing Commander III: Heart of the Tiger"
 short_description = "The final roll of the dice. Blair leads the mission to destroy Kilrah with the Temblor Bomb."

@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_resource")
 year = 2634
-order_index = 2
+order_index = 150
 era = "Early War Era"
 title = "The Anna Magdalena Tragedy"
 short_description = "The destruction of a civilian transport carrying orphans catalyzes the Declaration of War."

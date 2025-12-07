@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_resource")
 year = 2790
-order_index = 1
+order_index = 163
 era = "Future Era"
 title = "Wing Commander: Pilgrim Truth"
 short_description = "The Pilgrim legacy revealed. An ancient war against a cosmic enemy prepares for humanity's transcendence."

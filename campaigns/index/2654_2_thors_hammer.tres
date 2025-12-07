@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_resource")
 year = 2654
-order_index = 2
+order_index = 287
 era = "Vega Campaign Era"
 title = "Secret Missions: Operation Thor's Hammer"
 short_description = "The Tiger's Claw confronts the Graviton Gun. The destruction of the Sivar dreadnought ends the Goddard massacre."

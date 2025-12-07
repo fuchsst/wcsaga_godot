@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_resource")
 year = 2629
-order_index = 1
+order_index = 105
 era = "Early War Era"
 title = "The Iason Incident"
 short_description = "First contact with the Empire of Kilrah. The destruction of the TCS Iason marks the beginning of humanity's greatest conflict."

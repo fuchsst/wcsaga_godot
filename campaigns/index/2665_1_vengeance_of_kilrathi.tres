@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_resource")
 year = 2665
-order_index = 1
+order_index = 112
 era = "Dark Years Era"
 title = "Wing Commander II: Vengeance of the Kilrathi"
 short_description = "Blair returns from exile. The Enigma Sector campaign and the revelation of the Strakha stealth fighters."

@@ -57,12 +57,7 @@ total_events = 27
 2701_1_arena = "res://campaigns/index/2701_1_arena.tres"
 
 [metadata]
-created_by = "Claude Code"
 creation_date = "2025-12-06"
-source_documents = [
-    "Wing_Commander_Timeline.md",
-    "Game_Menu_Design.md"
-]
 canonical_games = [
     "Wing Commander I-IV",
     "Wing Commander: Prophecy",

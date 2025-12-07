@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_resource")
 year = 2669
-order_index = 4
+order_index = 117
 era = "Victory of 2669"
 title = "Wing Commander: Privateer"
 short_description = "The Gemini Sector frontier. Burrows navigates pirates, raiders, and the fanatical Retros."

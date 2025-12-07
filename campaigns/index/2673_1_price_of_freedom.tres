@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_resource")
 year = 2673
-order_index = 1
+order_index = 5
 era = "Post-War Vacuum"
 title = "Wing Commander IV: The Price of Freedom"
 short_description = "The Black Lance conspiracy. Blair exposes Tolwyn's plot to orchestrate a war to keep humanity militarized."

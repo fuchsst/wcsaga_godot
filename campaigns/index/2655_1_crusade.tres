@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_resource")
 year = 2655
-order_index = 1
+order_index = 220
 era = "Vega Campaign Era"
 title = "Secret Missions: Crusade"
 short_description = "The Firekkan Alliance. Ralgha nar Hhallas (Hobbes) defects, bringing critical intelligence to the Confederation."

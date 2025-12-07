@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_resource")
 year = 2701
-order_index = 1
+order_index = 100
 era = "Future Era"
 title = "Wing Commander: Arena"
 short_description = "Post-war frontier skirmishes. The Confederation stabilizes but the frontier remains lawless."

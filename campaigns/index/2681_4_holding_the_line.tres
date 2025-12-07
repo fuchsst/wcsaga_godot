@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_resource")
 year = 2681
-order_index = 4
+order_index = 300
 era = "Nephilim Era"
 title = "Holding The Line"
 short_description = "The Reserve Fleets stand firm. Documenting the battles fought away from the spotlight."

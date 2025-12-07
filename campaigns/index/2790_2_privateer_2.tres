@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_resource")
 year = 2790
-order_index = 2
+order_index = 113
 era = "Future Era"
 title = "Privateer 2: The Darkening"
 short_description = "A century later in the Tri-System. Ser Lev Arris searches for identity in an isolated human pocket."

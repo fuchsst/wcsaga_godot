@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_resource")
 year = 2654
-order_index = 1
+order_index = 110
 era = "Vega Campaign Era"
 title = "Wing Commander: Vega Campaign"
 short_description = "The Golden Age begins. The TCS Tiger's Claw launches the counter-offensive in the Vega Sector."

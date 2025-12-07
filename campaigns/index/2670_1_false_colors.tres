@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_resource")
 year = 2670
-order_index = 1
+order_index = 100
 era = "Post-War Vacuum"
 title = "False Colors"
 short_description = "The Landreich deals with Kilrathi warlords. The Karga supercarrier salvaged for balance of power."

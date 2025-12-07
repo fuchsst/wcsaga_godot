@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_resource")
 year = 2667
-order_index = 1
+order_index = 100
 era = "Dark Years Era"
 title = "Special Operations 1 & 2"
 short_description = "The Crossbow and Morningstar projects. Technological parity and the Jeep Carrier doctrine."

@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_resource")
 year = 2668
-order_index = 1
+order_index = 200
 era = "Crisis of 2668"
 title = "The False Armistice"
 short_description = "A treacherous peace. The Kilrathi deception allows them to complete the Hakaga-class supercarriers."

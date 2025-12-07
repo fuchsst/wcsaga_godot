@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_resource")
 year = 2681
-order_index = 1
+order_index = 42
 era = "Nephilim Era"
 title = "Wing Commander: Prophecy"
 short_description = "The Nephilim arrive. Lance Casey defends humanity aboard the TCS Midway megacarrier."

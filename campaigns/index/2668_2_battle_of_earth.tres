@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_resource")
 year = 2668
-order_index = 2
+order_index = 342
 era = "Crisis of 2668"
 title = "The Battle of Earth"
 short_description = "The 'Lost Year'. The Kilrathi supercarriers assault Earth as the Home Fleet burns."

@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_resource")
 year = 2669
-order_index = 3
+order_index = 300
 era = "Victory of 2669"
 title = "Wing Commander: Armada"
 short_description = "A lost patrol. The TCS Lexington and KIS Shiraak engage in deep space cat-and-mouse warfare."
