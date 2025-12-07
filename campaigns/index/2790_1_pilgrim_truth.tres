@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TimelineEventResource" load_steps=2 format=3 uid="uid://dgpdhl32d3ote"]
+
+[ext_resource type="Script" uid="uid://q7v3pejpcwpt" path="res://scripts/resources/ui/campaign_timeline/TimelineEventResource.gd" id="1_resource"]
+
+[resource]
+script = ExtResource("1_resource")
+year = 2790
+order_index = 1
+era = "Future Era"
+title = "Wing Commander: Pilgrim Truth"
+short_description = "The Pilgrim legacy revealed. An ancient war against a cosmic enemy prepares for humanity's transcendence."
+long_description = "Based on the movie continuity (where Blair is a 'Pilgrim' with genetic navigation abilities), Pilgrim Truth reveals that the Pilgrims were preparing for a cosmic war against an ancient enemy (implied to be related to the Nephilim). The synopsis describes a 'blue light' phenomenon and the transcendence of the Pilgrim people. Written by Peter Telep and released online after cancellation, this represents the thematic conclusion to the 'mystical' elements introduced in the 1999 film. While arguably a separate canon from the games, it provides a cosmic perspective on the Wing Commander universe, suggesting that humanity's journey through the Kilrathi War and Nephilim Invasion was merely preparation for a greater destiny among the stars."
+locked = true

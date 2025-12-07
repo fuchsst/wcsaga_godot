@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TimelineEventResource" load_steps=2 format=3 uid="uid://dnaqs16aelqtx"]
+
+[ext_resource type="Script" uid="uid://q7v3pejpcwpt" path="res://scripts/resources/ui/campaign_timeline/TimelineEventResource.gd" id="1_resource"]
+
+[resource]
+script = ExtResource("1_resource")
+year = 2701
+order_index = 1
+era = "Future Era"
+title = "Wing Commander: Arena"
+short_description = "Post-war frontier skirmishes. The Confederation stabilizes but the frontier remains lawless."
+long_description = "While the game is an arcade shooter, its manual, Star*Soldier*, is a treasure trove of lore. It describes the galaxy post-Nephilim: the Confederation has stabilized, but the frontier is lawless. It details the 'Bearcat' and 'Arrow' evolutions and confirms the continued low-level conflict with Kilrathi splinter factions and Nephilim remnants. Twenty years after the Nephilim invasion, humanity has rebuilt but faces new challenges. The Confederation Navy has adapted to post-war realities, with new ship designs and tactics. The frontier worlds, distant from central authority, host conflicts between mercenaries, pirates, and remnants of old enemies. Arena represents the 'day after' of the Wing Commander universe—humanity survives but must remain vigilant."
+locked = true

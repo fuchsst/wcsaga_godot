@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TimelineEventResource" load_steps=2 format=3 uid="uid://ba406f6s2kld8"]
+
+[ext_resource type="Script" uid="uid://q7v3pejpcwpt" path="res://scripts/resources/ui/campaign_timeline/TimelineEventResource.gd" id="1_resource"]
+
+[resource]
+script = ExtResource("1_resource")
+year = 2670
+order_index = 1
+era = "Post-War Vacuum"
+title = "False Colors"
+short_description = "The Landreich deals with Kilrathi warlords. The Karga supercarrier salvaged for balance of power."
+long_description = "This novel details the 'Vukar Tag' of the peace: the Landreich (a fiercely independent human faction) dealing with Kilrathi warlords who refuse to surrender. The war has ended officially, but pockets of Kilrathi resistance continue fighting. The Landreich salvages the Karga, a Kilrathi supercarrier, to maintain the balance of power in their region. This bridges the gap between the end of the war and the organized Border Worlds resistance seen in Wing Commander IV, showing the complex political situation in the post-war period."
+locked = true

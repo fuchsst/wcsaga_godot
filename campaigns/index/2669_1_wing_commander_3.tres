@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="TimelineEventResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/ui/campaign_timeline/TimelineEventResource.gd" id="1_resource"]
+
+[resource]
+script = ExtResource("1_resource")
+year = 2669
+order_index = 1
+era = "Victory of 2669"
+title = "Wing Commander III: Heart of the Tiger"
+short_description = "The final roll of the dice. Blair leads the mission to destroy Kilrah with the Temblor Bomb."
+long_description = "Blair, now a Colonel, is assigned to the TCS Victory, an antiquated Yorktown-class carrier commanded by Captain William Eisen. The Concordia has been destroyed. The narrative arc is the 'final roll of the dice.' Key plot points include the Behemoth (a massive plasma weapon designed to destroy Kilrah), its destruction by Thrakhath (aided by Hobbes' betrayal), and the Temblor Bomb (a tectonic frequency weapon delivered by the Excalibur heavy fighter). The revelation that Ralgha nar Hhallas was a sleeper agent (personality overlay) is one of the franchise's most significant twists. The game concludes with Blair dropping the Temblor Bomb on the tectonically unstable planet Kilrah, causing it to explode. The Emperor is killed, Thrakhath is defeated, and the Kilrathi surrender."
+locked = false
+campaign_root_scene = null

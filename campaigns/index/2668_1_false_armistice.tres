@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TimelineEventResource" load_steps=2 format=3 uid="uid://bh2kacgkcaxlt"]
+
+[ext_resource type="Script" uid="uid://q7v3pejpcwpt" path="res://scripts/resources/ui/campaign_timeline/TimelineEventResource.gd" id="1_resource"]
+
+[resource]
+script = ExtResource("1_resource")
+year = 2668
+order_index = 1
+era = "Crisis of 2668"
+title = "The False Armistice"
+short_description = "A treacherous peace. The Kilrathi deception allows them to complete the Hakaga-class supercarriers."
+long_description = "The Kilrathi sue for peace in early 2668. The Confederation, exhausted and bankrupt, accepts the armistice. Massive decommissioning of the fleet begins. Ships are mothballed, and crews are discharged. This is a ruse; the Kilrathi are stalling to complete the construction of the Hakaga-class supercarriers, massive vessels capable of glassing Earth. The Confederation walks into a trap, disarming while their enemy prepares the final blow."
+locked = true

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="TimelineEventResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/ui/campaign_timeline/TimelineEventResource.gd" id="1_resource"]
+
+[resource]
+script = ExtResource("1_resource")
+year = 2665
+order_index = 1
+era = "Dark Years Era"
+title = "Wing Commander II: Vengeance of the Kilrathi"
+short_description = "Blair returns from exile. The Enigma Sector campaign and the revelation of the Strakha stealth fighters."
+long_description = "Ten years after the Tiger's Claw incident, Blair serves on the TCS Austin in the backwater Caernarvon Station. Admiral Tolwyn, now commanding the flagship TCS Concordia, visits the sector, bringing the war back to Blair. The plot is a tragedy of betrayal. The Confederation High Command is infiltrated by a Mandarin traitor (Major Zach 'Jazz' Colson) working for Prince Thrakhath. The game centers on proving the existence of the Strakha stealth fighters to clear Blair's name. This era introduces the Broadsword bomber and phase shielding. The doctrine shifts from dogfighting to capital ship torpedo runs."
+locked = false
+campaign_root_scene = null

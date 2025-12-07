@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="TimelineEventResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/ui/campaign_timeline/TimelineEventResource.gd" id="1_resource"]
+
+[resource]
+script = ExtResource("1_resource")
+year = 2669
+order_index = 2
+era = "Victory of 2669"
+title = "Wing Commander Saga: The Darkest Dawn"
+short_description = "Battlegroup Serpent. The TCS Hermes leads the diversionary offensive that makes the Victory's mission possible."
+long_description = "Wing Commander Saga addresses a strategic question: How did the Victory get through to Kilrah? The answer is Battlegroup Serpent. The player controls Second Lieutenant David 'Sandman' Markham aboard the TCS Hermes. While Blair conducts the covert Temblor mission, the Hermes and the bulk of the remaining Confederation fleet launch a massive, suicidal diversionary offensive. The game utilizes the FreeSpace 2 engine to depict battles with dozens of capital ships and hundreds of fighters—a scale impossible in the 1994 engine. Saga is meticulously synchronized with WC3. Players hear radio chatter referencing the Victory's movements. The narrative ends with the Hermes crew witnessing the distant destruction of Kilrah, confirming their sacrifice was not in vain."
+locked = false
+campaign_root_scene = null

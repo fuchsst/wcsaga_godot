@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TimelineEventResource" load_steps=2 format=3 uid="uid://dnmis1x4veqlv"]
+
+[ext_resource type="Script" uid="uid://q7v3pejpcwpt" path="res://scripts/resources/ui/campaign_timeline/TimelineEventResource.gd" id="1_resource"]
+
+[resource]
+script = ExtResource("1_resource")
+year = 2668
+order_index = 2
+era = "Crisis of 2668"
+title = "The Battle of Earth"
+short_description = "The 'Lost Year'. The Kilrathi supercarriers assault Earth as the Home Fleet burns."
+long_description = "This represents the 'Lost Year' in the official game releases. Wing Commander II ends in 2667, and Wing Commander III begins in 2669 with the fleet in ruins. The catastrophic events of 2668 are detailed in the novel Fleet Action and the fan project Standoff. The Kilrathi supercarriers, the Hakaga-class, launch their assault on Earth. The Confederation Home Fleet is decimated in desperate battles as the enemy tries to break through to Earth's atmosphere and rain nuclear fire on humanity's homeworld."
+locked = true

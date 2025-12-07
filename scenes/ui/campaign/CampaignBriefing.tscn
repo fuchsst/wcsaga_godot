@@ -1,0 +1,101 @@
+[gd_scene load_steps=5 format=3 uid="uid://dubvgg83r5s26"]
+
+[ext_resource type="Material" uid="uid://5afcetwtq3t4" path="res://scenes/ui/materials/HologramMaterial.tres" id="1_hologram"]
+[ext_resource type="Script" uid="uid://cnwf5eqysy0bn" path="res://scenes/ui/campaign/CampaignBriefing.gd" id="2_script"]
+[ext_resource type="FontFile" uid="uid://jnlooruak5vm" path="res://resources/Share_Tech_Mono/ShareTechMono-Regular.ttf" id="3_pb07r"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_6jxhf"]
+font = ExtResource("3_pb07r")
+
+[node name="CampaignBriefing" type="Control"]
+custom_minimum_size = Vector2(900, 600)
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_script")
+
+[node name="BackgroundPanel" type="PanelContainer" parent="."]
+material = ExtResource("1_hologram")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="BackgroundPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 40
+
+[node name="VBoxContainer" type="VBoxContainer" parent="BackgroundPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="CampaignTitle" type="Label" parent="BackgroundPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "CAMPAIGN TITLE"
+label_settings = SubResource("LabelSettings_6jxhf")
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="BackgroundPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ContentColumns" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 40
+
+[node name="DescriptionCol" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/ContentColumns"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/ContentColumns/DescriptionCol"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="DescriptionText" type="Label" parent="BackgroundPanel/MarginContainer/VBoxContainer/ContentColumns/DescriptionCol/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Campaign briefing detail goes here..."
+autowrap_mode = 2
+
+[node name="InfoCol" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/ContentColumns"]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="StatusLabel" type="Label" parent="BackgroundPanel/MarginContainer/VBoxContainer/ContentColumns/InfoCol"]
+layout_mode = 2
+text = "Status: LOCKED"
+
+[node name="DifficultyLabel" type="Label" parent="BackgroundPanel/MarginContainer/VBoxContainer/ContentColumns/InfoCol"]
+layout_mode = 2
+text = "Difficulty: Standard"
+
+[node name="YearLabel" type="Label" parent="BackgroundPanel/MarginContainer/VBoxContainer/ContentColumns/InfoCol"]
+layout_mode = 2
+text = "Year: 2654"
+
+[node name="EraLabel" type="Label" parent="BackgroundPanel/MarginContainer/VBoxContainer/ContentColumns/InfoCol"]
+layout_mode = 2
+text = "Era: Vega Campaign"
+
+[node name="LaunchButton" type="Button" parent="BackgroundPanel/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "INITIATE LAUNCH SEQUENCE"
+
+[node name="CloseButton" type="Button" parent="BackgroundPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "ABORT"

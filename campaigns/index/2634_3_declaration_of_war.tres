@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TimelineEventResource" load_steps=2 format=3 uid="uid://kx55gym7kd0y"]
+
+[ext_resource type="Script" uid="uid://q7v3pejpcwpt" path="res://scripts/resources/ui/campaign_timeline/TimelineEventResource.gd" id="1_resource"]
+
+[resource]
+script = ExtResource("1_resource")
+year = 2634
+order_index = 3
+era = "Early War Era"
+title = "Declaration of War"
+short_description = "The Terran Confederation officially declares war on the Empire of Kilrah."
+long_description = "Following the McAuliffe Ambush and the Anna Magdalena tragedy, the Terran Confederation Congress formally declares war on the Empire of Kilrah. The Confederation had previously enacted a strict non-aggression zone, but the Empire, driven by a feudal warrior code demanding territorial conquest, ignores these boundaries. The stage is set for a century of conflict."
+locked = true

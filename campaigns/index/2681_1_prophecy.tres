@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="TimelineEventResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/ui/campaign_timeline/TimelineEventResource.gd" id="1_resource"]
+
+[resource]
+script = ExtResource("1_resource")
+year = 2681
+order_index = 1
+era = "Nephilim Era"
+title = "Wing Commander: Prophecy"
+short_description = "The Nephilim arrive. Lance Casey defends humanity aboard the TCS Midway megacarrier."
+long_description = "Tolwyn's fears are realized in 2681. The Nephilim, an insectoid race from the galactic core, open a wormhole in the Kilrah system. The protagonist is Lance Casey, son of 'Iceman'. He serves on the TCS Midway, the first of the 'Megacarriers' designed by Tolwyn before his death. The Midway is a self-contained fleet, a testament to the Black Lance's philosophy of overwhelming force. The game concludes with Blair (now a Commodore) sacrificing himself to destroy the Nephilim wormhole hub. He is listed as Missing in Action, presumed dead. The war against the Nephilim represents a new kind of threat—biomechanical ships that heal themselves and adapt to human tactics."
+locked = false
+campaign_root_scene = null

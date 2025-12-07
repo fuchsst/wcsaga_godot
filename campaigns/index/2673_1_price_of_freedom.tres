@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="TimelineEventResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/ui/campaign_timeline/TimelineEventResource.gd" id="1_resource"]
+
+[resource]
+script = ExtResource("1_resource")
+year = 2673
+order_index = 1
+era = "Post-War Vacuum"
+title = "Wing Commander IV: The Price of Freedom"
+short_description = "The Black Lance conspiracy. Blair exposes Tolwyn's plot to orchestrate a war to keep humanity militarized."
+long_description = "The destruction of Kilrah does not bring peace; it brings a power vacuum. The Confederation economy, geared for total war, collapses. The Border Worlds, heavily armed but economically neglected, agitate for independence. Blair, retired on a farm, is recalled by Admiral Tolwyn. Unmarked fighters using exotic weaponry ('Flash-Paks') are destroying shipping. Tolwyn blames the Border Worlds. The truth is darker: Tolwyn, fearing humanity will grow weak in peace, creates the Black Lance (a genetically enhanced special forces unit) to instigate a war that will keep the Confederation militarized. He argues that a greater threat is coming (foreshadowing the Nephilim). Blair defects to the Border Worlds, taking command of the BWS Intrepid. Later, he captures the TCS Lexington (CV-44). The game ends with Blair exposing Tolwyn at the Senate; Tolwyn commits suicide in his cell."
+locked = false
+campaign_root_scene = null

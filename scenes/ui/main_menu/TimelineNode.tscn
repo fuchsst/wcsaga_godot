@@ -1,0 +1,83 @@
+[gd_scene load_steps=7 format=3 uid="uid://cojjij34kelyb"]
+
+[ext_resource type="Script" uid="uid://ddkma35lglljc" path="res://scenes/ui/main_menu/TimelineNode.gd" id="1_timelinenode"]
+[ext_resource type="FontFile" uid="uid://jnlooruak5vm" path="res://resources/Share_Tech_Mono/ShareTechMono-Regular.ttf" id="2_2gvr1"]
+[ext_resource type="Material" uid="uid://5afcetwtq3t4" path="res://scenes/ui/materials/HologramMaterial.tres" id="2_hologrammaterial"]
+[ext_resource type="Theme" uid="uid://bholotheme001" path="res://scenes/ui/themes/HolographicTheme.tres" id="4_theme"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_wffik"]
+font = ExtResource("2_2gvr1")
+
+[sub_resource type="LabelSettings" id="LabelSettings_bwvpt"]
+font = ExtResource("2_2gvr1")
+font_size = 12
+
+[node name="TimelineNode" type="Control"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 3
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 80.0
+grow_horizontal = 2
+focus_mode = 2
+theme = ExtResource("4_theme")
+script = ExtResource("1_timelinenode")
+
+[node name="CenterAxis" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_bottom = 40.0
+grow_horizontal = 2
+
+[node name="ContentRoot" type="Control" parent="CenterAxis"]
+anchors_preset = 0
+offset_left = 60.0
+offset_top = -50.0
+offset_right = 340.0
+offset_bottom = 50.0
+mouse_filter = 1
+
+[node name="CardPanel" type="PanelContainer" parent="CenterAxis/ContentRoot"]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HologramPanel" type="Panel" parent="CenterAxis/ContentRoot/CardPanel"]
+material = ExtResource("2_hologrammaterial")
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterAxis/ContentRoot/CardPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 10
+
+[node name="ContentVBox" type="VBoxContainer" parent="CenterAxis/ContentRoot/CardPanel/MarginContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="CenterAxis/ContentRoot/CardPanel/MarginContainer/ContentVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "Category Title"
+label_settings = SubResource("LabelSettings_wffik")
+
+[node name="DescLabel" type="Label" parent="CenterAxis/ContentRoot/CardPanel/MarginContainer/ContentVBox"]
+custom_minimum_size = Vector2(200, 40)
+custom_maximum_size = Vector2(230, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.8, 1, 0.7)
+theme_override_font_sizes/font_size = 12
+text = "Description of the event."
+label_settings = SubResource("LabelSettings_bwvpt")
+text_overrun_behavior = 3
+autowrap_mode = 2
+clip_text = true

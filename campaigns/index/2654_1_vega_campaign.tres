@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="TimelineEventResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/ui/campaign_timeline/TimelineEventResource.gd" id="1_resource"]
+
+[resource]
+script = ExtResource("1_resource")
+year = 2654
+order_index = 1
+era = "Vega Campaign Era"
+title = "Wing Commander: Vega Campaign"
+short_description = "The Golden Age begins. The TCS Tiger's Claw launches the counter-offensive in the Vega Sector."
+long_description = "The narrative follows Christopher 'Maverick' Blair and his wingmen aboard the TCS Tiger's Claw. The carrier is tasked with the Vega Sector Campaign, a counter-offensive to retake systems overrun by the Kilrathi. The campaign is non-linear, branching based on success or failure. The canonical 'Winning Path' sees the Tiger's Claw liberating the systems of Enyo, McAulffe (symbolically reclaiming the site of the 2634 defeat), and Gateway, culminating in the assault on the Kilrathi High Command starbase in the Venice system. Key personnel include Colonel Halcyon, Major James 'Paladin' Taggart, Captain Jeannette 'Angel' Devereaux, and Lieutenant Todd 'Maniac' Marshall."
+locked = false
+campaign_root_scene = null

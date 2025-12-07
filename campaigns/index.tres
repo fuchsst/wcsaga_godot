@@ -1,0 +1,84 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/campaigns/campaign_manifest.gd" id="1_resource"]
+
+[resource]
+script = ExtResource("1_resource")
+
+[header]
+title = "Wing Commander Timeline Campaign Index"
+description = "Comprehensive chronological catalog of all major events in the Wing Commander universe, from the Iason Incident to the far future."
+version = "1.0"
+total_events = 27
+
+[events]
+# Early War Era (2629-2653)
+2629_1_iason_incident = "res://campaigns/index/2629_1_iason_incident.tres"
+2634_1_mcauliffe_ambush = "res://campaigns/index/2634_1_mcauliffe_ambush.tres"
+2634_2_anna_magdalena = "res://campaigns/index/2634_2_anna_magdalena.tres"
+2634_3_declaration_of_war = "res://campaigns/index/2634_3_declaration_of_war.tres"
+
+# Vega Campaign Era (2654-2656)
+2654_1_vega_campaign = "res://campaigns/index/2654_1_vega_campaign.tres"
+2654_2_thors_hammer = "res://campaigns/index/2654_2_thors_hammer.tres"
+2655_1_crusade = "res://campaigns/index/2655_1_crusade.tres"
+2654_3_academy = "res://campaigns/index/2654_3_academy.tres"
+
+# Dark Years Era (2656-2667)
+2656_1_loss_of_tigers_claw = "res://campaigns/index/2656_1_loss_of_tigers_claw.tres"
+2665_1_vengeance_of_kilrathi = "res://campaigns/index/2665_1_vengeance_of_kilrathi.tres"
+2667_1_special_operations = "res://campaigns/index/2667_1_special_operations.tres"
+
+# Crisis of 2668
+2668_1_false_armistice = "res://campaigns/index/2668_1_false_armistice.tres"
+2668_2_battle_of_earth = "res://campaigns/index/2668_2_battle_of_earth.tres"
+2668_3_standoff = "res://campaigns/index/2668_3_standoff.tres"
+
+# Victory of 2669
+2669_1_wing_commander_3 = "res://campaigns/index/2669_1_wing_commander_3.tres"
+2669_2_saga_darkest_dawn = "res://campaigns/index/2669_2_saga_darkest_dawn.tres"
+2669_3_armada = "res://campaigns/index/2669_3_armada.tres"
+2669_4_privateer = "res://campaigns/index/2669_4_privateer.tres"
+2669_5_heart_of_the_tiger = "res://campaigns/index/2669_5_heart_of_the_tiger.tres"
+
+# Post-War Vacuum (2670-2679)
+2673_1_price_of_freedom = "res://campaigns/index/2673_1_price_of_freedom.tres"
+2670_1_false_colors = "res://campaigns/index/2670_1_false_colors.tres"
+
+# Nephilim Era (2681)
+2681_1_prophecy = "res://campaigns/index/2681_1_prophecy.tres"
+2681_2_secret_ops = "res://campaigns/index/2681_2_secret_ops.tres"
+2681_3_unknown_enemy = "res://campaigns/index/2681_3_unknown_enemy.tres"
+2681_4_holding_the_line = "res://campaigns/index/2681_4_holding_the_line.tres"
+
+# Future Era (~2701-2790)
+2790_1_pilgrim_truth = "res://campaigns/index/2790_1_pilgrim_truth.tres"
+2790_2_privateer_2 = "res://campaigns/index/2790_2_privateer_2.tres"
+2701_1_arena = "res://campaigns/index/2701_1_arena.tres"
+
+[metadata]
+created_by = "Claude Code"
+creation_date = "2025-12-06"
+source_documents = [
+    "Wing_Commander_Timeline.md",
+    "Game_Menu_Design.md"
+]
+canonical_games = [
+    "Wing Commander I-IV",
+    "Wing Commander: Prophecy",
+    "Wing Commander: Secret Ops",
+    "Wing Commander: Privateer",
+    "Wing Commander: Armada"
+]
+fan_projects = [
+    "Wing Commander: Standoff",
+    "Wing Commander Saga: The Darkest Dawn",
+    "Wing Commander: Unknown Enemy"
+]
+novels = [
+    "Action Stations",
+    "Fleet Action",
+    "End Run",
+    "False Colors",
+    "Pilgrim Truth"
+]

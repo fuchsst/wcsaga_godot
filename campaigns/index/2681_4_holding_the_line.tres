@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TimelineEventResource" load_steps=2 format=3 uid="uid://j50nfo6fa7ru"]
+
+[ext_resource type="Script" uid="uid://q7v3pejpcwpt" path="res://scripts/resources/ui/campaign_timeline/TimelineEventResource.gd" id="1_resource"]
+
+[resource]
+script = ExtResource("1_resource")
+year = 2681
+order_index = 4
+era = "Nephilim Era"
+title = "Holding The Line"
+short_description = "The Reserve Fleets stand firm. Documenting the battles fought away from the spotlight."
+long_description = "Holding The Line is a massive collaborative text project that documents the battles fought by the units not on the front line with Casey. It details the defense of the localized systems by the Confederation Reserve and the Landreich. It provides the 'strategic depth' to the Nephilim war, showing that the invasion was a sector-wide flood, not a single spearhead. This fan fiction project paints a picture of a galaxy-wide conflict where countless brave pilots and crews fought and died in battles that never made the history books, holding the line against an alien menace while the great carriers got the glory."
+locked = true

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="TimelineEventResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/ui/campaign_timeline/TimelineEventResource.gd" id="1_resource"]
+
+[resource]
+script = ExtResource("1_resource")
+year = 2668
+order_index = 3
+era = "Crisis of 2668"
+title = "Wing Commander: Standoff"
+short_description = "The Lionheart and Firekka hold the line. The greatest sacrifice in Confederation history."
+long_description = "Standoff is a masterpiece of historical infill. The player assumes the role of Captain William 'Bradshaw', a pilot whose career was stalled by the peace. Bradshaw is stationed on the TCS Lionheart, a light carrier being prepared for decommissioning. When the Kilrathi deception is revealed, the Lionheart is one of the few active assets capable of responding. Following the loss of the Lionheart, Bradshaw is transferred to the TCS Firekka, a Wake-class escort carrier. The game branches into 'Winning' and 'Losing' paths. The winning path sees the Firekka intercepting supply lines; the losing path depicts Kilrathi fleets entering Earth's atmosphere. Standoff explains why the fleet is in tatters at WC3's start, documenting the destruction of the Home Fleet and the sacrifice of reserve units."
+locked = false
+campaign_root_scene = null

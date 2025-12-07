@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TimelineEventResource" load_steps=2 format=3 uid="uid://nh85f74mbrjw"]
+
+[ext_resource type="Script" uid="uid://q7v3pejpcwpt" path="res://scripts/resources/ui/campaign_timeline/TimelineEventResource.gd" id="1_resource"]
+
+[resource]
+script = ExtResource("1_resource")
+year = 2654
+order_index = 2
+era = "Vega Campaign Era"
+title = "Secret Missions: Operation Thor's Hammer"
+short_description = "The Tiger's Claw confronts the Graviton Gun. The destruction of the Sivar dreadnought ends the Goddard massacre."
+long_description = "Following the Vega victory, the Tiger's Claw is dispatched to the Goddard System to counter a new Kilrathi super-weapon, the Graviton Gun mounted on the Sivar dreadnought. The destruction of the Goddard colony (over a quarter-million casualties) marks an escalation in Kilrathi atrocities, shifting the war from conquest to extermination. The Tiger's Claw successfully hunts down and destroys the Sivar in the Spider system, saving humanity from a new terror."
+locked = true

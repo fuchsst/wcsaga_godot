@@ -1,0 +1,15 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://5afcetwtq3t4"]
+
+[ext_resource type="Shader" uid="uid://bsf86uhxi5pgl" path="res://scenes/ui/materials/ui_hologram.gdshader" id="1_shader"]
+
+[resource]
+shader = ExtResource("1_shader")
+shader_parameter/base_color = Color(0, 0.3, 0.6, 0.25)
+shader_parameter/scanline_count = 60.0
+shader_parameter/scanline_speed = -1.5
+shader_parameter/aberration_amount = 1.5
+shader_parameter/flicker_speed = 12.0
+shader_parameter/glow_color = Color(0.3, 0.7, 1.0, 1.0)
+shader_parameter/edge_glow_intensity = 1.0
+shader_parameter/edge_thickness = 0.06
+shader_parameter/glow_softness = 0.08

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TimelineEventResource" load_steps=2 format=3 uid="uid://sl2cn134k1n7"]
+
+[ext_resource type="Script" uid="uid://q7v3pejpcwpt" path="res://scripts/resources/ui/campaign_timeline/TimelineEventResource.gd" id="1_resource"]
+
+[resource]
+script = ExtResource("1_resource")
+year = 2667
+order_index = 1
+era = "Dark Years Era"
+title = "Special Operations 1 & 2"
+short_description = "The Crossbow and Morningstar projects. Technological parity and the Jeep Carrier doctrine."
+long_description = "These expansions focus on the Confederation's attempts to regain technological parity. Special Operations 1 involves the sea trials of the Crossbow bomber, a heavy anti-capital ship platform. Special Operations 2 introduces the Morningstar heavy fighter, a platform plagued by sabotage. The novel 'End Run' details Admiral Tolwyn's daring plan to invade the Vukar Tag system using 'Jeep Carriers' (escort carriers like the TCS Tarawa) to launch suicidal deep-strike raids. This introduces the concept of the escort carrier as a strategic asset."
+locked = true

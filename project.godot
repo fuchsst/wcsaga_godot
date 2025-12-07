@@ -13,21 +13,25 @@ config_version=5
 config/name="Wing Commander Saga"
 run/main_scene="uid://ddgh7610sax0p"
 config/features=PackedStringArray("4.5", "GL Compatibility")
+boot_splash/image="uid://cgljctqb483qk"
 config/icon="uid://cc58gpsbqci8y"
 
 [autoload]
 
 Signal_Debugger="*res://addons/SignalVisualizer/Debugger/SignalDebugger.gd"
 SceneManager="*res://addons/scene_manager/SceneManager.tscn"
-Main="*res://autoload/Main.gd"
 InputManager="*res://scripts/input/InputManager.gd"
 GameStateMachine="*res://scripts/game_state/GameStateMachine.gd"
 WCS="*res://scripts/utilities/WCS.gd"
+ProfileManager="*res://autoload/ProfileManager.gd"
+GlobalSettings="*res://autoload/GlobalSettings.gd"
+TimelineDatabase="*res://autoload/TimelineDatabase.gd"
 
 [display]
 
 window/size/viewport_width=1280
-window/size/viewport_height=960
+window/size/viewport_height=800
+window/size/mode=2
 window/stretch/mode="canvas_items"
 
 [dotnet]

@@ -3,20 +3,20 @@ extends LimboHSM
 # Global State Machine (LimboAI Refactor)
 # Manages high-level game states using Hierarchical State Machine
 
-# State Nodes
-const GameStateIntro = preload("res://scripts/game_state/states/GameStateIntro.gd")
-const GameStateMainMenu = preload("res://scripts/game_state/states/GameStateMainMenu.gd")
-const GameStateGameplay = preload("res://scripts/game_state/states/GameStateGameplay.gd")
+# State Nodes (use aliases to avoid shadowing global classes)
+const IntroStateClass = preload("res://scripts/game_state/states/GameStateIntro.gd")
+const MainMenuStateClass = preload("res://scripts/game_state/states/GameStateMainMenu.gd")
+const GameplayStateClass = preload("res://scripts/game_state/states/GameStateGameplay.gd")
 
-var state_intro: GameStateIntro
-var state_main_menu: GameStateMainMenu
-var state_gameplay: GameStateGameplay
+var state_intro: IntroStateClass
+var state_main_menu: MainMenuStateClass
+var state_gameplay: GameplayStateClass
 
 func _init() -> void:
 	# Initialize states
-	state_intro = GameStateIntro.new()
-	state_main_menu = GameStateMainMenu.new()
-	state_gameplay = GameStateGameplay.new()
+	state_intro = IntroStateClass.new()
+	state_main_menu = MainMenuStateClass.new()
+	state_gameplay = GameplayStateClass.new()
 
 func _ready() -> void:
 	# Setup HSM

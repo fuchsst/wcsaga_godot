@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TimelineEventResource" load_steps=2 format=3 uid="uid://bteccig1gu31h"]
+
+[ext_resource type="Script" uid="uid://q7v3pejpcwpt" path="res://scripts/resources/ui/campaign_timeline/TimelineEventResource.gd" id="1_resource"]
+
+[resource]
+script = ExtResource("1_resource")
+year = 2655
+order_index = 1
+era = "Vega Campaign Era"
+title = "Secret Missions: Crusade"
+short_description = "The Firekkan Alliance. Ralgha nar Hhallas (Hobbes) defects, bringing critical intelligence to the Confederation."
+long_description = "The Tiger's Claw moves to the Firefka system to protect the Firekkans, an avian species negotiating alliance with the Confederation. This expansion introduces Ralgha nar Hhallas (Hobbes), the captain of the Kilrathi frigate Ras Nik'hra. Disillusioned by his race's dishonorable conduct, Ralgha defects, bringing critical intelligence regarding the Kilrathi religious ceremony taking place in the sector. The alliance with the Firekkans provides the Confederation with new allies and insights into Kilrathi culture."
+locked = true

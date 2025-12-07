@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TimelineEventResource" load_steps=2 format=3 uid="uid://dkvpokuapyb1p"]
+
+[ext_resource type="Script" uid="uid://q7v3pejpcwpt" path="res://scripts/resources/ui/campaign_timeline/TimelineEventResource.gd" id="1_resource"]
+
+[resource]
+script = ExtResource("1_resource")
+year = 2634
+order_index = 1
+era = "Early War Era"
+title = "The McAuliffe Ambush"
+short_description = "The 'Pearl Harbor' of the Kilrathi War. A devastating defeat that galvanizes the Confederation."
+long_description = "The attack on the McAuliffe system marks the opening blow of the Kilrathi War. Confederation cryptographer Ches M. Penney partially decoded Kilrathi transmissions indicating an impending strike, but the Confederation's counter-deployment was outmaneuvered. The resulting battle is a catastrophic strategic defeat for the Confederation, though it galvanizes the human spirit. This era introduces the first generation of heroes, including a young Geoffrey Tolwyn."
+locked = true

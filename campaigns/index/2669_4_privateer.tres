@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TimelineEventResource" load_steps=2 format=3 uid="uid://cnllwcxh2y8rf"]
+
+[ext_resource type="Script" uid="uid://q7v3pejpcwpt" path="res://scripts/resources/ui/campaign_timeline/TimelineEventResource.gd" id="1_resource"]
+
+[resource]
+script = ExtResource("1_resource")
+year = 2669
+order_index = 4
+era = "Victory of 2669"
+title = "Wing Commander: Privateer"
+short_description = "The Gemini Sector frontier. Burrows navigates pirates, raiders, and the fanatical Retros."
+long_description = "While the main war rages in the Enigma and Vega sectors, the Gemini Sector (a frontier region) faces a different crisis. The player character, Burrows (canonically established as having the callsign 'Privateer' or 'Brownhair'), navigates a landscape of pirates, Kilrathi raiders, and the Retros (Church of Man), a fanatical anti-technology cult led by Mordecai Jones. The Steltek Incident: Burrows discovers a derelict alien fighter from an ancient race called the Steltek. The ship possesses a weapon (the Steltek Gun) capable of destroying anything. The narrative involves preventing this technology from falling into Kilrathi hands. The expansion Righteous Fire (1994) takes place 'one year later,' suggesting that disorder in Gemini persisted even after the Kilrah armistice."
+locked = true

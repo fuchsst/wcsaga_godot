@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TimelineEventResource" load_steps=2 format=3 uid="uid://cewsl0s3p8v25"]
+
+[ext_resource type="Script" uid="uid://q7v3pejpcwpt" path="res://scripts/resources/ui/campaign_timeline/TimelineEventResource.gd" id="1_resource"]
+
+[resource]
+script = ExtResource("1_resource")
+year = 2634
+order_index = 2
+era = "Early War Era"
+title = "The Anna Magdalena Tragedy"
+short_description = "The destruction of a civilian transport carrying orphans catalyzes the Declaration of War."
+long_description = "The Anna Magdalena, a transport ferrying orphans, is destroyed by Kilrathi fighters. This tragedy becomes the final catalyst for the Terran Confederation Congress to declare war on the Empire of Kilrah. The massacre of innocents unites humanity against the alien threat."
+locked = true

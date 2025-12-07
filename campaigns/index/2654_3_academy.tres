@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TimelineEventResource" load_steps=2 format=3 uid="uid://1wb6yejs52t7"]
+
+[ext_resource type="Script" uid="uid://q7v3pejpcwpt" path="res://scripts/resources/ui/campaign_timeline/TimelineEventResource.gd" id="1_resource"]
+
+[resource]
+script = ExtResource("1_resource")
+year = 2654
+order_index = 3
+era = "Vega Campaign Era"
+title = "Wing Commander Academy"
+short_description = "Training the next generation. Blair, Maniac, and Archer serve as cadets under Commodore Tolwyn."
+long_description = "The Wing Commander Academy game (1993) is a simulator with no plot, framed as training for Academy cadets. However, the 1996 animated series provides essential backstory. It depicts Blair, Maniac, and Archer serving as cadets aboard the Tiger's Claw under the command of Commodore Geoffrey Tolwyn. The series explores the psychological toll of the war and the formation of the legendary pilots who will shape the conflict. The Tolwyn/Halcyon discrepancy is reconciled by showing Tolwyn commanding during shakedown and early sorties before Halcyon takes over operational command during the intensive Vega Campaign."
+locked = true

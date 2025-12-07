@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="TimelineEventResource" load_steps=2 format=3 uid="uid://5uo7gfxaaliy"]
+
+[ext_resource type="Script" uid="uid://q7v3pejpcwpt" path="res://scripts/resources/ui/campaign_timeline/TimelineEventResource.gd" id="1_resource"]
+
+[resource]
+script = ExtResource("1_resource")
+year = 2669
+order_index = 5
+era = "Victory of 2669"
+title = "Heart of the Tiger"
+short_description = "The End of the War. The TCS Victory and TCS Hermes lead the final strike against Kilrah."
+long_description = "After decades of conflict, the Terran Confederation launches a desperate gamble to destroy the Kilrathi homeworld. Colonel Christopher Blair, the 'Heart of the Tiger', leads the insertion force."

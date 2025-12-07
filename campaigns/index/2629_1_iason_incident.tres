@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TimelineEventResource" load_steps=2 format=3 uid="uid://dd353um68klel"]
+
+[ext_resource type="Script" uid="uid://q7v3pejpcwpt" path="res://scripts/resources/ui/campaign_timeline/TimelineEventResource.gd" id="1_resource"]
+
+[resource]
+script = ExtResource("1_resource")
+year = 2629
+order_index = 1
+era = "Early War Era"
+title = "The Iason Incident"
+short_description = "First contact with the Empire of Kilrah. The destruction of the TCS Iason marks the beginning of humanity's greatest conflict."
+long_description = "The Confederation exploration vessel TCS Iason, commanded by Jedora Andropolos, encounters the Kilrathi ship KIS K'rath'kan in the Vega Sector. A misunderstanding of protocol—Confederation wide-band greetings are interpreted by the Kilrathi as radiation weapon attacks—leads to the destruction of the Iason. This event confirms the existence of a hostile, expansionist empire bordering human space."
+locked = true

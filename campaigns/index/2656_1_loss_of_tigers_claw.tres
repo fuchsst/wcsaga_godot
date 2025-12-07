@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TimelineEventResource" load_steps=2 format=3 uid="uid://bw0rmum2t4uw2"]
+
+[ext_resource type="Script" uid="uid://q7v3pejpcwpt" path="res://scripts/resources/ui/campaign_timeline/TimelineEventResource.gd" id="1_resource"]
+
+[resource]
+script = ExtResource("1_resource")
+year = 2656
+order_index = 1
+era = "Dark Years Era"
+title = "The Loss of the Tiger's Claw"
+short_description = "The 'Queen of the Fleet' is destroyed in the K'Tithrak Mang system. Blair is blamed and exiled."
+long_description = "The loss of the Tiger's Claw in the K'Tithrak Mang system changes the trajectory of the war. Blamed on 'stealth fighters' that no sensors can record, the destruction is pinned on Blair's negligence. He is demoted and exiled to the TCS Austin, marking a decade of stagnation for the Confederation while the Kilrathi advance. The death of the legendary carrier marks the end of the Golden Age and the beginning of the Dark Years."
+locked = true

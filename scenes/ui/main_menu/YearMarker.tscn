@@ -1,0 +1,33 @@
+[gd_scene load_steps=3 format=3 uid="uid://cvrkfu803fi6s"]
+
+[ext_resource type="Script" uid="uid://brwmqys3vqw4w" path="res://scenes/ui/main_menu/YearMarker.gd" id="2_script"]
+[ext_resource type="Theme" uid="uid://bholotheme001" path="res://scenes/ui/themes/HolographicTheme.tres" id="3_theme"]
+
+[node name="YearMarker" type="Control"]
+custom_minimum_size = Vector2(80, 40)
+layout_mode = 3
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 40.0
+grow_horizontal = 2
+theme = ExtResource("3_theme")
+script = ExtResource("2_script")
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(80, 36)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CenterContainer/Panel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "2654"
+horizontal_alignment = 1
+vertical_alignment = 1

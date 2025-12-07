@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TimelineEventResource" load_steps=2 format=3 uid="uid://bk2cxr3wp4n1b"]
+
+[ext_resource type="Script" uid="uid://q7v3pejpcwpt" path="res://scripts/resources/ui/campaign_timeline/TimelineEventResource.gd" id="1_resource"]
+
+[resource]
+script = ExtResource("1_resource")
+year = 2790
+order_index = 2
+era = "Future Era"
+title = "Privateer 2: The Darkening"
+short_description = "A century later in the Tri-System. Ser Lev Arris searches for identity in an isolated human pocket."
+long_description = "Set a century after the main events, Privateer 2 occurs in the Tri-System (Isaac, Hermes, Crius). It features no Kilrathi and no Confederation. It is best understood as a distant future or an isolated pocket of human civilization. The game focuses on Ser Lev Arris searching for his identity. The Tri-System represents humanity's spread to distant stars, but also its isolation from the main Confederation. With no direct connection to Earth or the Border Worlds, this region has developed its own unique culture and conflicts. It is historically isolated from the rest of the franchise, serving as a glimpse of humanity's far future."
+locked = true
