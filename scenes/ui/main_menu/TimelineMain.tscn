@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://c3awub26ci2y8"]
+[gd_scene load_steps=12 format=3 uid="uid://c3awub26ci2y8"]
 
 [ext_resource type="Script" uid="uid://bdu0iue0w5uff" path="res://scenes/ui/main_menu/TimelineController.gd" id="1_controller"]
 [ext_resource type="PackedScene" uid="uid://eiuvyl0vsb8x" path="res://scenes/ui/settings/SettingsWindow.tscn" id="2_settings"]
@@ -7,8 +7,10 @@
 [ext_resource type="Script" uid="uid://dah2gnpdax4kf" path="res://scenes/ui/main_menu/SpaceScene3D.gd" id="5_spacescene"]
 [ext_resource type="Script" uid="uid://ddni3kl7paoej" path="res://scenes/ui/utils/UIAnimator.gd" id="6_animator"]
 [ext_resource type="Material" path="res://scenes/ui/materials/BlurMaterial.tres" id="7_blur_shader_material"]
-[ext_resource type="Material" path="res://scenes/ui/materials/GridMaterial.tres" id="8_grid_material"]
-[ext_resource type="Environment" uid="uid://timeline_glow_env" path="res://scenes/ui/materials/TimelineGlowEnvironment.tres" id="9_glow_env"]
+[ext_resource type="Environment" path="res://scenes/ui/materials/TimelineGlowEnvironment.tres" id="9_glow_env"]
+[ext_resource type="AudioStream" uid="uid://cg7b7kj3ey8th" path="res://scenes/ui/main_menu/main_theme.ogg" id="10_bgm"]
+[ext_resource type="AudioStream" uid="uid://cypdxtunyu082" path="res://scenes/ui/main_menu/snd_brief_icon_select.ogg" id="11_select_sound"]
+[ext_resource type="AudioStream" uid="uid://61euswvr82ee" path="res://scenes/ui/main_menu/snd_popup_appear.ogg" id="12_popup_sound"]
 
 [node name="TimelineMain" type="Control"]
 layout_mode = 3
@@ -108,17 +110,6 @@ follow_focus = true
 horizontal_scroll_mode = 0
 vertical_scroll_mode = 2
 
-[node name="GridLayer" type="ColorRect" parent="TimelineLayer/VBoxContainer/MainScroll"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-material = ExtResource("8_grid_material")
-color = Color(1, 1, 1, 1)
-
 [node name="TimelineContent" type="VBoxContainer" parent="TimelineLayer/VBoxContainer/MainScroll"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -175,3 +166,16 @@ grow_vertical = 2
 
 [node name="SettingsWindow" parent="ModalLayer/ModalContainer" instance=ExtResource("2_settings")]
 layout_mode = 2
+
+[node name="BGM" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("10_bgm")
+volume_db = -10.0
+autoplay = true
+
+[node name="SndSelect" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("11_select_sound")
+volume_db = -5.0
+
+[node name="SndPopup" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("12_popup_sound")
+volume_db = -5.0

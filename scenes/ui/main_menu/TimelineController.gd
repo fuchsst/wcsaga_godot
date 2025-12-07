@@ -32,7 +32,6 @@ var _connector_layer: Control = null
 # @onready variable declarations
 @onready var main_scroll: ScrollContainer = $TimelineLayer/VBoxContainer/MainScroll
 @onready var timeline_content: VBoxContainer = $TimelineLayer/VBoxContainer/MainScroll/TimelineContent
-@onready var grid_layer: ColorRect = $TimelineLayer/VBoxContainer/MainScroll/GridLayer
 @onready var settings_window: Control = $ModalLayer/ModalContainer/SettingsWindow
 @onready var profile_widget: HBoxContainer = $TimelineLayer/VBoxContainer/TopBar/PlayerProfileWidget
 @onready var modal_layer: CanvasLayer = $ModalLayer
@@ -50,6 +49,11 @@ var _connector_layer: Control = null
 @onready var profile_rank: Label = $TimelineLayer/VBoxContainer/TopBar/PlayerProfileWidget/RankLabel
 @onready var profile_datetime: Label = $TimelineLayer/VBoxContainer/TopBar/PlayerProfileWidget/DateTimeLabel
 
+# Audio players
+@onready var bgm_player: AudioStreamPlayer = $BGM
+@onready var snd_select: AudioStreamPlayer = $SndSelect
+@onready var snd_popup: AudioStreamPlayer = $SndPopup
+
 
 func _ready() -> void:
 	_setup_connector_layer()
@@ -59,6 +63,11 @@ func _ready() -> void:
 	_update_profile_widget()
 	if main_scroll:
 		_target_scroll = _edge_margin
+
+	# Configure BGM to loop
+	if bgm_player and bgm_player.stream:
+		if bgm_player.stream is AudioStreamOggVorbis:
+			bgm_player.stream.loop = true
 
 
 func _setup_connector_layer() -> void:
@@ -106,6 +115,7 @@ func _setup_signals() -> void:
 	if btn_campaign:
 		btn_campaign.pressed.connect(func():
 			play_sfx("click")
+			_open_selected_details()
 		)
 	if btn_exit:
 		btn_exit.pressed.connect(func():
@@ -299,18 +309,182 @@ func _create_connector(year_marker: Control, timeline_node: Control) -> Line2D:
 	return connector
 
 
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_up"):
-		_target_scroll -= 80
+func _input(event: InputEvent) -> void:
+	# Don't process input if a modal is open
+	if active_modal and active_modal.visible:
+		return
+
+	# Only handle keyboard input - let ScrollContainer handle mouse wheel natively
+	if not event is InputEventKey:
+		return
+
+	# Arrow Up/Left - Previous item (allow echo for key repeat)
+	if event.is_action_pressed("ui_up", true) or event.is_action_pressed("ui_left", true):
+		_select_previous_item(not event.is_echo())
 		get_viewport().set_input_as_handled()
-	elif event.is_action_pressed("ui_down"):
-		_target_scroll += 80
+
+	# Arrow Down/Right - Next item (allow echo for key repeat)
+	elif event.is_action_pressed("ui_down", true) or event.is_action_pressed("ui_right", true):
+		_select_next_item(not event.is_echo())
 		get_viewport().set_input_as_handled()
-	elif event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-			_target_scroll -= 80
-		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			_target_scroll += 80
+
+	# Page Up - Previous year
+	elif event.is_action_pressed("ui_page_up"):
+		_scroll_to_previous_year()
+		get_viewport().set_input_as_handled()
+
+	# Page Down - Next year
+	elif event.is_action_pressed("ui_page_down"):
+		_scroll_to_next_year()
+		get_viewport().set_input_as_handled()
+
+	# Space/Enter - Open details
+	elif event.is_action_pressed("ui_accept"):
+		_open_selected_details()
+		get_viewport().set_input_as_handled()
+
+
+func _select_previous_item(play_sound: bool = true) -> void:
+	if _timeline_nodes.is_empty():
+		return
+
+	var current_index = _timeline_nodes.find(_selected_node)
+	var new_index: int
+	if current_index <= 0:
+		new_index = 0
+	else:
+		new_index = current_index - 1
+
+	# Only do something if index actually changed
+	if new_index != current_index or current_index < 0:
+		_select_node_at_index(new_index, play_sound)
+
+
+func _select_next_item(play_sound: bool = true) -> void:
+	if _timeline_nodes.is_empty():
+		return
+
+	var current_index = _timeline_nodes.find(_selected_node)
+	var new_index: int
+	if current_index < 0:
+		new_index = 0
+	elif current_index < _timeline_nodes.size() - 1:
+		new_index = current_index + 1
+	else:
+		new_index = current_index
+
+	# Only do something if index actually changed
+	if new_index != current_index or current_index < 0:
+		_select_node_at_index(new_index, play_sound)
+
+
+func _select_node_at_index(index: int, play_sound: bool = true) -> void:
+	if index < 0 or index >= _timeline_nodes.size():
+		return
+
+	var node = _timeline_nodes[index]
+	if not is_instance_valid(node):
+		return
+
+	# Scroll to center the node
+	_scroll_node_to_center(node)
+
+	# Update DateTimeLabel from selected event
+	_update_datetime_from_node(node)
+
+	if play_sound:
+		play_sfx("select")
+
+
+func _update_datetime_from_node(node: Control) -> void:
+	if not profile_datetime or not node:
+		return
+
+	# Get the data from the node
+	var data = node.data if "data" in node else null
+	if not data:
+		return
+
+	# Update DateTimeLabel with year.order_index format
+	var year_val: int = data.year if "year" in data else 0
+	var order_val: int = data.order_index if "order_index" in data else 0
+	profile_datetime.text = str(year_val) + "." + str(order_val).pad_zeros(3)
+
+
+func _scroll_node_to_center(node: Control) -> void:
+	if not main_scroll or not node:
+		return
+
+	# Calculate scroll position to center the node
+	var node_y = node.position.y + node.size.y / 2.0
+	var center_y = main_scroll.size.y / 2.0
+	_target_scroll = node_y - center_y
+
+
+func _scroll_to_previous_year() -> void:
+	if _timeline_nodes.is_empty() or _year_markers.is_empty():
+		return
+
+	# Get current year
+	var current_year = _selected_node.year if _selected_node and "year" in _selected_node else 0
+	var years = _year_markers.keys()
+	years.sort()
+
+	# Find previous year
+	var prev_year = years[0]
+	for year in years:
+		if year < current_year:
+			prev_year = year
+		else:
+			break
+
+	_scroll_to_year(prev_year)
+
+
+func _scroll_to_next_year() -> void:
+	if _timeline_nodes.is_empty() or _year_markers.is_empty():
+		return
+
+	# Get current year
+	var current_year = _selected_node.year if _selected_node and "year" in _selected_node else 0
+	var years = _year_markers.keys()
+	years.sort()
+
+	# Find next year
+	var next_year = years[-1]
+	for i in range(years.size() - 1, -1, -1):
+		if years[i] > current_year:
+			next_year = years[i]
+		else:
+			break
+
+	_scroll_to_year(next_year)
+
+
+func _scroll_to_year(year: int) -> void:
+	if year not in _year_markers:
+		return
+
+	var marker = _year_markers[year]
+	if not is_instance_valid(marker):
+		return
+
+	# Scroll to put year marker at top with margin
+	var top_margin = 80.0 # Margin from top panel
+	_target_scroll = marker.position.y - top_margin
+
+	# Also select the first item of that year
+	for node in _timeline_nodes:
+		if is_instance_valid(node) and "year" in node and node.year == year:
+			# Don't call _scroll_node_to_center, just trigger selection update
+			play_sfx("select")
+			break
+
+
+func _open_selected_details() -> void:
+	if _selected_node and is_instance_valid(_selected_node) and "data" in _selected_node:
+		play_sfx("popup")
+		_open_campaign_briefing(_selected_node.data)
 
 
 func _process(delta: float) -> void:
@@ -333,14 +507,10 @@ func _update_scroll_logic(delta: float) -> void:
 
 
 func _update_scroll_visuals() -> void:
-	if main_scroll and grid_layer:
+	if main_scroll:
 		var scroll_v = main_scroll.scroll_vertical
 		var max_s = max(1.0, main_scroll.get_v_scroll_bar().max_value - main_scroll.size.y)
 		var scroll_ratio = scroll_v / max_s
-
-		# Grid parallax (slower scrolling)
-		var grid_offset = scroll_ratio * 50.0
-		grid_layer.position.y = - grid_offset
 
 		# Update 3D background
 		var bg_viewport = $BackgroundLayer/StarfieldViewport/SubViewport
@@ -423,6 +593,10 @@ func _update_selection() -> void:
 			if _selected_node.has_method("set_selected"):
 				_selected_node.set_selected(true)
 
+			# Update DateTimeLabel for mouse wheel scrolling
+			_update_datetime_from_node(_selected_node)
+			play_sfx("select")
+
 			# Highlight corresponding year marker
 			var new_year = _selected_node.year if "year" in _selected_node else 0
 			if new_year in _year_markers:
@@ -437,8 +611,21 @@ func _update_selection() -> void:
 
 
 func play_sfx(sfx_name: String) -> void:
-	if ui_animator and ui_animator.has_method("play_sound"):
-		ui_animator.play_sound(sfx_name)
+	# Use dedicated audio players if available
+	match sfx_name:
+		"click", "popup":
+			if snd_popup:
+				snd_popup.play()
+		"select":
+			if snd_select:
+				snd_select.play()
+		"cancel":
+			if snd_select:
+				snd_select.play()
+		_:
+			# Fallback to ui_animator
+			if ui_animator and ui_animator.has_method("play_sound"):
+				ui_animator.play_sound(sfx_name)
 
 
 func _on_launch_campaign(campaign_data: Resource) -> void:

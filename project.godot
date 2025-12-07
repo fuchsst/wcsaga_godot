@@ -25,7 +25,7 @@ GameStateMachine="*res://scripts/game_state/GameStateMachine.gd"
 WCS="*res://scripts/utilities/WCS.gd"
 ProfileManager="*res://autoload/ProfileManager.gd"
 GlobalSettings="*res://autoload/GlobalSettings.gd"
-TimelineDatabase="*res://autoload/TimelineDatabase.gd"
+TimelineDatabase="*res://resources/campaign_index/TimelineDatabase.gd"
 
 [display]
 

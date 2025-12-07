@@ -21,6 +21,9 @@ const GAP_FROM_CENTER: float = 60.0
 @onready var desc_label: Label = $CenterAxis/ContentRoot/CardPanel/MarginContainer/ContentVBox/DescLabel
 @onready var content_root: Control = $CenterAxis/ContentRoot
 @onready var hologram_panel: Panel = $CenterAxis/ContentRoot/CardPanel/HologramPanel
+@onready var glow_layer1: ColorRect = $CenterAxis/ContentRoot/CardPanel/GlowLayer1
+@onready var glow_layer2: ColorRect = $CenterAxis/ContentRoot/CardPanel/GlowLayer2
+@onready var glow_layer3: ColorRect = $CenterAxis/ContentRoot/CardPanel/GlowLayer3
 @onready var card_panel: PanelContainer = $CenterAxis/ContentRoot/CardPanel
 @onready var center_axis: Control = $CenterAxis
 
@@ -43,6 +46,8 @@ func _ready() -> void:
 	if card_panel:
 		card_panel.minimum_size_changed.connect(_update_layout)
 		card_panel.clip_contents = true
+		# Connect card panel clicks
+		card_panel.gui_input.connect(_on_card_panel_input)
 
 	update_ui()
 
@@ -55,7 +60,12 @@ func _ready() -> void:
 	pivot_offset = size / 2.0
 
 	# Defer layout update
-	call_deferred("_update_layout")
+
+
+func _on_card_panel_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		accept_event()
+		clicked.emit(year, data)
 
 
 func setup(p_year: int, p_data: Resource, _show_year: bool = true) -> void:
@@ -157,17 +167,23 @@ func _apply_highlight_effect() -> void:
 		# Ensure outline color exists before tweening (fixes Nil error)
 		if not title_label.has_theme_color_override("font_outline_color"):
 			title_label.add_theme_color_override("font_outline_color", Color(0.4, 0.8, 1.0, 0.0))
-		title_label.add_theme_constant_override("outline_size", 2)
+		title_label.add_theme_constant_override("outline_size", 3)
 
 		tween.tween_property(title_label, "theme_override_colors/font_color",
-			Color(0.8, 1.0, 1.3), 0.25)
+			Color(0.9, 1.0, 1.2), 0.25)
 		tween.tween_property(title_label, "theme_override_colors/font_outline_color",
-			Color(0.4, 0.8, 1.0, 0.8), 0.25)
+			Color(0.4, 0.8, 1.0, 0.9), 0.25)
 
-	# Edge glow - smooth transition to bright border
-	if hologram_panel and hologram_panel.material:
-		tween.tween_property(hologram_panel.material, "shader_parameter/edge_glow_intensity",
-			4.0, 0.25)
+	# Multi-layer glow for smooth blur effect around the box
+	# Inner layer: brightest, smallest
+	if glow_layer1:
+		tween.tween_property(glow_layer1, "modulate", Color(0.3, 0.6, 1.0, 0.5), 0.2)
+	# Middle layer: medium brightness
+	if glow_layer2:
+		tween.tween_property(glow_layer2, "modulate", Color(0.3, 0.6, 1.0, 0.3), 0.25)
+	# Outer layer: softest, largest
+	if glow_layer3:
+		tween.tween_property(glow_layer3, "modulate", Color(0.3, 0.6, 1.0, 0.15), 0.3)
 
 
 func _apply_normal_effect() -> void:
@@ -184,10 +200,13 @@ func _apply_normal_effect() -> void:
 		tween.tween_property(title_label, "theme_override_colors/font_outline_color",
 			Color(0.4, 0.8, 1.0, 0.0), 0.35)
 
-	# Reset edge glow
-	if hologram_panel and hologram_panel.material:
-		tween.tween_property(hologram_panel.material, "shader_parameter/edge_glow_intensity",
-			1.0, 0.35)
+	# Hide all glow layers
+	if glow_layer1:
+		tween.tween_property(glow_layer1, "modulate", Color(0.3, 0.6, 1.0, 0.0), 0.3)
+	if glow_layer2:
+		tween.tween_property(glow_layer2, "modulate", Color(0.3, 0.6, 1.0, 0.0), 0.35)
+	if glow_layer3:
+		tween.tween_property(glow_layer3, "modulate", Color(0.3, 0.6, 1.0, 0.0), 0.4)
 
 
 func update_ui() -> void:

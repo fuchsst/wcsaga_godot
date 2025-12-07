@@ -47,13 +47,46 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 0
+
+[node name="GlowLayer1" type="ColorRect" parent="CenterAxis/ContentRoot/CardPanel"]
+layout_mode = 2
+offset_left = -4.0
+offset_top = -4.0
+offset_right = 4.0
+offset_bottom = 4.0
+mouse_filter = 2
+modulate = Color(0.3, 0.6, 1.0, 0.0)
+color = Color(1, 1, 1, 1)
+
+[node name="GlowLayer2" type="ColorRect" parent="CenterAxis/ContentRoot/CardPanel"]
+layout_mode = 2
+offset_left = -8.0
+offset_top = -8.0
+offset_right = 8.0
+offset_bottom = 8.0
+mouse_filter = 2
+modulate = Color(0.3, 0.6, 1.0, 0.0)
+color = Color(1, 1, 1, 1)
+
+[node name="GlowLayer3" type="ColorRect" parent="CenterAxis/ContentRoot/CardPanel"]
+layout_mode = 2
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+mouse_filter = 2
+modulate = Color(0.3, 0.6, 1.0, 0.0)
+color = Color(1, 1, 1, 1)
 
 [node name="HologramPanel" type="Panel" parent="CenterAxis/ContentRoot/CardPanel"]
 material = ExtResource("2_hologrammaterial")
 layout_mode = 2
+mouse_filter = 2
 
 [node name="MarginContainer" type="MarginContainer" parent="CenterAxis/ContentRoot/CardPanel"]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/margin_left = 15
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 15

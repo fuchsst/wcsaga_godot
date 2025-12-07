@@ -1,0 +1,10 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://line_glow_material"]
+
+[ext_resource type="Shader" path="res://scenes/ui/materials/line_glow.gdshader" id="1_shader"]
+
+[resource]
+shader = ExtResource("1_shader")
+shader_parameter/line_color = Color(0.4, 0.7, 1.0, 0.8)
+shader_parameter/glow_color = Color(0.3, 0.6, 1.0, 0.5)
+shader_parameter/glow_amount = 0.4
+shader_parameter/glow_intensity = 1.2

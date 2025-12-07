@@ -7,7 +7,7 @@ static var _events: Dictionary = {}
 static var _initialized: bool = false
 
 # Path to scan for timeline resources
-const CAMPAIGNS_PATH = "res://campaigns/index/"
+const CAMPAIGNS_PATH = "res://resources/campaign_index/"
 
 static func _initialize_data():
 	if _initialized: return
