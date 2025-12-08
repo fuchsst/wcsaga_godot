@@ -82,6 +82,15 @@ popup/item_15/id = 15
 layout_mode = 2
 text = "Run Import"
 
+[node name="ProgressBar" type="ProgressBar" parent="VBoxContainer"]
+layout_mode = 2
+step = 0.1
+
+[node name="CurrentFileLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+horizontal_alignment = 1
+text_overrun_behavior = 3
+
 [node name="StatusLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
 text = "Ready to import."

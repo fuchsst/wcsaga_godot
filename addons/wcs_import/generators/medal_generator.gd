@@ -5,7 +5,7 @@ const MedalResource = preload("res://scripts/resources/campaigns/medal_resource.
 const MedalManifest = preload("res://scripts/resources/campaigns/medal_manifest.gd")
 
 
-func generate_medals(manifest: MedalManifest, output_root: String, source_root: String) -> bool:
+func generate(manifest: MedalManifest, output_root: String, source_root: String) -> bool:
 	# Target: target/campaigns/hermes/medals/
 	var output_dir = output_root
 	if not DirAccess.dir_exists_absolute(output_dir):

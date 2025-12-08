@@ -10,7 +10,7 @@ const SOURCE_SOUNDS_DIR = "res://../source_assets/wcs_hermes_campaign/hermes_sou
 const SOURCE_MOVIES_DIR = "res://../source_assets/wcs_hermes_campaign/hermes_movies" # Assumption
 
 
-func generate_persona(persona: PersonaResource, output_root: String, source_root: String) -> void:
+func generate(persona: PersonaResource, output_root: String, source_root: String) -> void:
 	# Target: target/campaigns/hermes/persona/<PersonaName>/
 	var persona_slug = persona.persona_name
 	var target_dir = output_root.path_join(persona_slug)

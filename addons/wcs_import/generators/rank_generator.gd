@@ -5,7 +5,7 @@ const RankResource = preload("res://scripts/resources/campaigns/rank_resource.gd
 const RankManifest = preload("res://scripts/resources/campaigns/rank_manifest.gd")
 
 
-func generate_ranks(manifest: RankManifest, output_root: String, source_root: String) -> bool:
+func generate(manifest: RankManifest, output_root: String, source_root: String) -> bool:
 	# Target: target/campaigns/hermes/ranks/
 	var target_dir = output_root
 	if not DirAccess.dir_exists_absolute(target_dir):

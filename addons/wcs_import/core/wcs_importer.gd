@@ -107,12 +107,15 @@ const PROCESSING_ORDER = [
 
 var _file_map: Dictionary = {}
 
+signal progress_updated(current: int, total: int, filename: String)
+
 
 func build_file_map(root_dir: String) -> void:
 	print("Building file map from: " + root_dir)
 	_file_map.clear()
 	_scan_dir_recursive(root_dir)
 	WCSPathResolver.file_map = _file_map
+	WCSPathResolver.source_root = root_dir
 	print("File map built with " + str(_file_map.size()) + " entries.")
 
 
@@ -140,9 +143,20 @@ func process_batch(output_dir: String, filter_pattern: String = "", types_to_pro
 
 	var process_all = types_to_process.is_empty() or "all" in types_to_process
 
+	# Count total items for progress
+	var total_items = _count_batch_items(filter_pattern, types_to_process, process_all)
+	var current_item = 0
+
+	# Ensure animations are processed when ships are processed (for ship detail animations)
+	var include_animation = process_all or "animation" in types_to_process
+	if not include_animation and "ships" in types_to_process:
+		include_animation = true
+
 	# 1. Process Animations (*.eff, *.ani)
-	if process_all or "animation" in types_to_process:
-		failure_count += _process_batch_animations(output_dir, filter_pattern)
+	if include_animation:
+		var anim_result = _process_batch_animations_with_progress(output_dir, filter_pattern, current_item, total_items)
+		failure_count += anim_result.failures
+		current_item = anim_result.current
 
 	# 2. Process ordered TBLs
 	for filename in PROCESSING_ORDER:
@@ -156,6 +170,8 @@ func process_batch(output_dir: String, filter_pattern: String = "", types_to_pro
 			if not process_all and not type in types_to_process:
 				continue
 
+			current_item += 1
+			progress_updated.emit(current_item, total_items, filename)
 			print("Processing: " + filename + " (" + type + ")")
 			if not process_file(full_path, output_dir, type):
 				print("Failed to process: " + filename)
@@ -166,11 +182,17 @@ func process_batch(output_dir: String, filter_pattern: String = "", types_to_pro
 
 	# 3. Process Missions (*.fs2)
 	if process_all or "mission" in types_to_process:
-		failure_count += _process_batch_extension(output_dir, "fs2", "mission", filter_pattern)
+		var mission_result = _process_batch_extension_with_progress(output_dir, "fs2", "mission", filter_pattern, current_item, total_items)
+		failure_count += mission_result.failures
+		current_item = mission_result.current
 
 	# 4. Process Campaigns (*.fc2)
 	if process_all or "campaign" in types_to_process:
-		failure_count += _process_batch_extension(output_dir, "fc2", "campaign", filter_pattern)
+		var campaign_result = _process_batch_extension_with_progress(output_dir, "fc2", "campaign", filter_pattern, current_item, total_items)
+		failure_count += campaign_result.failures
+		current_item = campaign_result.current
+
+	progress_updated.emit(total_items, total_items, "Complete")
 
 	if failure_count == 0:
 		print("Batch processing completed successfully.")
@@ -178,6 +200,119 @@ func process_batch(output_dir: String, filter_pattern: String = "", types_to_pro
 
 	print("Batch processing completed with " + str(failure_count) + " failures.")
 	return false
+
+
+func _count_batch_items(filter_pattern: String, types_to_process: Array, process_all: bool) -> int:
+	var count = 0
+
+	# Count animations (include when ships is processed)
+	var include_animation = process_all or "animation" in types_to_process
+	if not include_animation and "ships" in types_to_process:
+		include_animation = true
+
+	# Count animations
+	if include_animation:
+		for fname in _file_map:
+			if fname.ends_with(".eff") or fname.ends_with(".ani"):
+				if filter_pattern.is_empty() or fname.matchn(filter_pattern):
+					var full_path = _file_map[fname]
+					if not fname.begins_with("empty.") and not full_path.contains("hermes_effects") and not full_path.contains("hermes_interface"):
+						count += 1
+
+	# Count TBLs
+	for filename in PROCESSING_ORDER:
+		if not filter_pattern.is_empty() and not filename.matchn(filter_pattern):
+			continue
+		if _file_map.has(filename.to_lower()):
+			var full_path = _file_map[filename.to_lower()]
+			var type = detect_type(full_path)
+			if process_all or type in types_to_process:
+				count += 1
+
+	# Count missions
+	if process_all or "mission" in types_to_process:
+		for fname in _file_map:
+			if fname.ends_with(".fs2"):
+				if filter_pattern.is_empty() or fname.matchn(filter_pattern):
+					count += 1
+
+	# Count campaigns
+	if process_all or "campaign" in types_to_process:
+		for fname in _file_map:
+			if fname.ends_with(".fc2"):
+				if filter_pattern.is_empty() or fname.matchn(filter_pattern):
+					count += 1
+
+	return count
+
+
+func _process_batch_animations_with_progress(output_dir: String, filter_pattern: String, start_index: int, total: int) -> Dictionary:
+	var failure_count = 0
+	var current = start_index
+	var anim_files = []
+	for fname in _file_map:
+		if fname.ends_with(".eff") or fname.ends_with(".ani"):
+			anim_files.append(fname)
+	anim_files.sort()
+
+	for fname in anim_files:
+		if not filter_pattern.is_empty() and not fname.matchn(filter_pattern):
+			continue
+
+		var full_path = _file_map[fname]
+		if fname.begins_with("empty.") or full_path.contains("hermes_effects") or full_path.contains("hermes_interface"):
+			continue
+
+		current += 1
+		progress_updated.emit(current, total, fname)
+
+		# Skip duplicates handled by generators
+		if full_path.contains("hermes_cbanims/"):
+			continue
+
+		# Use path resolver to determine correct output directory
+		var path_info = WCSPathResolver.determine_output_path(fname)
+		var category = path_info[0]
+		var subcategory = path_info[1]
+
+		var target_output_dir = output_dir
+		if category in ["fighter", "bomber", "missile", "capital", "station"]:
+			target_output_dir = output_dir.path_join("assets").path_join("ships").path_join(subcategory).path_join(category)
+		elif category == "weapon" or category == "effect" or category == "effects":
+			target_output_dir = output_dir.path_join("assets").path_join("effects").path_join(subcategory)
+		else:
+			target_output_dir = output_dir.path_join("assets")
+
+		if not DirAccess.dir_exists_absolute(target_output_dir):
+			DirAccess.make_dir_recursive_absolute(target_output_dir)
+
+		if not _process_animation(full_path, target_output_dir):
+			failure_count += 1
+
+	return {"failures": failure_count, "current": current}
+
+
+func _process_batch_extension_with_progress(output_dir: String, ext: String, type: String, filter_pattern: String, start_index: int, total: int) -> Dictionary:
+	var failure_count = 0
+	var current = start_index
+	var files = []
+	for fname in _file_map:
+		if fname.ends_with("." + ext):
+			files.append(fname)
+	files.sort()
+
+	for fname in files:
+		if not filter_pattern.is_empty() and not fname.matchn(filter_pattern):
+			continue
+
+		current += 1
+		progress_updated.emit(current, total, fname)
+
+		var full_path = _file_map[fname]
+		if not process_file(full_path, output_dir, type):
+			failure_count += 1
+
+	return {"failures": failure_count, "current": current}
 
 
 func _process_batch_animations(output_dir: String, filter_pattern: String) -> int:
@@ -259,7 +394,7 @@ func process_file(input_path: String, output_dir: String, type: String) -> bool:
 		"mainhall": return _process_mainhall(input_path, _resolve_output_path(output_dir, "campaigns/hermes/ui/menu"))
 		"medals": return _process_medals(input_path, _resolve_output_path(output_dir, "campaigns/hermes/medals"))
 		"menu": return _process_menu(input_path, _resolve_output_path(output_dir, "campaigns/hermes/ui/menu"))
-		"animation": return _process_animation(input_path, output_dir)
+		"animation": return _process_animation(input_path, _resolve_output_path(output_dir, "assets/animations"))
 		"messages": return _process_personas(input_path, _resolve_output_path(output_dir, "campaigns/hermes/personas"))
 		"mission": return _process_mission(input_path, _resolve_output_path(output_dir, "campaigns/hermes/missions"))
 		"music": return _process_music(input_path, _resolve_output_path(output_dir, "campaigns/hermes/soundtrack"))
@@ -275,7 +410,7 @@ func process_file(input_path: String, output_dir: String, type: String) -> bool:
 		"tips": return _process_tips(input_path, _resolve_output_path(output_dir, "campaigns/hermes"))
 		"traitor": return _process_traitor(input_path, _resolve_output_path(output_dir, "campaigns/hermes/ui/localisation"))
 		"weapon_expl": return _process_weapon_expl(input_path, _resolve_output_path(output_dir, "assets/effects"))
-		"localization": return _process_localization(input_path, output_dir)
+		"localization": return _process_localization(input_path, _resolve_output_path(output_dir, "campaigns/hermes/ui/localisation"))
 		_:
 			print("Skipping unsupported type: " + type)
 			return true
@@ -317,7 +452,30 @@ func _resolve_output_path(base: String, sub: String) -> String:
 func _process_animation(input_path: String, output_dir: String) -> bool:
 	var generator = AnimationGenerator.new()
 	var source_root = ProjectSettings.globalize_path(input_path.get_base_dir().get_base_dir())
-	return generator.generate(input_path, output_dir, source_root)
+
+	# Determine the correct output path based on the animation type
+	var filename = input_path.get_file()
+	var file_base = filename.get_basename()
+
+	# Use path resolver to determine the correct path based on filename patterns
+	var path_info = WCSPathResolver.determine_output_path(filename)
+	var category = path_info[0]
+	var subcategory = path_info[1]
+
+	var target_output_dir = output_dir
+
+	# For ship animations, use the ship's path
+	if category in ["fighter", "bomber", "missile", "capital", "station"]:
+		target_output_dir = output_dir.path_join("assets").path_join("ships").path_join(subcategory).path_join(category)
+	elif category == "weapon" or category == "effect" or category == "effects":
+		# Weapon effects and general effects go to effects directory with subcategory
+		target_output_dir = output_dir.path_join("assets").path_join("effects").path_join(subcategory)
+	else:
+		# Default: use the relative path from source
+		var relative_path = input_path.replace(WCSPathResolver.source_root, "").trim_prefix("/")
+		target_output_dir = output_dir.path_join("assets").path_join(relative_path.get_base_dir())
+
+	return generator.generate(input_path, target_output_dir, source_root)
 
 
 func _process_ships(input_path: String, output_dir: String) -> bool:
@@ -439,7 +597,13 @@ func _process_fireballs(input_path: String, output_dir: String) -> bool:
 	if fireballs == null or fireballs.is_empty(): return false
 	var generator = FireballGenerator.new()
 	var source_root = ProjectSettings.globalize_path(input_path.get_base_dir().get_base_dir())
-	return generator.generate(fireballs, output_dir, source_root)
+
+	var success = true
+	for fireball in fireballs:
+		if not generator.generate(fireball, output_dir, source_root):
+			success = false
+
+	return success
 
 
 func _process_hud_gauges(input_path: String, output_dir: String) -> bool:
@@ -453,20 +617,32 @@ func _process_hud_gauges(input_path: String, output_dir: String) -> bool:
 
 func _process_lightning(input_path: String, output_dir: String) -> bool:
 	var parser = WCSLightningParser.new()
-	var data = parser.parse(input_path)
-	if data == null: return false
+	var resources = parser.parse(input_path)
+	if resources == null or resources.is_empty(): return false
 	var generator = LightningGenerator.new()
 	var source_root = ProjectSettings.globalize_path(input_path.get_base_dir().get_base_dir())
-	return generator.generate(data, output_dir, source_root)
+
+	var success = true
+	for resource in resources:
+		if not generator.generate(resource, output_dir, source_root):
+			success = false
+
+	return success
 
 
 func _process_mflash(input_path: String, output_dir: String) -> bool:
 	var parser = WCSMuzzleFlashParser.new()
 	var flashes = parser.parse(input_path)
-	if flashes == null: return false
+	if flashes == null or flashes.is_empty(): return false
 	var generator = MuzzleFlashGenerator.new()
 	var source_root = ProjectSettings.globalize_path(input_path.get_base_dir().get_base_dir())
-	return generator.generate(flashes, output_dir, source_root)
+
+	var success = true
+	for flash in flashes:
+		if not generator.generate(flash, output_dir, source_root):
+			success = false
+
+	return success
 
 
 func _process_mainhall(input_path: String, output_dir: String) -> bool:
@@ -501,7 +677,9 @@ func _process_personas(input_path: String, output_dir: String) -> bool:
 	var personas = parser.parse(input_path)
 	if personas == null: return false
 	var generator = PersonaGenerator.new()
-	return generator.generate(personas, output_dir)
+	var source_root = ProjectSettings.globalize_path(input_path.get_base_dir().get_base_dir())
+	generator.generate(personas, output_dir, source_root)
+	return true
 
 
 func _process_music(input_path: String, output_dir: String) -> bool:
@@ -555,7 +733,7 @@ func _process_species(input_path: String, output_dir: String) -> bool:
 	if species == null: return false
 	var generator = SpeciesGenerator.new()
 	var source_root = ProjectSettings.globalize_path(input_path.get_base_dir().get_base_dir())
-	return generator.generate(species, output_dir, source_root)
+	return generator.generate_species_assets(species, output_dir, source_root)
 
 
 func _process_list_resource(input_path: String, output_dir: String, parser_class, _unused, name_key: String) -> bool:
@@ -599,13 +777,52 @@ func _process_traitor(input_path: String, output_dir: String) -> bool:
 
 func _process_weapon_expl(input_path: String, output_dir: String) -> bool:
 	var parser = WCSWeaponExplParser.new()
-	var data = parser.parse(input_path)
-	if data == null: return false
+	var resources = parser.parse(input_path)
+	if resources == null or resources.is_empty(): return false
 	var generator = WeaponExplosionGenerator.new()
 	var source_root = ProjectSettings.globalize_path(input_path.get_base_dir().get_base_dir())
-	return generator.generate(data, output_dir, source_root)
+
+	var success = true
+	for resource in resources:
+		if not generator.generate(resource, output_dir, source_root):
+			success = false
+
+	return success
 
 
 func _process_localization(input_path: String, output_dir: String) -> bool:
 	var parser = WCSLocalizationParser.new()
-	return parser.convert(input_path, output_dir)
+	var data = parser.parse(input_path)
+	if data == null:
+		return false
+
+	# Save localization data to output directory
+	# data is a Dictionary with locale -> Array[LocalizationRes] mapping
+	if not DirAccess.dir_exists_absolute(output_dir):
+		DirAccess.make_dir_recursive_absolute(output_dir)
+
+	const LocalizationManifest = preload("res://scripts/resources/ui/localisation/localization_manifest.gd")
+
+	var success = true
+	for locale in data.keys():
+		var locale_strings = data[locale]
+
+		# Create a manifest for this locale
+		var manifest = LocalizationManifest.new()
+		manifest.locale = locale
+		# Convert to properly typed array
+		var typed_strings: Array[LocalizationResource] = []
+		for item in locale_strings:
+			typed_strings.append(item as LocalizationResource)
+		manifest.strings = typed_strings
+
+		# Save the manifest directly in output_dir with locale suffix
+		var output_path = output_dir.path_join("strings_" + locale + ".tres")
+		var error = ResourceSaver.save(manifest, output_path)
+		if error != OK:
+			push_error("Failed to save localization manifest for locale '" + locale + "' to: " + output_path)
+			success = false
+		else:
+			print("Saved localization manifest for locale '" + locale + "': " + output_path)
+
+	return success

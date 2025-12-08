@@ -6,14 +6,14 @@ func generate(menu: Resource, output_dir: String, source_root: String) -> bool:
 	DirAccess.make_dir_recursive_absolute(output_dir)
 
 	# Background Image
-	if not menu.background_image.is_empty():
+	if not menu.bitmap_filename.is_empty():
 		var source = _find_source_asset(
-			source_root, menu.background_image, [".pcx", ".dds", ".png"]
+			source_root, menu.bitmap_filename, [".pcx", ".dds", ".png"]
 		)
 		if not source.is_empty():
 			_convert_asset(source, output_dir, "texture")
 		else:
-			print("Warning: Menu background not found: " + menu.background_image)
+			print("Warning: Menu background not found: " + menu.bitmap_filename)
 
 	# Save Resource
 	var save_path = output_dir.path_join("menu.tres")

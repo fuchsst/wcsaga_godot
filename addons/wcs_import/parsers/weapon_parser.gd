@@ -175,7 +175,9 @@ func _parse_weapon(first_line: String) -> Resource:
 		elif line.begins_with("$Shockwave Speed:"):
 			weapon.shockwave_speed = _extract_float_value(line, "$Shockwave Speed:")
 		elif line.begins_with("$Spawn Angle:"):
-			weapon.spawn_angle = _extract_float_value(line, "$Spawn Angle:")
+			if weapon.spawn_config == null:
+				weapon.spawn_config = WeaponDataScript.SpawnConfiguration.new()
+			weapon.spawn_config.spawn_angle = _extract_float_value(line, "$Spawn Angle:")
 		elif line.begins_with("$Rearm Rate:"):
 			weapon.rearm_rate = _extract_float_value(line, "$Rearm Rate:")
 		elif line.begins_with("+Min Lock Time:"):

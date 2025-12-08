@@ -6,7 +6,6 @@ const HelpResource = preload("res://scripts/resources/ui/localisation/help_resou
 
 func _parse_content() -> Variant:
 	var res = HelpResource.new()
-	res.topic = "Launch Help"
 	res.category = "launch"
 
 	var help_text = ""
@@ -18,5 +17,5 @@ func _parse_content() -> Variant:
 		if not line.begins_with(";"):
 			help_text += line + "\n"
 
-	res.text = help_text
+	res.topics["Launch Help"] = help_text
 	return res

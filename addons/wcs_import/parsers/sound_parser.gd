@@ -3,6 +3,7 @@ extends "res://addons/wcs_import/parsers/base_parser.gd"
 
 const AudioConfigResource = preload("res://scripts/resources/sounds/audio_config_resource.gd")
 const FlybySoundResource = preload("res://scripts/resources/sounds/flyby_sound_resource.gd")
+const SoundManifest = preload("res://scripts/resources/sounds/sound_manifest.gd")
 
 # Base path for sound files
 const SOUND_BASE_PATH = "res://assets/sounds/"
@@ -48,7 +49,10 @@ func _parse_content() -> Variant:
 
 			flyby_sounds.append(config)
 
-	return {"audio_configs": audio_configs, "flyby_sounds": flyby_sounds}
+	var manifest = SoundManifest.new()
+	manifest.audio_configs = audio_configs
+	manifest.flyby_sounds = flyby_sounds
+	return manifest
 
 
 func _parse_audio_entry(line: String, config: AudioConfigResource, prefix_len: int) -> void:

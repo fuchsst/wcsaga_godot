@@ -21,6 +21,6 @@ func _parse_content() -> Variant:
 			# Parse menu definition
 			pass
 		elif line.begins_with("+Filename:"):
-			menu_resource.background_image = _extract_string_value(line, "+Filename:")
+			menu_resource.bitmap_filename = _extract_string_value(line, "+Filename:")
 
 	return menu_resource

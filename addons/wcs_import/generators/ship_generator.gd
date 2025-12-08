@@ -25,7 +25,10 @@ func generate(ships: Array, output_dir: String, source_root: String) -> bool:
 		DirAccess.make_dir_recursive_absolute(ship_dir)
 
 		# Convert POF Model
-		var pof_source = _find_source_asset(source_root, pof_file)
+		var pof_source = WCSPathResolver.resolve_source_path(pof_file)
+		if pof_source.is_empty():
+			# Try manual search as fallback
+			pof_source = _find_source_asset(source_root, pof_file)
 		if pof_source.is_empty():
 			push_error("Error: Could not find POF source for " + pof_file)
 			return false

@@ -5,6 +5,7 @@ extends RefCounted
 ## Ports logic from Python PathManager.
 
 static var file_map: Dictionary = {}
+static var source_root: String = ""
 
 static func resolve_source_path(filename: String) -> String:
 	var lower_name = filename.to_lower()
@@ -87,6 +88,9 @@ const SPECIAL_CASES = {
 	"spherec": ["effect", "spherec"],
 	"f_shockwave": ["effect", "shockwave_f"],
 	"t_shockwave": ["effect", "shockwave_t"],
+	"t_shockwave-glow": ["effect", "shockwave_t"],
+	"shockwave3d-glow": ["effect", "shockwave"],
+	"confed_details": ["fighter", "terran"], # Terran ship detail animations
 }
 
 const MISC_MAPPINGS = {
@@ -94,10 +98,15 @@ const MISC_MAPPINGS = {
 	"cmeasure": ["weapon", "countermeasure"],
 	"escape_pod": ["utility", "escape_pod"],
 	"fire": ["effect", "fire"],
+	"fire-glow": ["effect", "fire"],
 	"ghost": ["effect", "ghost"],
 	"ghostmissile": ["weapon", "ghost_missile"],
 	"kcargo": ["utility", "kilrathi_cargo"],
 	"launcher": ["utility", "launcher"],
+	"shockwave3d-glow": ["effect", "shockwave"],
+	# Ship detail animations
+	"kif_": ["fighter", "kilrathi"], # Kilrathi fighter detail animations
+	"tcs_": ["capital", "terran"], # Terran Confederation ship detail animations
 }
 
 
@@ -137,6 +146,11 @@ static func determine_output_path(filename: String) -> Array:
 		if misc_name in MISC_MAPPINGS:
 			return MISC_MAPPINGS[misc_name]
 		return ["utility", misc_name]
+
+	# Check MISC_MAPPINGS by prefix
+	for prefix in MISC_MAPPINGS:
+		if file_base.begins_with(prefix):
+			return MISC_MAPPINGS[prefix]
 
 	for prefix in MODEL_MAPPINGS:
 		if file_base.begins_with(prefix):

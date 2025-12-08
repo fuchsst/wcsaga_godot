@@ -44,9 +44,9 @@ func generate(result: Dictionary, output_dir: String, source_root: String) -> bo
 
 				var tex = PlaceholderTexture2D.new()
 				tex.resource_path = res_path
-				
-				# StarBitmapData doesn't have texture property and isn't saved as resource
-				# star.texture = tex
+
+				# Assign texture to the star object
+				star.texture = tex
 			else:
 				push_error("Error: Could not find source for star bitmap: " + tex_filename)
 				return false

@@ -33,7 +33,13 @@ static func _compile_node(node: Resource) -> BTTask:
 	
 	if type == "logic":
 		var bt_type = op_def.get("bt_type")
+		if bt_type == null:
+			push_error("SexpCompiler: Missing bt_type for operator: " + op_name)
+			return null
 		var task = ClassDB.instantiate(bt_type) as BTTask
+		if task == null:
+			push_error("SexpCompiler: Failed to instantiate class: " + str(bt_type))
+			return null
 		for arg in node.arguments:
 			var child_task = _compile_node(arg)
 			if child_task:
@@ -79,36 +85,45 @@ static func _compile_when(node: Resource) -> BTTask:
 	# In a BT running every tick:
 	# Sequence [ Condition, Action ]
 	# If condition false -> Sequence Fails -> Tree continues?
-	var seq = BTSequence.new()
+	var seq = ClassDB.instantiate("BTSequence") as BTTask
+	if seq == null:
+		push_error("SexpCompiler: BTSequence class not found. LimboAI may not be installed.")
+		return null
 	seq.custom_name = "When " + _get_arg_preview(node.arguments, 0)
-	
+
 	for arg in node.arguments:
 		var child = _compile_node(arg)
 		if child:
 			seq.add_child(child)
-			
+
 	return seq
 
 static func _compile_cond(node: Resource) -> BTTask:
 	# ( cond ( (Cond1) (Action1) ) ( (Cond2) (Action2) ) ... )
 	# Like a Switch or If/ElseIf chain.
 	# In BT: Selector [ Sequence[Cond1, Act1], Sequence[Cond2, Act2] ... ]
-	var sel = BTSelector.new()
+	var sel = ClassDB.instantiate("BTSelector") as BTTask
+	if sel == null:
+		push_error("SexpCompiler: BTSelector class not found. LimboAI may not be installed.")
+		return null
 	sel.custom_name = "Cond"
-	
+
 	for arg in node.arguments:
 		# Each arg is a list ( (Cond) (Next-Mission) )
 		if arg.type == SexpNodeRef.Type.OPERATOR:
 			# Implicit Sequence?
 			# Actually in SEXP, the list wrapper is just a list.
 			# We treat it as a Sequence.
-			var sub_seq = BTSequence.new()
+			var sub_seq = ClassDB.instantiate("BTSequence") as BTTask
+			if sub_seq == null:
+				push_error("SexpCompiler: BTSequence class not found. Skipping sub-sequence.")
+				continue
 			for sub_arg in arg.arguments:
 				var sub_child = _compile_node(sub_arg)
 				if sub_child:
 					sub_seq.add_child(sub_child)
 			sel.add_child(sub_seq)
-			
+
 	return sel
 
 static func _extract_args(arg_nodes: Array) -> Array:

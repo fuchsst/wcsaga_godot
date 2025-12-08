@@ -30,7 +30,10 @@ func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 
 		# 2. Convert POF Model
 		if not res.projectile_model.is_empty() and res.projectile_model != "none":
-			var pof_source = _find_source_asset(source_root, res.projectile_model)
+			var pof_source = WCSPathResolver.resolve_source_path(res.projectile_model)
+			if pof_source.is_empty():
+				# Try manual search as fallback
+				pof_source = _find_source_asset(source_root, res.projectile_model)
 			if pof_source.is_empty():
 				push_error("Error: Could not find POF source for " + res.projectile_model)
 				return false
@@ -65,25 +68,46 @@ func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 			if res.display_icon.begins_with("empty"):
 				res.display_icon = "res://assets/shared/empty.tres"
 			else:
-				var icon_source = _find_source_asset(
-					source_root, res.display_icon, [".pcx", ".dds", ".png"]
-				)
+				# First try to find icon using path resolver
+				var icon_source = WCSPathResolver.resolve_source_path(res.display_icon)
+
+				# If not found, try searching in hermes_interface specifically
+				if icon_source.is_empty():
+					var hermes_interface_dir = source_root.path_join("hermes_interface")
+					icon_source = _find_source_asset(hermes_interface_dir, res.display_icon, [".eff", ".dds", ".pcx", ".png"])
+
+				# If still not found, try general search
+				if icon_source.is_empty():
+					icon_source = _find_source_asset(source_root, res.display_icon, [".pcx", ".dds", ".png"])
+
 				if icon_source.is_empty():
 					push_error("Error: Could not find icon source: " + res.display_icon)
-					# Some icons are truly optional or shared? But usually if referenced it should exist.
 					return false
-				
-				if not _convert_asset(icon_source, weapon_dir, "texture"):
+
+				# Determine conversion type based on file extension
+				var ext = icon_source.get_extension().to_lower()
+				var conversion_type = "texture"
+				if ext == "eff":
+					conversion_type = "animation"
+
+				if not _convert_asset(icon_source, weapon_dir, conversion_type):
 					push_error("Error: Failed to convert icon: " + icon_source)
 					return false
 
-				res.display_icon = icon_source.get_file().get_basename() + ".png" # Assuming conversion to PNG
+				# Set appropriate output filename
+				if conversion_type == "animation":
+					res.display_icon = icon_source.get_file().get_basename() + "_spriteframes.tres"
+				else:
+					res.display_icon = icon_source.get_file().get_basename() + ".png"
 
 		if not res._laser_bitmap_source.is_empty():
 			if not res._laser_bitmap_source.begins_with("empty"):
-				var laser_source = _find_source_asset(
-					source_root, res._laser_bitmap_source, [".pcx", ".dds", ".png"]
-				)
+				var laser_source = WCSPathResolver.resolve_source_path(res._laser_bitmap_source)
+				if laser_source.is_empty():
+					# Try manual search as fallback
+					laser_source = _find_source_asset(
+						source_root, res._laser_bitmap_source, [".pcx", ".dds", ".png"]
+					)
 				if laser_source.is_empty():
 					push_error("Error: Could not find laser bitmap source: " + res._laser_bitmap_source)
 					return false
