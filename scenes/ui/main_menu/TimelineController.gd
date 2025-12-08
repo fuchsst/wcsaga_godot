@@ -195,7 +195,7 @@ func _update_profile_widget() -> void:
 	var profile = ProfileManager.get_active_profile()
 	if profile and profile_callsign and profile_rank and profile_datetime:
 		profile_callsign.text = profile.callsign.to_upper()
-		profile_rank.text = profile.rank.to_upper()
+		profile_rank.text = profile.get_rank_name().to_upper()
 		var year = profile.active_timeline_year
 		var day_of_year = 79
 		profile_datetime.text = str(year) + "." + str(day_of_year).pad_zeros(3)

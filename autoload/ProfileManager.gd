@@ -57,6 +57,7 @@ func load_profile(profile_name: String) -> UserProfile:
 			active_profile_name = profile_name
 			active_profile = loaded_res
 			set_last_used_profile_name(profile_name)
+			_apply_profile_settings()
 			print("ProfileManager: Loaded profile '%s'" % profile_name)
 			profile_loaded.emit(active_profile)
 			return active_profile
@@ -240,3 +241,16 @@ func set_last_used_profile_name(profile_name: String) -> void:
 
 func _get_profile_path(profile_name: String) -> String:
 	return PROFILE_DIR + profile_name + ".tres"
+
+
+## Apply the active profile's settings to GlobalSettings.
+func _apply_profile_settings() -> void:
+	if not active_profile:
+		return
+	if not active_profile.settings:
+		return
+
+	# Apply audio and input settings via GlobalSettings
+	GlobalSettings.apply_audio_settings(active_profile.settings)
+	GlobalSettings.apply_input_bindings(active_profile.settings)
+	print("ProfileManager: Applied settings for profile '%s'" % active_profile_name)

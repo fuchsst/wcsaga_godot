@@ -4,10 +4,10 @@ extends Resource
 
 # Core scoring
 @export var score: int = 0
-@export var rank_index: int = 0  # 0=Ensign through 9=Admiral
+@export var rank_index: int = 0 # 0=Ensign through 9=Admiral
 
 # Kill statistics
-@export var kills: int = 0  # Total valid kills
+@export var kills: int = 0 # Total valid kills
 @export var assists: int = 0
 
 # Weapon accuracy - Primary
@@ -24,11 +24,14 @@ extends Resource
 
 # Flight statistics
 @export var missions_flown: int = 0
-@export var total_flight_time: float = 0.0  # In seconds
+@export var total_flight_time: float = 0.0 # In seconds
 
 # Typed collections instead of Dictionary
 @export var earned_medals: Array[PlayerMedalEntry] = []
 @export var kills_by_ship: Array[ShipKillEntry] = []
+
+# Mission history (per-mission stats storage)
+@export var mission_history: Array[MissionStats] = []
 
 
 ## Calculate primary weapon accuracy percentage.
@@ -90,3 +93,43 @@ func award_medal(medal_resource: Resource) -> void:
 	new_entry.count = 1
 	new_entry.date_awarded = Time.get_date_string_from_system()
 	earned_medals.append(new_entry)
+
+
+# ============================================================================
+# Mission History Functions
+# ============================================================================
+
+
+## Get stats for a specific mission, or null if not found.
+func get_mission_stats(mission_id: String) -> MissionStats:
+	for entry in mission_history:
+		if entry.mission_id == mission_id:
+			return entry
+	return null
+
+
+## Save or update mission stats (overwrites if exists).
+func save_mission_stats(stats: MissionStats) -> void:
+	for i in range(mission_history.size()):
+		if mission_history[i].mission_id == stats.mission_id:
+			mission_history[i] = stats
+			return
+	mission_history.append(stats)
+
+
+## Commit mission stats to alltime totals (called from debriefing on accept).
+func commit_mission_to_alltime(stats: MissionStats) -> void:
+	score += stats.score
+	kills += stats.kills
+	assists += stats.assists
+	p_shots_fired += stats.primary_shots_fired
+	p_shots_hit += stats.primary_shots_hit
+	s_shots_fired += stats.secondary_shots_fired
+	s_shots_hit += stats.secondary_shots_hit
+	bonehead_hits += stats.bonehead_hits
+	bonehead_kills += stats.bonehead_kills
+	missions_flown += 1
+
+	# Merge per-ship kills
+	for ship_kill in stats.kills_by_ship:
+		add_ship_kill(ship_kill.ship_class_id, ship_kill.kill_count)

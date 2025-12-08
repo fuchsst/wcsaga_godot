@@ -50,6 +50,7 @@ horizontal_alignment = 1
 layout_mode = 2
 
 [node name="TabContainer" type="TabContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 current_tab = 0
@@ -216,5 +217,6 @@ theme_override_constants/separation = 20
 alignment = 2
 
 [node name="CloseButton" type="Button" parent="BackgroundPanel/MarginContainer/VBoxContainer/FooterButtons"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "CLOSE"

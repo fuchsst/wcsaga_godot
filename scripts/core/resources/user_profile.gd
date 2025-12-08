@@ -1,7 +1,7 @@
 class_name UserProfile
 extends Resource
-## Player profile resource containing identity, statistics, and campaign progress.
-## Settings (audio, video, controls) are managed by GlobalSettings.gd.
+## Player profile resource containing identity, statistics, campaign progress,
+## and per-profile settings (audio, input, gameplay).
 
 # Rank calculation thresholds (matching legacy scoring.h)
 const RANK_THRESHOLDS: Array[int] = [0, 200, 600, 1500, 3000, 6000, 12000, 50000, 100000, 200000]
@@ -36,10 +36,15 @@ const RANK_NAMES: Array[String] = [
 @export var active_timeline_year: int = 2654
 @export var flags: int = 0
 
+# Per-profile settings (audio, input, gameplay)
+@export var settings: GameSettings
+
 
 func _init() -> void:
 	if stats == null:
 		stats = PlayerStats.new()
+	if settings == null:
+		settings = GameSettings.new()
 
 
 ## Calculate and update rank based on score.
@@ -116,5 +121,18 @@ func duplicate_profile() -> UserProfile:
 			entry_copy.ship_class_id = kill_entry.ship_class_id
 			entry_copy.kill_count = kill_entry.kill_count
 			copy.stats.kills_by_ship.append(entry_copy)
+		# Copy mission history
+		for mission_entry in stats.mission_history:
+			var mission_copy := MissionStats.new()
+			mission_copy.mission_id = mission_entry.mission_id
+			mission_copy.score = mission_entry.score
+			mission_copy.kills = mission_entry.kills
+			mission_copy.assists = mission_entry.assists
+			mission_copy.completed_at = mission_entry.completed_at
+			copy.stats.mission_history.append(mission_copy)
+
+	# Deep copy settings
+	if settings:
+		copy.settings = settings.duplicate_settings()
 
 	return copy

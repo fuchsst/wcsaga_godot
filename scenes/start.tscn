@@ -1,7 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://ddgh7610sax0p"]
+[gd_scene load_steps=2 format=3 uid="uid://ddgh7610sax0p"]
 
 [ext_resource type="Script" uid="uid://bpcdpcxi53mm0" path="res://scenes/ui/main_menu/Start.gd" id="1_start"]
-[ext_resource type="Texture2D" uid="uid://cgljctqb483qk" path="res://scenes/ui/background.png" id="2_u80x2"]
 
 [node name="Start" type="Control"]
 layout_mode = 3
@@ -12,19 +11,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_start")
 
-[node name="TextureRect" type="TextureRect" parent="."]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -640.0
-offset_top = -400.0
-offset_right = 640.0
-offset_bottom = 400.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("2_u80x2")
-expand_mode = 3
-stretch_mode = 5
+[node name="TextureRect" type="VideoStreamPlayer" parent="."]
+layout_mode = 0
+scale = Vector2(2.5078125, 3.1250002)
+metadata/_edit_group_ = true
