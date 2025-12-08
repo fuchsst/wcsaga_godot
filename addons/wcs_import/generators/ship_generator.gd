@@ -34,7 +34,7 @@ func generate(ships: Array, output_dir: String, source_root: String) -> bool:
 			return false
 
 		# Pass --textures flag for models
-		if not _convert_asset(pof_source, ship_dir, "model"):
+		if not _convert_asset(pof_source, ship_dir, "model", ["--textures"]):
 			push_error("Error: Failed to convert POF: " + pof_source)
 			return false
 

@@ -29,6 +29,7 @@ TimelineDatabase="*res://resources/campaign_index/TimelineDatabase.gd"
 IFFManager="*res://autoload/IFFManager.gd"
 SpeciesManager="*res://autoload/SpeciesManager.gd"
 AudioManager="*res://autoload/AudioManager.gd"
+CollisionManager="*res://autoload/CollisionManager.gd"
 
 [display]
 
