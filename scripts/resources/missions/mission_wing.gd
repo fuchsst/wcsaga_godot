@@ -8,6 +8,8 @@ const MissionEnums = preload("res://scripts/resources/missions/mission_enums.gd"
 @export var special_ship: String = "" # Special ship class for this wing
 @export var waves: int = 1 # Number of waves
 @export var wave_threshold: int = 0 # Wave arrival threshold
+@export var wave_delay_min: int = 0 # Minimum delay between waves
+@export var wave_delay_max: int = 0 # Maximum delay between waves
 
 @export var arrival_location: MissionEnums.ArrivalLocation = MissionEnums.ArrivalLocation.HYPERSPACE
 @export var arrival_cue: String = "" # SEXP arrival condition

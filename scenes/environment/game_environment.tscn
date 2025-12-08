@@ -1,0 +1,21 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/environment/environment_manager.gd" id="1_env_manager"]
+[ext_resource type="PackedScene" path="res://scenes/environment/starfield.tscn" id="2_starfield"]
+[ext_resource type="PackedScene" path="res://scenes/environment/sun.tscn" id="3_sun"]
+[ext_resource type="PackedScene" path="res://scenes/environment/nebula.tscn" id="4_nebula"]
+
+[node name="GameEnvironment" type="Node3D"]
+script = ExtResource("1_env_manager")
+ambient_color = Color(0.1, 0.1, 0.15, 1)
+ambient_energy = 0.3
+star_density = 1.0
+volumetric_effects = true
+dynamic_lighting = true
+
+[node name="Starfield" parent="." instance=ExtResource("2_starfield")]
+
+[node name="Sun" parent="." instance=ExtResource("3_sun")]
+
+[node name="Nebula" parent="." instance=ExtResource("4_nebula")]
+visible = false

@@ -1,0 +1,23 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/environment/starfield_controller.gd" id="1_starfield"]
+
+[node name="Starfield" type="Node3D"]
+script = ExtResource("1_starfield")
+num_layers = 3
+stars_per_layer = 1000
+star_sphere_radius = 1000.0
+min_brightness = 0.3
+max_brightness = 1.0
+min_star_size = 0.5
+max_star_size = 3.0
+color_variance = 0.2
+parallax_strength = 0.1
+layer_depth_scale = 1.5
+enable_twinkle = true
+twinkle_frequency = 0.5
+twinkle_intensity = 0.15
+debris_enabled = true
+max_debris = 200
+debris_base_size = 0.12
+debris_nebula_size = 0.5

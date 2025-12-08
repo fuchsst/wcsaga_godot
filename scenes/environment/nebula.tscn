@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/environment/nebula_controller.gd" id="1_nebula"]
+
+[node name="Nebula" type="Node3D"]
+script = ExtResource("1_nebula")
+fog_enabled = true
+particles_enabled = true
+max_particles = 1000
+lod_distance = 500.0

@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/environment/sun_controller.gd" id="1_sun"]
+
+[node name="Sun" type="Node3D"]
+script = ExtResource("1_sun")
+sun_distance = 800.0
+sun_direction = Vector3(1, 0.5, -1)
+base_scale = 100.0
+corona_intensity = 1.0
+flare_visibility_threshold = 0.0
+enable_pulse = true
+pulse_frequency = 0.1
+pulse_intensity = 0.05
