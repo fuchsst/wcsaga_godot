@@ -4,9 +4,9 @@ extends LimboHSM
 # Manages high-level game states using Hierarchical State Machine
 
 # State Nodes (use aliases to avoid shadowing global classes)
-const IntroStateClass = preload("res://scripts/game_state/states/GameStateIntro.gd")
-const MainMenuStateClass = preload("res://scripts/game_state/states/GameStateMainMenu.gd")
-const GameplayStateClass = preload("res://scripts/game_state/states/GameStateGameplay.gd")
+const IntroStateClass = preload("res://scripts/core/game_state/states/GameStateIntro.gd")
+const MainMenuStateClass = preload("res://scripts/core/game_state/states/GameStateMainMenu.gd")
+const GameplayStateClass = preload("res://scripts/core/game_state/states/GameStateGameplay.gd")
 
 var state_intro: IntroStateClass
 var state_main_menu: MainMenuStateClass

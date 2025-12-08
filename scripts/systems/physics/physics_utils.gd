@@ -43,7 +43,7 @@ static func velocity_ramp(
 		return v_in
 
 	var delta_v := v_goal - v_in
-	var dist := abs(delta_v)
+	var dist := absf(delta_v)
 
 	# Speed up closure when close to goal
 	var effective_ramp := ramp_time_const

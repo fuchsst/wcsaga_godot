@@ -1,14 +1,14 @@
 extends GdUnitTestSuite
 
-func test_ship_initialization() -> void:
-	var ship = Ship.new()
+func test_ship_entity_initialization() -> void:
+	var ship = ShipEntity.new()
 	assert_object(ship).is_not_null()
-	assert_float(ship.max_speed).is_equal(100.0)
-	assert_float(ship.gravity_scale).is_equal(0.0)
+	# ShipEntity is a physics body, check it exists
+	assert_bool(ship is WCSPhysicsBody).is_true()
 	ship.free()
 
-func test_ship_inheritance() -> void:
-	var ship = Ship.new()
-	assert_bool(ship is GameEntity).is_true()
-	assert_bool(ship is RigidBody3D).is_true()
+func test_ship_entity_inheritance() -> void:
+	var ship = ShipEntity.new()
+	assert_bool(ship is WCSPhysicsBody).is_true()
+	assert_bool(ship is CharacterBody3D).is_true()
 	ship.free()

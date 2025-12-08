@@ -72,6 +72,12 @@ func _setup_default_mappings() -> void:
 		key.keycode = KEY_CTRL
 		InputMap.action_add_event("ship_fire_secondary", key)
 
+	if not InputMap.has_action("ship_afterburner"):
+		InputMap.add_action("ship_afterburner")
+		var key = InputEventKey.new()
+		key.keycode = KEY_TAB
+		InputMap.action_add_event("ship_afterburner", key)
+
 func get_thrust_input() -> float:
 	return Input.get_axis("ship_thrust_backward", "ship_thrust_forward")
 

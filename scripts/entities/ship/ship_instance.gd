@@ -54,7 +54,6 @@ var performance_stats: Dictionary = {
 	"physics_updates": 0,
 	"collision_checks": 0,
 	"weapon_fires": 0,
-	"weapon_fires": 0,
 	"damage_applications": 0
 }
 

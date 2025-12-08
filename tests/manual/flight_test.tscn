@@ -1,0 +1,52 @@
+[gd_scene load_steps=6 format=3 uid="uid://bp7ljfnbj0aqg"]
+
+[ext_resource type="PackedScene" uid="uid://shipbasetemplate" path="res://scenes/entities/ship/ship_base.tscn" id="1_ship"]
+[ext_resource type="Script" path="res://scripts/entities/ship/controllers/player_ship_controller.gd" id="2_controller"]
+[ext_resource type="Script" path="res://scripts/core/camera/wcs_camera_controller.gd" id="3_camera"]
+
+[sub_resource type="GDScript" id="GDScript_setup"]
+script/source = "extends Node3D
+
+func _ready():
+	var ship = $PlayerShip
+	var camera = $WCSCameraController
+	var controller = $PlayerShip/PlayerShipController
+	
+	# Setup Camera
+	camera.set_host(ship)
+	
+	print(\"Flight Test Initialized. Use W/S for throttle, Arrows/Mouse for turn.\")
+"
+
+[sub_resource type="Environment" id="Environment_test"]
+background_mode = 1
+background_color = Color(0.1, 0.1, 0.1, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.5, 0.5, 0.5, 1)
+
+[node name="FlightTest" type="Node3D"]
+script = SubResource("GDScript_setup")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_test")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, -0.75, 0.433013, 0, 10, 0)
+
+[node name="PlayerShip" parent="." instance=ExtResource("1_ship")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+ship_name = "Player 1"
+
+[node name="PlayerShipController" type="Node" parent="PlayerShip"]
+script = ExtResource("2_controller")
+ship = NodePath("..")
+
+[node name="WCSCameraController" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 20, 30)
+current = true
+script = ExtResource("3_camera")
+external_distance = 30.0
+
+[node name="TestTarget" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -100)
+size = Vector3(10, 10, 10)
