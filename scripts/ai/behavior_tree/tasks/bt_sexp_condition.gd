@@ -12,6 +12,15 @@ class_name BTSexpCondition
 @export var arguments: Array = []
 
 
+func _get_mission_manager() -> Node:
+	"""Get MissionManager autoload safely for @tool scripts"""
+	if Engine.is_editor_hint():
+		return null
+	return (
+		Engine.get_singleton("MissionManager") if Engine.has_singleton("MissionManager") else null
+	)
+
+
 func _tick(_delta: float) -> Status:
 	match operator_id:
 		# Boolean atoms
@@ -76,7 +85,8 @@ func _check_is_destroyed() -> Status:
 	if ship_name.is_empty():
 		return FAILURE
 
-	if MissionManager and MissionManager.is_entity_destroyed(ship_name):
+	var mm = _get_mission_manager()
+	if mm and mm.is_entity_destroyed(ship_name):
 		return SUCCESS
 	return FAILURE
 
@@ -86,19 +96,21 @@ func _check_has_arrived() -> Status:
 	if ship_name.is_empty():
 		return FAILURE
 
-	if MissionManager and MissionManager.is_entity_arrived(ship_name):
+	var mm = _get_mission_manager()
+	if mm and mm.is_entity_arrived(ship_name):
 		return SUCCESS
 	return FAILURE
 
 
 func _check_has_arrived_delay() -> Status:
 	var ship_name = _get_arg(0)
-	var delay = _get_arg_float(1, 0.0)
+	var _delay = _get_arg_float(1, 0.0)
 
 	if ship_name.is_empty():
 		return FAILURE
 
-	if MissionManager and MissionManager.is_entity_arrived(ship_name):
+	var mm = _get_mission_manager()
+	if mm and mm.is_entity_arrived(ship_name):
 		# TODO: Check delay since arrival
 		return SUCCESS
 	return FAILURE
@@ -110,10 +122,11 @@ func _check_has_departed() -> Status:
 		return FAILURE
 
 	# Check if entity arrived previously but no longer exists
-	if MissionManager:
-		var entity = MissionManager.get_entity(ship_name)
+	var mm = _get_mission_manager()
+	if mm:
+		var entity = mm.get_entity(ship_name)
 		# If we had it but it's gone (and not destroyed), it departed
-		if entity == null and MissionManager.entity_registry.has(ship_name):
+		if entity == null and mm.entity_registry.has(ship_name):
 			return SUCCESS
 	return FAILURE
 
@@ -123,8 +136,9 @@ func _check_is_disabled() -> Status:
 	if ship_name.is_empty():
 		return FAILURE
 
-	if MissionManager:
-		var entity = MissionManager.get_entity(ship_name)
+	var mm = _get_mission_manager()
+	if mm:
+		var entity = mm.get_entity(ship_name)
 		if entity and entity.has_method("is_disabled") and entity.is_disabled():
 			return SUCCESS
 	return FAILURE
@@ -135,8 +149,9 @@ func _check_is_disarmed() -> Status:
 	if ship_name.is_empty():
 		return FAILURE
 
-	if MissionManager:
-		var entity = MissionManager.get_entity(ship_name)
+	var mm = _get_mission_manager()
+	if mm:
+		var entity = mm.get_entity(ship_name)
 		if entity and entity.has_method("is_disarmed") and entity.is_disarmed():
 			return SUCCESS
 	return FAILURE
@@ -147,8 +162,9 @@ func _check_event_status(expect_true: bool) -> Status:
 	if event_name.is_empty():
 		return FAILURE
 
-	if MissionManager:
-		var fire_count = MissionManager.get_event_fire_count(event_name)
+	var mm = _get_mission_manager()
+	if mm:
+		var fire_count = mm.get_event_fire_count(event_name)
 		if expect_true and fire_count > 0:
 			return SUCCESS
 		elif not expect_true and fire_count == 0:
@@ -182,7 +198,8 @@ func _check_greater_than() -> Status:
 
 func _check_time_elapsed() -> Status:
 	var seconds = _get_arg_float(0, 0.0)
-	if MissionManager and MissionManager.mission_time >= seconds:
+	var mm = _get_mission_manager()
+	if mm and mm.mission_time >= seconds:
 		return SUCCESS
 	return FAILURE
 

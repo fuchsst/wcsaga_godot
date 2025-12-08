@@ -45,11 +45,20 @@ var goal_status: Dictionary = {}
 ## Event tracking: event_name -> times_fired
 var event_fire_count: Dictionary = {}
 
+## Logic Execution
+var bt_player: BTPlayer = null
+
 # === LIFECYCLE ===
 
 
 func _ready() -> void:
 	add_to_group("mission_manager")
+	
+	# Setup logic player
+	bt_player = BTPlayer.new()
+	bt_player.name = "MissionLogicPlayer"
+	bt_player.active = false
+	add_child(bt_player)
 
 
 func _process(delta: float) -> void:
@@ -69,6 +78,13 @@ func load_mission(mission_path: String) -> bool:
 
 	current_mission = manifest
 	_reset_mission_state()
+	
+	# Load logic tree if present
+	if current_mission.mission_logic:
+		bt_player.behavior_tree = current_mission.mission_logic
+		bt_player.agent = self # Manager is the agent
+	else:
+		bt_player.behavior_tree = null
 
 	mission_loaded.emit(manifest)
 	print("MissionManager: Loaded mission - " + manifest.mission_title)
@@ -92,6 +108,13 @@ func start_mission() -> void:
 
 	# Initialize mission variables
 	_initialize_variables()
+	
+	# Start Logic
+	if bt_player.behavior_tree:
+		bt_player.active = true
+		print("MissionManager: Started Mission Logic Tree")
+	else:
+		print("MissionManager: No logic tree for this mission")
 
 	mission_started.emit()
 	print("MissionManager: Mission started - " + current_mission.mission_title)
@@ -100,6 +123,8 @@ func start_mission() -> void:
 func end_mission(success: bool) -> void:
 	"""End the current mission"""
 	mission_active = false
+	if bt_player:
+		bt_player.active = false
 	mission_ended.emit(success)
 	print("MissionManager: Mission ended - Success: " + str(success))
 
@@ -107,6 +132,9 @@ func end_mission(success: bool) -> void:
 func unload_mission() -> void:
 	"""Unload current mission and clean up"""
 	mission_active = false
+	if bt_player:
+		bt_player.active = false
+		bt_player.behavior_tree = null
 
 	# Despawn all entities
 	for entity_name in entity_registry.keys():
@@ -323,7 +351,7 @@ func _find_ship_scene(ship_stats: Resource) -> String:
 		if ResourceLoader.exists(path):
 			return path
 
-	return ""
+	return "res://scenes/entities/ship/ship_base.tscn"
 
 
 func _on_entity_destroyed(entity: Node, mission_object: MissionObject) -> void:

@@ -1,0 +1,18 @@
+[gd_resource type="BehaviorTree" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/ai/tasks/mission/bt_check_goal.gd" id="1_o8ie0"]
+[ext_resource type="Script" path="res://scripts/ai/tasks/mission/bt_trigger_event.gd" id="2_2gyg4"]
+
+[sub_resource type="BTCondition" id="BTCondition_jnig8"]
+script = ExtResource("1_o8ie0")
+goal_name_var = "goal_to_check"
+
+[sub_resource type="BTAction" id="BTAction_vd7hx"]
+script = ExtResource("2_2gyg4")
+event_name_var = "success_event"
+
+[sub_resource type="BTSequence" id="BTSequence_mk8wy"]
+children = [SubResource("BTCondition_jnig8"), SubResource("BTAction_vd7hx")]
+
+[resource]
+root_task = SubResource("BTSequence_mk8wy")

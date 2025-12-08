@@ -1,27 +1,12 @@
 extends Resource
 class_name MissionManifest
 
-const MissionObject = preload("res://scripts/resources/missions/mission_object.gd")
-const MissionWing = preload("res://scripts/resources/missions/mission_wing.gd")
-const MissionEvent = preload("res://scripts/resources/missions/mission_event.gd")
-const MissionGoal = preload("res://scripts/resources/missions/mission_goal.gd")
-const MissionMessage = preload("res://scripts/resources/missions/mission_message.gd")
-const MissionCutscene = preload("res://scripts/resources/missions/mission_cutscene.gd")
-const BackgroundData = preload("res://scripts/resources/missions/background_data.gd")
-const AsteroidField = preload("res://scripts/resources/missions/asteroid_field.gd")
-const PlayerData = preload("res://scripts/resources/missions/player_data.gd")
-const BriefingStage = preload("res://scripts/resources/missions/briefing_stage.gd")
-const DebriefingStage = preload("res://scripts/resources/missions/debriefing_stage.gd")
-const CommandBriefingStage = preload("res://scripts/resources/missions/command_briefing_stage.gd")
-const MissionEnums = preload("res://scripts/resources/missions/mission_enums.gd")
-const MissionMetadata = preload("res://scripts/resources/missions/mission_metadata.gd")
-const SexpVariable = preload("res://scripts/resources/missions/sexp_variable.gd")
-const WaypointList = preload("res://scripts/resources/missions/waypoint_list.gd")
 
 ## Root resource for a converted FS2 mission
 
 @export var mission_name: String = ""
 @export var mission_id: String = "" # Filename without extension, useful ID
+@export var mission_logic: BehaviorTree = null # Converted LimboAI logic tree
 # @export var source_file: String = "" # Removed as per feedback
 
 # Metadata

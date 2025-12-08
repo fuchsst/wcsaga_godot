@@ -1,0 +1,16 @@
+[gd_resource type="BehaviorTree" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/ai/behavior_tree/tasks/bt_fly_to_position.gd" id="1_86i5t"]
+
+[sub_resource type="BTAction" id="BTAction_rsf4h"]
+script = ExtResource("1_86i5t")
+target_pos_var = "waypoint"
+
+[sub_resource type="BTWait" id="BTWait_qyg3r"]
+duration = 2.0
+
+[sub_resource type="BTSequence" id="BTSequence_5npmn"]
+children = [SubResource("BTAction_rsf4h"), SubResource("BTWait_qyg3r")]
+
+[resource]
+root_task = SubResource("BTSequence_5npmn")

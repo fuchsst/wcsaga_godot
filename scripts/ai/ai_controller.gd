@@ -6,16 +6,16 @@ class_name AIController
 extends Node
 
 ## AI State
-@export var behavior_tree: BehaviorTree = null ## Currently active behavior tree
-@export var ai_class: AIClassResource = null ## AI class configuration
+@export var behavior_tree: BehaviorTree = null  ## Currently active behavior tree
+@export var ai_class: AIClassResource = null  ## AI class configuration
 
 ## References
-var ship: Node = null ## Parent ship entity
-var bt_player: BTPlayer = null ## LimboAI Behavior Tree player
-var blackboard: Blackboard = null ## Shared data for BT
+var ship: Node = null  ## Parent ship entity
+var bt_player: BTPlayer = null  ## LimboAI Behavior Tree player
+var blackboard: Blackboard = null  ## Shared data for BT
 
 ## Goal system (mirrors WCS ai_goal structure)
-var active_goals: Array = [] ## Array of goal dictionaries
+var active_goals: Array = []  ## Array of goal dictionaries
 var current_goal_index: int = 0
 
 ## Combat state
@@ -26,7 +26,14 @@ var waypoint_index: int = 0
 
 ## Timing
 var next_think_time: float = 0.0
-var think_interval: float = 0.1 ## How often AI makes decisions
+var think_interval: float = 0.1  ## How often AI makes decisions
+
+
+func _get_mission_manager() -> Node:
+	"""Get MissionManager autoload safely"""
+	return (
+		Engine.get_singleton("MissionManager") if Engine.has_singleton("MissionManager") else null
+	)
 
 
 func _ready() -> void:
@@ -158,8 +165,9 @@ func _populate_blackboard() -> void:
 	blackboard.set_var("waypoint_index", 0)
 
 	# Mission manager reference
-	if MissionManager:
-		blackboard.set_var("mission_manager", MissionManager)
+	var mm = _get_mission_manager()
+	if mm:
+		blackboard.set_var("mission_manager", mm)
 
 
 func _update_blackboard() -> void:
@@ -240,7 +248,8 @@ func _process_goal(goal: Dictionary) -> void:
 
 	# Resolve target if needed
 	if target_name and not target_entity:
-		if MissionManager:
-			var entity = MissionManager.get_entity(target_name)
+		var mm = _get_mission_manager()
+		if mm:
+			var entity = mm.get_entity(target_name)
 			if entity:
 				set_target(entity)

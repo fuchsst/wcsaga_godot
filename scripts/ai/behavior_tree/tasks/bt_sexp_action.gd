@@ -12,6 +12,15 @@ class_name BTSexpAction
 @export var arguments: Array = []
 
 
+func _get_mission_manager() -> Node:
+	"""Get MissionManager autoload safely for @tool scripts"""
+	if Engine.is_editor_hint():
+		return null
+	return (
+		Engine.get_singleton("MissionManager") if Engine.has_singleton("MissionManager") else null
+	)
+
+
 func _tick(_delta: float) -> Status:
 	match operator_id:
 		# No-op
@@ -103,29 +112,31 @@ func _generate_name() -> String:
 
 func _action_end_mission() -> Status:
 	var success = _get_arg(0) != "false"
-	if MissionManager:
-		MissionManager.end_mission(success)
+	var mm = _get_mission_manager()
+	if mm:
+		mm.end_mission(success)
 	return SUCCESS
 
 
 func _action_next_mission() -> Status:
 	var mission_name = _get_arg(0)
-	# Store in MissionManager for campaign to pick up
-	if MissionManager:
-		MissionManager.set_variable("next_mission", mission_name)
+	var mm = _get_mission_manager()
+	if mm:
+		mm.set_variable("next_mission", mission_name)
 	return SUCCESS
 
 
 func _action_end_campaign() -> Status:
-	if MissionManager:
-		MissionManager.set_variable("campaign_complete", true)
-		MissionManager.end_mission(true)
+	var mm = _get_mission_manager()
+	if mm:
+		mm.set_variable("campaign_complete", true)
+		mm.end_mission(true)
 	return SUCCESS
 
 
 func _action_send_message() -> Status:
 	var sender = _get_arg(0)
-	var priority = _get_arg(1)
+	var _priority = _get_arg(1)
 	var message_name = _get_arg(2)
 
 	# TODO: Route to message display system
@@ -145,8 +156,9 @@ func _action_add_goal() -> Status:
 	var goal_type = _get_arg(1)
 	var priority = _get_arg_int(2, 50)
 
-	if MissionManager:
-		var entity = MissionManager.get_entity(ship_name)
+	var mm = _get_mission_manager()
+	if mm:
+		var entity = mm.get_entity(ship_name)
 		if entity:
 			var ai_controller = entity.get_node_or_null("AIController")
 			if ai_controller and ai_controller.has_method("add_goal"):
@@ -159,8 +171,9 @@ func _action_add_wing_goal() -> Status:
 	var goal_type = _get_arg(1)
 	var priority = _get_arg_int(2, 50)
 
-	if MissionManager:
-		var entities = MissionManager.get_wing_entities(wing_name)
+	var mm = _get_mission_manager()
+	if mm:
+		var entities = mm.get_wing_entities(wing_name)
 		for entity in entities:
 			var ai_controller = entity.get_node_or_null("AIController")
 			if ai_controller and ai_controller.has_method("add_goal"):
@@ -171,8 +184,9 @@ func _action_add_wing_goal() -> Status:
 func _action_clear_goals() -> Status:
 	var ship_name = _get_arg(0)
 
-	if MissionManager:
-		var entity = MissionManager.get_entity(ship_name)
+	var mm = _get_mission_manager()
+	if mm:
+		var entity = mm.get_entity(ship_name)
 		if entity:
 			var ai_controller = entity.get_node_or_null("AIController")
 			if ai_controller and ai_controller.has_method("clear_goals"):
@@ -182,22 +196,25 @@ func _action_clear_goals() -> Status:
 
 func _action_validate_goal() -> Status:
 	var goal_name = _get_arg(0)
-	if MissionManager:
-		MissionManager.set_goal_status(goal_name, 1)  # Complete
+	var mm = _get_mission_manager()
+	if mm:
+		mm.set_goal_status(goal_name, 1)  # Complete
 	return SUCCESS
 
 
 func _action_invalidate_goal() -> Status:
 	var goal_name = _get_arg(0)
-	if MissionManager:
-		MissionManager.set_goal_status(goal_name, 2)  # Failed
+	var mm = _get_mission_manager()
+	if mm:
+		mm.set_goal_status(goal_name, 2)  # Failed
 	return SUCCESS
 
 
 func _action_set_invulnerable(invulnerable: bool) -> Status:
 	var ship_name = _get_arg(0)
-	if MissionManager:
-		var entity = MissionManager.get_entity(ship_name)
+	var mm = _get_mission_manager()
+	if mm:
+		var entity = mm.get_entity(ship_name)
 		if entity and "invulnerable" in entity:
 			entity.invulnerable = invulnerable
 	return SUCCESS
@@ -205,8 +222,9 @@ func _action_set_invulnerable(invulnerable: bool) -> Status:
 
 func _action_protect_ship(protect: bool) -> Status:
 	var ship_name = _get_arg(0)
-	if MissionManager:
-		var entity = MissionManager.get_entity(ship_name)
+	var mm = _get_mission_manager()
+	if mm:
+		var entity = mm.get_entity(ship_name)
 		if entity and "protected" in entity:
 			entity.protected = protect
 	return SUCCESS
@@ -214,8 +232,9 @@ func _action_protect_ship(protect: bool) -> Status:
 
 func _action_shields(enabled: bool) -> Status:
 	var ship_name = _get_arg(0)
-	if MissionManager:
-		var entity = MissionManager.get_entity(ship_name)
+	var mm = _get_mission_manager()
+	if mm:
+		var entity = mm.get_entity(ship_name)
 		if entity and "shields_enabled" in entity:
 			entity.shields_enabled = enabled
 	return SUCCESS
@@ -223,8 +242,9 @@ func _action_shields(enabled: bool) -> Status:
 
 func _action_stealth(stealthy: bool) -> Status:
 	var ship_name = _get_arg(0)
-	if MissionManager:
-		var entity = MissionManager.get_entity(ship_name)
+	var mm = _get_mission_manager()
+	if mm:
+		var entity = mm.get_entity(ship_name)
 		if entity and "stealthy" in entity:
 			entity.stealthy = stealthy
 	return SUCCESS
@@ -233,36 +253,39 @@ func _action_stealth(stealthy: bool) -> Status:
 func _action_set_variable() -> Status:
 	var var_name = _get_arg(0)
 	var value = _get_arg(1)
-	if MissionManager:
-		MissionManager.set_variable(var_name, value)
+	var mm = _get_mission_manager()
+	if mm:
+		mm.set_variable(var_name, value)
 	return SUCCESS
 
 
 func _action_modify_variable() -> Status:
 	var var_name = _get_arg(0)
 	var delta = _get_arg_float(1, 0.0)
-	if MissionManager:
-		var current = MissionManager.get_variable(var_name, 0.0)
+	var mm = _get_mission_manager()
+	if mm:
+		var current = mm.get_variable(var_name, 0.0)
 		if current is float or current is int:
-			MissionManager.set_variable(var_name, float(current) + delta)
+			mm.set_variable(var_name, float(current) + delta)
 	return SUCCESS
 
 
 func _action_warp_in() -> Status:
 	var ship_name = _get_arg(0)
-	# Find mission object and spawn
-	if MissionManager and MissionManager.current_mission:
-		for obj in MissionManager.current_mission.objects:
+	var mm = _get_mission_manager()
+	if mm and mm.current_mission:
+		for obj in mm.current_mission.objects:
 			if obj.object_name == ship_name:
-				MissionManager.spawn_entity(obj)
+				mm.spawn_entity(obj)
 				break
 	return SUCCESS
 
 
 func _action_warp_out() -> Status:
 	var ship_name = _get_arg(0)
-	if MissionManager:
-		var entity = MissionManager.get_entity(ship_name)
+	var mm = _get_mission_manager()
+	if mm:
+		var entity = mm.get_entity(ship_name)
 		if entity and entity.has_method("warp_out"):
 			entity.warp_out()
 		elif entity:
@@ -272,15 +295,16 @@ func _action_warp_out() -> Status:
 
 func _action_ship_vanish() -> Status:
 	var ship_name = _get_arg(0)
-	if MissionManager:
-		var entity = MissionManager.get_entity(ship_name)
+	var mm = _get_mission_manager()
+	if mm:
+		var entity = mm.get_entity(ship_name)
 		if entity:
 			entity.queue_free()
 	return SUCCESS
 
 
 func _action_change_music() -> Status:
-	var music_type = _get_arg(0)
+	var _music_type = _get_arg(0)
 	# TODO: Route to AudioManager
 	return SUCCESS
 
@@ -291,7 +315,7 @@ func _action_grant_promotion() -> Status:
 
 
 func _action_grant_medal() -> Status:
-	var medal_name = _get_arg(0)
+	var _medal_name = _get_arg(0)
 	# TODO: Route to ProfileManager
 	return SUCCESS
 

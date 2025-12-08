@@ -17,6 +17,13 @@ var mission_time: float = 0.0
 var is_running: bool = false
 
 
+func _get_mission_manager() -> Node:
+	"""Get MissionManager autoload safely"""
+	return (
+		Engine.get_singleton("MissionManager") if Engine.has_singleton("MissionManager") else null
+	)
+
+
 func _ready() -> void:
 	blackboard = Blackboard.new()
 	_populate_blackboard()
@@ -99,7 +106,8 @@ func _populate_blackboard() -> void:
 		return
 
 	blackboard.set_var("mission_time", 0.0)
-	blackboard.set_var("mission_manager", MissionManager if MissionManager else null)
+	var mm = _get_mission_manager()
+	blackboard.set_var("mission_manager", mm)
 
 	# Mission metadata
 	if mission:
@@ -147,9 +155,10 @@ func _setup_arrival_checkers() -> void:
 	if not mission or not "objects" in mission:
 		return
 
+	var mm = _get_mission_manager()
 	for obj in mission.objects:
 		# Skip if already spawned or no cue
-		if MissionManager and MissionManager.is_entity_arrived(obj.object_name):
+		if mm and mm.is_entity_arrived(obj.object_name):
 			continue
 
 		if "arrival_cue_bt" in obj and obj.arrival_cue_bt:
@@ -165,7 +174,8 @@ func _setup_arrival_checkers() -> void:
 
 func _check_pending_arrivals() -> void:
 	"""Check if any pending arrivals should spawn"""
-	if not mission or not MissionManager:
+	var mm = _get_mission_manager()
+	if not mission or not mm:
 		return
 
 	var to_remove: Array[String] = []
@@ -182,7 +192,7 @@ func _check_pending_arrivals() -> void:
 			# Find the mission object and spawn it
 			for obj in mission.objects:
 				if obj.object_name == obj_name:
-					MissionManager.spawn_entity(obj)
+					mm.spawn_entity(obj)
 					break
 
 			player.queue_free()

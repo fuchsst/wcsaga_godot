@@ -1,0 +1,18 @@
+[gd_resource type="BehaviorTree" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/ai/tasks/mission/bt_check_arrived.gd" id="1_yob0q"]
+[ext_resource type="Script" path="res://scripts/ai/tasks/mission/bt_trigger_event.gd" id="2_vy7ix"]
+
+[sub_resource type="BTCondition" id="BTCondition_k5ghc"]
+script = ExtResource("1_yob0q")
+object_name_var = "arrival_object"
+
+[sub_resource type="BTAction" id="BTAction_gs1gn"]
+script = ExtResource("2_vy7ix")
+event_name_var = "arrival_event"
+
+[sub_resource type="BTSequence" id="BTSequence_cwcbf"]
+children = [SubResource("BTCondition_k5ghc"), SubResource("BTAction_gs1gn")]
+
+[resource]
+root_task = SubResource("BTSequence_cwcbf")

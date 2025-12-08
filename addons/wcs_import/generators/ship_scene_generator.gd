@@ -26,13 +26,13 @@ func generate(res: Resource, output_dir: String, source_root: String) -> bool:
     # Ensure directory exists
     DirAccess.make_dir_recursive_absolute(ship_dir)
     
-    # 2. Create Root Node
-    var ShipEntity = load("res://scripts/entities/ship/ship_entity.gd")
-    if not ShipEntity:
-        print("Error: Could not load ShipEntity script")
+    # 2. Create Root Instance from Base Scene
+    var base_scene = load("res://scenes/entities/ship/ship_base.tscn")
+    if not base_scene:
+        print("Error: Could not load ship_base.tscn")
         return false
         
-    var ship_node = ShipEntity.new()
+    var ship_node = base_scene.instantiate()
     ship_node.name = filename # e.g. "hellcat_v"
     ship_node.ship_name = res.display_name if not res.display_name.is_empty() else res.ship_class
     ship_node.stats = res # Assign stats
@@ -55,16 +55,26 @@ func generate(res: Resource, output_dir: String, source_root: String) -> bool:
         if model_scene:
             var model_instance = model_scene.instantiate()
             model_instance.name = "Model"
-            ship_node.add_child(model_instance)
-            model_instance.owner = ship_node # Required for saving
+            
+            # Add to ModelContainer if it exists (from ship_base)
+            var container = ship_node.get_node_or_null("ModelContainer")
+            if container:
+                container.add_child(model_instance)
+                model_instance.owner = ship_node # Required for saving
+            else:
+                ship_node.add_child(model_instance)
+                model_instance.owner = ship_node
     else:
         print("Error: Could not locate model for " + res.ship_class)
-        # Continue anyway to generate the node structure? No, probably fail.
-        # return false
     
-    # 4. Add Collision Shape based on ship dimensions or model bounds
-    var collision = CollisionShape3D.new()
-    collision.name = "CollisionShape3D"
+    # 4. Add Collision Shape
+    # ship_base has "CollisionShape3D", we update its shape
+    var collision = ship_node.get_node_or_null("CollisionShape3D")
+    if not collision:
+        collision = CollisionShape3D.new()
+        collision.name = "CollisionShape3D"
+        ship_node.add_child(collision)
+        collision.owner = ship_node
     
     # Create collision shape based on ship length from stats or use model bounds
     var box_shape = BoxShape3D.new()
@@ -80,8 +90,6 @@ func generate(res: Resource, output_dir: String, source_root: String) -> bool:
         box_shape.size = Vector3(10, 5, 15)
     
     collision.shape = box_shape
-    ship_node.add_child(collision)
-    collision.owner = ship_node
 
     # 5. Generate Hardpoints & Visuals from ShipModelData
     if ship_node.stats.model_data:

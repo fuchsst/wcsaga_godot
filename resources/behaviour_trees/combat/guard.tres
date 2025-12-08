@@ -1,0 +1,17 @@
+[gd_resource type="BehaviorTree" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/ai/behavior_tree/tasks/bt_chase_target.gd" id="1_rhvd7"]
+[ext_resource type="Script" path="res://scripts/ai/behavior_tree/tasks/bt_fly_to_position.gd" id="2_y1bs5"]
+
+[sub_resource type="BTAction" id="BTAction_81d4j"]
+script = ExtResource("1_rhvd7")
+
+[sub_resource type="BTAction" id="BTAction_mnha0"]
+script = ExtResource("2_y1bs5")
+target_pos_var = "guard_pos"
+
+[sub_resource type="BTSelector" id="BTSelector_s15m8"]
+children = [SubResource("BTAction_81d4j"), SubResource("BTAction_mnha0")]
+
+[resource]
+root_task = SubResource("BTSelector_s15m8")

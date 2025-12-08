@@ -1,0 +1,22 @@
+[gd_resource type="BehaviorTree" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/ai/behavior_tree/tasks/bt_chase_target.gd" id="1_hhwn1"]
+[ext_resource type="Script" path="res://scripts/ai/behavior_tree/tasks/bt_fire_weapons.gd" id="2_iajb3"]
+
+[sub_resource type="BTAction" id="BTAction_nlkvs"]
+script = ExtResource("1_hhwn1")
+
+[sub_resource type="BTAction" id="BTAction_8ehd2"]
+script = ExtResource("2_iajb3")
+
+[sub_resource type="BTParallel" id="BTParallel_etmbn"]
+children = [SubResource("BTAction_nlkvs"), SubResource("BTAction_8ehd2")]
+
+[sub_resource type="BTSequence" id="BTSequence_bxfwl"]
+children = [SubResource("BTParallel_etmbn")]
+
+[sub_resource type="BTSelector" id="BTSelector_g5aj0"]
+children = [SubResource("BTSequence_bxfwl")]
+
+[resource]
+root_task = SubResource("BTSelector_g5aj0")

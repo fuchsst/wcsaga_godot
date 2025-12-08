@@ -1,7 +1,4 @@
-## ShipEntity - Complete Ship Entity with WCS-Faithful Physics
-## Extends WCSPhysicsBody for authentic flight model simulation
-## Bridges converted TRES data with Godot scene system
-
+@tool
 class_name ShipEntity
 extends WCSPhysicsBody
 
@@ -20,13 +17,13 @@ signal afterburner_state_changed(enabled: bool)
 		if is_inside_tree():
 			_initialize_from_stats()
 
-@export var team: int = 0  ## IFF team index
-@export var ship_name: String = ""  ## Instance name (e.g., "Alpha 1")
+@export var team: int = 0 ## IFF team index
+@export var ship_name: String = "" ## Instance name (e.g., "Alpha 1")
 
 # === STATE ===
 ## Hull and shields
 var current_hull: float = 100.0
-var current_shields: Array[float] = [100.0, 100.0, 100.0, 100.0]  ## Front, Left, Right, Rear
+var current_shields: Array[float] = [100.0, 100.0, 100.0, 100.0] ## Front, Left, Right, Rear
 var shield_quadrant_count: int = 4
 
 ## Energy systems
@@ -42,6 +39,10 @@ var is_destroyed: bool = false
 var last_attacker: Node = null
 var damage_feedback: Array[DamageResult] = []
 
+# === SYSTEMS ===
+const ShipWeaponSystemScript = preload("res://scripts/entities/ship/weapon_system.gd")
+var weapon_system: Node # Type hint issues with cyclic preloads, safer to use Node or weak ref
+
 # === COMPONENTS ===
 var model_node: Node3D
 var collision_shape: CollisionShape3D
@@ -56,8 +57,21 @@ func _ready() -> void:
 	add_to_group("ships")
 	add_to_group("game_entities")
 
+	# Initialize weapon system
+	weapon_system = ShipWeaponSystemScript.new()
+	weapon_system.name = "WeaponSystem"
+	add_child(weapon_system)
+	
+	# Forward weapon fired signal
+	weapon_system.weapon_fired.connect(func(_idx, secondary):
+		# TODO: We need the actual projectile scene or weapon type to emit with signal
+		# For now emitting null scene as placeholder
+		weapon_fired.emit(self, 1 if secondary else 0, null)
+	)
+
 	if stats:
 		_initialize_from_stats()
+		weapon_system.setup(self)
 	else:
 		push_warning("ShipEntity initialized without ShipStats!")
 
@@ -148,7 +162,7 @@ func _create_physics_data_from_stats() -> ShipPhysicsData:
 
 	# Glide mode
 	if stats.glide_enabled:
-		data.glide_cap = stats.max_velocity.z * 1.1  # Slightly above max normal velocity
+		data.glide_cap = stats.max_velocity.z * 1.1 # Slightly above max normal velocity
 		data.glide_accel_mult = 0.5
 
 	return data
@@ -298,7 +312,7 @@ func _apply_damage(result: DamageResult) -> void:
 
 func _get_shield_quadrant(impact_point: Vector3) -> int:
 	if impact_point == Vector3.ZERO:
-		return 0  # Default to front
+		return 0 # Default to front
 
 	# Convert to local coordinates
 	var local_point = to_local(impact_point)
@@ -307,13 +321,13 @@ func _get_shield_quadrant(impact_point: Vector3) -> int:
 	var angle = atan2(local_point.x, -local_point.z)
 
 	if angle >= -PI / 4 and angle < PI / 4:
-		return 0  # Front
+		return 0 # Front
 	elif angle >= PI / 4 and angle < 3 * PI / 4:
-		return 2  # Right
+		return 2 # Right
 	elif angle >= -3 * PI / 4 and angle < -PI / 4:
-		return 1  # Left
+		return 1 # Left
 	else:
-		return 3  # Rear
+		return 3 # Rear
 
 
 func _check_subsystem_damage(result: DamageResult) -> void:
@@ -382,14 +396,35 @@ func set_afterburner_enabled(enabled: bool) -> void:
 		return
 
 	is_afterburner_active = enabled
-	set_afterburner(enabled)  # Call parent WCSPhysicsBody method
+	set_afterburner(enabled) # Call parent WCSPhysicsBody method
 	afterburner_state_changed.emit(enabled)
 
 
-func fire_weapon(_slot: int) -> void:
-	"""Fire weapon from specified slot"""
-	# TODO: Implement weapon firing
-	pass
+func fire_weapon(slot: int) -> void:
+	"""Fire weapon from specified slot - Legacy/AI hook"""
+	if slot == 0: # Primary
+		weapon_system.set_trigger(true)
+		# Auto-release for single shot logic if needed, but for now assume held
+	elif slot == 1: # Secondary
+		weapon_system.set_secondary_trigger(true)
+
+func stop_firing_weapon(slot: int) -> void:
+	if slot == 0:
+		weapon_system.set_trigger(false)
+	elif slot == 1:
+		weapon_system.set_secondary_trigger(false)
+
+func cycle_primary_weapon() -> void:
+	weapon_system.cycle_primary()
+
+func cycle_secondary_weapon() -> void:
+	weapon_system.cycle_secondary()
+
+func consume_weapon_energy(amount: float) -> bool:
+	if weapon_energy >= amount:
+		weapon_energy -= amount
+		return true
+	return false
 
 
 # ==============================================================================
