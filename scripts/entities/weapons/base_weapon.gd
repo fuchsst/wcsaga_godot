@@ -3,7 +3,7 @@ extends Node3D
 
 # Dependencies
 const WeaponData = preload("res://scripts/resources/weapons/weapon_data.gd")
-const DamageResult = preload("res://scripts/entities/ship/data/damage_result.gd") # Assuming this exists or will exist
+# DamageResult is available via class_name, no preload needed
 
 # Configuration
 @export var weapon_data: WeaponData

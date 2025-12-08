@@ -283,7 +283,7 @@ func _update_twinkle(delta: float) -> void:
 			var base_brightness: float = star_info["base_brightness"]
 			
 			var twinkle := sin(_time * speed + phase) * twinkle_intensity
-			var new_brightness := clamp(base_brightness + twinkle, 0.0, 1.0)
+			var new_brightness := clampf(base_brightness + twinkle, 0.0, 1.0)
 			
 			var color := colors[i]
 			color.a = new_brightness
