@@ -34,6 +34,7 @@ func generate(res: Resource, output_dir: String, source_root: String) -> bool:
         
     var ship_node = ShipEntity.new()
     ship_node.name = filename # e.g. "hellcat_v"
+    ship_node.ship_name = res.display_name if not res.display_name.is_empty() else res.ship_class
     ship_node.stats = res # Assign stats
     
     # 3. Add Model Instance
@@ -61,12 +62,24 @@ func generate(res: Resource, output_dir: String, source_root: String) -> bool:
         # Continue anyway to generate the node structure? No, probably fail.
         # return false
     
-    # 4. Add Collision Shape
-    # (Usually this comes from the GLTF if imported with collisions, or we add a generic one)
-    # For now, we add a placeholder collision shape if none exists in model
+    # 4. Add Collision Shape based on ship dimensions or model bounds
     var collision = CollisionShape3D.new()
     collision.name = "CollisionShape3D"
-    collision.shape = BoxShape3D.new() # Placeholder
+    
+    # Create collision shape based on ship length from stats or use model bounds
+    var box_shape = BoxShape3D.new()
+    if res.ship_length_meters > 0:
+        # Use ship length to approximate dimensions (length is Z, width is X, height is Y)
+        # Typical fighter proportions: length:width:height = 1:0.5:0.3
+        var length = res.ship_length_meters
+        var width = length * 0.5
+        var height = length * 0.3
+        box_shape.size = Vector3(width, height, length)
+    else:
+        # Default fallback
+        box_shape.size = Vector3(10, 5, 15)
+    
+    collision.shape = box_shape
     ship_node.add_child(collision)
     collision.owner = ship_node
 

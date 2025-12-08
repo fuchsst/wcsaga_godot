@@ -30,6 +30,7 @@ IFFManager="*res://autoload/IFFManager.gd"
 SpeciesManager="*res://autoload/SpeciesManager.gd"
 AudioManager="*res://autoload/AudioManager.gd"
 CollisionManager="*res://autoload/CollisionManager.gd"
+MissionManager="*res://autoload/MissionManager.gd"
 
 [display]
 

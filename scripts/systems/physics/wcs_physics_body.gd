@@ -21,20 +21,20 @@ var state: WCSPhysicsState
 
 ## Control input (-1 to 1 for each axis)
 var control_input := {
-	"pitch": 0.0,  # -1 = nose down, +1 = nose up
-	"yaw": 0.0,  # -1 = left, +1 = right (heading)
-	"roll": 0.0,  # -1 = left, +1 = right (bank)
-	"forward": 0.0,  # -1 = reverse, +1 = forward
-	"sideways": 0.0,  # -1 = left, +1 = right (strafe)
-	"vertical": 0.0,  # -1 = down, +1 = up
-	"cruise_percent": 0.0,  # 0-100 cruise control
+	"pitch": 0.0, # -1 = nose down, +1 = nose up
+	"yaw": 0.0, # -1 = left, +1 = right (heading)
+	"roll": 0.0, # -1 = left, +1 = right (bank)
+	"forward": 0.0, # -1 = reverse, +1 = forward
+	"sideways": 0.0, # -1 = left, +1 = right (strafe)
+	"vertical": 0.0, # -1 = down, +1 = up
+	"cruise_percent": 0.0, # 0-100 cruise control
 }
 
 ## Constants matching C++ defines
 const REDUCED_DAMP_FACTOR := 10.0
-const REDUCED_DAMP_TIME := 2.0  # seconds
+const REDUCED_DAMP_TIME := 2.0 # seconds
 const SW_ROT_FACTOR := 5.0
-const SW_BLAST_DURATION := 2.0  # seconds
+const SW_BLAST_DURATION := 2.0 # seconds
 const SPECIAL_WARP_T_CONST := 0.651
 const MAX_SHIP_SPEED := 500.0
 const RESET_SHIP_SPEED := 440.0
@@ -96,7 +96,7 @@ func _velocity_ramp(v_in: float, v_goal: float, ramp_time_const: float, delta: f
 		return v_in
 
 	var delta_v := v_goal - v_in
-	var dist := abs(delta_v)
+	var dist: float = absf(delta_v)
 
 	# Hack to speed up closure when close to goal
 	var effective_ramp := ramp_time_const
@@ -157,7 +157,7 @@ func _process_control_input(delta: float) -> void:
 	# Limit reverse velocity
 	if goal_vel.z < -physics_data.max_rear_velocity:
 		if not (flags & PhysicsFlags.Flag.AFTERBURNER_ON):
-			goal_vel.z = -physics_data.max_rear_velocity
+			goal_vel.z = - physics_data.max_rear_velocity
 
 	# Apply velocity ramping (if ACCELERATES flag set)
 	if flags & PhysicsFlags.Flag.ACCELERATES:
@@ -376,9 +376,9 @@ func _simulate_rotation(delta: float) -> void:
 
 	# Apply rotation
 	var delta_angles := new_rotvel * delta
-	rotate(Vector3.RIGHT, delta_angles.x)  # Pitch
-	rotate(Vector3.UP, delta_angles.y)  # Yaw
-	rotate(Vector3.FORWARD, delta_angles.z)  # Roll
+	rotate(Vector3.RIGHT, delta_angles.x) # Pitch
+	rotate(Vector3.UP, delta_angles.y) # Yaw
+	rotate(Vector3.FORWARD, delta_angles.z) # Roll
 
 	# Orthogonalize to prevent drift
 	global_transform = global_transform.orthonormalized()
@@ -443,7 +443,7 @@ func set_afterburner(enabled: bool) -> void:
 		state.set_flag(PhysicsFlags.Flag.AFTERBURNER_ON)
 	else:
 		state.clear_flag(PhysicsFlags.Flag.AFTERBURNER_ON)
-		state.afterburner_decay_time = 0.5  # Shake decay
+		state.afterburner_decay_time = 0.5 # Shake decay
 	physics_mode_changed.emit(state.flags)
 
 

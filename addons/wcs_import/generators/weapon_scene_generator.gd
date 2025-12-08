@@ -34,16 +34,16 @@ func generate_scene(weapon_data: WCSWeaponData, output_root: String) -> void:
 	weapon_data.take_over_path(resource_path)
 	print("Saved weapon resource to: " + resource_path)
 
-	# Create Scene
+	# Create Scene - determine weapon type correctly
 	var root_node: Node3D
-
+	
 	if weapon_data.is_beam:
 		root_node = BeamWeapon.new()
 		root_node.name = "BeamWeapon"
 	elif weapon_data.flak_config != null:
 		root_node = FlakWeapon.new()
 		root_node.name = "FlakWeapon"
-	if weapon_data.homing_type > 0:
+	elif weapon_data.homing_type > 0:
 		root_node = Missile.new()
 		root_node.name = "MissileWeapon"
 	else:
@@ -52,7 +52,32 @@ func generate_scene(weapon_data: WCSWeaponData, output_root: String) -> void:
 
 	root_node.weapon_data = weapon_data
 
-	# 5. Instantiate Visuals
+	# Add collision area for projectile detection
+	var collision_area = Area3D.new()
+	collision_area.name = "HitArea"
+	collision_area.collision_layer = 0 # Will be set at runtime based on team
+	collision_area.collision_mask = 0 # Will be set at runtime
+	collision_area.monitorable = true
+	collision_area.monitoring = true
+	root_node.add_child(collision_area)
+	collision_area.owner = root_node
+	
+	# Add collision shape to the area
+	var collision_shape = CollisionShape3D.new()
+	collision_shape.name = "CollisionShape"
+	
+	# Size based on weapon radius or default
+	var sphere_shape = SphereShape3D.new()
+	if weapon_data.collision_radius > 0:
+		sphere_shape.radius = weapon_data.collision_radius
+	else:
+		sphere_shape.radius = 0.5 # Default projectile radius
+	collision_shape.shape = sphere_shape
+	
+	collision_area.add_child(collision_shape)
+	collision_shape.owner = root_node
+
+	# Instantiate Visuals from model if available
 	if (
 		not weapon_data.projectile_model.is_empty()
 		and weapon_data.projectile_model.ends_with(".glb")
