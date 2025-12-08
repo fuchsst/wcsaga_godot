@@ -1,0 +1,12 @@
+[gd_scene load_steps=2 format=3 uid="uid://dl7c4np5f6w8k"]
+
+[ext_resource type="Script" path="res://scripts/core/camera/wcs_camera_controller.gd" id="1_camera"]
+
+[node name="PlayerCamera" type="Camera3D"]
+script = ExtResource("1_camera")
+current = true
+fov = 50.0
+near = 0.1
+far = 50000.0
+
+[node name="AudioListener3D" type="AudioListener3D" parent="."]
