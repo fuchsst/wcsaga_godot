@@ -5,8 +5,11 @@ extends "res://scripts/resources/core/wcs_base_resource.gd"
 ##
 ## Contains all sound configurations from sounds.tbl.
 
-@export var audio_configs: Array[Resource] = []  # Array[AudioConfigResource]
-@export var flyby_sounds: Array[Resource] = []  # Array[FlybySoundResource]
+const AudioConfigResource = preload("res://scripts/resources/sounds/audio_config_resource.gd")
+const FlybySoundResource = preload("res://scripts/resources/sounds/flyby_sound_resource.gd")
+
+@export var audio_configs: Array[AudioConfigResource] = []
+@export var flyby_sounds: Array[FlybySoundResource] = []
 
 
 func get_resource_type() -> String:

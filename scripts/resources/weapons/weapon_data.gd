@@ -49,6 +49,9 @@ class CorkscrewConfiguration extends Resource:
 	@export var counter_rotate: bool = false
 	@export var helix: bool = false
 
+class SpawnConfiguration extends Resource:
+	@export var spawn_angle: float = 180.0
+
 class ParticleSpew extends Resource:
 	@export var count: int = 0
 	@export var time: int = 0
@@ -111,6 +114,7 @@ enum WeaponFlags {
 @export var weapon_range_meters: float = 1000.0
 @export var fire_rate_hz: float = 1.0 # Derived from 1 / $Fire Wait
 @export var lifetime: float = 1.0
+@export var free_flight_time: float = 0.0
 
 # -------------------------------------------------------------------------
 # 3. Damage & Impact
@@ -149,6 +153,7 @@ enum WeaponFlags {
 @export var catch_up_pixels_per_sec: float = 0.0
 @export var catch_up_penalty: float = 0.0
 @export var fof_field_of_view: float = 0.0 # $FOF
+@export var view_cone_degrees: float = 0.0 # $View Cone
 
 @export_group("Arming & Safety")
 @export var arm_time: float = 0.0
@@ -202,6 +207,7 @@ var _laser_glow_source: String = ""
 @export var beam_config: Resource
 @export var trail_config: Resource
 @export var corkscrew_config: Resource
+@export var spawn_config: Resource
 @export var flak_config: Resource
 @export var particle_spew: Resource
 

@@ -7,8 +7,7 @@ extends "res://scripts/resources/core/wcs_base_resource.gd"
 ## Maps to help.tbl, launchhelp.tbl, tips.tbl
 
 @export_group("Help Content")
-@export var topic: String = ""
-@export var text: String = ""
+@export var topics: Dictionary = {}
 @export var category: String = "general"
 
 

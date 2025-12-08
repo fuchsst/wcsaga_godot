@@ -17,14 +17,13 @@ enum IFFFlags {
 @export var attacks: Array[String] = []
 
 # Perception Colors (Subjective View)
-# Dictionary mapping other IFF names to the color this IFF sees them as
-# Key: IFF Name (String), Value: Color
-@export var perceptions: Dictionary = {}
+# How this IFF perceives other IFFs (typed array instead of Dictionary)
+@export var perceptions: Array[IFFPerception] = []
 
 # Flags
 @export var flags: Array[IFFFlags] = []
 
-# Default Ship Flags
+# Default Ship Flags (uses MissionEnums enums for type safety)
 @export_group("Default Ship Flags")
-@export var default_ship_flags: Array[String] = []
-@export var default_ship_flags2: Array[String] = []
+@export var default_ship_flags: Array[MissionEnums.ShipFlags] = []
+@export var default_ship_flags2: Array[MissionEnums.ShipFlags2] = []

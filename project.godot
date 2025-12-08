@@ -26,6 +26,9 @@ WCS="*res://scripts/utilities/WCS.gd"
 ProfileManager="*res://autoload/ProfileManager.gd"
 GlobalSettings="*res://autoload/GlobalSettings.gd"
 TimelineDatabase="*res://resources/campaign_index/TimelineDatabase.gd"
+IFFManager="*res://autoload/IFFManager.gd"
+SpeciesManager="*res://autoload/SpeciesManager.gd"
+AudioManager="*res://autoload/AudioManager.gd"
 
 [display]
 

@@ -31,6 +31,11 @@ extends Resource
 # Sensors
 @export var awacs_multiplier: float = 1.0
 
+# Flyby Sounds (from sounds.tbl flyby section)
+@export_group("Flyby Sounds")
+@export var flyby_fighter: AudioStream
+@export var flyby_bomber: AudioStream
+
 # Fiction / Intel Data
 @export_group("Fiction Data")
 @export_multiline var description: String = ""

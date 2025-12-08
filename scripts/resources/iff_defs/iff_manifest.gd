@@ -30,4 +30,4 @@ extends Resource
 
 # IFF Definitions
 @export_group("IFF Definitions")
-@export var iffs: Array[Resource] = []  # Array of IFFResource
+@export var iffs: Array[IFFResource] = []
