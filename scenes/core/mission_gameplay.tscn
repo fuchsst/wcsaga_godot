@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=3 uid="uid://mission_gameplay"]
+
+[ext_resource type="Script" path="res://scripts/environment/environment_manager.gd" id="1_env"]
+[ext_resource type="Script" path="res://scripts/ui/hud/hud_controller.gd" id="2_hud"]
+
+[node name="MissionGameplay" type="Node"]
+
+[node name="Environment" type="Node3D" parent="."]
+script = ExtResource("1_env")
+
+[node name="Entities" type="Node3D" parent="."]
+
+[node name="HUD" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="HUDController" type="Control" parent="HUD"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_hud")

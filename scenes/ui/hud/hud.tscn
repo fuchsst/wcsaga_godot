@@ -1,0 +1,344 @@
+[gd_scene load_steps=2 format=3 uid="uid://c3k5x7hud1234"]
+
+[ext_resource type="Script" path="res://scripts/ui/hud/hud_controller.gd" id="1_hud_ctrl"]
+
+[node name="HUD" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_hud_ctrl")
+hud_color = Color(0, 1, 0, 0.8)
+hud_bright_color = Color(0.2, 1, 0.2, 1)
+hud_dim_color = Color(0, 0.7, 0, 0.5)
+warning_color = Color(1, 0, 0, 1)
+
+[node name="HUDRoot" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TopBar" type="HBoxContainer" parent="HUDRoot"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 40.0
+grow_horizontal = 2
+theme_override_constants/separation = 20
+
+[node name="MissionTimeLabel" type="Label" parent="HUDRoot/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_colors/font_color = Color(0, 1, 0, 1)
+text = "00:00"
+
+[node name="DirectiveLabel" type="Label" parent="HUDRoot/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0, 1, 0, 1)
+text = ""
+horizontal_alignment = 1
+
+[node name="LeftPanel" type="VBoxContainer" parent="HUDRoot"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 20.0
+offset_top = -150.0
+offset_right = 180.0
+offset_bottom = 150.0
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="ShieldContainer" type="VBoxContainer" parent="HUDRoot/LeftPanel"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="ShieldLabel" type="Label" parent="HUDRoot/LeftPanel/ShieldContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 1, 0, 1)
+theme_override_font_sizes/font_size = 12
+text = "SHIELDS"
+
+[node name="ShieldQuadrants" type="HBoxContainer" parent="HUDRoot/LeftPanel/ShieldContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ShieldFront" type="ProgressBar" parent="HUDRoot/LeftPanel/ShieldContainer/ShieldQuadrants"]
+custom_minimum_size = Vector2(35, 20)
+layout_mode = 2
+value = 100.0
+show_percentage = false
+
+[node name="ShieldLeft" type="ProgressBar" parent="HUDRoot/LeftPanel/ShieldContainer/ShieldQuadrants"]
+custom_minimum_size = Vector2(35, 20)
+layout_mode = 2
+value = 100.0
+show_percentage = false
+
+[node name="ShieldRight" type="ProgressBar" parent="HUDRoot/LeftPanel/ShieldContainer/ShieldQuadrants"]
+custom_minimum_size = Vector2(35, 20)
+layout_mode = 2
+value = 100.0
+show_percentage = false
+
+[node name="ShieldRear" type="ProgressBar" parent="HUDRoot/LeftPanel/ShieldContainer/ShieldQuadrants"]
+custom_minimum_size = Vector2(35, 20)
+layout_mode = 2
+value = 100.0
+show_percentage = false
+
+[node name="HullContainer" type="VBoxContainer" parent="HUDRoot/LeftPanel"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="HullLabel" type="Label" parent="HUDRoot/LeftPanel/HullContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 1, 0, 1)
+theme_override_font_sizes/font_size = 12
+text = "HULL: 100"
+
+[node name="HullBar" type="ProgressBar" parent="HUDRoot/LeftPanel/HullContainer"]
+custom_minimum_size = Vector2(150, 15)
+layout_mode = 2
+value = 100.0
+show_percentage = false
+
+[node name="EnergyContainer" type="VBoxContainer" parent="HUDRoot/LeftPanel"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="WeaponEnergyLabel" type="Label" parent="HUDRoot/LeftPanel/EnergyContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 1, 0, 1)
+theme_override_font_sizes/font_size = 12
+text = "WEAPON ENERGY"
+
+[node name="WeaponEnergyBar" type="ProgressBar" parent="HUDRoot/LeftPanel/EnergyContainer"]
+custom_minimum_size = Vector2(150, 12)
+layout_mode = 2
+value = 100.0
+show_percentage = false
+
+[node name="AfterburnerLabel" type="Label" parent="HUDRoot/LeftPanel/EnergyContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 1, 0, 1)
+theme_override_font_sizes/font_size = 12
+text = "AFTERBURNER"
+
+[node name="AfterburnerBar" type="ProgressBar" parent="HUDRoot/LeftPanel/EnergyContainer"]
+custom_minimum_size = Vector2(150, 12)
+layout_mode = 2
+value = 100.0
+show_percentage = false
+
+[node name="RightPanel" type="VBoxContainer" parent="HUDRoot"]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -150.0
+offset_right = -20.0
+offset_bottom = 150.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="TargetContainer" type="VBoxContainer" parent="HUDRoot/RightPanel"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TargetHeader" type="Label" parent="HUDRoot/RightPanel/TargetContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 1, 0, 1)
+theme_override_font_sizes/font_size = 12
+text = "TARGET"
+
+[node name="TargetNameLabel" type="Label" parent="HUDRoot/RightPanel/TargetContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.5, 0, 1)
+text = "NO TARGET"
+
+[node name="TargetHullBar" type="ProgressBar" parent="HUDRoot/RightPanel/TargetContainer"]
+custom_minimum_size = Vector2(150, 12)
+layout_mode = 2
+value = 100.0
+show_percentage = false
+
+[node name="TargetDistanceLabel" type="Label" parent="HUDRoot/RightPanel/TargetContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 1, 0, 1)
+theme_override_font_sizes/font_size = 12
+text = "0 m"
+
+[node name="WeaponsContainer" type="VBoxContainer" parent="HUDRoot/RightPanel"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="WeaponsHeader" type="Label" parent="HUDRoot/RightPanel/WeaponsContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 1, 0, 1)
+theme_override_font_sizes/font_size = 12
+text = "WEAPONS"
+
+[node name="PrimaryWeaponLabel" type="Label" parent="HUDRoot/RightPanel/WeaponsContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 1, 0, 1)
+text = "PRIMARY: ---"
+
+[node name="SecondaryWeaponLabel" type="Label" parent="HUDRoot/RightPanel/WeaponsContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0, 1)
+text = "SECONDARY: ---"
+
+[node name="BottomBar" type="HBoxContainer" parent="HUDRoot"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -80.0
+grow_horizontal = 2
+grow_vertical = 0
+alignment = 1
+theme_override_constants/separation = 100
+
+[node name="SpeedContainer" type="VBoxContainer" parent="HUDRoot/BottomBar"]
+layout_mode = 2
+
+[node name="SpeedLabel" type="Label" parent="HUDRoot/BottomBar/SpeedContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 1, 0, 1)
+text = "SPEED: 0"
+horizontal_alignment = 1
+
+[node name="ThrottleBar" type="ProgressBar" parent="HUDRoot/BottomBar/SpeedContainer"]
+custom_minimum_size = Vector2(100, 15)
+layout_mode = 2
+value = 0.0
+show_percentage = false
+
+[node name="RadarContainer" type="Control" parent="HUDRoot/BottomBar"]
+custom_minimum_size = Vector2(150, 60)
+layout_mode = 2
+
+[node name="RadarBg" type="ColorRect" parent="HUDRoot/BottomBar/RadarContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0.1, 0, 0.5)
+
+[node name="RadarLabel" type="Label" parent="HUDRoot/BottomBar/RadarContainer"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -30.0
+offset_right = 30.0
+offset_bottom = 15.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0, 0.7, 0, 1)
+theme_override_font_sizes/font_size = 10
+text = "RADAR"
+horizontal_alignment = 1
+
+[node name="ETSContainer" type="VBoxContainer" parent="HUDRoot/BottomBar"]
+layout_mode = 2
+
+[node name="ETSLabel" type="Label" parent="HUDRoot/BottomBar/ETSContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 1, 0, 1)
+theme_override_font_sizes/font_size = 10
+text = "E/S/W"
+horizontal_alignment = 1
+
+[node name="ETSBars" type="HBoxContainer" parent="HUDRoot/BottomBar/ETSContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ETSEnginesBar" type="ProgressBar" parent="HUDRoot/BottomBar/ETSContainer/ETSBars"]
+custom_minimum_size = Vector2(25, 40)
+layout_mode = 2
+max_value = 4.0
+value = 2.0
+show_percentage = false
+fill_mode = 3
+
+[node name="ETSShieldsBar" type="ProgressBar" parent="HUDRoot/BottomBar/ETSContainer/ETSBars"]
+custom_minimum_size = Vector2(25, 40)
+layout_mode = 2
+max_value = 4.0
+value = 2.0
+show_percentage = false
+fill_mode = 3
+
+[node name="ETSWeaponsBar" type="ProgressBar" parent="HUDRoot/BottomBar/ETSContainer/ETSBars"]
+custom_minimum_size = Vector2(25, 40)
+layout_mode = 2
+max_value = 4.0
+value = 2.0
+show_percentage = false
+fill_mode = 3
+
+[node name="MessageContainer" type="VBoxContainer" parent="HUDRoot"]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+anchor_right = 0.4
+offset_left = 20.0
+offset_top = 50.0
+offset_bottom = -100.0
+grow_vertical = 2
+theme_override_constants/separation = 2
+
+[node name="CenterReticle" type="Control" parent="HUDRoot"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ReticleH" type="ColorRect" parent="HUDRoot/CenterReticle"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -15.0
+offset_top = -1.0
+offset_right = 15.0
+offset_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 1, 0, 0.8)
+
+[node name="ReticleV" type="ColorRect" parent="HUDRoot/CenterReticle"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -1.0
+offset_top = -15.0
+offset_right = 1.0
+offset_bottom = 15.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 1, 0, 0.8)
