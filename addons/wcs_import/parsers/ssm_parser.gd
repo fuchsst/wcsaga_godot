@@ -5,7 +5,7 @@ const SSMResource = preload("res://scripts/resources/weapons/ssm_resource.gd")
 
 
 func _parse_content() -> Variant:
-	var ssm_resource = SSMResource.new()
+	var ssm_list: Array = []
 
 	_skip_empty_lines()
 
@@ -19,6 +19,8 @@ func _parse_content() -> Variant:
 
 		if line.begins_with("$SSM:"):
 			# Parse SSM definition
-			pass
+			var ssm_resource = SSMResource.new()
+			ssm_resource.name = _extract_string_value(line, "$SSM:")
+			ssm_list.append(ssm_resource)
 
-	return ssm_resource
+	return ssm_list

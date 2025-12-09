@@ -220,8 +220,9 @@ func _spawn_arc_effect() -> void:
 	# TODO: Spawn actual particle effect for electric arc
 	# Would use GPUParticles3D with arc shader
 	# Play arc sound based on duration
-	if AudioManager:
-		AudioManager.play_sound_by_name(&"debris_arc_01", global_position)
+	var audio := Engine.get_singleton("AudioManager")
+	if audio:
+		audio.play_sound_by_name(&"debris_arc_01", global_position)
 
 
 # ==============================================================================
@@ -294,11 +295,12 @@ func _spawn_explosion() -> void:
 	# TODO: Instantiate Fireball scene at position
 	# Would use ObjectManager or direct instantiation
 	# Play explosion sound
-	if AudioManager:
+	var audio := Engine.get_singleton("AudioManager")
+	if audio:
 		if is_hull_debris:
-			AudioManager.play_sound_by_name(&"explosion_medium", global_position)
+			audio.play_sound_by_name(&"explosion_medium", global_position)
 		else:
-			AudioManager.play_sound_by_name(&"explosion_small", global_position)
+			audio.play_sound_by_name(&"explosion_small", global_position)
 
 
 # ==============================================================================

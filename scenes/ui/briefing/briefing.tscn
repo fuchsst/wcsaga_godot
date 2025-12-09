@@ -1,0 +1,89 @@
+[gd_scene load_steps=1 format=3 uid="uid://briefing_scene"]
+
+[node name="Briefing" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.05, 0.1, 0.95)
+
+[node name="Container" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 50.0
+offset_top = 50.0
+offset_right = -50.0
+offset_bottom = -50.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="MissionTitle" type="Label" parent="Container"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "MISSION BRIEFING"
+horizontal_alignment = 1
+
+[node name="StagePanel" type="PanelContainer" parent="Container"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="StageText" type="RichTextLabel" parent="Container/StagePanel"]
+layout_mode = 2
+bbcode_enabled = true
+scroll_active = true
+
+[node name="ObjectivesHeader" type="Label" parent="Container"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "OBJECTIVES"
+horizontal_alignment = 1
+
+[node name="ObjectivesList" type="VBoxContainer" parent="Container"]
+layout_mode = 2
+
+[node name="NavContainer" type="HBoxContainer" parent="Container"]
+layout_mode = 2
+alignment = 1
+
+[node name="PrevButton" type="Button" parent="Container/NavContainer"]
+layout_mode = 2
+text = "< Previous"
+
+[node name="StageIndicator" type="Label" parent="Container/NavContainer"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+text = "Stage 1 of 1"
+horizontal_alignment = 1
+
+[node name="NextButton" type="Button" parent="Container/NavContainer"]
+layout_mode = 2
+text = "Next >"
+
+[node name="ButtonContainer" type="HBoxContainer" parent="Container"]
+layout_mode = 2
+alignment = 1
+
+[node name="BackButton" type="Button" parent="Container/ButtonContainer"]
+layout_mode = 2
+text = "Back to Menu"
+
+[node name="Spacer" type="Control" parent="Container/ButtonContainer"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+
+[node name="LaunchButton" type="Button" parent="Container/ButtonContainer"]
+layout_mode = 2
+text = "LAUNCH MISSION"

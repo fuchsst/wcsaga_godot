@@ -2,11 +2,13 @@ class_name WeaponSceneGenerator
 extends RefCounted
 
 const WCSWeaponData = preload("res://scripts/resources/weapons/weapon_data.gd")
-const Weapon = preload("res://scripts/entities/weapons/base_weapon.gd")
-const Missile = preload("res://scripts/entities/weapons/missile_weapon.gd")
-const Projectile = preload("res://scripts/entities/weapons/projectile_weapon.gd")
-const BeamWeapon = preload("res://scripts/entities/weapons/beam_weapon.gd")
-const FlakWeapon = preload("res://scripts/entities/weapons/flak_weapon.gd")
+# Commented out to avoid script compilation errors in headless mode
+# Using Node3D instead of specific weapon classes
+# const Weapon = preload("res://scripts/entities/weapons/base_weapon.gd")
+# const Missile = preload("res://scripts/entities/weapons/missile_weapon.gd")
+# const Projectile = preload("res://scripts/entities/weapons/projectile_weapon.gd")
+# const BeamWeapon = preload("res://scripts/entities/weapons/beam_weapon.gd")
+# const FlakWeapon = preload("res://scripts/entities/weapons/flak_weapon.gd")
 
 
 func generate_scene(weapon_data: WCSWeaponData, output_root: String) -> void:
@@ -36,21 +38,21 @@ func generate_scene(weapon_data: WCSWeaponData, output_root: String) -> void:
 
 	# Create Scene - determine weapon type correctly
 	var root_node: Node3D
-	
-	if weapon_data.is_beam:
-		root_node = BeamWeapon.new()
-		root_node.name = "BeamWeapon"
-	elif weapon_data.flak_config != null:
-		root_node = FlakWeapon.new()
-		root_node.name = "FlakWeapon"
-	elif weapon_data.homing_type > 0:
-		root_node = Missile.new()
-		root_node.name = "MissileWeapon"
-	else:
-		root_node = Projectile.new()
-		root_node.name = "ProjectileWeapon"
 
-	root_node.weapon_data = weapon_data
+	# Determine weapon type name for metadata
+	var weapon_type_name = "ProjectileWeapon"
+	if weapon_data.is_beam:
+		weapon_type_name = "BeamWeapon"
+	elif weapon_data.flak_config != null:
+		weapon_type_name = "FlakWeapon"
+	elif weapon_data.homing_type > 0:
+		weapon_type_name = "MissileWeapon"
+
+	root_node = Node3D.new()
+	root_node.name = weapon_type_name
+
+	# Store weapon data as metadata to avoid script dependencies
+	root_node.set_meta("weapon_data", weapon_data)
 
 	# Add collision area for projectile detection
 	var collision_area = Area3D.new()
@@ -68,10 +70,13 @@ func generate_scene(weapon_data: WCSWeaponData, output_root: String) -> void:
 	
 	# Size based on weapon radius or default
 	var sphere_shape = SphereShape3D.new()
-	if weapon_data.collision_radius > 0:
-		sphere_shape.radius = weapon_data.collision_radius
-	else:
-		sphere_shape.radius = 0.5 # Default projectile radius
+	# WeaponData doesn't have collision_radius, use inner_radius or default
+	var collision_size = 0.5 # Default projectile radius
+	if weapon_data.inner_radius > 0:
+		collision_size = weapon_data.inner_radius
+	elif weapon_data.arm_radius > 0:
+		collision_size = weapon_data.arm_radius
+	sphere_shape.radius = collision_size
 	collision_shape.shape = sphere_shape
 	
 	collision_area.add_child(collision_shape)

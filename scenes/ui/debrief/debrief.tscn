@@ -1,0 +1,67 @@
+[gd_scene load_steps=1 format=3 uid="uid://debrief_scene"]
+
+[node name="Debrief" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.05, 0.1, 0.95)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Container" type="VBoxContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(600, 400)
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="ResultLabel" type="Label" parent="CenterContainer/Container"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "MISSION COMPLETE"
+horizontal_alignment = 1
+
+[node name="MissionTitle" type="Label" parent="CenterContainer/Container"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Mission Name"
+horizontal_alignment = 1
+
+[node name="GoalsHeader" type="Label" parent="CenterContainer/Container"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "OBJECTIVES"
+horizontal_alignment = 1
+
+[node name="GoalsList" type="VBoxContainer" parent="CenterContainer/Container"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="StatsLabel" type="Label" parent="CenterContainer/Container"]
+layout_mode = 2
+text = "Mission Time: 00:00"
+horizontal_alignment = 1
+
+[node name="ButtonContainer" type="HBoxContainer" parent="CenterContainer/Container"]
+layout_mode = 2
+alignment = 1
+
+[node name="ContinueButton" type="Button" parent="CenterContainer/Container/ButtonContainer"]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+text = "CONTINUE"

@@ -47,6 +47,25 @@ func run_import(args: Dictionary) -> bool:
 			return false
 
 	var output_dir = args["output"]
+	
+	# Normalize the output directory to an absolute path
+	# The output_dir is the Godot project root (where res:// points to)
+	# Subpaths like "assets/weapons" are added by wcs_importer based on asset type
+	if output_dir == "." or output_dir == "res://":
+		output_dir = res_path
+	elif output_dir == "target" or output_dir.ends_with("/target"):
+		# Special case: "target" means the Godot project directory
+		output_dir = res_path
+	elif not output_dir.begins_with("/"):
+		# Relative path - assume relative to the repo root (parent of target/)
+		output_dir = project_root.path_join(output_dir)
+		# If the result points to the same as res_path, use res_path directly
+		if output_dir.simplify_path() == res_path.simplify_path():
+			output_dir = res_path
+		else:
+			output_dir = output_dir.simplify_path()
+	
+	print("Resolved output_dir: " + output_dir)
 	var filter_pattern = args.get("filter", "")
 
 	importer.build_file_map(default_source_root)

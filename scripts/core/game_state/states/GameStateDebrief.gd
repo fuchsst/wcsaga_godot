@@ -26,7 +26,11 @@ func _enter() -> void:
 		_mission = mm.current_mission
 		_mission_success = mm.last_mission_success if "last_mission_success" in mm else false
 
-	_setup_debrief_scene()
+	if not _setup_debrief_scene():
+		push_error("GameStateDebrief: Failed to load debrief scene!")
+		_transition_to_menu()
+		return
+
 	_display_results()
 
 	print("GameStateDebrief: Mission " + ("SUCCESS" if _mission_success else "FAILED"))
@@ -47,88 +51,21 @@ func _update(_delta: float) -> void:
 
 # === SETUP METHODS ===
 
-func _setup_debrief_scene() -> void:
-	"""Load and configure debrief UI scene"""
-	var root = get_tree().root
+func _setup_debrief_scene() -> bool:
+	"""Load and configure debrief UI scene. Returns false if failed."""
+	if not ResourceLoader.exists(DEBRIEF_SCENE):
+		push_error("GameStateDebrief: Scene not found at " + DEBRIEF_SCENE)
+		return false
 
-	if ResourceLoader.exists(DEBRIEF_SCENE):
-		var scene = load(DEBRIEF_SCENE)
-		if scene:
-			_debrief_scene = scene.instantiate()
-			root.add_child(_debrief_scene)
-			_connect_debrief_signals()
-			return
+	var scene = load(DEBRIEF_SCENE)
+	if not scene:
+		push_error("GameStateDebrief: Failed to load scene " + DEBRIEF_SCENE)
+		return false
 
-	# Create fallback debrief UI
-	_create_fallback_debrief_ui(root)
-
-
-func _create_fallback_debrief_ui(root: Node) -> void:
-	"""Create minimal debrief UI if scene not found"""
-	_debrief_scene = CanvasLayer.new()
-	_debrief_scene.name = "DebriefUI"
-	_debrief_scene.layer = 100
-	root.add_child(_debrief_scene)
-
-	# Background panel
-	var bg = ColorRect.new()
-	bg.name = "Background"
-	bg.color = Color(0.05, 0.05, 0.1, 0.95)
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_debrief_scene.add_child(bg)
-
-	# Container
-	var container = VBoxContainer.new()
-	container.name = "Container"
-	container.set_anchors_preset(Control.PRESET_CENTER)
-	container.custom_minimum_size = Vector2(600, 400)
-	container.add_theme_constant_override("separation", 20)
-	_debrief_scene.add_child(container)
-
-	# Result header
-	var result_label = Label.new()
-	result_label.name = "ResultLabel"
-	result_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	result_label.add_theme_font_size_override("font_size", 48)
-	container.add_child(result_label)
-
-	# Mission title
-	var title = Label.new()
-	title.name = "MissionTitle"
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 24)
-	container.add_child(title)
-
-	# Goals section
-	var goals_header = Label.new()
-	goals_header.name = "GoalsHeader"
-	goals_header.text = "OBJECTIVES"
-	goals_header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	goals_header.add_theme_font_size_override("font_size", 18)
-	container.add_child(goals_header)
-
-	var goals_list = VBoxContainer.new()
-	goals_list.name = "GoalsList"
-	goals_list.add_theme_constant_override("separation", 5)
-	container.add_child(goals_list)
-
-	# Stats section
-	var stats_label = Label.new()
-	stats_label.name = "StatsLabel"
-	stats_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	container.add_child(stats_label)
-
-	# Continue button
-	var btn_container = HBoxContainer.new()
-	btn_container.alignment = BoxContainer.ALIGNMENT_CENTER
-	container.add_child(btn_container)
-
-	var continue_btn = Button.new()
-	continue_btn.name = "ContinueButton"
-	continue_btn.text = "CONTINUE"
-	continue_btn.custom_minimum_size = Vector2(200, 50)
-	continue_btn.pressed.connect(_on_continue_pressed)
-	btn_container.add_child(continue_btn)
+	_debrief_scene = scene.instantiate()
+	get_tree().root.add_child(_debrief_scene)
+	_connect_debrief_signals()
+	return true
 
 
 func _connect_debrief_signals() -> void:

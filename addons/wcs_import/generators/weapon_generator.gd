@@ -7,14 +7,29 @@ const WCSPathResolver = preload("res://addons/wcs_import/core/path_resolver.gd")
 
 func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 	print("Processing " + str(weapons.size()) + " weapons...")
+	print("DEBUG: Received output_dir: ", output_dir)
 
 	var scene_generator = WeaponSceneGenerator.new()
 
+	# Convert output_dir to absolute path if needed
+	# Output_dir comes from wcs_importer and should be the final target directory
+	# (e.g., /home/.../target/assets/weapons or res://assets/weapons)
+	var global_output_dir = output_dir
+	if output_dir.begins_with("res://"):
+		# Convert res:// path to absolute filesystem path
+		global_output_dir = ProjectSettings.globalize_path(output_dir)
+	elif not output_dir.begins_with("/"):
+		# Relative path - resolve relative to the Godot project root (res://)
+		var godot_project_root = ProjectSettings.globalize_path("res://")
+		if godot_project_root.ends_with("/"):
+			godot_project_root = godot_project_root.left(-1)
+		global_output_dir = godot_project_root.path_join(output_dir).simplify_path()
+	print("DEBUG: Globalized output_dir: ", global_output_dir)
+
 	# Use base output dir (assets/weapons) as root for generator
 	# The generator handles subdirectories (category/weapon_name)
-	# Use base output dir (assets/weapons) as root for generator
-	# The generator handles subdirectories (category/weapon_name)
-	var weapons_root = output_dir
+	var weapons_root = global_output_dir
+	print("DEBUG: Using weapons_root: ", weapons_root)
 
 	for res in weapons:
 		# 1. Determine specific output directory for this weapon
@@ -42,26 +57,16 @@ func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 				push_error("Error: Failed to convert POF model: " + pof_source)
 				return false
 
-			# Update resource to point to converted GLB (keep original basename)
+			# Update resource to point to converted model (keep original basename)
 			res.projectile_model = pof_source.get_file().get_basename() + ".gltf"
 
-			# Attempt to generate ModelData for the weapon model if available
-			if not res.projectile_model.is_empty() and res.projectile_model.ends_with(".gltf"):
-				var basename = res.projectile_model.get_basename()
-				var json_access_path = weapon_dir.path_join(basename + "_data.json")
-				
-				if FileAccess.file_exists(json_access_path):
-					var md_generator = load("res://addons/wcs_import/generators/model_data_generator.gd").new()
-					var generated_data = md_generator.generate(json_access_path)
-					if generated_data:
-						print("Generated ModelData for weapon: " + basename)
-					else:
-						# If model data generation fails, is it critical? Maybe not, but let's error for consistency if expected
-						# Actually ModelData is optional enrichment. Let's warn but maybe not fail hard unless needed.
-						# But purely purely "fail early if referenced resource not available": The JSON was available.
-						# Let's print error.
-						push_error("Error: Failed to generate ModelData for weapon: " + basename)
-						return false
+			# Cleanup any intermediate JSON files from POF conversion
+			# ModelDataGenerator creates ShipModelData which is not applicable to weapons
+			var basename = res.projectile_model.get_basename()
+			var json_access_path = weapon_dir.path_join(basename + "_data.json")
+			if FileAccess.file_exists(json_access_path):
+				DirAccess.remove_absolute(json_access_path)
+				print("Cleaned up intermediate JSON for weapon model: " + basename)
 
 		# 3. Convert/Copy Textures and Icons
 		if not res.display_icon.is_empty():
@@ -81,24 +86,24 @@ func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 					icon_source = _find_source_asset(source_root, res.display_icon, [".pcx", ".dds", ".png"])
 
 				if icon_source.is_empty():
-					push_error("Error: Could not find icon source: " + res.display_icon)
-					return false
-
-				# Determine conversion type based on file extension
-				var ext = icon_source.get_extension().to_lower()
-				var conversion_type = "texture"
-				if ext == "eff":
-					conversion_type = "animation"
-
-				if not _convert_asset(icon_source, weapon_dir, conversion_type):
-					push_error("Error: Failed to convert icon: " + icon_source)
-					return false
-
-				# Set appropriate output filename
-				if conversion_type == "animation":
-					res.display_icon = icon_source.get_file().get_basename() + "_spriteframes.tres"
+					push_warning("Warning: Could not find icon source: " + res.display_icon)
+					res.display_icon = ""
 				else:
-					res.display_icon = icon_source.get_file().get_basename() + ".png"
+					# Determine conversion type based on file extension
+					var ext = icon_source.get_extension().to_lower()
+					var conversion_type = "texture"
+					if ext == "eff":
+						conversion_type = "animation"
+
+					if not _convert_asset(icon_source, weapon_dir, conversion_type):
+						push_warning("Warning: Failed to convert icon: " + icon_source)
+						res.display_icon = ""
+					else:
+						# Set appropriate output filename
+						if conversion_type == "animation":
+							res.display_icon = icon_source.get_file().get_basename() + "_spriteframes.tres"
+						else:
+							res.display_icon = icon_source.get_file().get_basename() + ".png"
 
 		if not res._laser_bitmap_source.is_empty():
 			if not res._laser_bitmap_source.begins_with("empty"):
@@ -109,24 +114,25 @@ func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 						source_root, res._laser_bitmap_source, [".pcx", ".dds", ".png"]
 					)
 				if laser_source.is_empty():
-					push_error("Error: Could not find laser bitmap source: " + res._laser_bitmap_source)
-					return false
-				
-				if not _convert_asset(laser_source, weapon_dir, "texture"):
-					push_error("Error: Failed to convert laser bitmap: " + laser_source)
-					return false
-					
-				var tex_path = weapon_dir.path_join(laser_source.get_file().get_basename() + ".png")
-				if not FileAccess.file_exists(tex_path):
-					push_error("Error: Converted laser bitmap not found: " + tex_path)
-					return false
-					
-				var loaded_tex = load(tex_path)
-				if loaded_tex:
-					res.laser_bitmap = loaded_tex
+					push_warning("Warning: Could not find laser bitmap source: " + res._laser_bitmap_source)
 				else:
-					push_error("Error: Failed to load laser bitmap: " + tex_path)
-					return false
+					if not _convert_asset(laser_source, weapon_dir, "texture"):
+						push_warning("Warning: Failed to convert laser bitmap: " + laser_source)
+					else:
+						var tex_path = weapon_dir.path_join(laser_source.get_file().get_basename() + ".png")
+						print("DEBUG: Checking for texture at: ", tex_path)
+						# weapon_dir is an absolute path, so tex_path is also absolute
+						var file_exists = FileAccess.file_exists(tex_path)
+						print("DEBUG: File exists (absolute)? ", file_exists)
+						if not file_exists:
+							push_warning("Warning: Converted laser bitmap not found: " + tex_path)
+						else:
+							# Load using the absolute path
+							var loaded_tex = load(tex_path)
+							if loaded_tex:
+								res.laser_bitmap = loaded_tex
+							else:
+								push_warning("Warning: Failed to load laser bitmap: " + tex_path)
 
 		if not res._laser_glow_source.is_empty():
 			if not res._laser_glow_source.begins_with("empty"):
@@ -134,24 +140,20 @@ func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 					source_root, res._laser_glow_source, [".pcx", ".dds", ".png"]
 				)
 				if glow_source.is_empty():
-					push_error("Error: Could not find laser glow source: " + res._laser_glow_source)
-					return false
-				
-				if not _convert_asset(glow_source, weapon_dir, "texture"):
-					push_error("Error: Failed to convert laser glow: " + glow_source)
-					return false
-
-				var tex_path = weapon_dir.path_join(glow_source.get_file().get_basename() + ".png")
-				if not FileAccess.file_exists(tex_path):
-					push_error("Error: Converted laser glow not found: " + tex_path)
-					return false
-					
-				var loaded_tex = load(tex_path)
-				if loaded_tex:
-					res.laser_glow = loaded_tex
+					push_warning("Warning: Could not find laser glow source: " + res._laser_glow_source)
 				else:
-					push_error("Error: Failed to load laser glow: " + tex_path)
-					return false
+					if not _convert_asset(glow_source, weapon_dir, "texture"):
+						push_warning("Warning: Failed to convert laser glow: " + glow_source)
+					else:
+						var tex_path = weapon_dir.path_join(glow_source.get_file().get_basename() + ".png")
+						if not FileAccess.file_exists(tex_path):
+							push_warning("Warning: Converted laser glow not found: " + tex_path)
+						else:
+							var loaded_tex = load(tex_path)
+							if loaded_tex:
+								res.laser_glow = loaded_tex
+							else:
+								push_warning("Warning: Failed to load laser glow: " + tex_path)
 
 		if not res.tech_animation.is_empty():
 			if res.tech_animation.begins_with("empty"):
@@ -159,12 +161,11 @@ func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 			else:
 				var anim_source = _find_source_asset(source_root, res.tech_animation, [".ani", ".eff"])
 				if anim_source.is_empty():
-					push_error("Error: Could not find tech animation source: " + res.tech_animation)
-					return false
-				
-				if not _convert_asset(anim_source, weapon_dir, "ui"):
-					push_error("Error: Failed to convert tech animation: " + anim_source)
-					return false
+					push_warning("Warning: Could not find tech animation source: " + res.tech_animation)
+					res.tech_animation = ""
+				elif not _convert_asset(anim_source, weapon_dir, "ui"):
+					push_warning("Warning: Failed to convert tech animation: " + anim_source)
+					res.tech_animation = ""
 
 		# 4. Resolve Impact Explosion
 		if not res.impact_explosion.is_empty():

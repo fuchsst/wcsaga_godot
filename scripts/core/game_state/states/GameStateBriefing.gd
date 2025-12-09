@@ -40,7 +40,11 @@ func _enter() -> void:
 		_skip_to_gameplay()
 		return
 
-	_setup_briefing_scene()
+	if not _setup_briefing_scene():
+		push_error("GameStateBriefing: Failed to load briefing scene!")
+		_skip_to_gameplay()
+		return
+
 	_show_stage(_current_stage)
 
 	print("GameStateBriefing: Showing mission - " + _mission.mission_title)
@@ -65,119 +69,21 @@ func _update(_delta: float) -> void:
 
 # === SETUP METHODS ===
 
-func _setup_briefing_scene() -> void:
-	"""Load and configure briefing UI scene"""
-	var root = get_tree().root
+func _setup_briefing_scene() -> bool:
+	"""Load and configure briefing UI scene. Returns false if failed."""
+	if not ResourceLoader.exists(BRIEFING_SCENE):
+		push_error("GameStateBriefing: Scene not found at " + BRIEFING_SCENE)
+		return false
 
-	if ResourceLoader.exists(BRIEFING_SCENE):
-		var scene = load(BRIEFING_SCENE)
-		if scene:
-			_briefing_scene = scene.instantiate()
-			root.add_child(_briefing_scene)
-			_connect_briefing_signals()
-			return
+	var scene = load(BRIEFING_SCENE)
+	if not scene:
+		push_error("GameStateBriefing: Failed to load scene " + BRIEFING_SCENE)
+		return false
 
-	# Create fallback briefing UI
-	_create_fallback_briefing_ui(root)
-
-
-func _create_fallback_briefing_ui(root: Node) -> void:
-	"""Create minimal briefing UI if scene not found"""
-	_briefing_scene = CanvasLayer.new()
-	_briefing_scene.name = "BriefingUI"
-	_briefing_scene.layer = 100
-	root.add_child(_briefing_scene)
-
-	# Background panel
-	var bg = ColorRect.new()
-	bg.name = "Background"
-	bg.color = Color(0.05, 0.05, 0.1, 0.95)
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_briefing_scene.add_child(bg)
-
-	# Container
-	var container = VBoxContainer.new()
-	container.name = "Container"
-	container.set_anchors_preset(Control.PRESET_FULL_RECT)
-	container.add_theme_constant_override("separation", 20)
-	_briefing_scene.add_child(container)
-
-	# Title
-	var title = Label.new()
-	title.name = "MissionTitle"
-	title.text = _mission.mission_title if _mission else "MISSION BRIEFING"
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 32)
-	container.add_child(title)
-
-	# Stage text
-	var stage_panel = PanelContainer.new()
-	stage_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	container.add_child(stage_panel)
-
-	var stage_text = RichTextLabel.new()
-	stage_text.name = "StageText"
-	stage_text.bbcode_enabled = true
-	stage_text.scroll_active = true
-	stage_panel.add_child(stage_text)
-
-	# Objectives section
-	var objectives_label = Label.new()
-	objectives_label.name = "ObjectivesHeader"
-	objectives_label.text = "OBJECTIVES"
-	objectives_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	objectives_label.add_theme_font_size_override("font_size", 20)
-	container.add_child(objectives_label)
-
-	var objectives_list = VBoxContainer.new()
-	objectives_list.name = "ObjectivesList"
-	container.add_child(objectives_list)
-
-	# Stage navigation
-	var nav_container = HBoxContainer.new()
-	nav_container.name = "NavContainer"
-	nav_container.alignment = BoxContainer.ALIGNMENT_CENTER
-	container.add_child(nav_container)
-
-	var prev_btn = Button.new()
-	prev_btn.name = "PrevButton"
-	prev_btn.text = "< Previous"
-	prev_btn.pressed.connect(_prev_stage)
-	nav_container.add_child(prev_btn)
-
-	var stage_indicator = Label.new()
-	stage_indicator.name = "StageIndicator"
-	stage_indicator.text = "Stage 1 of 1"
-	stage_indicator.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	stage_indicator.custom_minimum_size.x = 150
-	nav_container.add_child(stage_indicator)
-
-	var next_btn = Button.new()
-	next_btn.name = "NextButton"
-	next_btn.text = "Next >"
-	next_btn.pressed.connect(_next_stage)
-	nav_container.add_child(next_btn)
-
-	# Launch button
-	var launch_container = HBoxContainer.new()
-	launch_container.alignment = BoxContainer.ALIGNMENT_CENTER
-	container.add_child(launch_container)
-
-	var back_btn = Button.new()
-	back_btn.name = "BackButton"
-	back_btn.text = "Back to Menu"
-	back_btn.pressed.connect(_on_back_pressed)
-	launch_container.add_child(back_btn)
-
-	var spacer = Control.new()
-	spacer.custom_minimum_size.x = 50
-	launch_container.add_child(spacer)
-
-	var launch_btn = Button.new()
-	launch_btn.name = "LaunchButton"
-	launch_btn.text = "LAUNCH MISSION"
-	launch_btn.pressed.connect(_on_launch_pressed)
-	launch_container.add_child(launch_btn)
+	_briefing_scene = scene.instantiate()
+	get_tree().root.add_child(_briefing_scene)
+	_connect_briefing_signals()
+	return true
 
 
 func _connect_briefing_signals() -> void:

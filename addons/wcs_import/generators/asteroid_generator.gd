@@ -52,25 +52,25 @@ func generate(data: Dictionary, output_dir: String, source_root: String) -> bool
 	if data.has("explosion_blast"):
 		resource.explosion_blast = data["explosion_blast"]
 	if data.has("impact_explosion_effect"):
-		resource.impact_explosion_effect = data["impact_explosion_effect"]
-	if data.has("impact_explosion_radius"):
-		resource.impact_explosion_radius = data["impact_explosion_radius"]
+		resource.impact_effect = data["impact_explosion_effect"]
 
 	# Save Resource
 	var tres_path = asset_dir.path_join(asteroid_id + ".tres")
+	print("DEBUG: Attempting to save TRES to: ", tres_path)
 	var err = ResourceSaver.save(resource, tres_path)
 	if err != OK:
-		print("ERROR: Failed to save resource: ", tres_path)
+		print("ERROR: Failed to save resource: ", tres_path, " - Error code: ", err)
 		return false
-	print("Saved TRES: ", tres_path)
+	print("Saved TRES: ", tres_path, " - Error code: ", err)
 
 	# 2. Create Scene
 	var root = RigidBody3D.new()
 	root.name = asteroid_name
 
 	# Attach behavior script
-	root.set_script(Asteroid)
-	root.asteroid_data = resource
+	# Temporarily commented out to avoid script loading errors in headless mode
+	# root.set_script(Asteroid)
+	root.set_meta("asteroid_data", resource)
 
 	# Add Collision Shape (Placeholder - Sphere)
 	var collision = CollisionShape3D.new()
@@ -121,8 +121,9 @@ func generate(data: Dictionary, output_dir: String, source_root: String) -> bool
 		else:
 			print("ERROR: Failed to load GLTF: ", gltf_path, " Error code: ", gltf_err)
 
-	# Assign variation nodes to script property
-	root.variations = variation_nodes
+	# Assign variation nodes to script property (commented out to avoid script dependency)
+	# root.variations = variation_nodes
+	root.set_meta("variations", variation_nodes)
 
 	# Pack scene
 	var scene = PackedScene.new()
@@ -183,7 +184,7 @@ func _convert_asset(source_path: String, target_dir: String, type: String) -> bo
 	var global_target = ProjectSettings.globalize_path(target_dir)
 
 	var args = [
-		"run", "--directory", "..", "python", "-m", "converter", global_source, global_target, "--type", type
+		"run", "--directory", "..", "python", "-m", "converter", global_source, global_target, "--type", type, "--no-model-data"
 	]
 
 	var output = []
