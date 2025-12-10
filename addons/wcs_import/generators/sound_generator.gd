@@ -38,12 +38,12 @@ func _convert_audio_config(config: Resource, source_root: String, output_dir: St
 	var source_file = _find_source_asset(source_root, search_name, [".wav", ".ogg"])
 
 	if source_file.is_empty():
-		push_error("Error: Could not find source for sound: " + filename)
-		return false
+		push_warning("Warning: Could not find source for sound: " + filename)
+		return true # Continue with other sounds
 
 	if not _convert_asset(source_file, output_dir, "audio"):
-		push_error("Error: Failed to convert sound asset: " + source_file)
-		return false
+		push_warning("Warning: Failed to convert sound asset: " + source_file)
+		return true # Continue with other sounds
 
 	var converted_filename = source_file.get_file().get_basename() + ".ogg"
 	var converted_path = output_dir.path_join(converted_filename)
@@ -52,19 +52,19 @@ func _convert_audio_config(config: Resource, source_root: String, output_dir: St
 	if not res_path.begins_with("res://"):
 		res_path = ProjectSettings.localize_path(res_path)
 
-	if not FileAccess.file_exists(res_path):
-		push_error("Error: Converted file not found: " + res_path)
-		return false
+	if not FileAccess.file_exists(converted_path):
+		push_warning("Warning: Converted file not found: " + converted_path)
+		return true
 
-	# Fail early logic: Just try to load. If it fails (e.g. not imported), it fails.
-	# We rely on the build system/CLI to handle imports or accept the error.
+	# Store the path for lazy loading (headless mode can't load resources immediately)
+	config.audio_path = res_path
+
+	# Try to load immediately (will work in non-headless mode)
 	var stream = load(res_path)
 	if stream:
 		config.audio_stream = stream
-	else:
-		push_error("Error: Failed to load sound resource: " + res_path)
-		return false
-	
+	# If load fails (headless mode), audio_path is still set for runtime loading
+
 	return true
 
 

@@ -14,7 +14,7 @@ func _initialize():
 
 func _process(_delta):
 	_run()
-	return true # Exit loop
+	return true  # Exit loop
 
 
 func _run():
@@ -47,7 +47,7 @@ func run_import(args: Dictionary) -> bool:
 			return false
 
 	var output_dir = args["output"]
-	
+
 	# Normalize the output directory to an absolute path
 	# The output_dir is the Godot project root (where res:// points to)
 	# Subpaths like "assets/weapons" are added by wcs_importer based on asset type
@@ -64,7 +64,7 @@ func run_import(args: Dictionary) -> bool:
 			output_dir = res_path
 		else:
 			output_dir = output_dir.simplify_path()
-	
+
 	print("Resolved output_dir: " + output_dir)
 	var filter_pattern = args.get("filter", "")
 
@@ -89,7 +89,7 @@ func run_import(args: Dictionary) -> bool:
 		# Batch mode
 		# CLI batch mode runs everything unless filtered.
 		# Pass types_to_process based on args or default to all.
-		var types = [] # Empty means all
+		var types = []  # Empty means all
 		return importer.process_batch(output_dir, filter_pattern, types)
 
 
@@ -98,12 +98,22 @@ func _parse_args() -> Dictionary:
 	var user_args = OS.get_cmdline_user_args()
 	print("User args: " + str(user_args))
 
-	for i in range(user_args.size()):
+	var i = 0
+	while i < user_args.size():
 		var arg = user_args[i]
 		if arg.begins_with("--"):
-			var key = arg.substr(2)
-			var val = ""
-			if i + 1 < user_args.size() and not user_args[i + 1].begins_with("--"):
-				val = user_args[i + 1]
-			args[key] = val
+			var key_val = arg.substr(2)
+			# Handle --key=value format
+			if key_val.contains("="):
+				var parts = key_val.split("=", true, 1)  # Split on first = only
+				args[parts[0]] = parts[1] if parts.size() > 1 else ""
+			else:
+				# Handle --key value format
+				var key = key_val
+				var val = ""
+				if i + 1 < user_args.size() and not user_args[i + 1].begins_with("--"):
+					val = user_args[i + 1]
+					i += 1  # Skip the value in next iteration
+				args[key] = val
+		i += 1
 	return args

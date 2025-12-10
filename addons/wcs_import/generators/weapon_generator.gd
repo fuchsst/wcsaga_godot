@@ -3,11 +3,18 @@ extends RefCounted
 
 const WeaponSceneGenerator = preload("res://addons/wcs_import/generators/weapon_scene_generator.gd")
 const WCSPathResolver = preload("res://addons/wcs_import/core/path_resolver.gd")
+const SoundManifest = preload("res://scripts/resources/sounds/sound_manifest.gd")
+
+# Sound lookup cache: index -> AudioStream
+var _sound_lookup: Dictionary = {}
 
 
 func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 	print("Processing " + str(weapons.size()) + " weapons...")
 	print("DEBUG: Received output_dir: ", output_dir)
+
+	# Load sound manifest for audio resolution
+	_load_sound_manifest()
 
 	var scene_generator = WeaponSceneGenerator.new()
 
@@ -52,7 +59,7 @@ func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 			if pof_source.is_empty():
 				push_error("Error: Could not find POF source for " + res.projectile_model)
 				return false
-			
+
 			if not _convert_asset(pof_source, weapon_dir, "model"):
 				push_error("Error: Failed to convert POF model: " + pof_source)
 				return false
@@ -79,11 +86,15 @@ func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 				# If not found, try searching in hermes_interface specifically
 				if icon_source.is_empty():
 					var hermes_interface_dir = source_root.path_join("hermes_interface")
-					icon_source = _find_source_asset(hermes_interface_dir, res.display_icon, [".eff", ".dds", ".pcx", ".png"])
+					icon_source = _find_source_asset(
+						hermes_interface_dir, res.display_icon, [".eff", ".dds", ".pcx", ".png"]
+					)
 
 				# If still not found, try general search
 				if icon_source.is_empty():
-					icon_source = _find_source_asset(source_root, res.display_icon, [".pcx", ".dds", ".png"])
+					icon_source = _find_source_asset(
+						source_root, res.display_icon, [".pcx", ".dds", ".png"]
+					)
 
 				if icon_source.is_empty():
 					push_warning("Warning: Could not find icon source: " + res.display_icon)
@@ -101,7 +112,9 @@ func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 					else:
 						# Set appropriate output filename
 						if conversion_type == "animation":
-							res.display_icon = icon_source.get_file().get_basename() + "_spriteframes.tres"
+							res.display_icon = (
+								icon_source.get_file().get_basename() + "_spriteframes.tres"
+							)
 						else:
 							res.display_icon = icon_source.get_file().get_basename() + ".png"
 
@@ -114,12 +127,16 @@ func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 						source_root, res._laser_bitmap_source, [".pcx", ".dds", ".png"]
 					)
 				if laser_source.is_empty():
-					push_warning("Warning: Could not find laser bitmap source: " + res._laser_bitmap_source)
+					push_warning(
+						"Warning: Could not find laser bitmap source: " + res._laser_bitmap_source
+					)
 				else:
 					if not _convert_asset(laser_source, weapon_dir, "texture"):
 						push_warning("Warning: Failed to convert laser bitmap: " + laser_source)
 					else:
-						var tex_path = weapon_dir.path_join(laser_source.get_file().get_basename() + ".png")
+						var tex_path = weapon_dir.path_join(
+							laser_source.get_file().get_basename() + ".png"
+						)
 						print("DEBUG: Checking for texture at: ", tex_path)
 						# weapon_dir is an absolute path, so tex_path is also absolute
 						var file_exists = FileAccess.file_exists(tex_path)
@@ -140,12 +157,16 @@ func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 					source_root, res._laser_glow_source, [".pcx", ".dds", ".png"]
 				)
 				if glow_source.is_empty():
-					push_warning("Warning: Could not find laser glow source: " + res._laser_glow_source)
+					push_warning(
+						"Warning: Could not find laser glow source: " + res._laser_glow_source
+					)
 				else:
 					if not _convert_asset(glow_source, weapon_dir, "texture"):
 						push_warning("Warning: Failed to convert laser glow: " + glow_source)
 					else:
-						var tex_path = weapon_dir.path_join(glow_source.get_file().get_basename() + ".png")
+						var tex_path = weapon_dir.path_join(
+							glow_source.get_file().get_basename() + ".png"
+						)
 						if not FileAccess.file_exists(tex_path):
 							push_warning("Warning: Converted laser glow not found: " + tex_path)
 						else:
@@ -159,9 +180,13 @@ func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 			if res.tech_animation.begins_with("empty"):
 				res.tech_animation = "res://assets/shared/empty.tres"
 			else:
-				var anim_source = _find_source_asset(source_root, res.tech_animation, [".ani", ".eff"])
+				var anim_source = _find_source_asset(
+					source_root, res.tech_animation, [".ani", ".eff"]
+				)
 				if anim_source.is_empty():
-					push_warning("Warning: Could not find tech animation source: " + res.tech_animation)
+					push_warning(
+						"Warning: Could not find tech animation source: " + res.tech_animation
+					)
 					res.tech_animation = ""
 				elif not _convert_asset(anim_source, weapon_dir, "ui"):
 					push_warning("Warning: Failed to convert tech animation: " + anim_source)
@@ -185,7 +210,10 @@ func generate(weapons: Array, output_dir: String, source_root: String) -> bool:
 			# Let's assume explosions are handled separately and we just link.
 			res.impact_explosion = expl_path
 
-		# 5. Generate Scene and Resource
+		# 5. Resolve sounds from manifest
+		_resolve_weapon_sounds(res)
+
+		# 6. Generate Scene and Resource
 		scene_generator.generate_scene(res, weapons_root)
 
 	return true
@@ -236,7 +264,16 @@ func _convert_asset(source_path: String, target_dir: String, type: String) -> bo
 	var global_target = ProjectSettings.globalize_path(target_dir)
 
 	var args = [
-		"run", "--directory", "..", "python", "-m", "converter", global_source, global_target, "--type", type
+		"run",
+		"--directory",
+		"..",
+		"python",
+		"-m",
+		"converter",
+		global_source,
+		global_target,
+		"--type",
+		type
 	]
 
 	var output = []
@@ -248,3 +285,94 @@ func _convert_asset(source_path: String, target_dir: String, type: String) -> bo
 		return false
 
 	return true
+
+
+# ==============================================================================
+# SOUND RESOLUTION
+# ==============================================================================
+
+
+func _load_sound_manifest() -> void:
+	"""Load sound manifest and build index -> AudioStream lookup table."""
+	_sound_lookup.clear()
+
+	var manifest_path = "res://assets/sounds/sounds.tres"
+	if not ResourceLoader.exists(manifest_path):
+		push_warning(
+			(
+				"Sound manifest not found at: "
+				+ manifest_path
+				+ ". Weapon sounds will not be resolved."
+			)
+		)
+		return
+
+	var manifest = load(manifest_path)
+	if not manifest:
+		push_warning("Failed to load sound manifest. Weapon sounds will not be resolved.")
+		return
+
+	# Build lookup from signature (index) to audio_stream
+	if manifest.audio_configs:
+		for config in manifest.audio_configs:
+			if config.signature >= 0 and config.audio_stream:
+				_sound_lookup[config.signature] = config.audio_stream
+
+	print("Loaded sound manifest with " + str(_sound_lookup.size()) + " sound entries.")
+
+
+func _get_sound_by_index(sound_index: int) -> AudioStream:
+	"""Look up an AudioStream by its sound index from sounds.tbl."""
+	if sound_index < 0:
+		return null
+	if _sound_lookup.has(sound_index):
+		return _sound_lookup[sound_index]
+	return null
+
+
+func _resolve_weapon_sounds(weapon_res: Resource) -> void:
+	"""Resolve sound indices to AudioStream resources."""
+	# Fire sound (launch_sound_index)
+	if weapon_res.launch_sound_index >= 0:
+		var stream = _get_sound_by_index(weapon_res.launch_sound_index)
+		if stream:
+			weapon_res.fire_sound = stream
+		else:
+			push_warning(
+				(
+					"Could not resolve fire sound index "
+					+ str(weapon_res.launch_sound_index)
+					+ " for weapon "
+					+ weapon_res.id
+				)
+			)
+
+	# Impact sound
+	if weapon_res.impact_sound_index >= 0:
+		var stream = _get_sound_by_index(weapon_res.impact_sound_index)
+		if stream:
+			weapon_res.impact_sound = stream
+		else:
+			push_warning(
+				(
+					"Could not resolve impact sound index "
+					+ str(weapon_res.impact_sound_index)
+					+ " for weapon "
+					+ weapon_res.id
+				)
+			)
+
+	# Flyby sound
+	if weapon_res.flyby_sound_index >= 0:
+		var stream = _get_sound_by_index(weapon_res.flyby_sound_index)
+		if stream:
+			weapon_res.flyby_sound = stream
+		else:
+			push_warning(
+				(
+					"Could not resolve flyby sound index "
+					+ str(weapon_res.flyby_sound_index)
+					+ " for weapon "
+					+ weapon_res.id
+				)
+			)

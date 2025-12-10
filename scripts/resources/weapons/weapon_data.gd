@@ -104,6 +104,7 @@ enum WeaponFlags {
 @export var tech_description: String = ""
 @export var display_icon: String = ""
 @export var anim_file: String = "" # Loadout animation, TODO, make reference to spriteframes resource tres file
+@export var scene_path: String = "" # Path to instantiable projectile scene (.tscn)
 
 # -------------------------------------------------------------------------
 # 2. Physics & Ballistics
@@ -218,6 +219,9 @@ var _laser_glow_source: String = ""
 @export var launch_sound_index: int = -1
 @export var impact_sound_index: int = -1
 @export var flyby_sound_index: int = -1
+@export var fire_sound: AudioStream # Resolved from sounds.tbl during weapon generation
+@export var impact_sound: AudioStream # Resolved from sounds.tbl during weapon generation
+@export var flyby_sound: AudioStream # Resolved from sounds.tbl during weapon generation
 
 # -------------------------------------------------------------------------
 # 10. Flags

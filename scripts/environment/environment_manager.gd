@@ -40,6 +40,14 @@ signal environmental_damage(damage_info: Dictionary)
 ## Enable dynamic lighting
 @export var dynamic_lighting: bool = true
 
+# Preload WCS lighting config script
+const WCSLightingConfigScript = preload("res://scripts/environment/wcs_lighting_config.gd")
+
+@export_group("WCS Lighting")
+## WCS-specific lighting configuration (from legacy C++ lighting.cpp)
+@export var lighting_config: Resource # WCSLightingConfig
+
+
 # ==============================================================================
 # INTERNAL STATE
 # ==============================================================================
@@ -70,10 +78,17 @@ const NebulaControllerScript = preload("res://scripts/environment/nebula_control
 
 
 func _ready() -> void:
+	_ensure_lighting_config()
 	_setup_base_environment()
 	_find_or_create_components()
 	_initialized = true
 	environment_ready.emit()
+
+
+func _ensure_lighting_config() -> void:
+	## Ensure we have a valid WCS lighting config
+	if not lighting_config:
+		lighting_config = WCSLightingConfigScript.create_default()
 
 
 func _process(delta: float) -> void:
@@ -282,7 +297,7 @@ func _apply_ambient_settings() -> void:
 	if nebula:
 		var nebula_color: Color = nebula.get_fog_color()
 		env.ambient_light_color = nebula_color.lerp(ambient_color, 0.5)
-		env.ambient_light_energy = ambient_energy * 0.5  # Dimmer in nebula
+		env.ambient_light_energy = ambient_energy * 0.5 # Dimmer in nebula
 	else:
 		env.ambient_light_color = ambient_color
 		env.ambient_light_energy = ambient_energy
@@ -312,7 +327,7 @@ func _extract_environment_config(mission_data: Resource) -> Dictionary:
 				{
 					"name": "Sun_%d" % sun_list.size(),
 					"direction": _angles_to_direction(sun_angles),
-					"texture": sun_entry.get("texture"),  # Texture2D
+					"texture": sun_entry.get("texture"), # Texture2D
 					"scale": sun_entry.get("scale", 1.0)
 				}
 			)
@@ -357,7 +372,7 @@ func _extract_environment_config(mission_data: Resource) -> Dictionary:
 					"pitch": neb_pitch if neb_pitch else 0,
 					"bank": neb_bank if neb_bank else 0,
 					"heading": neb_heading if neb_heading else 0,
-					"fog_density": 0.3,  # Default, override from NebulaData if available
+					"fog_density": 0.3, # Default, override from NebulaData if available
 					"fog_color": Color(0.3, 0.2, 0.4)
 				}
 
@@ -458,22 +473,22 @@ func apply_effects_to_ship(ship: Node3D, delta: float) -> Dictionary:
 ## Set quality settings
 func set_quality_preset(preset: int) -> void:
 	match preset:
-		0:  # Low
+		0: # Low
 			star_density = 0.3
 			volumetric_effects = false
 			if starfield:
 				starfield.enable_twinkle = false
-		1:  # Medium
+		1: # Medium
 			star_density = 0.7
 			volumetric_effects = false
 			if starfield:
 				starfield.enable_twinkle = true
-		2:  # High
+		2: # High
 			star_density = 1.0
 			volumetric_effects = true
 			if starfield:
 				starfield.enable_twinkle = true
-		3:  # Ultra
+		3: # Ultra
 			star_density = 1.5
 			volumetric_effects = true
 			if starfield:
@@ -538,7 +553,7 @@ func clear_environment() -> void:
 
 ## Pool of reusable dynamic lights
 var _point_light_pool: Array[OmniLight3D] = []
-var _active_point_lights: Array[Dictionary] = []  # {light, end_time}
+var _active_point_lights: Array[Dictionary] = [] # {light, end_time}
 
 const MAX_DYNAMIC_LIGHTS := 32
 const LIGHT_POOL_SIZE := 16
@@ -546,11 +561,18 @@ const LIGHT_POOL_SIZE := 16
 
 ## Add a dynamic point light (for explosions, weapon impacts)
 ## Returns the light node for further customization, or null if pool exhausted
+## Energy is automatically scaled by WCS point_light_factor (8.6x) for authentic look
 func add_point_light(
-	light_position: Vector3, color: Color, energy: float, radius: float, duration: float = 0.0
+	light_position: Vector3, color: Color, energy: float, radius: float, duration: float = 0.0,
+	apply_wcs_factor: bool = true
 ) -> OmniLight3D:
 	if not dynamic_lighting:
 		return null
+
+	# Apply WCS point light factor if enabled
+	var effective_energy := energy
+	if apply_wcs_factor and lighting_config:
+		effective_energy = lighting_config.get_point_light_energy(energy)
 
 	# Get or create a light from pool
 	var light := _get_pooled_light()
@@ -560,9 +582,9 @@ func add_point_light(
 	# Configure the light
 	light.global_position = light_position
 	light.light_color = color
-	light.light_energy = energy
+	light.light_energy = effective_energy
 	light.omni_range = radius
-	light.omni_attenuation = 1.5  # Quadratic falloff
+	light.omni_attenuation = 1.5 # Quadratic falloff
 	light.visible = true
 
 	# Track if it has a duration
@@ -571,7 +593,7 @@ func add_point_light(
 			{
 				"light": light,
 				"end_time": Time.get_ticks_msec() + int(duration * 1000.0),
-				"start_energy": energy
+				"start_energy": effective_energy
 			}
 		)
 
@@ -579,27 +601,34 @@ func add_point_light(
 
 
 ## Add a tube light approximation (for beam weapons)
-## Uses two point lights at endpoints - Godot doesn't have native tube lights
+## Uses point lights along the beam - Godot doesn't have native tube lights
+## Energy is automatically scaled by WCS tube_light_factor (1.0x default)
 func add_tube_light(
 	start_pos: Vector3,
 	end_pos: Vector3,
 	color: Color,
 	energy: float,
 	radius: float,
-	_affected_object: Node3D = null
+	_affected_object: Node3D = null,
+	apply_wcs_factor: bool = true
 ) -> Array[OmniLight3D]:
 	if not dynamic_lighting:
 		return []
 
+	# Apply WCS tube light factor if enabled
+	var effective_energy := energy
+	if apply_wcs_factor and lighting_config:
+		effective_energy = lighting_config.get_tube_light_energy(energy)
+
 	var lights: Array[OmniLight3D] = []
 
-	# Create light at start
-	var start_light := add_point_light(start_pos, color, energy * 0.5, radius)
+	# Create light at start - pass false for apply_wcs_factor as we already applied tube factor
+	var start_light := add_point_light(start_pos, color, effective_energy * 0.5, radius, 0.0, false)
 	if start_light:
 		lights.append(start_light)
 
 	# Create light at end
-	var end_light := add_point_light(end_pos, color, energy * 0.5, radius)
+	var end_light := add_point_light(end_pos, color, effective_energy * 0.5, radius, 0.0, false)
 	if end_light:
 		lights.append(end_light)
 
@@ -607,7 +636,7 @@ func add_tube_light(
 	var beam_length := start_pos.distance_to(end_pos)
 	if beam_length > radius * 2.0:
 		var mid_pos := (start_pos + end_pos) * 0.5
-		var mid_light := add_point_light(mid_pos, color, energy * 0.3, radius)
+		var mid_light := add_point_light(mid_pos, color, effective_energy * 0.3, radius, 0.0, false)
 		if mid_light:
 			lights.append(mid_light)
 
@@ -652,7 +681,7 @@ func _get_pooled_light() -> OmniLight3D:
 	var light := OmniLight3D.new()
 	light.name = "DynamicLight_%d" % total_lights
 	light.add_to_group("dynamic_lights")
-	light.shadow_enabled = false  # Performance
+	light.shadow_enabled = false # Performance
 	add_child(light)
 	return light
 

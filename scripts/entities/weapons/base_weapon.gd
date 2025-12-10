@@ -1,12 +1,12 @@
 class_name BaseWeapon
 extends Node3D
 
-# Dependencies
-const WeaponData = preload("res://scripts/resources/weapons/weapon_data.gd")
+# Dependencies - using alias to avoid shadowing global class_name
+const WCSWeaponData = preload("res://scripts/resources/weapons/weapon_data.gd")
 # DamageResult is available via class_name, no preload needed
 
 # Configuration
-@export var weapon_data: WeaponData
+@export var weapon_data: WCSWeaponData
 
 # State
 var fired_by: Node3D  # Ship or object that fired this
@@ -21,6 +21,10 @@ signal weapon_expired
 
 
 func _ready() -> void:
+	# Try to load weapon_data from metadata if not set via @export
+	if not weapon_data:
+		_load_weapon_data_from_metadata()
+
 	if weapon_data:
 		_initialize_from_data()
 	else:
@@ -38,6 +42,19 @@ func _ready() -> void:
 	get_tree().create_timer(max(lifetime, 0.1)).timeout.connect(_on_lifetime_expired)
 
 
+func _load_weapon_data_from_metadata() -> void:
+	# Scene generator stores weapon_data_path in metadata
+	if has_meta("weapon_data_path"):
+		var path = get_meta("weapon_data_path")
+		if ResourceLoader.exists(path):
+			weapon_data = load(path)
+			return
+
+	# Fallback: check for weapon_data directly in metadata (older scenes)
+	if has_meta("weapon_data"):
+		weapon_data = get_meta("weapon_data")
+
+
 func _setup_collision_layers(area: Area3D) -> void:
 	# Projectiles should only hit things not on their team
 	# For now use basic setup - will be refined by CollisionManager
@@ -51,9 +68,44 @@ func _setup_collision_layers(area: Area3D) -> void:
 
 
 func _initialize_from_data() -> void:
-	# Set initial physics state
-	# Visuals are assumed to be instantiated by the scene generator or loader
-	pass
+	# Create laser visual if no model exists and this is a laser weapon
+	if not get_node_or_null("Visuals") and weapon_data:
+		if weapon_data.laser_bitmap and weapon_data.laser_length > 0:
+			_create_laser_visual()
+
+
+func _create_laser_visual() -> void:
+	# Create elongated quad mesh for laser projectile
+	var mesh_instance = MeshInstance3D.new()
+	mesh_instance.name = "LaserMesh"
+
+	# Create quad mesh (oriented along Z axis)
+	var quad = QuadMesh.new()
+	quad.size = Vector2(weapon_data.laser_head_radius * 2.0, weapon_data.laser_length)
+	quad.orientation = PlaneMesh.FACE_Z
+	mesh_instance.mesh = quad
+
+	# Create material with laser texture
+	var material = StandardMaterial3D.new()
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.billboard_mode = BaseMaterial3D.BILLBOARD_FIXED_Y
+	material.albedo_color = weapon_data.laser_color if weapon_data.laser_color else Color.RED
+
+	if weapon_data.laser_bitmap:
+		material.albedo_texture = weapon_data.laser_bitmap
+
+	if weapon_data.laser_glow:
+		material.emission_enabled = true
+		material.emission = weapon_data.laser_color if weapon_data.laser_color else Color.RED
+		material.emission_energy_multiplier = 2.0
+
+	mesh_instance.material_override = material
+
+	# Position mesh so it extends forward from origin
+	mesh_instance.position.z = -weapon_data.laser_length / 2.0
+
+	add_child(mesh_instance)
 
 
 func setup(
@@ -119,7 +171,7 @@ func _detonate(hit_object: Node3D = null) -> void:
 
 	weapon_detonated.emit(global_position)
 
-	if weapon_data.flags & WeaponData.WeaponFlags.PARTICLE_SPEW:
+	if weapon_data.flags & WCSWeaponData.WeaponFlags.PARTICLE_SPEW:
 		_spawn_particle_spew()
 
 	if hit_object and weapon_data:
@@ -130,16 +182,16 @@ func _detonate(hit_object: Node3D = null) -> void:
 			)
 
 			# Inject Effects
-			if weapon_data.flags & WeaponData.WeaponFlags.ENERGY_SUCK:
+			if weapon_data.flags & WCSWeaponData.WeaponFlags.ENERGY_SUCK:
 				# Use total damage as base for suck amount if not specified otherwise
 				damage_info["energy_suck"] = damage_info.get("total_damage", 0.0)
 
-			if weapon_data.flags & WeaponData.WeaponFlags.EMP:
+			if weapon_data.flags & WCSWeaponData.WeaponFlags.EMP:
 				damage_info["emp"] = {
 					"intensity": weapon_data.emp_intensity, "time": weapon_data.emp_time
 				}
 
-			if weapon_data.flags & WeaponData.WeaponFlags.ELECTRONICS:
+			if weapon_data.flags & WCSWeaponData.WeaponFlags.ELECTRONICS:
 				damage_info["electronics"] = true
 
 			hit_object.take_damage(damage_info, fired_by)
