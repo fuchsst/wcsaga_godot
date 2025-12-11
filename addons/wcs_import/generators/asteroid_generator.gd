@@ -63,87 +63,133 @@ func generate(data: Dictionary, output_dir: String, source_root: String) -> bool
 		return false
 	print("Saved TRES: ", tres_path, " - Error code: ", err)
 
-	# 2. Create Scene
-	var root = RigidBody3D.new()
-	root.name = asteroid_name
+	# 2. Create Scene using text-based generation for proper script attachment
+	# This avoids issues with PackedScene.pack() not serializing scripts in headless mode
 
-	# Attach behavior script
-	# Temporarily commented out to avoid script loading errors in headless mode
-	# root.set_script(Asteroid)
-	root.set_meta("asteroid_data", resource)
-
-	# Add Collision Shape (Placeholder - Sphere)
-	var collision = CollisionShape3D.new()
-	var shape = SphereShape3D.new()
-	shape.radius = 10.0 # Default
-	collision.shape = shape
-	collision.name = "CollisionShape3D"
-	root.add_child(collision)
-	collision.owner = root
-
-	# Add variations
-	var variation_nodes: Array[Node3D] = []
-
+	# Build model references
+	var model_paths: Array[String] = []
 	for i in range(pof_keys.size()):
 		var key = pof_keys[i]
 		if not data.has(key):
 			continue
-
 		var pof_file = data[key]
 		if pof_file.is_empty() or pof_file == "none":
 			continue
-
 		var pof_basename = pof_file.get_basename()
 		var gltf_path = asset_dir.path_join(pof_basename + ".gltf")
+		if FileAccess.file_exists(gltf_path):
+			model_paths.append(gltf_path)
 
-		# Load GLTF scene using GLTFDocument (bypasses need for editor import)
-		if not FileAccess.file_exists(gltf_path):
-			print("WARNING: Model file not found: ", gltf_path)
-			continue
+	# Generate scene text
+	var tscn_content = _generate_asteroid_scene_text(
+		asteroid_name, asteroid_id, tres_path, model_paths, asset_dir
+	)
 
-		var gltf = GLTFDocument.new()
-		var state = GLTFState.new()
-		var gltf_err = gltf.append_from_file(gltf_path, state)
-
-		if gltf_err == OK:
-			var instance = gltf.generate_scene(state)
-			instance.name = "Variation_" + str(i)
-			root.add_child(instance)
-			instance.owner = root
-			variation_nodes.append(instance)
-
-			# Update collision radius from first variation
-			if i == 0:
-				shape.radius = 20.0 # Placeholder - ideally calculated from AABB
-
-			# Hide by default (except first one)
-			instance.visible = (i == 0)
-		else:
-			print("ERROR: Failed to load GLTF: ", gltf_path, " Error code: ", gltf_err)
-
-	# Assign variation nodes to script property (commented out to avoid script dependency)
-	# root.variations = variation_nodes
-	root.set_meta("variations", variation_nodes)
-
-	# Pack scene
-	var scene = PackedScene.new()
-	var pack_result = scene.pack(root)
-	if pack_result == OK:
-		var tscn_path = asset_dir.path_join(asteroid_id + ".tscn")
-		var save_err = ResourceSaver.save(scene, tscn_path)
-		if save_err != OK:
-			print("ERROR saving TSCN ", tscn_path, ": ", save_err)
-			root.free()
-			return false
-		else:
-			print("Saved TSCN: ", tscn_path)
+	# Write scene file
+	var tscn_path = asset_dir.path_join(asteroid_id + ".tscn")
+	var file = FileAccess.open(tscn_path, FileAccess.WRITE)
+	if file:
+		file.store_string(tscn_content)
+		file.close()
+		print("Saved TSCN: ", tscn_path)
 	else:
-		print("ERROR packing scene for ", asteroid_id)
-		root.free()
+		print("ERROR: Failed to write TSCN: ", tscn_path)
 		return false
 
-	root.free()
 	return true
+
+
+func _generate_asteroid_scene_text(
+	asteroid_name: String,
+	_asteroid_id: String,
+	resource_path: String,
+	model_paths: Array[String],
+	asset_dir: String
+) -> String:
+	var lines: Array[String] = []
+
+	# Calculate load steps: script + resource + shape + models
+	var load_steps = 3 + model_paths.size()
+
+	# Header
+	lines.append("[gd_scene load_steps=%d format=3]" % load_steps)
+	lines.append("")
+
+	# External resources
+	var ext_id = 1
+	(
+		lines
+		.append(
+			(
+				'[ext_resource type="Script" path="res://scripts/entities/asteroid/asteroid.gd" id="script_%d"]'
+				% ext_id
+			)
+		)
+	)
+	var script_id = "script_%d" % ext_id
+	ext_id += 1
+
+	# Resource path - convert to res://
+	var res_resource_path = _to_res_path(resource_path, asset_dir)
+	lines.append(
+		(
+			'[ext_resource type="Resource" path="%s" id="asteroid_data_%d"]'
+			% [res_resource_path, ext_id]
+		)
+	)
+	var data_id = "asteroid_data_%d" % ext_id
+	ext_id += 1
+
+	# Model resources
+	var model_ids: Array[String] = []
+	for model_path in model_paths:
+		var res_model_path = _to_res_path(model_path, asset_dir)
+		lines.append(
+			'[ext_resource type="PackedScene" path="%s" id="model_%d"]' % [res_model_path, ext_id]
+		)
+		model_ids.append("model_%d" % ext_id)
+		ext_id += 1
+
+	lines.append("")
+
+	# Sub-resources
+	lines.append('[sub_resource type="SphereShape3D" id="SphereShape3D_collision"]')
+	lines.append("radius = 10.0")
+	lines.append("")
+
+	# Root node
+	lines.append('[node name="%s" type="RigidBody3D"]' % asteroid_name)
+	lines.append('script = ExtResource("%s")' % script_id)
+	lines.append('asteroid_data = ExtResource("%s")' % data_id)
+	lines.append("")
+
+	# Collision shape
+	lines.append('[node name="CollisionShape3D" type="CollisionShape3D" parent="."]')
+	lines.append('shape = SubResource("SphereShape3D_collision")')
+	lines.append("")
+
+	# Model instances
+	for i in range(model_ids.size()):
+		var visible = "true" if i == 0 else "false"
+		lines.append(
+			'[node name="Variation_%d" parent="." instance=ExtResource("%s")]' % [i, model_ids[i]]
+		)
+		if i > 0:
+			lines.append("visible = false")
+		lines.append("")
+
+	return "\n".join(lines)
+
+
+func _to_res_path(abs_path: String, _asset_dir: String) -> String:
+	var project_root = ProjectSettings.globalize_path("res://")
+	if abs_path.begins_with(project_root):
+		return abs_path.replace(project_root, "res://")
+	# Fallback: find /target/ in path
+	var idx = abs_path.find("/target/")
+	if idx != -1:
+		return "res://" + abs_path.substr(idx + 8)
+	return abs_path
 
 
 func _find_source_asset(root_path: String, filename: String, extensions: Array = []) -> String:
@@ -184,7 +230,17 @@ func _convert_asset(source_path: String, target_dir: String, type: String) -> bo
 	var global_target = ProjectSettings.globalize_path(target_dir)
 
 	var args = [
-		"run", "--directory", "..", "python", "-m", "converter", global_source, global_target, "--type", type, "--no-model-data"
+		"run",
+		"--directory",
+		"..",
+		"python",
+		"-m",
+		"converter",
+		global_source,
+		global_target,
+		"--type",
+		type,
+		"--no-model-data"
 	]
 
 	var output = []

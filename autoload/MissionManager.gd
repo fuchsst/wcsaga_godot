@@ -16,11 +16,12 @@ signal goal_updated(goal: MissionGoal, new_status: int)
 signal event_triggered(event: MissionEvent)
 
 # === CONSTANTS ===
-const MissionManifest = preload("res://scripts/resources/missions/mission_manifest.gd")
-const MissionObject = preload("res://scripts/resources/missions/mission_object.gd")
-const MissionGoal = preload("res://scripts/resources/missions/mission_goal.gd")
-const MissionEvent = preload("res://scripts/resources/missions/mission_event.gd")
-const MissionWing = preload("res://scripts/resources/missions/mission_wing.gd")
+# Preloads removed to avoid shadowing global class_names
+# const MissionManifest = preload("res://scripts/resources/missions/mission_manifest.gd")
+# const MissionObject = preload("res://scripts/resources/missions/mission_object.gd")
+# const MissionGoal = preload("res://scripts/resources/missions/mission_goal.gd")
+# const MissionEvent = preload("res://scripts/resources/missions/mission_event.gd")
+# const MissionWing = preload("res://scripts/resources/missions/mission_wing.gd")
 
 # === STATE ===
 ## Currently loaded mission manifest
@@ -221,7 +222,7 @@ func spawn_entity(mission_object: MissionObject) -> Node:
 
 	# Apply initial hull/shields
 	if mission_object.initial_hull < 100 and entity.has_method("set") and "current_hull" in entity:
-		var max_hull = mission_object.ship.hull_hitpoints if mission_object.ship else 100.0
+		var max_hull: float = float(mission_object.ship.hull_hitpoints) if mission_object.ship else 100.0
 		entity.current_hull = max_hull * mission_object.initial_hull / 100.0
 
 	# Add to scene tree
@@ -339,6 +340,15 @@ func _find_ship_scene(ship_stats: Resource) -> String:
 
 	# Check common locations
 	var search_paths = [
+		# Try generator structure (Type/Race/Class)
+		"res://assets/ships/fighter/terran/" + ship_class + "/" + ship_class + ".tscn",
+		"res://assets/ships/bomber/terran/" + ship_class + "/" + ship_class + ".tscn",
+		"res://assets/ships/capital/terran/" + ship_class + "/" + ship_class + ".tscn",
+		"res://assets/ships/fighter/kilrathi/" + ship_class + "/" + ship_class + ".tscn",
+		"res://assets/ships/bomber/kilrathi/" + ship_class + "/" + ship_class + ".tscn",
+		"res://assets/ships/capital/kilrathi/" + ship_class + "/" + ship_class + ".tscn",
+		
+		# Try legacy structure (Race/Type/Class)
 		"res://assets/ships/terran/fighter/" + ship_class + "/" + ship_class + ".tscn",
 		"res://assets/ships/terran/bomber/" + ship_class + "/" + ship_class + ".tscn",
 		"res://assets/ships/terran/capital/" + ship_class + "/" + ship_class + ".tscn",

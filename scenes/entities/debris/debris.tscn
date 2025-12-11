@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://c8j9k1l2m3n4p"]
+
+[ext_resource type="Script" path="res://scripts/entities/debris/debris.gd" id="1_script"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_placeholder"]
+size = Vector3(1, 1, 1)
+
+[node name="Debris" type="RigidBody3D"]
+collision_layer = 8
+collision_mask = 15
+max_contacts_reported = 4
+contact_monitor = true
+script = ExtResource("1_script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_placeholder")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]

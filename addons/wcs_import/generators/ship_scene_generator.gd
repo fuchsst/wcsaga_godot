@@ -4,239 +4,235 @@ extends RefCounted
 const WCSPathResolver = preload("res://addons/wcs_import/core/path_resolver.gd")
 
 func generate(res: Resource, output_dir: String, source_root: String) -> bool:
-    print("Generating Scene for " + res.ship_class)
-    
-    # 1. Determine Output Path
-    var pof_file = res.model_file
-    if pof_file.is_empty():
-        pof_file = res.ship_class + ".pof"
-        
-    var path_info = WCSPathResolver.determine_output_path(pof_file)
-    var category = path_info[0]
-    var subcategory = path_info[1]
-    
-    var filename = _normalize_filename(res.ship_class)
-    
-    # User requested colocated assets: assets/ships/<category>/<subcategory>/<filename>
-    # output_dir usually points to "target" or project root.
-    # WCSPathResolver usually returns "ships" as category for ships.
-    
-    var ship_dir = output_dir.path_join(category).path_join(subcategory).path_join(filename)
-    
-    # Ensure directory exists
-    DirAccess.make_dir_recursive_absolute(ship_dir)
-    
-    # 2. Create Root Instance from Base Scene
-    var base_scene = load("res://scenes/entities/ship/ship_base.tscn")
-    if not base_scene:
-        print("Error: Could not load ship_base.tscn")
-        return false
-        
-    var ship_node = base_scene.instantiate()
-    ship_node.name = filename # e.g. "hellcat_v"
-    ship_node.ship_name = res.display_name if not res.display_name.is_empty() else res.ship_class
-    ship_node.stats = res # Assign stats
-    
-    # 3. Add Model Instance
-    # Model should be in the same directory
-    var model_filename = res.model_file
-    var model_path = ship_dir.path_join(model_filename)
-    
-    if not FileAccess.file_exists(model_path):
-         print("Warning: Model not found at " + model_path)
-         # Try finding it in case of extension mismatch?
-         if FileAccess.file_exists(ship_dir.path_join(filename + ".gltf")):
-             model_path = ship_dir.path_join(filename + ".gltf")
-         elif FileAccess.file_exists(ship_dir.path_join(filename + ".glb")):
-             model_path = ship_dir.path_join(filename + ".glb")
-    
-    if FileAccess.file_exists(model_path):
-        var model_scene = load(model_path)
-        if model_scene:
-            var model_instance = model_scene.instantiate()
-            model_instance.name = "Model"
-            
-            # Add to ModelContainer if it exists (from ship_base)
-            var container = ship_node.get_node_or_null("ModelContainer")
-            if container:
-                container.add_child(model_instance)
-                model_instance.owner = ship_node # Required for saving
-            else:
-                ship_node.add_child(model_instance)
-                model_instance.owner = ship_node
-    else:
-        print("Error: Could not locate model for " + res.ship_class)
-    
-    # 4. Add Collision Shape
-    # ship_base has "CollisionShape3D", we update its shape
-    var collision = ship_node.get_node_or_null("CollisionShape3D")
-    if not collision:
-        collision = CollisionShape3D.new()
-        collision.name = "CollisionShape3D"
-        ship_node.add_child(collision)
-        collision.owner = ship_node
-    
-    # Create collision shape based on ship length from stats or use model bounds
-    var box_shape = BoxShape3D.new()
-    if res.ship_length_meters > 0:
-        # Use ship length to approximate dimensions (length is Z, width is X, height is Y)
-        # Typical fighter proportions: length:width:height = 1:0.5:0.3
-        var length = res.ship_length_meters
-        var width = length * 0.5
-        var height = length * 0.3
-        box_shape.size = Vector3(width, height, length)
-    else:
-        # Default fallback
-        box_shape.size = Vector3(10, 5, 15)
-    
-    collision.shape = box_shape
+	print("Generating Scene for " + res.ship_class)
+	
+	# 1. Determine Output Path
+	var pof_file = res.model_file
+	if pof_file.is_empty():
+		pof_file = res.ship_class + ".pof"
+		
+	var path_info = WCSPathResolver.determine_output_path(pof_file)
+	var category = path_info[0]
+	var subcategory = path_info[1]
+	
+	var filename = _normalize_filename(res.ship_class)
+	var ship_dir = output_dir.path_join(category).path_join(subcategory).path_join(filename)
+	
+	DirAccess.make_dir_recursive_absolute(ship_dir)
+	
+	# 2. Prepare Paths
+	var base_scene_path = "res://scenes/entities/ship/ship_base.tscn"
+	var resource_path = ship_dir.path_join(filename + ".tres")
+	
+	# Model path logic
+	var model_filename = res.model_file
+	var model_path = ship_dir.path_join(model_filename)
+	
+	# If model specifically at resource path doesn't exist, try variants
+	if not FileAccess.file_exists(model_path):
+		var gltf_p = ship_dir.path_join(filename + ".gltf")
+		var glb_p = ship_dir.path_join(filename + ".glb")
+		if FileAccess.file_exists(gltf_p):
+			model_path = gltf_p
+		elif FileAccess.file_exists(glb_p):
+			model_path = glb_p
+		else:
+			# If still not found, check if model_filename was just a basename without ext
+			# or if we should check common locations. 
+			# For now, we trust the logic or leave model_path pointing to non-existent (handled later)
+			pass
 
-    # 5. Generate Hardpoints & Visuals from ShipModelData
-    if ship_node.stats.model_data:
-        _generate_hardpoints(ship_node, ship_node.stats.model_data)
+	# 3. Generate Text Content
+	var tscn_content = _generate_ship_scene_text(
+		filename,
+		res,
+		base_scene_path,
+		resource_path,
+		model_path
+	)
+	
+	# 4. Write Scene File
+	var scene_path = ship_dir.path_join(filename + ".tscn")
+	var file = FileAccess.open(scene_path, FileAccess.WRITE)
+	if file:
+		file.store_string(tscn_content)
+		file.close()
+		print("Saved Scene (Text): " + scene_path)
+		return true
+	else:
+		print("Error writing scene file: " + scene_path)
+		return false
 
-    # 6. Save Scene
-    var scene = PackedScene.new()
-    var result = scene.pack(ship_node)
-    if result == OK:
-        var scene_path = ship_dir.path_join(filename + ".tscn")
-        ResourceSaver.save(scene, scene_path)
-        print("Saved Scene: " + scene_path)
-        
-        # Cleanup
-        ship_node.free()
-        return true
-    else:
-        print("Error packing scene: " + str(result))
-        ship_node.free()
-        return false
+func _generate_ship_scene_text(
+	ship_name: String,
+	stats: Resource,
+	base_scene_path: String,
+	resource_path: String,
+	model_path: String
+) -> String:
+	var lines: Array[String] = []
+	
+	# External Resources Registry
+	var ext_resources = [] # Array of {path, type, id}
+	
+	# Helper to find or add resource
+	var get_ext_id = func(path, type):
+		for res in ext_resources:
+			if res.path == path:
+				return res.id
+		var new_id = "%d_%s" % [ext_resources.size() + 1, type.to_lower().substr(0, 3)]
+		ext_resources.append({"path": path, "type": type, "id": new_id})
+		return new_id
 
-func _generate_hardpoints(root: Node, data: ShipModelData):
-    # --- Hardpoints Container (Guns, Missiles, Turrets, Eyes) ---
-    var hardpoints_root = Node3D.new()
-    hardpoints_root.name = "Hardpoints"
-    root.add_child(hardpoints_root)
-    hardpoints_root.owner = root
+	# 1. Base Scene
+	var base_id = get_ext_id.call(base_scene_path, "PackedScene")
+	
+	# 2. Stats Resource
+	var res_stats_path = _to_res_path(resource_path)
+	var stats_id = get_ext_id.call(res_stats_path, "Resource")
+	
+	# 3. Model
+	var has_model = not model_path.is_empty() and FileAccess.file_exists(model_path)
+	var model_id = ""
+	if has_model:
+		var res_model_path = _to_res_path(model_path)
+		model_id = get_ext_id.call(res_model_path, "PackedScene")
 
-    # 1. Guns (Array[ShipHardpointBank])
-    if not data.guns.is_empty():
-        var group = Node3D.new()
-        group.name = "Guns"
-        hardpoints_root.add_child(group)
-        group.owner = root
-        
-        for bank in data.guns:
-            var bank_node = Node3D.new()
-            # Clean bank name
-            bank_node.name = "Bank_" + bank.name.replace(" ", "_")
-            group.add_child(bank_node)
-            bank_node.owner = root
-            
-            for i in bank.points.size():
-                var marker = Marker3D.new()
-                marker.name = "Point_" + str(i)
-                marker.position = bank.points[i]
-                bank_node.add_child(marker)
-                marker.owner = root
+	# Header
+	# Approximate load steps. Godot is forgiving, but let's try to be close.
+	# Ext resources count + 1 subresource + 1 (for main node?)
+	var load_steps = ext_resources.size() + 2
+	lines.append('[gd_scene load_steps=%d format=3]' % load_steps)
+	lines.append("")
+	
+	# Write External Resources
+	for r in ext_resources:
+		lines.append('[ext_resource type="%s" path="%s" id="%s"]' % [r.type, r.path, r.id])
+	lines.append("")
+	
+	# Sub Resource: Collision Shape
+	# Approximation logic from previous generator
+	var box_size = Vector3(10, 5, 15)
+	if stats.ship_length_meters > 0:
+		var length = stats.ship_length_meters
+		var width = length * 0.5
+		var height = length * 0.3
+		box_size = Vector3(width, height, length)
+		
+	lines.append('[sub_resource type="BoxShape3D" id="BoxShape3D_gen"]')
+	lines.append('size = Vector3(%.4f, %.4f, %.4f)' % [box_size.x, box_size.y, box_size.z])
+	lines.append("")
+	
+	# Root Node
+	lines.append('[node name="%s" instance=ExtResource("%s")]' % [ship_name, base_id])
+	lines.append('stats = ExtResource("%s")' % stats_id)
+	lines.append('ship_name = "%s"' % (stats.display_name if not stats.display_name.is_empty() else stats.ship_class))
+	lines.append("")
+	
+	# CollisionShape3D override
+	lines.append('[node name="CollisionShape3D" parent="." index="0"]')
+	lines.append('shape = SubResource("BoxShape3D_gen")')
+	lines.append("")
+	
+	# Model Container
+	lines.append('[node name="ModelContainer" parent="." index="1"]')
+	lines.append("")
+	
+	if has_model:
+		lines.append('[node name="Model" parent="ModelContainer" index="0" instance=ExtResource("%s")]' % model_id)
+		lines.append("")
+	
+	# Generate derived nodes from ModelData
+	if stats.model_data:
+		_append_model_data_nodes(lines, stats.model_data)
+		
+	return "\n".join(lines)
 
-    # 2. Missiles (Array[ShipHardpointBank])
-    if not data.missiles.is_empty():
-        var group = Node3D.new()
-        group.name = "Missiles"
-        hardpoints_root.add_child(group)
-        group.owner = root
-        
-        for bank in data.missiles:
-            var bank_node = Node3D.new()
-            bank_node.name = "Bank_" + bank.name.replace(" ", "_")
-            group.add_child(bank_node)
-            bank_node.owner = root
-            
-            for i in bank.points.size():
-                var marker = Marker3D.new()
-                marker.name = "Point_" + str(i)
-                marker.position = bank.points[i]
-                bank_node.add_child(marker)
-                marker.owner = root
+func _append_model_data_nodes(lines: Array, data: Resource):
+	# Hardpoints container exists in base scene at index ? 
+	# Safest to reference parent="Hardpoints"
+	# Guns
+	if not data.guns.is_empty():
+		lines.append('[node name="Guns" type="Node3D" parent="Hardpoints" index="0"]')
+		lines.append("")
+		for bank in data.guns:
+			var bank_name = "Bank_" + _clean_name(bank.name)
+			lines.append('[node name="%s" type="Node3D" parent="Hardpoints/Guns"]' % bank_name)
+			lines.append("")
+			for i in bank.points.size():
+				var pt = bank.points[i]
+				lines.append('[node name="Point_%d" type="Marker3D" parent="Hardpoints/Guns/%s"]' % [i, bank_name])
+				lines.append('position = Vector3(%.4f, %.4f, %.4f)' % [pt.x, pt.y, pt.z])
+				lines.append("")
 
-    # 3. Eyes / Viewpoints (Array[ShipEye])
-    if not data.eyes.is_empty():
-        var group = Node3D.new()
-        group.name = "Eyes"
-        hardpoints_root.add_child(group)
-        group.owner = root
-        
-        for i in data.eyes.size():
-            var eye_data = data.eyes[i]
-            var marker = Marker3D.new()
-            marker.name = "Eye_" + str(i)
-            marker.position = eye_data.position
-            # TODO: Set rotation from eye_data.normal
-            group.add_child(marker)
-            marker.owner = root
+	# Missiles
+	if not data.missiles.is_empty():
+		lines.append('[node name="Missiles" type="Node3D" parent="Hardpoints" index="1"]')
+		lines.append("")
+		for bank in data.missiles:
+			var bank_name = "Bank_" + _clean_name(bank.name)
+			lines.append('[node name="%s" type="Node3D" parent="Hardpoints/Missiles"]' % bank_name)
+			lines.append("")
+			for i in bank.points.size():
+				var pt = bank.points[i]
+				lines.append('[node name="Point_%d" type="Marker3D" parent="Hardpoints/Missiles/%s"]' % [i, bank_name])
+				lines.append('position = Vector3(%.4f, %.4f, %.4f)' % [pt.x, pt.y, pt.z])
+				lines.append("")
 
-    # 4. Turrets (Array[ShipTurret])
-    if not data.turrets.is_empty():
-        var group = Node3D.new()
-        group.name = "Turrets"
-        hardpoints_root.add_child(group)
-        group.owner = root
-        
-        for t_data in data.turrets:
-            var t_node = Node3D.new()
-            t_node.name = t_data.name
-            group.add_child(t_node)
-            t_node.owner = root
-            
-            # Add fire points as markers
-            for i in t_data.fire_points.size():
-                var marker = Marker3D.new()
-                marker.name = "FirePoint_" + str(i)
-                marker.position = t_data.fire_points[i]
-                t_node.add_child(marker)
-                marker.owner = root
+	# Turrets
+	if not data.turrets.is_empty():
+		lines.append('[node name="Turrets" type="Node3D" parent="Hardpoints" index="2"]')
+		lines.append("")
+		for turret in data.turrets:
+			var t_name = _clean_name(turret.name)
+			lines.append('[node name="%s" type="Node3D" parent="Hardpoints/Turrets"]' % t_name)
+			# Do we have turret base position? Usually define fire points.
+			lines.append("")
+			for i in turret.fire_points.size():
+				var pt = turret.fire_points[i]
+				lines.append('[node name="FirePoint_%d" type="Marker3D" parent="Hardpoints/Turrets/%s"]' % [i, t_name])
+				lines.append('position = Vector3(%.4f, %.4f, %.4f)' % [pt.x, pt.y, pt.z])
+				lines.append("")
 
-    # --- Visuals Container (Thrusters, Engine Glows) ---
-    var visuals_root = Node3D.new()
-    visuals_root.name = "Visuals"
-    root.add_child(visuals_root)
-    visuals_root.owner = root
+	# Eyes
+	if not data.eyes.is_empty():
+		lines.append('[node name="Eyes" type="Node3D" parent="Hardpoints" index="3"]')
+		lines.append("")
+		for i in data.eyes.size():
+			var eye = data.eyes[i]
+			lines.append('[node name="Eye_%d" type="Marker3D" parent="Hardpoints/Eyes"]' % i)
+			lines.append('position = Vector3(%.4f, %.4f, %.4f)' % [eye.position.x, eye.position.y, eye.position.z])
+			# Rotation from normal could be complex in text, skipping for now or assume forward
+			lines.append("")
 
-    # 5. Thrusters (Array[ShipThruster])
-    if not data.thrusters.is_empty():
-        var group = Node3D.new()
-        group.name = "Thrusters"
-        visuals_root.add_child(group)
-        group.owner = root
-        
-        for i in data.thrusters.size():
-            var t_data = data.thrusters[i]
-            var glow = GPUParticles3D.new()
-            glow.name = "Thruster_" + str(i)
-            glow.position = t_data.position
-            # Placeholder setup
-            glow.emitting = true
-            glow.amount = 16
-            glow.lifetime = 0.5
-            
-            group.add_child(glow)
-            glow.owner = root
+	# Visuals (New node not in base, so we add it to root)
+	# parent="."
+	if not data.thrusters.is_empty():
+		lines.append('[node name="Visuals" type="Node3D" parent="."]')
+		lines.append("")
+		lines.append('[node name="Thrusters" type="Node3D" parent="Visuals"]')
+		lines.append("")
+		for i in data.thrusters.size():
+			var t = data.thrusters[i]
+			lines.append('[node name="Thruster_%d" type="Marker3D" parent="Visuals/Thrusters"]' % i)
+			lines.append('position = Vector3(%.4f, %.4f, %.4f)' % [t.position.x, t.position.y, t.position.z])
+			lines.append("")
 
-
-func _map_category_to_feature(cat: String) -> String:
-    # "ships/fighter" -> "fighters"
-    # "ships/capital" -> "capital_ships"
-    if cat.contains("fighter") or cat.contains("bomber"):
-        return "fighters"
-    if cat.contains("capital"):
-        return "capital_ships"
-    if cat.contains("utility") or cat.contains("support"):
-        return "support"
-    return "misc"
+func _to_res_path(abs_path: String) -> String:
+	var project_root = ProjectSettings.globalize_path("res://")
+	if abs_path.begins_with(project_root):
+		return abs_path.replace(project_root, "res://")
+	var idx = abs_path.find("/target/")
+	if idx != -1:
+		return "res://" + abs_path.substr(idx + 8)
+	return abs_path
 
 func _normalize_filename(name: String) -> String:
-    var n = name.to_lower()
-    n = n.replace(" ", "_")
-    n = n.replace("-", "_")
-    n = n.replace("#", "_")
-    return n
+	var n = name.to_lower()
+	n = n.replace(" ", "_")
+	n = n.replace("-", "_")
+	n = n.replace("#", "_")
+	return n
+
+func _clean_name(name: String) -> String:
+	return name.replace(" ", "_").replace("-", "_").replace(".", "")

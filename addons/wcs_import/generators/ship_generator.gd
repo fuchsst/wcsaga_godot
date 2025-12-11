@@ -87,6 +87,13 @@ func generate(ships: Array, output_dir: String, source_root: String) -> bool:
 		else:
 			print("Saved: " + save_path + " (Model: " + res.model_file + ")")
 
+			# Generate Scene
+			var scene_gen = load("res://addons/wcs_import/generators/ship_scene_generator.gd").new()
+			if scene_gen.generate(res, output_dir, source_root):
+				print("Generated Scene for: " + res.ship_class)
+			else:
+				print("Warning: Failed to generate scene for: " + res.ship_class)
+
 	return true
 
 

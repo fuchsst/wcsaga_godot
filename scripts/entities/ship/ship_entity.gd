@@ -377,8 +377,32 @@ func _on_destroyed() -> void:
 
 
 func _spawn_destruction_effects() -> void:
-	# TODO: Instantiate explosion scene based on stats.explosion_effect
-	pass
+	# Spawn explosion
+	# Use generic explosion for now or from stats
+	# We'll use a signal or MissionManager to spawn to avoid direct scene tree manipulation if possible,
+	# but direct instantiation is standard for effects.
+	# TODO: Use specific explosion from stats
+	# var explosion_type = stats.explosion_propnum
+	# Spawn Debris
+	var debris_count = randi_range(4, 8)
+	var debris_scene = load("res://scenes/entities/debris/debris.tscn")
+	if debris_scene:
+		for i in range(debris_count):
+			var debris = debris_scene.instantiate()
+			# Add to scene root (or specific container)
+			get_tree().current_scene.add_child(debris)
+			
+			# Configure debris
+			debris.spawn_from_ship(
+				global_position,
+				global_transform.basis,
+				velocity,
+				state.rotational_velocity,
+				global_position, # Explosion center
+				500.0, # Explosion force
+				stats.hull_hitpoints,
+				collision_shape.shape.size.length() * 0.5 if collision_shape and collision_shape.shape else 10.0
+			)
 
 
 # ==============================================================================

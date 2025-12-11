@@ -299,10 +299,10 @@ func _process_batch_animations_with_progress(
 		if category in ["fighter", "bomber", "missile", "capital", "station"]:
 			target_output_dir = (
 				output_dir
-				. path_join("assets")
-				. path_join("ships")
-				. path_join(subcategory)
-				. path_join(category)
+				.path_join("assets")
+				.path_join("ships")
+				.path_join(subcategory)
+				.path_join(category)
 			)
 		elif category == "weapon" or category == "effect" or category == "effects":
 			target_output_dir = output_dir.path_join("assets").path_join("effects").path_join(
@@ -631,6 +631,7 @@ func detect_type(path: String) -> String:
 
 	var special_mappings = {
 		"ai.tbl": "ai_classes",
+		"asteroid.tbl": "asteroids",
 		"strings.tbl": "localization",
 		"tstrings.tbl": "localization",
 		"species_defs.tbl": "species_defs"
@@ -699,10 +700,10 @@ func _process_animation(input_path: String, output_dir: String) -> bool:
 	if category in ["fighter", "bomber", "missile", "capital", "station"]:
 		target_output_dir = (
 			output_dir
-			. path_join("assets")
-			. path_join("ships")
-			. path_join(subcategory)
-			. path_join(category)
+			.path_join("assets")
+			.path_join("ships")
+			.path_join(subcategory)
+			.path_join(category)
 		)
 	elif category == "weapon" or category == "effect" or category == "effects":
 		# Weapon effects and general effects go to effects directory with subcategory
@@ -1102,7 +1103,7 @@ func _process_localization(input_path: String, output_dir: String) -> bool:
 				(
 					"Failed to save localization manifest for locale '"
 					+ locale
-					+ "' to: "
+					+"' to: "
 					+ output_path
 				)
 			)
