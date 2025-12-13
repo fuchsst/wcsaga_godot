@@ -11,12 +11,12 @@ extends BTCondition
 func _tick(_delta: float) -> Status:
 	if not MissionManager:
 		return FAILURE
-		
+
 	var name_to_check = object_name
 	if not object_name_var.is_empty():
 		name_to_check = blackboard.get_var(object_name_var, object_name)
-		
+
 	if MissionManager.is_entity_arrived(name_to_check):
 		return SUCCESS
-		
+
 	return FAILURE

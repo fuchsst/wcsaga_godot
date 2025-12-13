@@ -2,7 +2,7 @@
 class_name BTEvade
 extends BTAction
 
-## Behavior Tree Action: Evade 
+## Behavior Tree Action: Evade
 ## Performs evasive maneuvers
 
 @export var evade_time: float = 2.0
@@ -23,11 +23,11 @@ func _enter() -> void:
 func _tick(delta: float) -> Status:
 	var ship: ShipEntity = agent as ShipEntity
 	if not ship: return FAILURE
-	
+
 	_timer -= delta
 	if _timer <= 0:
 		return SUCCESS
-		
+
 	# Apply evade input
 	# Roll + Pitch/Yaw
 	ship.set_control_input(
@@ -36,12 +36,12 @@ func _tick(delta: float) -> Status:
 		1.0, # Roll constantly
 		1.0 # Full throttle
 	)
-	
+
 	# Maybe Strafe?
 	ship.set_control_input(
 		_evade_dir.y, _evade_dir.x, 1.0, 1.0,
 		signf(_evade_dir.x), # Slide X
 		signf(_evade_dir.y) # Slide Y
 	)
-	
+
 	return RUNNING

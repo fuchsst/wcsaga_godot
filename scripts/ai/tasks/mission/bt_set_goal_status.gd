@@ -11,6 +11,6 @@ extends BTAction
 func _tick(_delta: float) -> Status:
 	if not MissionManager:
 		return FAILURE
-		
+
 	MissionManager.set_goal_status(goal_name, new_status)
 	return SUCCESS

@@ -6,16 +6,16 @@ class_name AIController
 extends Node
 
 ## AI State
-@export var behavior_tree: BehaviorTree = null  ## Currently active behavior tree
-@export var ai_class: AIClassResource = null  ## AI class configuration
+@export var behavior_tree: BehaviorTree = null ## Currently active behavior tree
+@export var ai_class: AIClassResource = null ## AI class configuration
 
 ## References
-var ship: Node = null  ## Parent ship entity
-var bt_player: BTPlayer = null  ## LimboAI Behavior Tree player
-var blackboard: Blackboard = null  ## Shared data for BT
+var ship: Node = null ## Parent ship entity
+var bt_player: BTPlayer = null ## LimboAI Behavior Tree player
+var blackboard: Blackboard = null ## Shared data for BT
 
 ## Goal system (mirrors WCS ai_goal structure)
-var active_goals: Array = []  ## Array of goal dictionaries
+var active_goals: Array = [] ## Array of goal dictionaries
 var current_goal_index: int = 0
 
 ## Combat state
@@ -26,7 +26,7 @@ var waypoint_index: int = 0
 
 ## Timing
 var next_think_time: float = 0.0
-var think_interval: float = 0.1  ## How often AI makes decisions
+var think_interval: float = 0.1 ## How often AI makes decisions
 
 
 func _get_mission_manager() -> Node:
@@ -127,6 +127,41 @@ func set_waypoints(points: Array[Vector3]) -> void:
 		blackboard.set_var("waypoint_index", 0)
 
 
+func set_wing_leader(leader: Node, slot: int = 1) -> void:
+	"""Set wing leader for formation flying"""
+	if blackboard:
+		blackboard.set_var("wing_leader", leader)
+		blackboard.set_var("formation_slot", slot)
+
+
+func set_dock_target(target: Node, dock_point: int = 0) -> void:
+	"""Set target for docking operations"""
+	if blackboard:
+		blackboard.set_var("dock_target", target)
+		blackboard.set_var("dock_point", dock_point)
+
+
+func set_carrier(carrier_ship: Node, bay_idx: int = 0) -> void:
+	"""Set carrier for bay emerge/depart operations"""
+	if blackboard:
+		blackboard.set_var("carrier", carrier_ship)
+		blackboard.set_var("bay_index", bay_idx)
+
+
+func set_path_nodes(path: Array[Vector3]) -> void:
+	"""Set path nodes for path following"""
+	if blackboard:
+		blackboard.set_var("path_nodes", path)
+		blackboard.set_var("path_index", 0)
+
+
+func notify_under_attack(attacker: Node) -> void:
+	"""Called when ship is taking fire"""
+	if blackboard:
+		blackboard.set_var("under_attack", true)
+		blackboard.set_var("threat_source", attacker)
+
+
 # === PRIVATE HELPERS ===
 
 
@@ -151,18 +186,51 @@ func _populate_blackboard() -> void:
 	blackboard.set_var("ship", ship)
 	blackboard.set_var("ship_name", ship.name if ship else "")
 
-	# AI class parameters
+	# AI class resource reference (for tasks to access all params)
+	blackboard.set_var("ai_class", ai_class)
+
+	# Core AI parameters
 	if ai_class:
 		blackboard.set_var("accuracy", ai_class.accuracy)
 		blackboard.set_var("evasion", ai_class.evasion)
 		blackboard.set_var("courage", ai_class.courage)
 		blackboard.set_var("patience", ai_class.patience)
 
+		# Combat timing
+		blackboard.set_var("ai_turn_time_scale", ai_class.ai_turn_time_scale)
+		blackboard.set_var("ai_fire_delay_scale", ai_class.hostile_ai_fire_delay_scale)
+
+		# Attack tactics
+		blackboard.set_var("ai_glide_attack_percent", ai_class.ai_glide_attack_percent)
+		blackboard.set_var("ai_circle_strafe_percent", ai_class.ai_circle_strafe_percent)
+
 	# Combat state
 	blackboard.set_var("target", null)
+	blackboard.set_var("target_valid", false)
 	blackboard.set_var("guard_target", null)
 	blackboard.set_var("waypoints", [])
 	blackboard.set_var("waypoint_index", 0)
+
+	# Ship status
+	blackboard.set_var("hull_percent", 1.0)
+	blackboard.set_var("weapon_energy_percent", 1.0)
+	blackboard.set_var("under_attack", false)
+	blackboard.set_var("firing", false)
+
+	# Formation/wing
+	blackboard.set_var("wing_leader", null)
+	blackboard.set_var("formation_slot", 0)
+
+	# Docking/bay
+	blackboard.set_var("dock_target", null)
+	blackboard.set_var("carrier", null)
+	blackboard.set_var("bay_index", 0)
+	blackboard.set_var("is_docked", false)
+	blackboard.set_var("in_bay", false)
+
+	# Navigation
+	blackboard.set_var("path_nodes", [])
+	blackboard.set_var("path_index", 0)
 
 	# Mission manager reference
 	var mm = _get_mission_manager()
