@@ -6,45 +6,45 @@ const WCSPathResolver = preload("res://addons/wcs_import/core/path_resolver.gd")
 func generate(res: Resource, output_dir: String, source_root: String) -> bool:
 	print("Generating Scene for " + res.ship_class)
 	
-	# 1. Determine Output Path
+	# 1. Determine Output Path - must match ship_generator.gd logic
 	var pof_file = res.model_file
 	if pof_file.is_empty():
-		pof_file = res.ship_class + ".pof"
+		push_warning("No model_file on resource for ship: " + res.ship_class)
+		return false
 		
 	var path_info = WCSPathResolver.determine_output_path(pof_file)
 	var category = path_info[0]
 	var subcategory = path_info[1]
 	
-	var filename = _normalize_filename(res.ship_class)
-	var ship_dir = output_dir.path_join(category).path_join(subcategory).path_join(filename)
+	# Use POF basename for folder name (matching ship_generator.gd)
+	var pof_basename = pof_file.get_basename().to_lower()
+	var folder_name = _extract_ship_name_from_pof(pof_basename)
+	var ship_dir = output_dir.path_join(category).path_join(subcategory).path_join(folder_name)
 	
 	DirAccess.make_dir_recursive_absolute(ship_dir)
 	
 	# 2. Prepare Paths
 	var base_scene_path = "res://scenes/entities/ship/ship_base.tscn"
-	var resource_path = ship_dir.path_join(filename + ".tres")
+	var resource_path = ship_dir.path_join(folder_name + ".tres")
 	
-	# Model path logic
-	var model_filename = res.model_file
-	var model_path = ship_dir.path_join(model_filename)
+	# Model path logic - the GLTF is in the same folder with its original basename
+	var model_path = ship_dir.path_join(res.model_file)
 	
 	# If model specifically at resource path doesn't exist, try variants
 	if not FileAccess.file_exists(model_path):
-		var gltf_p = ship_dir.path_join(filename + ".gltf")
-		var glb_p = ship_dir.path_join(filename + ".glb")
+		var gltf_p = ship_dir.path_join(pof_basename + ".gltf")
+		var glb_p = ship_dir.path_join(pof_basename + ".glb")
 		if FileAccess.file_exists(gltf_p):
 			model_path = gltf_p
 		elif FileAccess.file_exists(glb_p):
 			model_path = glb_p
 		else:
-			# If still not found, check if model_filename was just a basename without ext
-			# or if we should check common locations. 
-			# For now, we trust the logic or leave model_path pointing to non-existent (handled later)
+			# If still not found, leave model_path pointing to expected location
 			pass
 
 	# 3. Generate Text Content
 	var tscn_content = _generate_ship_scene_text(
-		filename,
+		folder_name,
 		res,
 		base_scene_path,
 		resource_path,
@@ -52,7 +52,7 @@ func generate(res: Resource, output_dir: String, source_root: String) -> bool:
 	)
 	
 	# 4. Write Scene File
-	var scene_path = ship_dir.path_join(filename + ".tscn")
+	var scene_path = ship_dir.path_join(folder_name + ".tscn")
 	var file = FileAccess.open(scene_path, FileAccess.WRITE)
 	if file:
 		file.store_string(tscn_content)
@@ -140,6 +140,8 @@ func _generate_ship_scene_text(
 	
 	if has_model:
 		lines.append('[node name="Model" parent="ModelContainer" index="0" instance=ExtResource("%s")]' % model_id)
+		# Rotate -90 degrees on X-axis so ship faces forward (-Z) instead of up (+Y)
+		lines.append('rotation_degrees = Vector3(-90, 0, 0)')
 		lines.append("")
 	
 	# Generate derived nodes from ModelData
@@ -233,6 +235,18 @@ func _normalize_filename(name: String) -> String:
 	n = n.replace("-", "_")
 	n = n.replace("#", "_")
 	return n
+
+
+func _extract_ship_name_from_pof(pof_basename: String) -> String:
+	# Strip common prefixes like "tcf_", "tcb_", "tcs_", "kif_", "kib_", "kim_", etc.
+	# E.g., "tcf_hellcat_v" -> "hellcat_v", "kif_dralthi_mk_iv" -> "dralthi_mk_iv"
+	var prefixes = ["tcf_", "tcb_", "tcs_", "kif_", "kib_", "kic_", "kis_", "kim_", "kb_", "tcc_"]
+	var name = pof_basename
+	for prefix in prefixes:
+		if name.begins_with(prefix):
+			name = name.substr(prefix.length())
+			break
+	return name
 
 func _clean_name(name: String) -> String:
 	return name.replace(" ", "_").replace("-", "_").replace(".", "")

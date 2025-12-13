@@ -54,7 +54,7 @@ var bt_player: BTPlayer = null
 
 func _ready() -> void:
 	add_to_group("mission_manager")
-	
+
 	# Setup logic player
 	bt_player = BTPlayer.new()
 	bt_player.name = "MissionLogicPlayer"
@@ -79,7 +79,7 @@ func load_mission(mission_path: String) -> bool:
 
 	current_mission = manifest
 	_reset_mission_state()
-	
+
 	# Load logic tree if present
 	if current_mission.mission_logic:
 		bt_player.behavior_tree = current_mission.mission_logic
@@ -109,7 +109,7 @@ func start_mission() -> void:
 
 	# Initialize mission variables
 	_initialize_variables()
-	
+
 	# Start Logic
 	if bt_player.behavior_tree:
 		bt_player.active = true
@@ -332,36 +332,56 @@ func _initialize_variables() -> void:
 
 
 func _find_ship_scene(ship_stats: Resource) -> String:
-	"""Find the .tscn scene file for a ship"""
-	if not ship_stats or not "ship_class" in ship_stats:
+	"""Find the .tscn scene file for a ship using model_file-based path"""
+	if not ship_stats:
 		return ""
 
-	var ship_class = ship_stats.ship_class.to_lower().replace(" ", "_")
+	# Primary: use model_file to derive folder name (matches generator logic)
+	if "model_file" in ship_stats and not ship_stats.model_file.is_empty():
+		var model_basename = ship_stats.model_file.get_basename().to_lower()
+		var folder_name = _extract_ship_name_from_pof(model_basename)
 
-	# Check common locations
-	var search_paths = [
-		# Try generator structure (Type/Race/Class)
-		"res://assets/ships/fighter/terran/" + ship_class + "/" + ship_class + ".tscn",
-		"res://assets/ships/bomber/terran/" + ship_class + "/" + ship_class + ".tscn",
-		"res://assets/ships/capital/terran/" + ship_class + "/" + ship_class + ".tscn",
-		"res://assets/ships/fighter/kilrathi/" + ship_class + "/" + ship_class + ".tscn",
-		"res://assets/ships/bomber/kilrathi/" + ship_class + "/" + ship_class + ".tscn",
-		"res://assets/ships/capital/kilrathi/" + ship_class + "/" + ship_class + ".tscn",
-		
-		# Try legacy structure (Race/Type/Class)
-		"res://assets/ships/terran/fighter/" + ship_class + "/" + ship_class + ".tscn",
-		"res://assets/ships/terran/bomber/" + ship_class + "/" + ship_class + ".tscn",
-		"res://assets/ships/terran/capital/" + ship_class + "/" + ship_class + ".tscn",
-		"res://assets/ships/kilrathi/fighter/" + ship_class + "/" + ship_class + ".tscn",
-		"res://assets/ships/kilrathi/bomber/" + ship_class + "/" + ship_class + ".tscn",
-		"res://assets/ships/kilrathi/capital/" + ship_class + "/" + ship_class + ".tscn",
-	]
+		# Search categories and factions
+		var cats = ["fighter", "bomber", "capital", "station", "missile", "utility"]
+		var factions = ["terran", "kilrathi", "pirate", "unknown"]
 
-	for path in search_paths:
-		if ResourceLoader.exists(path):
-			return path
+		for cat in cats:
+			for faction in factions:
+				var base = "res://assets/ships/" + cat + "/" + faction + "/"
+				var path = base + folder_name + "/" + folder_name + ".tscn"
+				if ResourceLoader.exists(path):
+					return path
 
+	# Fallback: try ship_class-based paths
+	if "ship_class" in ship_stats:
+		var sc = ship_stats.ship_class.to_lower()
+		sc = sc.replace(" ", "_").replace("-", "_").replace("#", "_")
+		var cats = ["fighter", "bomber", "capital", "station"]
+		var factions = ["terran", "kilrathi", "pirate"]
+
+		for cat in cats:
+			for faction in factions:
+				var base = "res://assets/ships/" + cat + "/" + faction + "/"
+				var path = base + sc + "/" + sc + ".tscn"
+				if ResourceLoader.exists(path):
+					return path
+
+	# Final fallback: base scene
 	return "res://scenes/entities/ship/ship_base.tscn"
+
+
+func _extract_ship_name_from_pof(pof_basename: String) -> String:
+	"""Strip common prefixes from POF basename (matches generator)"""
+	var prefixes = [
+		"tcf_", "tcb_", "tcs_", "kif_", "kib_", "kic_", "kis_", "kim_",
+		"kb_", "tcc_", "tb_", "prf_", "prs_", "misc_"
+	]
+	var name = pof_basename
+	for prefix in prefixes:
+		if name.begins_with(prefix):
+			name = name.substr(prefix.length())
+			break
+	return name
 
 
 func _on_entity_destroyed(entity: Node, mission_object: MissionObject) -> void:
