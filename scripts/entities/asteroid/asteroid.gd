@@ -9,6 +9,13 @@ extends GameEntity
 signal asteroid_destroyed(position: Vector3, size_type: int)
 
 # ==============================================================================
+# CONSTANTS
+# ==============================================================================
+
+const WRAP_CHECK_INTERVAL := 2.0
+const COLLISION_CHECK_INTERVAL := 2.0
+
+# ==============================================================================
 # CONFIGURATION
 # ==============================================================================
 
@@ -31,6 +38,12 @@ signal asteroid_destroyed(position: Vector3, size_type: int)
 ## Reference to the field manager (set by AsteroidFieldManager)
 var field_manager: Node3D = null
 
+## Predicted collision target object number
+var collide_objnum: int = -1
+
+## Time to predicted impact
+var collide_time_to_impact: float = -1.0
+
 # ==============================================================================
 # RUNTIME STATE
 # ==============================================================================
@@ -43,19 +56,6 @@ var _wrap_check_timer: float = 0.0
 
 ## Time until next collision prediction check
 var _collision_check_timer: float = 0.0
-
-## Predicted collision target object number
-var collide_objnum: int = -1
-
-## Time to predicted impact
-var collide_time_to_impact: float = -1.0
-
-# ==============================================================================
-# CONSTANTS
-# ==============================================================================
-
-const WRAP_CHECK_INTERVAL := 2.0
-const COLLISION_CHECK_INTERVAL := 2.0
 
 # ==============================================================================
 # INITIALIZATION
@@ -99,8 +99,8 @@ func _setup_collision_layers() -> void:
 			collision_mask = cm.get_collision_mask("asteroid", "")
 	else:
 		# Default layers if CollisionManager not available
-		collision_layer = 1 << 4  # Asteroid layer
-		collision_mask = (1 << 0) | (1 << 1) | (1 << 2) | (1 << 4)  # Ship, weapon, etc.
+		collision_layer = 1 << 4 # Asteroid layer
+		collision_mask = (1 << 0) | (1 << 1) | (1 << 2) | (1 << 4) # Ship, weapon, etc.
 
 
 # ==============================================================================
@@ -114,6 +114,12 @@ func _physics_process(delta: float) -> void:
 	if _wrap_check_timer <= 0.0:
 		_wrap_check_timer = WRAP_CHECK_INTERVAL
 		_check_field_wrap()
+
+	# Check for collision prediction periodically
+	_collision_check_timer -= delta
+	if _collision_check_timer <= 0.0:
+		_collision_check_timer = COLLISION_CHECK_INTERVAL
+		_check_collision_prediction()
 
 	# Cap speed to prevent asteroids from getting too fast
 	_cap_speed()
@@ -140,6 +146,77 @@ func _cap_speed() -> void:
 func _check_field_wrap() -> void:
 	if field_manager and field_manager.has_method("check_wrap"):
 		field_manager.check_wrap(self)
+
+
+## Check for predicted collisions with escort ships
+func _check_collision_prediction() -> void:
+	# Reset prediction state
+	collide_objnum = -1
+	collide_time_to_impact = -1.0
+
+	# Only predict if we're moving
+	var speed := linear_velocity.length()
+	if speed < 1.0:
+		return
+
+	# Find nearest escort ship and predict collision
+	var ships := get_tree().get_nodes_in_group("escort_ships")
+	if ships.is_empty():
+		# Fallback to player ship
+		ships = get_tree().get_nodes_in_group("player_ship")
+
+	var min_time := 24.0 # Max look-ahead time (ASTEROID_MIN_COLLIDE_TIME)
+
+	for ship in ships:
+		if not is_instance_valid(ship) or not ship is Node3D:
+			continue
+
+		var ship_node: Node3D = ship as Node3D
+		var time_to_impact := _calculate_time_to_impact(ship_node)
+
+		if time_to_impact > 0.0 and time_to_impact < min_time:
+			min_time = time_to_impact
+			collide_objnum = ship_node.get_instance_id()
+			collide_time_to_impact = time_to_impact
+
+
+## Calculate time until this asteroid would hit the target
+func _calculate_time_to_impact(target: Node3D) -> float:
+	var to_target := target.global_position - global_position
+	var rel_velocity := linear_velocity
+
+	# Account for target velocity if available
+	if target is RigidBody3D:
+		rel_velocity -= (target as RigidBody3D).linear_velocity
+	elif "velocity" in target:
+		rel_velocity -= target.velocity
+
+	var speed := rel_velocity.length()
+	if speed < 0.1:
+		return -1.0 # Not approaching
+
+	var direction := rel_velocity.normalized()
+	var closing_rate := to_target.normalized().dot(direction)
+
+	if closing_rate < 0.3:
+		return -1.0 # Not heading towards target
+
+	# Estimate radius for collision check
+	var asteroid_radius := _get_asteroid_radius()
+	var target_radius := 50.0 # Default estimate
+	if "radius" in target:
+		target_radius = target.radius
+	elif target.has_method("get_collision_radius"):
+		target_radius = target.get_collision_radius()
+
+	var combined_radius := asteroid_radius + target_radius
+
+	# Simple time estimate based on distance and closing speed
+	var dist := to_target.length() - combined_radius
+	if dist <= 0.0:
+		return 0.1 # Already in collision range
+
+	return dist / (speed * closing_rate)
 
 
 # ==============================================================================
@@ -241,7 +318,7 @@ func _apply_explosion_damage() -> void:
 			asteroid_data.explosion_outer_radius,
 			asteroid_data.explosion_damage,
 			asteroid_data.explosion_blast,
-			null  # No source weapon
+			null # No source weapon
 		)
 
 

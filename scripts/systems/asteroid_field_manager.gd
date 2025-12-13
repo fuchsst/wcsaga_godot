@@ -5,8 +5,9 @@
 class_name AsteroidFieldManager
 extends Node3D
 
-const AsteroidFieldDataClass = preload("res://scripts/resources/asteroids/asteroid_field_data.gd")
-const AsteroidDataClass = preload("res://scripts/resources/asteroids/asteroid_data.gd")
+# ==============================================================================
+# SIGNALS
+# ==============================================================================
 
 ## Emitted when an asteroid is destroyed
 signal asteroid_destroyed(asteroid: Node3D, position: Vector3, size_type: int)
@@ -15,11 +16,28 @@ signal asteroid_destroyed(asteroid: Node3D, position: Vector3, size_type: int)
 signal field_initialized(asteroid_count: int)
 
 # ==============================================================================
+# CONSTANTS
+# ==============================================================================
+
+const AsteroidFieldDataClass = preload("res://scripts/resources/asteroids/asteroid_field_data.gd")
+const AsteroidDataClass = preload("res://scripts/resources/asteroids/asteroid_data.gd")
+
+const WRAP_CHECK_INTERVAL := 2.0 # Seconds between wrap checks per asteroid
+const COLLISION_CHECK_INTERVAL := 2.0 # Seconds between collision predictions
+const MIN_THROW_DELAY := 1.0 # Minimum seconds between throws
+const THROW_TIME_BASE := 24.0 # Base time for intercept calculation
+
+# Size spawn weights for initial field generation
+const SMALL_WEIGHT := 8
+const MEDIUM_WEIGHT := 4
+const LARGE_WEIGHT := 1
+
+# ==============================================================================
 # CONFIGURATION
 # ==============================================================================
 
 ## Field configuration data
-@export var field_data: Resource  # AsteroidFieldData
+@export var field_data: Resource # AsteroidFieldData
 
 ## Asteroid scene (if not provided via AsteroidData)
 @export var default_asteroid_scene: PackedScene
@@ -28,29 +46,27 @@ signal field_initialized(asteroid_count: int)
 @export var max_asteroids: int = 512
 
 # ==============================================================================
-# CONSTANTS
-# ==============================================================================
-
-const WRAP_CHECK_INTERVAL := 2.0  # Seconds between wrap checks per asteroid
-const COLLISION_CHECK_INTERVAL := 2.0  # Seconds between collision predictions
-
-# Size spawn weights for initial field generation
-const SMALL_WEIGHT := 8
-const MEDIUM_WEIGHT := 4
-const LARGE_WEIGHT := 1
-
-# ==============================================================================
 # RUNTIME STATE
 # ==============================================================================
 
 ## Currently active asteroids
 var asteroids: Array[Node3D] = []
 
+## Ship to throw asteroids at (active throwing)
+var throw_target: Node3D = null
+
+## Max simultaneous incoming asteroids
+var max_incoming_asteroids: int = 3
+
 ## Enabled state
 var _field_enabled: bool = true
 
 ## Field initialized
 var _initialized: bool = false
+
+## Active throwing internal state
+var _next_throw_time: float = 0.0
+var _thrown_count: int = 0
 
 # ==============================================================================
 # INITIALIZATION
@@ -63,7 +79,7 @@ func _ready() -> void:
 
 
 ## Initialize the asteroid field from data
-func initialize_field(data: Resource) -> void:  # AsteroidFieldData
+func initialize_field(data: Resource) -> void: # AsteroidFieldData
 	field_data = data
 
 	if not data:
@@ -73,23 +89,27 @@ func initialize_field(data: Resource) -> void:  # AsteroidFieldData
 	# Clear any existing asteroids
 	clear_field()
 
-	# Create initial asteroids
+	# Create initial asteroids/debris based on genre
 	for i in range(data.num_initial_asteroids):
 		if asteroids.size() >= max_asteroids:
 			break
 
-		# Determine size type based on weights
-		var size_type := _get_weighted_size_type()
+		var obj: Node3D = null
+		if data.debris_genre == AsteroidFieldDataClass.DebrisGenre.SHIP:
+			# Ship debris field - spawn debris with weighted sizes
+			obj = _create_ship_debris()
+		else:
+			# Asteroid field - spawn asteroids (large only initially)
+			obj = create_asteroid(AsteroidDataClass.SizeType.LARGE)
 
-		# Create asteroid at random position
-		var asteroid := create_asteroid(size_type)
-		if asteroid:
-			asteroids.append(asteroid)
+		if obj:
+			asteroids.append(obj)
 
 	_initialized = true
 	field_initialized.emit(asteroids.size())
 
-	print("AsteroidFieldManager: Created %d asteroids" % asteroids.size())
+	var genre_name := "asteroids" if data.debris_genre == 0 else "ship debris"
+	print("AsteroidFieldManager: Created %d %s" % [asteroids.size(), genre_name])
 
 
 ## Get a weighted random size type
@@ -163,6 +183,86 @@ func create_asteroid(
 	return asteroid
 
 
+# ==============================================================================
+# SHIP DEBRIS CREATION
+# ==============================================================================
+
+
+## Create ship debris for DG_SHIP genre fields
+func _create_ship_debris(spawn_position: Vector3 = Vector3.ZERO) -> Node3D:
+	if not field_data:
+		return null
+
+	# Get weighted debris type based on size
+	var size_type := _get_weighted_size_type()
+
+	# Find appropriate debris scene
+	var debris_idx := 0
+	if field_data.debris_types.size() > 0:
+		# Use enabled debris types from field config
+		debris_idx = field_data.debris_types[randi() % field_data.debris_types.size()]
+
+	var scene: PackedScene = null
+	if field_data.ship_debris_scenes.size() > debris_idx:
+		scene = field_data.ship_debris_scenes[debris_idx]
+
+	if not scene:
+		# Fallback to default debris scene
+		if ResourceLoader.exists("res://scenes/entities/debris.tscn"):
+			scene = load("res://scenes/entities/debris.tscn")
+
+	if not scene:
+		push_warning("AsteroidFieldManager: No debris scene available")
+		return null
+
+	# Instantiate debris
+	var debris: Node3D = scene.instantiate()
+	if not debris:
+		return null
+
+	# Position
+	if spawn_position == Vector3.ZERO:
+		debris.global_position = field_data.get_random_spawn_position()
+	else:
+		debris.global_position = spawn_position
+
+	# Random orientation
+	debris.global_rotation = Vector3(randf() * TAU, randf() * TAU, randf() * TAU)
+
+	# Add to scene
+	add_child(debris)
+
+	# Configure velocity
+	if debris is RigidBody3D:
+		var rb: RigidBody3D = debris as RigidBody3D
+		rb.linear_velocity = field_data.get_random_velocity()
+		rb.angular_velocity = Vector3(
+			(randf() - 0.5) * 0.5, (randf() - 0.5) * 0.5, (randf() - 0.5) * 0.5
+		)
+
+	# Set debris data if available
+	if field_data.ship_debris_data.size() > debris_idx:
+		if "debris_data" in debris:
+			debris.debris_data = field_data.ship_debris_data[debris_idx]
+
+	# Mark as hull debris for larger sizes
+	if "is_hull_debris" in debris:
+		debris.is_hull_debris = (size_type == AsteroidDataClass.SizeType.LARGE)
+
+	# Connect destruction signal
+	if debris.has_signal("destroyed"):
+		debris.destroyed.connect(_on_debris_destroyed.bind(debris))
+
+	return debris
+
+
+func _on_debris_destroyed(debris: Node3D) -> void:
+	"""Handle debris destruction"""
+	var idx := asteroids.find(debris)
+	if idx >= 0:
+		asteroids.remove_at(idx)
+
+
 ## Configure an asteroid after instantiation
 func _configure_asteroid(asteroid: Node3D, data: AsteroidData, inherit_velocity: Vector3) -> void:
 	# Set data reference
@@ -192,7 +292,7 @@ func _configure_asteroid(asteroid: Node3D, data: AsteroidData, inherit_velocity:
 
 
 ## Get asteroid data for a size type
-func _get_asteroid_data_for_size(size_type: int) -> Resource:  # AsteroidData
+func _get_asteroid_data_for_size(size_type: int) -> Resource: # AsteroidData
 	if not field_data:
 		return null
 
@@ -300,11 +400,11 @@ func _spawn_sub_asteroids(
 		AsteroidDataClass.SizeType.MEDIUM:
 			sub_size_type = AsteroidDataClass.SizeType.SMALL
 		_:
-			return  # Small asteroids don't spawn sub-asteroids
+			return # Small asteroids don't spawn sub-asteroids
 
 	# Get parent data to determine count
 	var parent_data := _get_asteroid_data_for_size(parent_size_type)
-	var sub_count := 3  # Default
+	var sub_count := 3 # Default
 	var speed_factor := 1.5
 
 	if parent_data:
@@ -357,3 +457,120 @@ func get_asteroid_count() -> int:
 ## Check if field is initialized
 func is_initialized() -> bool:
 	return _initialized
+
+
+# ==============================================================================
+# ACTIVE THROWING
+# ==============================================================================
+
+
+## Set the target ship for active throwing
+func set_throw_target(target: Node3D) -> void:
+	throw_target = target
+	if target:
+		_next_throw_time = Time.get_ticks_msec() / 1000.0 + MIN_THROW_DELAY
+
+
+## Call periodically to maybe throw an asteroid at the target
+func _process(_delta: float) -> void:
+	if not _field_enabled or not _initialized:
+		return
+
+	if field_data and field_data.field_type == AsteroidFieldDataClass.FieldType.ACTIVE:
+		_maybe_throw_asteroid()
+
+
+func _maybe_throw_asteroid() -> void:
+	"""Periodically throw asteroids at the throw target"""
+	if throw_target == null or not is_instance_valid(throw_target):
+		return
+
+	var current_time := Time.get_ticks_msec() / 1000.0
+	if current_time < _next_throw_time:
+		return
+
+	# Count asteroids currently heading towards target
+	var incoming := _count_incoming_asteroids()
+	if incoming >= max_incoming_asteroids:
+		return
+
+	# Create and aim asteroid
+	var asteroid := create_asteroid(AsteroidDataClass.SizeType.LARGE)
+	if asteroid:
+		_aim_at_target(asteroid, throw_target)
+		asteroids.append(asteroid)
+		_thrown_count += 1
+
+		# Schedule next throw (longer delay as more thrown)
+		_next_throw_time = current_time + MIN_THROW_DELAY + _thrown_count * 0.5
+
+
+func _count_incoming_asteroids() -> int:
+	"""Count asteroids heading towards throw target"""
+	var count := 0
+	if throw_target == null:
+		return 0
+
+	var target_pos := throw_target.global_position
+
+	for asteroid in asteroids:
+		if not is_instance_valid(asteroid):
+			continue
+
+		if asteroid is RigidBody3D:
+			var to_target := target_pos - asteroid.global_position
+			var vel: Vector3 = (asteroid as RigidBody3D).linear_velocity
+			if vel.length() > 0.1 and to_target.normalized().dot(vel.normalized()) > 0.5:
+				count += 1
+
+	return count
+
+
+func _aim_at_target(asteroid: Node3D, target: Node3D) -> void:
+	"""Calculate intercept trajectory for asteroid to hit target"""
+	if not asteroid or not target:
+		return
+
+	var target_pos := target.global_position
+	var target_vel := Vector3.ZERO
+	if target is RigidBody3D:
+		target_vel = (target as RigidBody3D).linear_velocity
+	elif "velocity" in target:
+		target_vel = target.velocity
+
+	# Predict where target will be
+	var delta_time := THROW_TIME_BASE + randf() * 20.0
+	var predicted_pos := target_pos + target_vel * delta_time
+
+	# Add randomness to hit area
+	var rand_offset := Vector3(
+		(randf() - 0.5) * 50.0,
+		(randf() - 0.5) * 50.0,
+		(randf() - 0.5) * 50.0
+	)
+	predicted_pos += rand_offset
+
+	# Calculate velocity to intercept
+	var asteroid_data: Resource = null
+	if "asteroid_data" in asteroid:
+		asteroid_data = asteroid.asteroid_data
+
+	var max_speed := 60.0
+	if asteroid_data and "max_speed" in asteroid_data:
+		max_speed = asteroid_data.max_speed
+
+	var speed := max_speed * (randf() * 0.5 + 0.5)
+
+	# Direction from current position towards predicted target
+	var direction := (predicted_pos - asteroid.global_position).normalized()
+
+	# Position asteroid so it will arrive at target in delta_time
+	asteroid.global_position = predicted_pos - direction * speed * delta_time
+
+	if asteroid is RigidBody3D:
+		(asteroid as RigidBody3D).linear_velocity = direction * speed
+
+
+## Get number of thrown asteroids this session
+func get_thrown_count() -> int:
+	return _thrown_count

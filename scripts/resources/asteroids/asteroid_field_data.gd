@@ -6,10 +6,16 @@ class_name AsteroidFieldData
 extends Resource
 
 ## Field type enumeration
-enum FieldType { ACTIVE = 0, PASSIVE = 1 }  ## Asteroids move and wrap around field  ## Asteroids are stationary
+enum FieldType {
+	ACTIVE = 0, ## Asteroids move and wrap around field
+	PASSIVE = 1, ## Asteroids are stationary
+}
 
 ## Debris genre enumeration
-enum DebrisGenre { ASTEROID = 0, SHIP = 1 }  ## Generic rocky asteroids  ## Ship debris field
+enum DebrisGenre {
+	ASTEROID = 0, ## Generic rocky asteroids
+	SHIP = 1, ## Ship debris field
+}
 
 # ==============================================================================
 # FIELD BOUNDS
@@ -60,11 +66,18 @@ enum DebrisGenre { ASTEROID = 0, SHIP = 1 }  ## Generic rocky asteroids  ## Ship
 
 @export_group("Asteroid Types")
 ## Resources for small asteroids
-@export var small_asteroid_data: Resource  # AsteroidData
+@export var small_asteroid_data: Resource # AsteroidData
 ## Resources for medium asteroids
-@export var medium_asteroid_data: Resource  # AsteroidData
+@export var medium_asteroid_data: Resource # AsteroidData
 ## Resources for large asteroids
-@export var large_asteroid_data: Resource  # AsteroidData
+@export var large_asteroid_data: Resource # AsteroidData
+
+@export_group("Ship Debris Types")
+## Ship debris data for each species (used when debris_genre == SHIP)
+## Index corresponds to species index, value is the debris scene/data
+@export var ship_debris_scenes: Array[PackedScene] = []
+## Ship debris data resources for each type
+@export var ship_debris_data: Array[Resource] = [] # Array of DebrisData
 
 # ==============================================================================
 # HELPER METHODS
