@@ -267,6 +267,67 @@ func _register_control_actions() -> void:
 	_add_action("autopilot_toggle", 6, "Toggle Autopilot", KEY_ALT | KEY_A)
 	_add_action("nav_cycle", 6, "Cycle Nav Points", KEY_ALT | KEY_N)
 
+	# Tab 0 (Targeting) - Additional subsystem targeting
+	_add_action("target_subobj_reticle", 0, "Target Subsystem in Reticle", KEY_SHIFT | KEY_Y)
+	_add_action("target_next_subobj", 0, "Target Next Subsystem", KEY_S)
+	_add_action("target_prev_subobj", 0, "Target Previous Subsystem", KEY_SHIFT | KEY_S)
+	_add_action("stop_targeting_subsystem", 0, "Stop Targeting Subsystem", KEY_SHIFT | KEY_U)
+	_add_action("target_targets_target", 0, "Target Target's Target", KEY_SHIFT | KEY_T)
+	_add_action(
+		"target_closest_attacker_self", 0, "Target Closest Attacker (Self)", KEY_SHIFT | KEY_R
+	)
+
+	# Escort Management
+	_add_action("add_remove_escort", 0, "Add/Remove Escort", KEY_SHIFT | KEY_E)
+	_add_action("escort_clear", 0, "Clear Escort List", KEY_ALT | KEY_E)
+	_add_action("target_next_escort", 0, "Target Next Escort Ship", KEY_E)
+
+	# Special Targeting
+	_add_action("target_closest_repair", 0, "Target Closest Repair Ship", 0)
+	_add_action("target_next_uninspected", 0, "Target Next Uninspected Cargo", KEY_N)
+	_add_action(
+		"target_prev_uninspected", 0, "Target Previous Uninspected Cargo", KEY_SHIFT | KEY_N
+	)
+	_add_action("target_newest_ship", 0, "Target Newest Ship", KEY_SHIFT | KEY_Y)
+	_add_action("target_next_turret", 0, "Target Next Live Turret", KEY_K)
+	_add_action("target_prev_turret", 0, "Target Previous Live Turret", KEY_SHIFT | KEY_K)
+	_add_action("target_next_bomb", 0, "Target Next Bomb/Missile", KEY_B)
+	_add_action("target_prev_bomb", 0, "Target Previous Bomb/Missile", KEY_SHIFT | KEY_B)
+
+	# Shield Transfer (Tab 6)
+	_add_action("shield_xfer_top", 6, "Transfer Shields to Front", KEY_UP | KEY_ALT)
+	_add_action("shield_xfer_bottom", 6, "Transfer Shields to Rear", KEY_DOWN | KEY_ALT)
+	_add_action("shield_xfer_left", 6, "Transfer Shields to Left", KEY_LEFT | KEY_ALT)
+	_add_action("shield_xfer_right", 6, "Transfer Shields to Right", KEY_RIGHT | KEY_ALT)
+	_add_action("xfer_energy_shield", 6, "Transfer Energy to Shields", KEY_BRACKETLEFT | KEY_SHIFT)
+	_add_action("xfer_energy_laser", 6, "Transfer Energy to Weapons", KEY_BRACKETRIGHT | KEY_SHIFT)
+
+	# Slide Thrust (Tab 2: Flight)
+	_add_action("slide_left", 2, "Slide Left", KEY_A | KEY_SHIFT, -1, 1)
+	_add_action("slide_right", 2, "Slide Right", KEY_D | KEY_SHIFT, -1, 1)
+	_add_action("slide_up", 2, "Slide Up", KEY_W | KEY_SHIFT, -1, 1)
+	_add_action("slide_down", 2, "Slide Down", KEY_S | KEY_SHIFT, -1, 1)
+	_add_action("glide_when_pressed", 2, "Glide (Hold)", KEY_CAPSLOCK, -1, 1)
+	_add_action("bank_when_pressed", 2, "Bank When Pressed", 0, -1, 1)
+
+	# Multiplayer Messaging (Tab 4)
+	_add_action("msg_attack_subsystem", 4, "Squadmate: Attack Subsystem", KEY_ALT | KEY_S)
+	_add_action("multi_msg_all", 4, "MP: Message All", KEY_1)
+	_add_action("multi_msg_friendly", 4, "MP: Message Friendlies", KEY_2)
+	_add_action("multi_msg_hostile", 4, "MP: Message Hostiles", KEY_3)
+	_add_action("multi_msg_target", 4, "MP: Message Target", KEY_4)
+	_add_action("multi_observer_zoom", 4, "MP: Observer Zoom To", 0)
+	_add_action("multi_netinfo_toggle", 4, "MP: Toggle Net Info", 0)
+	_add_action("multi_self_destruct", 4, "MP: Self Destruct", 0)
+
+	# Time Controls (Tab 6)
+	_add_action("time_speed_up", 6, "Speed Up Time", KEY_SHIFT | KEY_PERIOD)
+	_add_action("time_slow_down", 6, "Slow Down Time", KEY_SHIFT | KEY_COMMA)
+	_add_action("toggle_hud_contrast", 6, "Toggle HUD Contrast", KEY_ALT | KEY_H)
+
+	# Navigation View (Tab 5)
+	_add_action("show_navmap", 5, "Show Navigation Map", KEY_N | KEY_ALT)
+
 	# Ensure all actions are registered in InputMap
 	for action_def in control_actions:
 		if not InputMap.has_action(action_def.id):

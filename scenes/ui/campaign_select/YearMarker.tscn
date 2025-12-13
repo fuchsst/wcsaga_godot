@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://cvrkfu803fi6s"]
 
-[ext_resource type="Script" uid="uid://brwmqys3vqw4w" path="res://scenes/ui/main_menu/YearMarker.gd" id="2_script"]
+[ext_resource type="Script" uid="uid://brwmqys3vqw4w" path="res://scenes/ui/campaign_select/YearMarker.gd" id="2_script"]
 [ext_resource type="Theme" uid="uid://bholotheme001" path="res://scenes/ui/themes/HolographicTheme.tres" id="3_theme"]
 
 [node name="YearMarker" type="Control"]

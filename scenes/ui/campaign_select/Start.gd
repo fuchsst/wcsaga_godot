@@ -10,7 +10,7 @@ func _ready():
 	print("Intro Finished. Loading Main Menu...")
 	# Transition using SceneManager
 	# The user requested using the addon. Assumes "SceneManager" is an autoload.
-	var main_scene_path = "res://scenes/ui/main_menu/TimelineMain.tscn"
+	var main_scene_path = "res://scenes/ui/campaign_select/TimelineMain.tscn"
 	if has_node("/root/SceneManager"):
 		var scene_manager = get_node("/root/SceneManager")
 		await scene_manager.change_scene(main_scene_path, {"pattern": "fade", "speed": 1.0})

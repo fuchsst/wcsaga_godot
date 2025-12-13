@@ -31,6 +31,8 @@ SpeciesManager="*res://autoload/SpeciesManager.gd"
 AudioManager="*res://autoload/AudioManager.gd"
 CollisionManager="*res://autoload/CollisionManager.gd"
 MissionManager="*res://autoload/MissionManager.gd"
+AutopilotManager="*res://autoload/AutopilotManager.gd"
+SubtitleManager="*res://autoload/SubtitleManager.gd"
 
 [display]
 

@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://cojjij34kelyb"]
 
-[ext_resource type="Script" uid="uid://ddkma35lglljc" path="res://scenes/ui/main_menu/TimelineNode.gd" id="1_timelinenode"]
+[ext_resource type="Script" uid="uid://ddkma35lglljc" path="res://scenes/ui/campaign_select/TimelineNode.gd" id="1_timelinenode"]
 [ext_resource type="FontFile" uid="uid://jnlooruak5vm" path="res://resources/Share_Tech_Mono/ShareTechMono-Regular.ttf" id="2_2gvr1"]
 [ext_resource type="Material" uid="uid://5afcetwtq3t4" path="res://scenes/ui/materials/HologramMaterial.tres" id="2_hologrammaterial"]
 [ext_resource type="Theme" uid="uid://bholotheme001" path="res://scenes/ui/themes/HolographicTheme.tres" id="4_theme"]

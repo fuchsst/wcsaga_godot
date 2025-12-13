@@ -87,7 +87,8 @@ enum WeaponFlags {
 	SHUDDER = 1 << 19,
 	MUZZLE_FLASH = 1 << 20,
 	LOCK_ARM = 1 << 21,
-	STREAM = 1 << 22
+	STREAM = 1 << 22,
+	CMEASURE = 1 << 23, # Countermeasure weapon
 }
 
 # -------------------------------------------------------------------------
@@ -252,6 +253,9 @@ func is_explosive() -> bool:
 
 func is_homing() -> bool:
 	return homing_type != HomingType.NONE
+
+func is_countermeasure() -> bool:
+	return flags & WeaponFlags.CMEASURE != 0
 
 func calculate_damage_against_target(
 	_target_species: String,

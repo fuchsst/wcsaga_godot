@@ -5,49 +5,46 @@
 class_name Debris
 extends RigidBody3D
 
-
 ## Signals
 signal destroyed(debris: Debris)
 signal death_roll_started(debris: Debris)
 
-
 ## Configuration
-@export var debris_data: Resource ## Configuration resource (DebrisData)
-@export var is_hull_debris: bool = false ## True for large hull chunks
-@export var is_vaporized: bool = false ## True if source was vaporized
-
+@export var debris_data: Resource  ## Configuration resource (DebrisData)
+@export var is_hull_debris: bool = false  ## True for large hull chunks
+@export var is_vaporized: bool = false  ## True if source was vaporized
 
 ## Runtime State
-var source_signature: int = -1 ## Signature of source object
-var source_team: int = 0 ## Team of source object
-var lifeleft: float = -1.0 ## Seconds until death (-1 = persist)
-var must_survive_until: float = 0.0 ## Minimum survival time
-var hull_strength: float = 10.0 ## Current health
-var submodel_index: int = 0 ## Which submodel this represents
-
+var source_signature: int = -1  ## Signature of source object
+var source_team: int = 0  ## Team of source object
+var lifeleft: float = -1.0  ## Seconds until death (-1 = persist)
+var must_survive_until: float = 0.0  ## Minimum survival time
+var hull_strength: float = 10.0  ## Current health
+var submodel_index: int = 0  ## Which submodel this represents
 
 ## Electric Arc System
-var arc_frequency: int = 0 ## 0 = no arcs, >0 = ms between arc triggers
+var arc_frequency: int = 0  ## 0 = no arcs, >0 = ms between arc triggers
 var _next_arc_time: float = 0.0
-var _fire_timeout: float = 0.0 ## When fireballs stop appearing
-var _arc_active: bool = false # Reserved for future arc effects
-
+var _fire_timeout: float = 0.0  ## When fireballs stop appearing
+var _arc_points: Array[Array] = []  ## Array of [start, end] Vector3 pairs
+var _arc_timers: Array[float] = []  ## Timeout for each arc
+var _arc_mesh_instance: MeshInstance3D = null
+const MAX_ARCS: int = 8
+const ARC_DURATION: float = 0.15  ## Seconds each arc is visible
+const ARC_SEGMENTS: int = 5  ## How jagged the arc line is
 
 ## Death Roll State
 var _is_dying: bool = false
 var _death_roll_time: float = 0.0
 
-
 ## Distance Culling
-const MAX_DEBRIS_DIST: float = 10000.0 ## 10km max distance
-const DISTANCE_CHECK_INTERVAL: float = 10.0 ## Check every 10 seconds
+const MAX_DEBRIS_DIST: float = 10000.0  ## 10km max distance
+const DISTANCE_CHECK_INTERVAL: float = 10.0  ## Check every 10 seconds
 var _next_distance_check: float = 0.0
-
 
 ## Constants (from legacy)
 const DEBRIS_ROTVEL_SCALE: float = 5.0
 const DEAD_DAMP_TIME_CONST: float = 10000.0
-
 
 # ==============================================================================
 # INITIALIZATION
@@ -57,12 +54,12 @@ const DEAD_DAMP_TIME_CONST: float = 10000.0
 func _ready() -> void:
 	add_to_group("debris")
 	add_to_group("game_entities")
-	
+
 	# Set physics properties for debris
-	gravity_scale = 0.0 # No gravity in space
+	gravity_scale = 0.0  # No gravity in space
 	linear_damp = 0.0
-	angular_damp = 0.1 # Slight rotational damping
-	
+	angular_damp = 0.1  # Slight rotational damping
+
 	# Initialize distance check with random offset
 	_next_distance_check = randf_range(4.0, 8.0) * DISTANCE_CHECK_INTERVAL
 
@@ -81,68 +78,73 @@ func spawn_from_ship(
 ) -> void:
 	if data:
 		debris_data = data
-	
+
 	# Position and rotation from source
 	global_position = source_position
 	global_transform.basis = source_rotation
-	
+
 	# Calculate radial velocity from explosion
 	var to_center := source_position - explosion_center
 	var radial_vel: Vector3
 	var force_scale := explosion_force * randf_range(10.0, 30.0)
-	
+
 	if to_center.length_squared() < 0.1:
 		# Random direction if at center
-		radial_vel = Vector3(
-			randf_range(-1.0, 1.0),
-			randf_range(-1.0, 1.0),
-			randf_range(-1.0, 1.0)
-		).normalized() * force_scale
+		radial_vel = (
+			(
+				Vector3(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0), randf_range(-1.0, 1.0))
+				. normalized()
+			)
+			* force_scale
+		)
 	else:
 		radial_vel = to_center.normalized() * force_scale
-	
+
 	# Calculate velocity contribution from source's rotation
 	var world_rotvel := source_rotation * source_angular_velocity
 	var vel_from_rotation := world_rotvel.cross(to_center) * DEBRIS_ROTVEL_SCALE
-	
+
 	# Final velocity = radial + inherited + rotational contribution
 	linear_velocity = radial_vel + source_velocity + vel_from_rotation
-	
+
 	# Random rotational velocity, scale inversely with size
 	var mesh_radius := _get_mesh_radius()
 	if mesh_radius < 1.0:
 		mesh_radius = 1.0
 	var rot_scale := randf_range(6.0, 10.0) / mesh_radius
-	angular_velocity = Vector3(
-		randf_range(-1.0, 1.0),
-		randf_range(-1.0, 1.0),
-		randf_range(-1.0, 1.0)
-	).normalized() * rot_scale
-	
+	angular_velocity = (
+		Vector3(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0), randf_range(-1.0, 1.0)).normalized()
+		* rot_scale
+	)
+
 	# Initialize hull strength
 	if debris_data:
 		hull_strength = debris_data.get_random_hitpoints(ship_hull_strength)
 	else:
 		hull_strength = ship_hull_strength / 8.0
-	
+
 	# Initialize lifespan
 	if debris_data:
 		lifeleft = debris_data.get_random_lifetime(is_hull_debris)
 	else:
 		lifeleft = randf_range(0.5, 3.0) if not is_hull_debris else -1.0
-	
+
 	# Vaporized debris lives longer
 	if is_vaporized and lifeleft > 0:
 		lifeleft *= 3.0
-	
+
 	# Initialize electric arcs for hull debris
 	if is_hull_debris:
 		var arc_percent: float = debris_data.arc_percent if debris_data else 0.5
 		if randf() < arc_percent:
 			arc_frequency = debris_data.arc_frequency_base if debris_data else 1000
 			# Fireball timeout based on ship radius
-			_fire_timeout = get_tree().get_ticks_msec() / 1000.0 + ship_radius / 3.0 + randf() * ship_radius * 3.0
-	
+			_fire_timeout = (
+				get_tree().get_ticks_msec() / 1000.0
+				+ ship_radius / 3.0
+				+ randf() * ship_radius * 3.0
+			)
+
 	# Store minimum survival time
 	must_survive_until = get_tree().get_ticks_msec() / 1000.0
 
@@ -156,36 +158,41 @@ func _physics_process(delta: float) -> void:
 	if _is_dying:
 		_process_death_roll(delta)
 		return
-	
+
 	# Update lifespan
 	if lifeleft > 0.0:
 		lifeleft -= delta
 		if lifeleft <= 0.0:
 			start_death_roll()
 			return
-	
+
 	# Check distance culling
 	_check_distance_culling()
-	
+
 	# Update electric arcs
 	if arc_frequency > 0:
 		_update_electric_arcs(delta)
-	
+
+	# Update arc visuals (fade out)
+	_update_arc_visuals(delta)
+
 	# Speed limit
-	var max_speed: float = debris_data.get_max_speed(is_hull_debris, false) if debris_data else 200.0
+	var max_speed: float = (
+		debris_data.get_max_speed(is_hull_debris, false) if debris_data else 200.0
+	)
 	if linear_velocity.length_squared() > max_speed * max_speed:
 		linear_velocity = linear_velocity.normalized() * max_speed
 
 
 func _check_distance_culling() -> void:
 	var current_time: float = get_tree().get_ticks_msec() / 1000.0
-	
+
 	if current_time < _next_distance_check:
 		return
 	if current_time < must_survive_until:
 		_next_distance_check = current_time + DISTANCE_CHECK_INTERVAL
 		return
-	
+
 	# Find player position
 	var camera := get_viewport().get_camera_3d()
 	if camera:
@@ -193,36 +200,132 @@ func _check_distance_culling() -> void:
 		if distance > MAX_DEBRIS_DIST:
 			# Too far, expire quickly
 			lifeleft = 0.1
-	
+
 	_next_distance_check = current_time + DISTANCE_CHECK_INTERVAL
 
 
 func _update_electric_arcs(_delta: float) -> void:
 	var current_time: float = get_tree().get_ticks_msec() / 1000.0
-	
+
 	if current_time > _fire_timeout:
 		arc_frequency = 0
 		return
-	
+
 	if current_time < _next_arc_time:
 		return
-	
+
 	# Trigger arc effect
 	_spawn_arc_effect()
-	
+
 	# Schedule next arc
 	var next_delay := float(arc_frequency) / 1000.0
-	arc_frequency += 100 # Arcs become less frequent over time
+	arc_frequency += 100  # Arcs become less frequent over time
 	_next_arc_time = current_time + randf_range(next_delay, next_delay * 2.0)
 
 
 func _spawn_arc_effect() -> void:
-	# TODO: Spawn actual particle effect for electric arc
-	# Would use GPUParticles3D with arc shader
-	# Play arc sound based on duration
-	var audio := Engine.get_singleton("AudioManager")
-	if audio:
-		audio.play_sound_by_name(&"debris_arc_01", global_position)
+	# Get mesh bounds for arc endpoints
+	var radius: float = _get_mesh_radius()
+
+	# Generate random arc endpoints on surface
+	var start := _random_surface_point(radius)
+	var end := _random_surface_point(radius)
+
+	# Don't create arc if points too close
+	if start.distance_to(end) < radius * 0.3:
+		return
+
+	# Add arc to active list
+	if _arc_points.size() >= MAX_ARCS:
+		_arc_points.pop_front()
+		_arc_timers.pop_front()
+
+	_arc_points.append([start, end])
+	_arc_timers.append(ARC_DURATION)
+
+	# Rebuild arc mesh
+	_rebuild_arc_mesh()
+
+	# Play arc sound
+	var audio: Node = get_node_or_null("/root/AudioManager")
+	if audio and audio.has_method("play_sound_by_name"):
+		audio.play_sound_by_name("debris_arc_01", global_position)
+
+
+func _random_surface_point(radius: float) -> Vector3:
+	"""Generate random point on debris surface"""
+	return (
+		Vector3(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0), randf_range(-1.0, 1.0)).normalized()
+		* radius
+		* randf_range(0.5, 1.0)
+	)
+
+
+func _rebuild_arc_mesh() -> void:
+	"""Rebuild the arc visual mesh from current arc points"""
+	if not _arc_mesh_instance:
+		_arc_mesh_instance = MeshInstance3D.new()
+		_arc_mesh_instance.name = "ArcMesh"
+		add_child(_arc_mesh_instance)
+
+		# Create unshaded material for arcs
+		var mat := StandardMaterial3D.new()
+		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		mat.albedo_color = Color(0.6, 0.8, 1.0)  # Electric blue
+		mat.emission_enabled = true
+		mat.emission = Color(0.4, 0.6, 1.0)
+		mat.emission_energy_multiplier = 3.0
+		_arc_mesh_instance.material_override = mat
+
+	if _arc_points.is_empty():
+		_arc_mesh_instance.mesh = null
+		return
+
+	# Build mesh using ImmediateMesh
+	var im := ImmediateMesh.new()
+	im.surface_begin(Mesh.PRIMITIVE_LINES)
+
+	for arc in _arc_points:
+		var start: Vector3 = arc[0]
+		var end_pt: Vector3 = arc[1]
+
+		# Create jagged lightning path
+		var prev := start
+		for i in range(ARC_SEGMENTS):
+			var t := float(i + 1) / float(ARC_SEGMENTS)
+			var next := start.lerp(end_pt, t)
+
+			# Add random offset (except for last point)
+			if i < ARC_SEGMENTS - 1:
+				var offset := Vector3(
+					randf_range(-0.3, 0.3), randf_range(-0.3, 0.3), randf_range(-0.3, 0.3)
+				)
+				next += offset
+
+			im.surface_add_vertex(prev)
+			im.surface_add_vertex(next)
+			prev = next
+
+	im.surface_end()
+	_arc_mesh_instance.mesh = im
+
+
+func _update_arc_visuals(delta: float) -> void:
+	"""Update arc timers and fade out expired arcs"""
+	var needs_rebuild := false
+
+	var i := 0
+	while i < _arc_timers.size():
+		_arc_timers[i] -= delta
+		if _arc_timers[i] <= 0:
+			_arc_points.remove_at(i)
+			_arc_timers.remove_at(i)
+			needs_rebuild = true
+		else:
+			i += 1
+
+	if needs_rebuild:
+		_rebuild_arc_mesh()
 
 
 # ==============================================================================
@@ -233,16 +336,16 @@ func _spawn_arc_effect() -> void:
 func take_damage(damage: float, _attacker: Node = null) -> void:
 	if _is_dying:
 		return
-	
+
 	# Spawn hit particles
 	_spawn_hit_particles(global_position)
-	
+
 	# Apply damage
 	if damage < 0.0:
 		damage = 0.0
-	
+
 	hull_strength -= damage
-	
+
 	if hull_strength <= 0.0:
 		start_death_roll()
 
@@ -261,12 +364,12 @@ func _spawn_hit_particles(_hit_pos: Vector3) -> void:
 func start_death_roll() -> void:
 	if _is_dying:
 		return
-	
+
 	_is_dying = true
 	_death_roll_time = 0.0
-	
+
 	death_roll_started.emit(self)
-	
+
 	# Schedule explosion
 	var death_duration := randf_range(0.5, 1.5)
 	var timer := get_tree().create_timer(death_duration)
@@ -275,7 +378,7 @@ func start_death_roll() -> void:
 
 func _process_death_roll(delta: float) -> void:
 	_death_roll_time += delta
-	
+
 	# Could add visual effects during death roll
 	# e.g., increasing particle emission, flickering lights
 
@@ -283,10 +386,10 @@ func _process_death_roll(delta: float) -> void:
 func _explode() -> void:
 	# Spawn explosion fireball
 	_spawn_explosion()
-	
+
 	# Notify listeners
 	destroyed.emit(self)
-	
+
 	# Remove from scene
 	queue_free()
 
@@ -311,17 +414,17 @@ func _spawn_explosion() -> void:
 func _on_body_entered(body: Node) -> void:
 	if body == self:
 		return
-	
+
 	# Calculate collision damage based on relative velocity
 	var relative_velocity := linear_velocity.length()
 	if body is RigidBody3D:
 		relative_velocity = (linear_velocity - body.linear_velocity).length()
-	
+
 	var collision_damage := relative_velocity * relative_velocity * 0.001
-	
+
 	# Apply damage to self
 	take_damage(collision_damage * 0.5)
-	
+
 	# Apply damage to other if it can take damage
 	if body.has_method("take_damage"):
 		var damage_mult: float = debris_data.damage_mult if debris_data else 1.0

@@ -3,6 +3,15 @@ extends Resource
 ## Per-profile game settings including audio, input, and gameplay preferences.
 ## Stored with UserProfile and cloned when profile is cloned.
 
+## Joystick axis mapping indices (from legacy JOY_*_AXIS)
+enum JoyAxis {
+	HEADING = 0, # X axis -> Yaw
+	PITCH = 1, # Y axis -> Pitch
+	BANK = 2, # Z/Rudder axis -> Roll
+	ABS_THROTTLE = 3, # Slider -> Absolute throttle
+	REL_THROTTLE = 4, # Dial -> Relative throttle adjustment
+}
+
 # ============================================================================
 # Audio Settings (0.0 - 1.0)
 # ============================================================================
@@ -44,11 +53,24 @@ extends Resource
 ## Invert pitch axis (up/down)
 @export var invert_pitch: bool = false
 
-## Invert yaw axis (left/right)
+## Invert yaw/heading axis (left/right)
 @export var invert_yaw: bool = false
 
-## Invert roll axis (banking)
+## Invert roll/bank axis
 @export var invert_roll: bool = false
+
+## Invert thrust axis
+@export var invert_thrust: bool = false
+
+## Joystick axis assignments (index -> JoyAxis enum)
+@export var joy_axis_heading: int = JOY_AXIS_LEFT_X
+@export var joy_axis_pitch: int = JOY_AXIS_LEFT_Y
+@export var joy_axis_bank: int = JOY_AXIS_RIGHT_X
+@export var joy_axis_throttle: int = -1 # -1 = disabled
+
+## Disable secondary/tertiary axes
+@export var disable_axis2: bool = false
+@export var disable_axis3: bool = false
 
 ## Custom input bindings (overrides defaults)
 @export var input_bindings: Array[InputBindingEntry] = []
@@ -101,6 +123,13 @@ func duplicate_settings() -> GameSettings:
 	copy.invert_pitch = invert_pitch
 	copy.invert_yaw = invert_yaw
 	copy.invert_roll = invert_roll
+	copy.invert_thrust = invert_thrust
+	copy.joy_axis_heading = joy_axis_heading
+	copy.joy_axis_pitch = joy_axis_pitch
+	copy.joy_axis_bank = joy_axis_bank
+	copy.joy_axis_throttle = joy_axis_throttle
+	copy.disable_axis2 = disable_axis2
+	copy.disable_axis3 = disable_axis3
 	copy.skill_level = skill_level
 	copy.auto_targeting = auto_targeting
 	copy.auto_speed_match = auto_speed_match

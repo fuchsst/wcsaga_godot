@@ -1,9 +1,15 @@
 class_name MissileWeapon
 extends BaseWeapon
 
+# Countermeasure diversion
+const MAX_CMEASURE_TRACK_DIST: float = 300.0
+const CMEASURE_CHECK_INTERVAL: float = 0.5 # Check every 0.5 seconds
+
 # Local State
 var time_since_launch: float = 0.0
 var swarm_index: int = 0
+var cm_check_timer: float = 0.0
+var is_tracking_cm: bool = false
 
 # Swarm State
 var swarm_change_timer: float = 0.0
@@ -77,6 +83,14 @@ func _apply_guidance(delta: float) -> void:
 	if not target or not is_instance_valid(target):
 		return
 
+	# 0. Check for countermeasure diversion (only HEAT/ASPECT)
+	cm_check_timer -= delta
+	if cm_check_timer <= 0:
+		cm_check_timer = CMEASURE_CHECK_INTERVAL
+		var cm := _find_nearest_countermeasure()
+		if cm:
+			_divert_to_countermeasure(cm)
+
 	# 1. Swarm Logic
 	if weapon_data.flags & WeaponData.WeaponFlags.SWARM:
 		_apply_swarm_guidance(delta)
@@ -89,6 +103,51 @@ func _apply_guidance(delta: float) -> void:
 		
 	# 3. Standard Homing
 	_apply_standard_homing(delta)
+
+
+func _find_nearest_countermeasure() -> Node3D:
+	"""Find nearest hostile countermeasure within tracking distance"""
+	# Only HEAT and ASPECT seekers can be diverted
+	if weapon_data.homing_type not in [
+		WeaponData.HomingType.HEAT,
+		WeaponData.HomingType.HEAT_SEEKING,
+		WeaponData.HomingType.ASPECT,
+		WeaponData.HomingType.ASPECT_SEEKING
+	]:
+		return null
+	
+	var my_team := -1
+	if fired_by and "team" in fired_by:
+		my_team = fired_by.team
+	
+	var nearest_cm: Node3D = null
+	var nearest_dist := MAX_CMEASURE_TRACK_DIST
+	
+	var cms := get_tree().get_nodes_in_group("countermeasures")
+	for cm in cms:
+		if not is_instance_valid(cm):
+			continue
+		
+		# Skip own team's CMs
+		if "team" in cm and cm.team == my_team:
+			continue
+		
+		var dist := global_position.distance_to(cm.global_position)
+		if dist < nearest_dist:
+			nearest_dist = dist
+			nearest_cm = cm
+	
+	return nearest_cm
+
+
+func _divert_to_countermeasure(cm: Node3D) -> void:
+	"""Switch target to countermeasure"""
+	target = cm
+	is_tracking_cm = true
+	
+	# Register with CM for tracking
+	if cm.has_method("register_diverted_missile"):
+		cm.register_diverted_missile(self)
 
 func _apply_swarm_guidance(delta: float) -> void:
 	# Update Swarm Target Offset

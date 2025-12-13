@@ -1,16 +1,16 @@
 [gd_scene load_steps=12 format=3 uid="uid://c3awub26ci2y8"]
 
-[ext_resource type="Script" uid="uid://bdu0iue0w5uff" path="res://scenes/ui/main_menu/TimelineController.gd" id="1_controller"]
+[ext_resource type="Script" uid="uid://bdu0iue0w5uff" path="res://scenes/ui/campaign_select/TimelineController.gd" id="1_controller"]
 [ext_resource type="PackedScene" uid="uid://eiuvyl0vsb8x" path="res://scenes/ui/settings/SettingsWindow.tscn" id="2_settings"]
 [ext_resource type="Material" uid="uid://5afcetwtq3t4" path="res://scenes/ui/materials/HologramMaterial.tres" id="3_material"]
 [ext_resource type="Texture2D" uid="uid://cgljctqb483qk" path="res://scenes/ui/background.png" id="4_background"]
-[ext_resource type="Script" uid="uid://dah2gnpdax4kf" path="res://scenes/ui/main_menu/SpaceScene3D.gd" id="5_spacescene"]
+[ext_resource type="Script" uid="uid://dah2gnpdax4kf" path="res://scenes/ui/campaign_select/SpaceScene3D.gd" id="5_spacescene"]
 [ext_resource type="Script" uid="uid://ddni3kl7paoej" path="res://scenes/ui/utils/UIAnimator.gd" id="6_animator"]
 [ext_resource type="Material" path="res://scenes/ui/materials/BlurMaterial.tres" id="7_blur_shader_material"]
 [ext_resource type="Environment" path="res://scenes/ui/materials/TimelineGlowEnvironment.tres" id="9_glow_env"]
-[ext_resource type="AudioStream" uid="uid://cg7b7kj3ey8th" path="res://scenes/ui/main_menu/main_theme.ogg" id="10_bgm"]
-[ext_resource type="AudioStream" uid="uid://cypdxtunyu082" path="res://scenes/ui/main_menu/snd_brief_icon_select.ogg" id="11_select_sound"]
-[ext_resource type="AudioStream" uid="uid://61euswvr82ee" path="res://scenes/ui/main_menu/snd_popup_appear.ogg" id="12_popup_sound"]
+[ext_resource type="AudioStream" uid="uid://cg7b7kj3ey8th" path="res://scenes/ui/campaign_select/main_theme.ogg" id="10_bgm"]
+[ext_resource type="AudioStream" uid="uid://cypdxtunyu082" path="res://scenes/ui/campaign_select/snd_brief_icon_select.ogg" id="11_select_sound"]
+[ext_resource type="AudioStream" uid="uid://61euswvr82ee" path="res://scenes/ui/campaign_select/snd_popup_appear.ogg" id="12_popup_sound"]
 
 [node name="TimelineMain" type="Control"]
 layout_mode = 3

@@ -8,11 +8,11 @@ const TimelineEventRes = preload(
 	"res://scripts/resources/ui/campaign_timeline/TimelineEventResource.gd"
 )
 
-const TIMELINE_NODE_SCENE = preload("res://scenes/ui/main_menu/TimelineNode.tscn")
-const YEAR_MARKER_SCENE = preload("res://scenes/ui/main_menu/YearMarker.tscn")
+const TIMELINE_NODE_SCENE = preload("res://scenes/ui/campaign_select/TimelineNode.tscn")
+const YEAR_MARKER_SCENE = preload("res://scenes/ui/campaign_select/YearMarker.tscn")
 const PROFILE_EDITOR_SCENE = preload("res://scenes/ui/profile/ProfileEditor.tscn")
 const CAMPAIGN_BRIEFING_SCENE = preload("res://scenes/ui/campaign/CampaignBriefing.tscn")
-const ELBOW_CONNECTOR_SCRIPT = preload("res://scenes/ui/main_menu/ElbowConnector.gd")
+const ELBOW_CONNECTOR_SCRIPT = preload("res://scenes/ui/campaign_select/ElbowConnector.gd")
 
 var profile_editor: Control
 var campaign_briefing: Control

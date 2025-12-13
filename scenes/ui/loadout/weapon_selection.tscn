@@ -1,0 +1,96 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/loadout/weapon_selection.gd" id="1_weapon"]
+
+[node name="WeaponSelection" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_weapon")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.1, 0.12, 0.15, 1)
+
+[node name="HSplitContainer" type="HSplitContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+
+[node name="LoadoutPanel" type="VBoxContainer" parent="HSplitContainer"]
+custom_minimum_size = Vector2(350, 0)
+layout_mode = 2
+
+[node name="Title" type="Label" parent="HSplitContainer/LoadoutPanel"]
+layout_mode = 2
+text = "WEAPON LOADOUT"
+horizontal_alignment = 1
+
+[node name="PrimarySection" type="VBoxContainer" parent="HSplitContainer/LoadoutPanel"]
+layout_mode = 2
+
+[node name="PrimaryLabel" type="Label" parent="HSplitContainer/LoadoutPanel/PrimarySection"]
+layout_mode = 2
+text = "Primary Weapons"
+
+[node name="BankContainer" type="VBoxContainer" parent="HSplitContainer/LoadoutPanel/PrimarySection"]
+layout_mode = 2
+
+[node name="SecondarySection" type="VBoxContainer" parent="HSplitContainer/LoadoutPanel"]
+layout_mode = 2
+
+[node name="SecondaryLabel" type="Label" parent="HSplitContainer/LoadoutPanel/SecondarySection"]
+layout_mode = 2
+text = "Secondary Weapons"
+
+[node name="BankContainer" type="VBoxContainer" parent="HSplitContainer/LoadoutPanel/SecondarySection"]
+layout_mode = 2
+
+[node name="Spacer" type="Control" parent="HSplitContainer/LoadoutPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ButtonContainer" type="HBoxContainer" parent="HSplitContainer/LoadoutPanel"]
+layout_mode = 2
+alignment = 1
+
+[node name="BackButton" type="Button" parent="HSplitContainer/LoadoutPanel/ButtonContainer"]
+layout_mode = 2
+text = "Back"
+
+[node name="ConfirmButton" type="Button" parent="HSplitContainer/LoadoutPanel/ButtonContainer"]
+layout_mode = 2
+text = "Launch Mission"
+
+[node name="WeaponPool" type="VBoxContainer" parent="HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PoolTitle" type="Label" parent="HSplitContainer/WeaponPool"]
+layout_mode = 2
+text = "Available Weapons"
+horizontal_alignment = 1
+
+[node name="WeaponList" type="ItemList" parent="HSplitContainer/WeaponPool"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="StatsPanel" type="PanelContainer" parent="HSplitContainer/WeaponPool"]
+custom_minimum_size = Vector2(0, 150)
+layout_mode = 2
+
+[node name="StatsLabel" type="RichTextLabel" parent="HSplitContainer/WeaponPool/StatsPanel"]
+layout_mode = 2
+bbcode_enabled = true
+text = "Select a weapon to view stats"

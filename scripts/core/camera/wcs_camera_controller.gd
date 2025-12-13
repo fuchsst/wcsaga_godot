@@ -82,6 +82,9 @@ var target_object: Node3D = null
 ## Submodel index for host attachment (-1 = ship root)
 var host_submodel: int = -1
 
+## Submodel index for target tracking (-1 = object root)
+var target_submodel: int = -1
+
 ## External view angles (pitch, yaw, roll in radians)
 var external_angles: Vector3 = Vector3.ZERO
 
@@ -287,9 +290,29 @@ func set_host(ship: Node3D, submodel: int = -1) -> void:
 
 
 ## Set target object for look-at tracking
-func set_target(obj: Node3D) -> void:
+func set_target(obj: Node3D, submodel: int = -1) -> void:
 	target_object = obj
+	target_submodel = submodel
 	target_changed.emit(obj)
+
+
+## Clear target (stop tracking)
+func clear_target() -> void:
+	target_object = null
+	target_submodel = -1
+	target_changed.emit(null)
+
+
+## Get target position (for look-at calculations)
+func _get_target_position() -> Vector3:
+	if not target_object or not is_instance_valid(target_object):
+		return global_position + global_transform.basis.z * -100.0
+
+	# Try to get submodel position if specified
+	if target_submodel >= 0 and target_object.has_method("get_submodel_position"):
+		return target_object.get_submodel_position(target_submodel)
+
+	return target_object.global_position
 
 
 ## Get the eye position on host ship (cockpit view point)
@@ -360,10 +383,22 @@ func _update_camera(delta: float) -> void:
 			target_pos = result.origin
 			target_basis = result.basis
 
-		ViewMode.DEAD_VIEW, ViewMode.OTHER_SHIP, ViewMode.FREECAMERA:
-			# These modes keep current position or use special logic
+		ViewMode.DEAD_VIEW, ViewMode.OTHER_SHIP:
+			# These modes keep current position
 			target_pos = global_position
 			target_basis = global_transform.basis
+
+		ViewMode.FREECAMERA:
+			# SEXP-controlled camera - look at target if set
+			target_pos = global_position
+			if target_object and is_instance_valid(target_object):
+				var target_vec := (_get_target_position() - target_pos).normalized()
+				if target_vec.length_squared() > 0.001:
+					target_basis = Basis.looking_at(target_vec, Vector3.UP)
+				else:
+					target_basis = global_transform.basis
+			else:
+				target_basis = global_transform.basis
 
 		_:
 			target_pos = _get_host_eye_position()

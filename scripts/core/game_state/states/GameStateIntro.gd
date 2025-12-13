@@ -1,14 +1,16 @@
 class_name GameStateIntro
 extends LimboState
 
-# Intro State
-# Handles splash screens and intro videos
+## Intro State - Splash screens and intro video
+
 
 func _enter() -> void:
 	print("Entering Intro State")
-	# Play intro video or show splash screen
-	# For now, just transition to MainMenu after a delay
-	get_tree().create_timer(1.0).timeout.connect(func(): dispatch("to_main_menu"))
+	# Skip intro for now, go directly to campaign select
+	var gsm := get_parent()
+	if gsm and gsm.has_method("dispatch"):
+		gsm.dispatch(&"to_campaign_select")
+
 
 func _exit() -> void:
 	print("Exiting Intro State")
