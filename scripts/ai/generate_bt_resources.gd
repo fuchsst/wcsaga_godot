@@ -15,6 +15,9 @@ const BTSelectTarget = preload("res://scripts/ai/behavior_tree/tasks/combat/bt_s
 const BTAttackRun = preload("res://scripts/ai/behavior_tree/tasks/combat/bt_attack_run.gd")
 const BTEvadeManeuver = preload("res://scripts/ai/behavior_tree/tasks/combat/bt_evade_maneuver.gd")
 const BTCircleStrafe = preload("res://scripts/ai/behavior_tree/tasks/combat/bt_circle_strafe.gd")
+const BTSentryGun = preload("res://scripts/ai/behavior_tree/tasks/combat/bt_sentry_gun.gd")
+const BTBigShipAttack = preload(
+	"res://scripts/ai/behavior_tree/tasks/combat/bt_big_ship_attack.gd")
 
 # Guard tasks
 const BTGuardPatrol = preload(

@@ -159,7 +159,40 @@ func notify_under_attack(attacker: Node) -> void:
 	"""Called when ship is taking fire"""
 	if blackboard:
 		blackboard.set_var("under_attack", true)
-		blackboard.set_var("threat_source", attacker)
+		blackboard.set_var("attacker", attacker)
+		blackboard.set_var("last_hit_time", Time.get_ticks_msec() / 1000.0)
+
+
+func notify_incoming_weapon(weapon: Node, dist: float) -> void:
+	"""Called when an incoming weapon is detected"""
+	if blackboard:
+		var current_dist = blackboard.get_var("danger_weapon_dist", 999999.0)
+		if dist < current_dist:
+			blackboard.set_var("danger_weapon", weapon)
+			blackboard.set_var("danger_weapon_dist", dist)
+
+
+func notify_missile_lock(time_locked: float, locked: bool) -> void:
+	"""Called when aspect lock status changes"""
+	if blackboard:
+		blackboard.set_var("aspect_locked_time", time_locked)
+		blackboard.set_var("aspect_locked", locked)
+
+
+func update_stealth_tracking(pos: Vector3, vel: Vector3) -> void:
+	"""Update stealth target last known position"""
+	if blackboard:
+		blackboard.set_var("stealth_target_last_pos", pos)
+		blackboard.set_var("stealth_target_last_vel", vel)
+		blackboard.set_var("stealth_last_visible_time", Time.get_ticks_msec() / 1000.0)
+
+
+func set_rearm_state(awaiting: bool, being_rearmed: bool, support: Node = null) -> void:
+	"""Update rearm/repair status"""
+	if blackboard:
+		blackboard.set_var("awaiting_rearm", awaiting)
+		blackboard.set_var("being_rearmed", being_rearmed)
+		blackboard.set_var("support_ship", support)
 
 
 # === PRIVATE HELPERS ===
@@ -231,6 +264,28 @@ func _populate_blackboard() -> void:
 	# Navigation
 	blackboard.set_var("path_nodes", [])
 	blackboard.set_var("path_index", 0)
+
+	# Threat detection (from legacy ai_info)
+	blackboard.set_var("danger_weapon", null) ## Closest incoming weapon
+	blackboard.set_var("danger_weapon_dist", 999999.0)
+	blackboard.set_var("attacker", null) ## Ship attacking us
+	blackboard.set_var("last_hit_time", 0.0)
+	blackboard.set_var("last_hit_quadrant", 0)
+
+	# Aspect lock tracking (for missiles)
+	blackboard.set_var("aspect_locked_time", 0.0)
+	blackboard.set_var("aspect_locked", false)
+	blackboard.set_var("nearest_locked_missile", null)
+
+	# Stealth pursuit tracking
+	blackboard.set_var("stealth_target_last_pos", Vector3.ZERO)
+	blackboard.set_var("stealth_target_last_vel", Vector3.ZERO)
+	blackboard.set_var("stealth_last_visible_time", 0.0)
+
+	# Rearm state
+	blackboard.set_var("awaiting_rearm", false)
+	blackboard.set_var("being_rearmed", false)
+	blackboard.set_var("support_ship", null)
 
 	# Mission manager reference
 	var mm = _get_mission_manager()
